@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS users (
+  email VARCHAR(254) PRIMARY KEY,
+  passhash BIGINT,
+  roles BIT VARYING(8)
+);
+

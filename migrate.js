@@ -1,36 +1,62 @@
-var pg = require('pg');
+const fs = require('fs');
+const pg = require('pg').native;
 
-// create a config to configure both pooling behavior
-// and client options
-// note: all config is optional and the environment variables
-// will be read if the config is not present
-var config = {
-  user: 'postgres', //env var: PGUSER
-  database: 'couture', //env var: PGDATABASE
-  host: 'localhost', // Server hosting the postgres database
-  port: 5432, //env var: PGPORT
-  max: 10, // max number of clients in the pool
-  idleTimeoutMillis: 30000, // how long a client is allowed to remain idle before being closed
-};
+var pg_pool = new pg.Pool({
+  user: 'root',
+  password: 'password',
+  database: 'couture',
+  host: '127.0.0.1',
+  port: 5432,
+  max: 10,
+  idleTimeoutMillis: 1000,
+});
 
-var pool = new pg.Pool(config);
-
-// to run a query we can acquire a client from the pool,
-// run a query on the client, and then return the client to the pool
-pool.connect(function(err, client, done) {
+// grab a client from the pool
+pg_pool.connect(function(err, client, done) {
   if(err) {
     return console.error('error fetching client from pool', err);
   }
-  client.query('SELECT $1::int AS number', ['1'], function(err, result) {
-    done();
 
-    if(err) {
-      return console.error('error running query', err);
-    }
-    console.log(result.rows[0].number);
-  });
+  // create migration table if we don't have one
+  client.query(`
+    CREATE TABLE IF NOT EXISTS migrations (
+      filename VARCHAR(32) PRIMARY KEY
+    );
+  `, function(err, result) {
+
+    client.query('SELECT filename FROM migrations', function(err, result) {
+      if(err) {
+        done(); return console.error('error running query', err);
+      }
+
+      let migrated_filenames = result.rows.map(function(row) {return row.filename;});
+
+      // read migration files
+      let migrations = fs.readdirSync(__dirname+'/migrations/');
+      for( let i=0; i<migrations.length; i++ ) {
+        // check if this migration was done already
+        if (migrated_filenames.indexOf(migrations[i]) == -1) {
+          let sql = fs.readFileSync(__dirname+'/migrations/'+migrations[i], "utf-8");
+          console.log("running migration "+migrations[i]+":");
+          console.log(sql);
+          client.query(sql, function(err) {
+            if(err) {
+              done(); return console.error('error running query', err);
+            }
+            client.query('INSERT INTO migrations (filename) VALUES ($$'+migrations[i]+'$$)');
+          });
+        }
+      }
+
+      done();
+    }); // query migration table
+  }); // create migration table
+
+
+
 });
 
-pool.on('error', function (err, client) {
+pg_pool.on('error', function (err, client) {
   console.error('pg client error', err.message, err.stack)
 })
+
