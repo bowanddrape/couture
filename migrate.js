@@ -34,6 +34,9 @@ pg_pool.connect(function(err, client, done) {
       // read migration files
       let migrations = fs.readdirSync(__dirname+'/migrations/');
       for( let i=0; i<migrations.length; i++ ) {
+        // ignore non-sql files
+        if (!/\.sql$/.test(migrations[i]))
+          continue;
         // check if this migration was done already
         if (migrated_filenames.indexOf(migrations[i]) == -1) {
           let sql = fs.readFileSync(__dirname+'/migrations/'+migrations[i], "utf-8");

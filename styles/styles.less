@@ -1,0 +1,89 @@
+
+@import "./facility.less";
+
+@import "../public/dist/sprite.less";
+
+main {
+  height: 400px;
+  background-color: #f4f4f4;
+  font-family: "Verlag A",'Verlag B',"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+top_banner {
+  display: block;
+  width: 100%;
+  color: #fff;
+  background-color: #000;
+  padding: 10px 0;
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+top_banner container {
+  display: block;
+  width: 80%;
+  max-width: 1400px;
+  margin: auto;
+}
+top_banner msg {
+  float: right;
+}
+
+menu {
+  position: fixed;
+  top: 0;
+  border-left: solid 1px #000;
+  height: 100%;
+  background-color: #ffdd5c;
+  margin: 0;
+  padding: 0;
+  padding-top: 20px;
+  font-size: 40px;
+  width: 100%;
+}
+menu handle {
+  .icon;
+  .sprite(@hamburger_menu);
+  display: block;
+  top: 50px;
+  left: -112px;
+  width: 112px;
+  border: solid 1px #000;
+  border-right: none;
+  background-color: #ffdd5c;
+  position: absolute;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+menu options a {
+  display: block;
+  background-color: #000;
+  color: #fff;
+  padding: 5px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  white-space: nowrap;
+  overflow-right: hidden;
+}
+
+button {
+  display: block;
+  border: none;
+  background-color: #fff;
+  color: #000;
+  font-weight: bold;
+  font-size: 20px;
+  border: solid 5px #000;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  margin: auto;
+  margin-top: 10px;
+  left: 50%;
+  width: 300px;
+}
+
+
+placeholder_content img {
+  width: 100%;
+  pointer-events: none;
+}

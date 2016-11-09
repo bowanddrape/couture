@@ -1,0 +1,50 @@
+
+@import "./colors.less";
+
+@shipping_details_width: 400px;
+shipment {
+  position: relative;
+  display: block;
+  width: 95%;
+  padding: 20px;
+  margin-top: 10px;
+  border-bottom: solid 5px #0005;
+
+  .time_bar {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  shipping_details {
+    display: block;
+    margin-left: 130px;
+    font-weight: bold;
+    div {
+      position: relative;
+      width: @shipping_details_width;
+      height: 20px;
+      label {
+        position: absolute;
+        right: 5px+@shipping_details_width;
+        top: 0px;
+        font-weight: normal;
+      }
+    }
+  }
+}
+shipment:last-child {
+  border-bottom: none;
+}
+
+.timestamp {
+  margin-right: 30px;
+  color: @grey;
+}
+
+item {
+  background-color: #aaa;
+  &:nth-child(2n) {
+    background-color: #fff;
+  }
+}
+
