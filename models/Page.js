@@ -92,6 +92,7 @@ class Page extends SQLTable {
             if (component.preprocessProps) {
               return component.preprocessProps(props, function(err, result) {
                 if (err) {
+                  console.log(err); //TODO elevate this
                   return res.status(500).end(err.toString());
                 }
                 Page.render(req, res, component, result);

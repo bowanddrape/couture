@@ -60,6 +60,10 @@ CREATE EXTENSION IF NOT EXISTS plv8;
 CREATE OR REPLACE FUNCTION assembly_extract_skus(assembly JSONB)
 RETURNS JSONB AS $$
   function _assembly_extract_skus(assembly, accumulator) {
+    /* bail if nothing */
+    if (!assembly) {
+      return {};
+    }
     /* if array, iterate over it */
     if (assembly["0"]) {
       for (var i=0; i<assembly.length; i++) {

@@ -14,8 +14,8 @@ class ProductList extends React.Component {
     let store = options.store[0];
     // get store inventory
     Inventory.get(store.facility_id, function(err, store_inventory) {
-      if (!store_inventory.inventory) return callback("Store has no inventory");
-
+      if (err) return callback(err);
+      if (!store_inventory || !store_inventory.inventory) return callback("Store has no inventory");
       // set up sync with db components
       let sku_queries = [];
       store.products.recurseProductFamily(function(item, ancestor) {

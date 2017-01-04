@@ -10,9 +10,29 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const multer = require('multer');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
+const multer = require('multer');
+var aws = require('aws-sdk');
+const multerS3 = require('multer-s3');
+// FIXME move these keys into the config file
+var s3 = new aws.S3({ accessKeyId: 'AKIAI26A5CTDF6CFGPZA', secretAccessKey: '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', region: 'us-east-1' })
+var upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'www.bowanddrape.com',
+    acl: 'public-read',
+    contentType: function(req, file, cb) {
+      cb(null, file.mimetype);
+    },
+    contentDisposition: function(req, file, cb) {
+      cb(null, `attachment; filename=${file.originalname}`);
+    },
+    key: function (req, file, cb) {
+      cb(null, req.path.substring(1)+'_uploads/'+Date.now());
+    }
+  })
+})
 
 const User = require('./models/User.js');
 const Order = require('./models/Order.js');
@@ -52,7 +72,7 @@ app.use(User.handleAuthentication);
 app.use(User.handleHTTP);
 
 // handle API endpoints
-app.use(Order.handleHTTP);
+app.use(upload.single('image'), Order.handleHTTP);
 app.use(Facility.handleHTTP);
 
 // handle pages

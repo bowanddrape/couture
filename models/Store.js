@@ -7,7 +7,7 @@ class Store extends SQLTable {
     super();
     this.id = store.id;
     this.facility_id = store.facility_id;
-    this.products = store.products;
+    this.products = new Item(store.products);
   }
 
   // needed by SQLTable
@@ -17,19 +17,6 @@ class Store extends SQLTable {
       pkey: "id",
       fields: ["facility_id","products"]
     };
-  }
-
-  // extends SqlTable
-  static sqlQuery(model, query, values, callback) {
-    // also make products of class Item
-    super.sqlQuery(model, query, values, function(err, result) {
-      if (err) return err;
-      console.log(result);
-      result.forEach(function(row) {
-        row.products = new Item(row.products);
-      });
-      callback(err, result);
-    });
   }
 }
 

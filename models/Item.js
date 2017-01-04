@@ -88,10 +88,15 @@ class Component extends SQLTable {
 // This class handles arrays of items, where items may have assemblies or
 // be families of products, it's intentionally open but could get messy
 // quickly but I suppose we'll deal with that problem later
+// TODO It's getting messy already, we need some more error handling and tests
 class Item {
   constructor(items) {
     // if this is a single item, put it in an array
     this.items = items.sku ? [items.sku] : items;
+    // if we got nothing, flaunt it
+    if (!this.items) {
+      this.items = [];
+    }
     this.items = this.items.map(function(item) {
       return new Component(item);
     });

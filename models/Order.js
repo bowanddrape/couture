@@ -29,9 +29,24 @@ class Order extends SQLTable {
       return next();
     }
     if (req.method=='POST') {
+      // TODO server-side order verification?
+
       let order = new Order(req.body);
+
+      // reject orders for nothing
+      if (!order.contents || !order.contents.items.length)
+        return res.json({error: "Attempt to place empty order"});
+
+      // if an image was uploaded, set the content's image to the resulting img
+      if (req.file && req.file.location)
+        order.contents.items[0].props.image = req.file.location;
+
+console.log("req.body");
 console.log(req.body);
+console.log("req.body.contents");
 console.log(req.body.contents);
+console.log("req.file");
+console.log(req.file);
       // if we got an email subscription, edit/create user
       if (req.body.email && typeof(req.body.contact_me)!='undefined') {
         let user = new User({email:req.body.email, props:{contact_me_kiosk:req.body.contact_me}});
@@ -40,8 +55,11 @@ console.log(req.body.contents);
       // TODO add payment
 
       return order.upsert((err, result) => {
-        if (err) console.log(err);
-console.log(result);
+        if (err) {
+          console.log(err);
+          return res.json({error: "Could not create order"});
+        }
+
         // add shipment detail
         let shipment = new Shipment({
           order_id: result.rows[0].id,

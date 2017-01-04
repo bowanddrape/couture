@@ -18,6 +18,16 @@ class Shipment extends SQLTable {
       fields: ["from_id", "to_id", "order_id", "contents", "sent", "received", "tracking_code"]
     };
   }
+
+  static handleHTTP(req, res, next) {
+    req.path_tokens = req.url.split('?')[0].split('/').slice(1);
+
+    if (req.path_tokens[0]!='shipment') {
+      return next();
+    }
+    if (req.method=='POST') {
+    }
+  }
 }
 
 module.exports = Shipment;
