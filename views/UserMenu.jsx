@@ -11,35 +11,26 @@ class UserMenu extends React.Component {
 
   render() {
 
-    let LoginPassHash = React.createClass({
-      render: function() {
-        // ignore if already logged in
-        if (this.props.user && this.props.user.email) {
-          return null;
-        }
-        return (
-          <login>
-            <input placeholder="email address" type="text"/>
-            <input placeholder="password" type="text"/>
-            <button>Login</button>
-            <button>Register</button>
-          </login>
-        )
-      }
-    });
+    let menu_items = [];
+    menu_items.push(React.createElement(UserProfile, this.props));
+    menu_items.push(React.createElement(FacebookLogin, this.props));
+    if (this.props.user&&this.props.user.roles&&this.props.user.roles.length) {
+      menu_items.push(<a href="#" disabled>Admin</a>);
+    }
+    menu_items.push(<a href="#" disabled>Customize</a>);
+    menu_items.push(<a href="#" disabled>Gift Cards</a>);
+    if (this.props.user&&this.props.user.email)
+      menu_items.push(<button onClick={this.logout.bind(this)}>Logout</button>);
 
     return (
       React.createElement("menu", {},
-        React.createElement(UserProfile, this.props),
-        React.createElement(FacebookLogin, this.props),
-        React.createElement(LoginPassHash, this.props),
-        <div onClick={this.logout.bind(this)}>{this.props.user&&this.props.user.email?"logout":""}</div>,
+        menu_items,
         <handle/>
       )
     );
   }
   logout() {
-    console.log("logout");
+    // TODO also logout facebook
     BowAndDrape.dispatcher.handleAuth({});
   }
 

@@ -4,14 +4,19 @@ const https = require('https');
 const jsonwebtoken = require('jsonwebtoken');
 
 const SQLTable = require('./SQLTable');
+const Mail = require('./Mail');
 
 const jwt_secret = fs.readFileSync('./jwt_secret');
+
+// enumerate available roles
+const available_roles = ["bowanddrape", "nordstrom", "bloomingdales", "thebay", "lordandtaylor"];
 
 class User extends SQLTable {
   constructor(user) {
     super();
-    this.email = user.email.toLowerCase();
+    this.email = user.email.toLowerCase(); // remember lowercase while selecting
     this.passhash = user.passhash;
+    this.verified = user.verified;
     this.props = user.props;
   }
 
@@ -20,7 +25,7 @@ class User extends SQLTable {
     return {
       tablename: "users",
       pkey: "email",
-      fields: ["passhash", "props"]
+      fields: ["passhash", "verified", "props"]
     };
   }
 
@@ -39,9 +44,35 @@ class User extends SQLTable {
     if (req.path_tokens[1]=='register') {
       return User.handleRegister(req, res);
     }
-    console.log("user endpoint");
-    console.log(req.method);
-    console.log(req.body);
+
+    if (req.path_tokens[1]=='verify') {
+      if (req.method=="POST") {
+        return User.get(req.body.email, function(err, user) {
+          if (err || !user)
+            return res.json({error: {email: "Please register first!"}});
+          user.verifying = true;
+          User.generateJwtToken(user, (err, token) => {
+            Mail.send(user.email, "Verify your Bow & Drape Account", `Click <a href="https://staging.bowanddrape.com/user/verify/${token}">here</a> to verify ownership your account`, (err) => {
+              if (err) return res.json({error: err.toString()});
+              res.json({error: 'email sent, please wait a few mins for it to reach your inbox'});
+            });
+          });
+        });
+      } // POST, send email
+      if (req.method=="GET") {
+        return jsonwebtoken.verify(req.path_tokens[2], jwt_secret, (err, user) => {
+          if (err) return res.json({error:err});
+          if (!user.verifying) return res.json({err:"invalid token"});
+          user = new User(user);
+          user.verified = true;
+          user.upsert((err, result) => {
+            if (err) return res.json({error:err});
+            return res.end("Your account is now verified! In the future, this will be a page that will have you set a new password");
+          });
+        });
+      }
+    }
+
     next();
   }
 
@@ -56,7 +87,6 @@ class User extends SQLTable {
       token = req.header('Authorization').substr(7);
     }
 
-
     // ignore if no creds supplied
     if (!token) return next();
 
@@ -64,10 +94,12 @@ class User extends SQLTable {
     if (token) {
       jsonwebtoken.verify(token, jwt_secret, function(err, user) {
         if (err) {
-          req.user = {error: err.message};
+          console.log("user token verify error: "+err.message);
+          req.user = null;
           return next();
         }
         req.user = new User(user);
+        req.user.populateRoles();
         next();
       });
     }
@@ -98,43 +130,57 @@ class User extends SQLTable {
             // reformat data to be consistent
             facebook_user.props = {};
             facebook_user.props.image = facebook_user.picture.data.url;
-            delete facebook_user.picture;
-            facebook_user.props.login_mode = "facebook";
             facebook_user.props.name = facebook_user.name;
+            facebook_user.props.facebook_login = true;
 
             let user = new User(facebook_user);
             user.upsert(function(err, result) {
               if (err) console.log(err);
-              User.sendJwtToken(res, facebook_user);
+              User.sendJwtToken(res, user);
             });
           });
         }
       );
       request.on('error', function(err) {console.log(err);});
       request.end();
-    } else {
+      return;
+    } else if (req.body.email && req.body.passhash) {
       // try password auth
-      User.get(req.body.email, function(err, user) {
-        if (!user) return res.json({error:"user not found"}).end();
+      return User.get(req.body.email.toLowerCase(), function(err, user) {
+        if (err) {
+          return res.json({error:"something went wrong, hold on while we investigate"}).end();
+        }
+
+        // if user did not exist, create one
+        if (!user)
+          return User.handleRegister(req, res);
+
         if (!user.passhash)
-          return res.json({error:"password not set"}).end();
-        if (user.passhash.toString('hex')!=req.body.passhash)
-          return res.json({error:"incorrect password"}).end();
-        user.login_mode = "passhash";
+          return res.json({error:{password:"Verify your email to set password"}}).end();
+        if (user.passhash!=req.body.passhash)
+          return res.json({error:{password:"Incorrect password"}}).end();
         User.sendJwtToken(res, user);
       });
     }
 
+    return res.json({error:"no login credentials"}).end();
   }
 
   static sendJwtToken(res, user) {
-    delete user.passhash; // strip off the password part
-    user.name = user.name ? user.name : user.email; // default name to email
-    user.iat = Math.floor(Date.now() / 1000);
-    user.exp = Math.floor(Date.now() / 1000) + 60*24*7;
-    jsonwebtoken.sign(user, jwt_secret, {}, function(err, token) {
-      if (err) console.log(err);
+    User.generateJwtToken(user, function(err, token) {
       res.json({token: token}).end();
+    });
+  }
+
+  static generateJwtToken(user, callback) {
+    user.populateRoles();
+    delete user.passhash; // strip off the password part
+    user.props.name = user.props.name ? user.props.name : user.email; // default name to email
+    user.iat = Math.floor(Date.now() / 1000);
+    user.exp = Math.floor(Date.now() / 1000) + 60*60*24*7;
+    jsonwebtoken.sign(user, jwt_secret, {}, function(err, token) {
+      if (err) console.log(err); // TODO: escalate this
+      callback(err, token);
     });
   }
 
@@ -143,9 +189,31 @@ class User extends SQLTable {
     User.get(req.body.email, function(err, user) {
       if (user) return res.json({error:"user exists"}).end();
 
-      // login as the new user
-      User.handleLogin(req, res);
+      let new_user = new User({
+        email: req.body.email,
+        passhash: req.body.passhash,
+        props: {
+          login_mode: "passhash"
+        }
+      });
+      new_user.upsert(function(err, result) {
+        if (err) console.log(err); // TODO: escalate this
+        // login as the new user
+        User.sendJwtToken(res, new_user);
+      });
     });
+  }
+
+  // lookup user roles
+  populateRoles() {
+    this.roles = [];
+    // only verified users get roles
+    if (!this.verified)
+      return;
+    // add domain role
+    let domain_role = this.email.substring(0, this.email.lastIndexOf('.')).substring(this.email.indexOf('@')+1);
+    if (available_roles.indexOf(domain_role)>=0)
+      this.roles.push(domain_role);
   }
 }
 

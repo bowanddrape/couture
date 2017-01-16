@@ -1,6 +1,12 @@
 
 @import "./colors.less";
 
+shipments {
+  display: block;
+  padding: 10px;
+  background-color: @color_support_0;
+}
+
 @shipping_details_width: 400px;
 shipment {
   position: relative;
@@ -31,6 +37,11 @@ shipment {
       }
     }
   }
+  address {
+    display: inline;
+    font-size: 10px;
+    font-weight: normal;
+  }
 }
 shipment:last-child {
   border-bottom: none;
@@ -38,11 +49,22 @@ shipment:last-child {
 
 .timestamp {
   margin-right: 30px;
-  color: @grey;
+  color: @color_secondary;
+  opacity: 0.5;
 }
 
 item {
+  position: relative;
+  display: block;
   background-color: #aaa;
+  deets {
+    img {
+      width: 200px;
+      height: 150px;
+    }
+    display: flex;
+    justify-content: space-between;
+  }
   &:nth-child(2n) {
     background-color: #fff;
   }

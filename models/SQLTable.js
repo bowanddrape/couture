@@ -32,7 +32,7 @@ class SQLTable {
           return callback(err);
         }
 
-        if (model) {
+        if (model && result.rows.length) {
           let ret = result.rows.map(function(row) {return new model(row)});
           return callback(null, ret);
         }
@@ -128,7 +128,7 @@ class SQLTable {
     SQLTable.sqlQuery(this.constructor, query, [this[sql.pkey]], (err, prev) => {
       if (err) return callback(err);
       // if it existed before, merge props
-      if (prev) {
+      if (prev && prev.length) {
         prev[0].props = prev[0].props ? prev[0].props : {};
         this.props = Object.assign(prev[0].props, this.props);
       }

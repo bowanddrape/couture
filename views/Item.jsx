@@ -7,8 +7,15 @@ class Item extends React.Component {
 
     return (
       <item>
+        <deets>
+          <img src={this.props.props.image}/>
+          <div>{this.props.sku}</div>
+          <div>{this.props.props.name}</div>
+          <div>${this.props.props.price}</div>
+          <div></div>
+        </deets>
         {picklist}
-        {JSON.stringify(this.props)}
+        {JSON.stringify(this.props.assembly)}
       </item>
     )
   }

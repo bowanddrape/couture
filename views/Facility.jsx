@@ -8,18 +8,25 @@ class Facility extends React.Component {
   }
 
   render() {
-    let shipments = [];
-    for (let i=0; i<this.props.shipments.length; i++) {
+    let pending_outbound_shipments = [];
+    for (let i=0; i<this.props.pending_outbound_shipments.length; i++) {
       let props = {};
-      Object.assign(props, this.props.shipments[i]);
+      Object.assign(props, this.props.pending_outbound_shipments[i]);
       props.key = i;
-      shipments.push(
+      props.facilities = this.props.facilities;
+      pending_outbound_shipments.push(
         React.createElement(Shipment, props)
       );
     }
     return (
       <div>
-        {shipments}
+        <h1>Facility "{this.props.facility.props.name}"</h1>
+        <shipments>
+          <h2>Pending Outbound Shipments</h2>
+          <div id="pending_outbound_shipments">
+            {pending_outbound_shipments}
+          </div>
+        </shipments>
       </div>
     )
   }

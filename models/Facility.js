@@ -30,11 +30,8 @@ class Facility extends SQLTable {
 
     // user must be logged in
     if (!req.user) {
-      Page.renderNotFound(req, res);
+      return Page.renderNotFound(req, res);
     }
-    // TODO give roles
-    req.user.roles = ["bowanddrape"];
-    // TODO also enforce verified email
 
     if (req.path_tokens.length == 1)
       return Facility.handleList(req, res);
@@ -60,20 +57,22 @@ class Facility extends SQLTable {
       if (err || !facility)
         return Page.renderNotFound(req, res);
       // check permissions
-      facility.props.admins.filter(function(role) {
+      let authorized = facility.props.admins.filter(function(role) {
         return req.user.roles.indexOf(role) != -1;
       });
-      if (!facility.props.admins.length) {
-        return Page.sendNotFound(req, res);
+      if (!authorized.length) {
+        return Page.renderNotFound(req, res);
       }
 
       // get pending outbound shipments
-      Shipment.getAll({from_id:facility.id, tracking_code:null}, (err, shipments) => {
-        shipments = shipments?shipments:[];
+      Shipment.getAll({from_id:facility.id, tracking_code:null}, (err, pending_outbound_shipments) => {
+        pending_outbound_shipments = pending_outbound_shipments ?
+            pending_outbound_shipments : [];
         // this is a shipment, so all details are already fully hydrated
         Page.render(req, res, View, {
           facility: facility,
-          shipments: shipments
+          facilities: [facility],
+          pending_outbound_shipments: pending_outbound_shipments
         });
       });
     });

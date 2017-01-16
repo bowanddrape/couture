@@ -31,6 +31,14 @@ class Order extends SQLTable {
     if (req.method=='POST') {
       // TODO server-side order verification?
 
+      if (typeof(req.body.contents)=='string') {
+        try {
+          req.body.contents = JSON.parse(req.body.contents);
+        } catch (err) {
+          return res.json({error: "Malformed payload"});
+        }
+      }
+
       let order = new Order(req.body);
 
       // reject orders for nothing
@@ -41,12 +49,6 @@ class Order extends SQLTable {
       if (req.file && req.file.location)
         order.contents.items[0].props.image = req.file.location;
 
-console.log("req.body");
-console.log(req.body);
-console.log("req.body.contents");
-console.log(req.body.contents);
-console.log("req.file");
-console.log(req.file);
       // if we got an email subscription, edit/create user
       if (req.body.email && typeof(req.body.contact_me)!='undefined') {
         let user = new User({email:req.body.email, props:{contact_me_kiosk:req.body.contact_me}});

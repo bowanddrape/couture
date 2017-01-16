@@ -12,15 +12,19 @@ class Dispatcher extends EventEmitter {
     super(props);
   }
   handleAuth(auth_object) {
+    if (auth_object.error) {
+      document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      return this.emit('user', {error: auth_object.error});
+    }
     if (!auth_object.token) {
-      document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
       return this.emit('user', {});
     }
     let decoded = jwt_decode(auth_object.token);
     this.emit('user', decoded);
     // save cookie
     var d = new Date();
-    d.setTime(d.getTime() + (30 *24*60*60*1000));
+    d.setTime(d.getTime() + (7*24*60*60*1000));
     var expires = "expires="+ d.toUTCString();
     document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
   }
@@ -31,5 +35,6 @@ module.exports = {
   React: React,
   ReactDOM: ReactDOM,
   LayoutMain: LayoutMain,
+bcrypt: require('bcryptjs'),
   dispatcher: new Dispatcher()
 };

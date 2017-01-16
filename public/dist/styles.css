@@ -1,3 +1,20 @@
+@font-face {
+  font-family: Zurich-Condensed-Bold;
+  src: url(/Zurich__Condensed_BT.ttf) format('truetype');
+}
+.bodyfont {
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000000;
+}
+.headerfont {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000000;
+}
+shipments {
+  display: block;
+  padding: 10px;
+  background-color: #eaeaea;
+}
 shipment {
   position: relative;
   display: block;
@@ -27,100 +44,129 @@ shipment shipping_details div label {
   top: 0px;
   font-weight: normal;
 }
+shipment address {
+  display: inline;
+  font-size: 10px;
+  font-weight: normal;
+}
 shipment:last-child {
   border-bottom: none;
 }
 .timestamp {
   margin-right: 30px;
-  color: #aaaaaa;
+  color: #000000;
+  opacity: 0.5;
 }
 item {
+  position: relative;
+  display: block;
   background-color: #aaa;
+}
+item deets {
+  display: flex;
+  justify-content: space-between;
+}
+item deets img {
+  width: 200px;
+  height: 150px;
 }
 item:nth-child(2n) {
   background-color: #fff;
 }
 .icon {
-  background-image: url('/sprite.png?7f8e27dca1aec04f8404d71bdbfe6d4ee62f879b');
+  background-image: url('/sprite.png?a73a1606c57a4a9223bd585af8f77909606e3b89');
 }
-main {
-  height: 400px;
-  background-color: #f4f4f4;
-  font-family: "Verlag A", 'Verlag B', "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-top_banner {
-  display: block;
-  width: 100%;
-  color: #fff;
-  background-color: #000;
-  padding: 10px 0;
-  font-size: 15px;
-  margin-bottom: 15px;
-}
-top_banner container {
-  display: block;
-  width: 80%;
-  max-width: 1400px;
-  margin: auto;
-}
-top_banner msg {
-  float: right;
+body {
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000000;
 }
 menu {
   position: fixed;
   top: 0;
-  border-left: solid 1px #000;
+  border-left: solid 1px #000000;
   height: 100%;
-  background-color: #ffdd5c;
+  background-color: #c79e6a;
   margin: 0;
-  padding: 0;
-  padding-top: 20px;
+  padding: 20px;
   font-size: 40px;
   width: 100%;
 }
-menu handle {
-  background-image: url('/sprite.png?7f8e27dca1aec04f8404d71bdbfe6d4ee62f879b');
+menu user {
+  display: block;
+  color: #ffffff;
+  margin-left: 55px;
+  margin-bottom: 15px;
+}
+menu user img {
+  background-image: url('/sprite.png?a73a1606c57a4a9223bd585af8f77909606e3b89');
   background-position: 0px 0px;
   background-repeat: no-repeat;
   overflow: hidden;
-  width: 120px;
-  height: 120px;
-  display: block;
-  top: 50px;
-  left: -112px;
-  width: 112px;
-  border: solid 1px #000;
-  border-right: none;
-  background-color: #ffdd5c;
+  display: inline;
+  width: 53px;
+  height: 53px;
+  border-radius: 5px;
+  border: solid 2px #ffffff;
   position: absolute;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
+  width: 50px;
+  height: 50px;
+  margin-left: -55px;
 }
-menu options a {
+menu login msg {
   display: block;
-  background-color: #000;
-  color: #fff;
+  font-size: 20px;
+  color: #aa0000;
+}
+menu handle {
+  background-image: url('/sprite.png?a73a1606c57a4a9223bd585af8f77909606e3b89');
+  background-position: 0px -53px;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  width: 62px;
+  height: 62px;
+  background-color: #c79e6a;
+  display: block;
+  position: absolute;
+  top: 50px;
+  left: -60px;
+  width: 60px;
+  height: 60px;
+  border: solid 1px #000000;
+  border-right: none;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+menu a {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000000;
+  display: block;
   padding: 5px;
   margin-bottom: 10px;
-  margin-left: 10px;
   white-space: nowrap;
   overflow-right: hidden;
+  text-decoration: none;
 }
 button {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000000;
   display: block;
-  border: none;
   background-color: #fff;
   color: #000;
   font-weight: bold;
   font-size: 20px;
-  border: solid 5px #000;
+  border: solid 5px #000000;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
-  margin: auto;
   margin-top: 10px;
-  left: 50%;
   width: 300px;
+}
+address *:not(:first-child) {
+  margin-left: 7px;
+}
+input.error {
+  box-shadow: 0 0 10px #aa0000;
+  color: #aa0000;
 }
 placeholder_content img {
   width: 100%;

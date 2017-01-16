@@ -1,7 +1,9 @@
 CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(254) PRIMARY KEY,
-  passhash BYTEA,
-  props JSONB
+  passhash VARCHAR(64),
+  props JSONB,
+  verified BOOLEAN DEFAULT False,
+  created INT DEFAULT date_part('epoch',NOW())
 );
 
 /* needed by gen_random_uuid() */

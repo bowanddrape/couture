@@ -12,6 +12,7 @@
     "babel-preset-es2015": "~6.16.0",
     "babel-preset-react": "~6.16.0",
     "babelify": "~7.3.0",
+    "bcryptjs": "^2.4.0",
     "body-parser": "^1.15.2",
     "browserify": "^13.0.1",
     "cookie-parser": "^1.4.3",
@@ -27,7 +28,9 @@
     "pg": "^6.1.0",
     "pg-native": "^1.10.0",
     "react": "~15.3.2",
-    "react-swipeable": "^3.6.0"
+    "react-swipeable": "^3.6.0",
+    "sendgrid": "^4.7.1",
+    "sendmail": "^1.1.1"
   },
   "devDependencies": {
     "babel-loader": "^6.2.5",

@@ -77,6 +77,7 @@ class LayoutMain extends React.Component {
         trackMouse={true}
       >
           <meta httpEquiv="content-type" content="text/html; charset=utf-8" />
+          <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/> 
           <link rel="stylesheet" href="/styles.css" type="text/css"></link>
           <div dangerouslySetInnerHTML={{__html:this.props.content}} />
           <div style={{position:"fixed",left:(this.state.viewport_width - 20 + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s"}}>
