@@ -5,7 +5,10 @@ const ReactDOM = require('react-dom');
 const EventEmitter = require('events');
 const jwt_decode = require('jwt-decode');
 
+const LayoutBasic = require('./LayoutBasic.jsx');
 const LayoutMain = require('./LayoutMain.jsx');
+
+const UserPasswordReset = require('./UserPasswordReset.jsx');
 
 class Dispatcher extends EventEmitter {
   constructor(props) {
@@ -34,7 +37,10 @@ class Dispatcher extends EventEmitter {
 module.exports = {
   React: React,
   ReactDOM: ReactDOM,
-  LayoutMain: LayoutMain,
-bcrypt: require('bcryptjs'),
+  views: {
+    LayoutMain: LayoutMain,
+    LayoutBasic: LayoutBasic,
+    UserPasswordReset: UserPasswordReset,
+  },
   dispatcher: new Dispatcher()
 };

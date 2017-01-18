@@ -42,6 +42,7 @@ const Page = require('./models/Page.js');
 const LayoutMain = require('./views/LayoutMain');
 const BowAndDrape = require('./views/BowAndDrape.jsx');
 
+const NotFound = require('./views/NotFound.jsx');
 
 // populate req.body with json body content
 app.use(bodyParser.json());
@@ -91,8 +92,10 @@ app.use(function(req, res, next) {
       React.createElement("img", {src:"/placeholder.png"})
     )
   );
-  let page = React.createElement(LayoutMain, {content:ReactDOMServer.renderToString(content)});
+
+  let page = React.createElement(NotFound, {});
   return res.end(ReactDOMServer.renderToString(page));
+  return Page.render(req, res, NotFound, {});
 });
 
 

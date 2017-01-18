@@ -1,5 +1,6 @@
 
 const React = require('react');
+const ReactDOMServer = require('react-dom/server');
 const Swipeable = require('react-swipeable');
 
 const UserMenu = require('./UserMenu.jsx');
@@ -69,6 +70,17 @@ class LayoutMain extends React.Component {
   }
 
   render() {
+    let content = null;
+
+    if (typeof(document)=='undefined' || typeof(BowAndDrape.views[this.props.content_name])=='undefined') {
+      content = (<div dangerouslySetInnerHTML={{__html:this.props.content_string}} />);
+    } else {
+      content = React.createElement(
+        BowAndDrape.views[this.props.content_name],
+        JSON.parse(this.props.content_props)
+      );
+    }
+
     return (
       <Swipeable
         onSwiping={this.onSwiping}
@@ -79,7 +91,7 @@ class LayoutMain extends React.Component {
           <meta httpEquiv="content-type" content="text/html; charset=utf-8" />
           <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/> 
           <link rel="stylesheet" href="/styles.css" type="text/css"></link>
-          <div dangerouslySetInnerHTML={{__html:this.props.content}} />
+          {content}
           <div style={{position:"fixed",left:(this.state.viewport_width - 20 + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s"}}>
             {React.createElement(UserMenu, this.state)}
           </div>
@@ -91,14 +103,20 @@ class LayoutMain extends React.Component {
 
         <script src="/BowAndDrape.js"></script>
         <script dangerouslySetInnerHTML={{__html:`
+
           var BowAndDrape = require("BowAndDrape");
           var React = BowAndDrape.React;
           var ReactDOM = BowAndDrape.ReactDOM;
-          var layoutMain = React.createElement(BowAndDrape.LayoutMain, {content: \`${this.props.content}\`});
+          var layout = React.createElement(BowAndDrape.views.LayoutMain, {
+            content_string: \`${this.props.content_string}\`,
+            content_name: \`${this.props.content_name}\`,
+            content_props: \`${this.props.content_props}\`}
+          );
           ReactDOM.render(
-            layoutMain,
+            layout,
             document.body
           );
+
         `}} >
         </script>
 

@@ -106,13 +106,14 @@ class Page extends SQLTable {
     });
   }
 
-  static render(req, res, component, props) {
+  static render(req, res, component, props, layout=LayoutMain) {
     // if json was requested, just return the props object
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.json(props).end();
     // render the page server-side
     let content = React.createElement(component, props);
-    let page = React.createElement(LayoutMain, {content:ReactDOMServer.renderToString(content)});
+    let page = React.createElement(layout, {content_string:ReactDOMServer.renderToString(content), content_name:content.type.name.toString(), content_props: JSON.stringify(props)});
+
     return res.end(ReactDOMServer.renderToString(page));
   }
 

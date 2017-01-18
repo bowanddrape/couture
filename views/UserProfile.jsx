@@ -58,14 +58,20 @@ class UserProfile extends React.Component {
     if (error)
       return BowAndDrape.dispatcher.emit('user', {error: error});
 
-    let salt = ("$2a$10$bsalty"+email.replace(/[@+\.]/g,"")+"saltysaltsalt").substring(0,29);
-    bcrypt.hash(password, salt, function(err, passhash) {
+    UserProfile.hashPassword(email, password, (err, passhash) => {
       if (err) console.log(err);
       let payload = {
         email: email,
-        passhash: passhash.substring(29),
+        passhash: passhash,
       }
       UserProfile.sendLoginRequest(payload);
+    });
+  }
+
+  static hashPassword(email, password, callback) {
+    let salt = ("$2a$10$bsalty"+email.replace(/[@+\.]/g,"")+"saltysaltsalt").substring(0,29);
+    bcrypt.hash(password, salt, (err, passhash) => {
+      callback(err, passhash.substring(29));
     });
   }
 

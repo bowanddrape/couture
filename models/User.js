@@ -6,6 +6,10 @@ const jsonwebtoken = require('jsonwebtoken');
 const SQLTable = require('./SQLTable');
 const Mail = require('./Mail');
 
+const Page = require('./Page');
+const LayoutBasic = require('../views/LayoutBasic.jsx');
+const UserPasswordReset = require('../views/UserPasswordReset.jsx');
+
 const jwt_secret = fs.readFileSync('./jwt_secret');
 
 // enumerate available roles
@@ -54,6 +58,7 @@ class User extends SQLTable {
           User.generateJwtToken(user, (err, token) => {
             Mail.send(user.email, "Verify your Bow & Drape Account", `Click <a href="https://staging.bowanddrape.com/user/verify/${token}">here</a> to verify ownership your account`, (err) => {
               if (err) return res.json({error: err.toString()});
+
               res.json({error: 'email sent, please wait a few mins for it to reach your inbox'});
             });
           });
@@ -67,10 +72,22 @@ class User extends SQLTable {
           user.verified = true;
           user.upsert((err, result) => {
             if (err) return res.json({error:err});
-            return res.end("Your account is now verified! In the future, this will be a page that will have you set a new password");
+            return Page.render(req, res, UserPasswordReset, {}, LayoutBasic);
           });
         });
       }
+    }
+
+    if (req.path_tokens[1]=="reset_password" && req.method=="POST") {
+      console.log("resetting password");
+      if (!req.user) {
+          return res.status(401).json({"error":"invalid authorization"});
+      }
+      req.user.passhash = req.body.passhash;
+      return req.user.upsert(function(err, result) {
+        if (err) return res.status(500).json({"error":"could not update password"});
+        User.sendJwtToken(res, req.user);
+      });
     }
 
     next();
