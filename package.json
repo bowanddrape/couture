@@ -20,6 +20,7 @@
     "html-pdf": "^2.1.0",
     "jsonwebtoken": "^7.1.9",
     "jwt-decode": "^2.1.0",
+    "less-vars-to-js": "^1.1.2",
     "multer": "^1.2.0",
     "multer-s3": "^2.5.0",
     "newrelic": "^1.33.0",

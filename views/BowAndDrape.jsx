@@ -41,6 +41,7 @@ module.exports = {
     LayoutMain: LayoutMain,
     LayoutBasic: LayoutBasic,
     UserPasswordReset: UserPasswordReset,
+    Facility: require('./Facility.jsx'),
   },
   dispatcher: new Dispatcher()
 };

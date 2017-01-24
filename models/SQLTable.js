@@ -71,16 +71,28 @@ class SQLTable {
     });
   }
 
+  // helper function to build a query statement from an object
   static getAll(constraints, callback) {
     if (!this.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.getSQLSettings();
+
     let where = "";
     let values = [];
+    let order_by = "";
+    let limit = "";
+
+    // build WHERE based on constraints
     for (let column in constraints) {
-      if (constraints[column]===null) {
+      // ignore our special "page" object
+      if (column == "page") continue;
+      if (constraints[column]===null || constraints[column]==="null") {
         where = where ?
           where + ` AND ${column} IS NULL`:
           `WHERE ${column} IS NULL`;
+      } else if (constraints[column]==="not_null") {
+        where = where ?
+          where + ` AND ${column} IS NOT NULL`:
+          `WHERE ${column} IS NOT NULL`;
       } else {
         values.push(constraints[column]);
         where = where ?
@@ -88,7 +100,30 @@ class SQLTable {
           `WHERE ${column}=$${values.length}`;
       }
     }
-    this.sqlQuery(this, `SELECT * FROM ${sql.tablename} ${where}`, values, callback);
+
+    // pull out reserved keys in constrains
+    if (constraints && constraints.page) {
+      limit = constraints.page.limit?` LIMIT ${constraints.page.limit}`:"";
+      let direction = !constraints.page.direction||constraints.page.direction.toUpperCase()=="DESC"
+        ? "DESC"
+        : "ASC";
+      order_by = constraints.page.sort
+        ? ` ORDER BY ${constraints.page.sort} ${direction}`
+        : "";
+      if (constraints.page.start) {
+        let compare = direction=="ASC"?'>':'<';
+        values.push(constraints.page.start);
+        where = where ?
+          where + ` AND ${constraints.page.sort}${compare}$${values.length}`:
+          `WHERE ${constraints.page.sort}${compare}$${values.length}`;
+      }
+    }
+
+    this.sqlQuery(this, `SELECT * FROM ${sql.tablename} ${where}${order_by}${limit}`, values, (err, result) => {
+      // if we didn't get anything, return an empty array
+      if (err || !result.length) return callback(err, []);
+      return callback(null, result);
+    });
   }
 
   upsert(callback) {

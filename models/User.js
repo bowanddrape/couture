@@ -56,7 +56,7 @@ class User extends SQLTable {
             return res.json({error: {email: "Please register first!"}});
           user.verifying = true;
           User.generateJwtToken(user, (err, token) => {
-            Mail.send(user.email, "Verify your Bow & Drape Account", `Click <a href="https://staging.bowanddrape.com/user/verify/${token}">here</a> to verify ownership your account`, (err) => {
+            Mail.send(user.email, "Verify your Bow & Drape Account", `Click <a href="https://staging.bowanddrape.com/user/verify/${token}">here</a> to verify ownership of your account`, (err) => {
               if (err) return res.json({error: err.toString()});
 
               res.json({error: 'email sent, please wait a few mins for it to reach your inbox'});

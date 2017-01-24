@@ -56,8 +56,8 @@ class LayoutMain extends React.Component {
     }
     let token = readCookie("token");
     if (token) {
-      console.log("cookie token");
       BowAndDrape.dispatcher.handleAuth({token:token});
+      BowAndDrape.token = token;
     }
 
     // bind resize
@@ -92,7 +92,7 @@ class LayoutMain extends React.Component {
           <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/> 
           <link rel="stylesheet" href="/styles.css" type="text/css"></link>
           {content}
-          <div style={{position:"fixed",left:(this.state.viewport_width - 20 + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s"}}>
+          <div style={{position:"fixed",left:(this.state.viewport_width - (this.state.viewport_width*0.015) + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s"}}>
             {React.createElement(UserMenu, this.state)}
           </div>
         {/*<Swipeable

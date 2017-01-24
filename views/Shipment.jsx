@@ -7,13 +7,12 @@ const Address = require('./Address.jsx');
 
 class Shipment extends React.Component {
   render() {
-
     let line_items = [];
-    for (let i=0; this.props.contents && i<this.props.contents.items.length; i++) {
-      let item_props = this.props.contents.items[i];
-      item_props.key = i;
-      item_props.picklist = true;
-      line_items.push(React.createElement(Item, item_props));
+    if (this.props.contents) {
+      let item_array = typeof(this.props.contents.items)!='undefined'?this.props.contents.items:this.props.contents;
+      for (let i=0; i<item_array.length; i++) {
+        line_items.push(<Item key={line_items.length} picklist={true} {...item_array[i]} />);
+      }
     }
 
     let from = (<div><label>From: </label>{this.props.from_id}</div>);
@@ -32,8 +31,13 @@ class Shipment extends React.Component {
     return (
       <shipment>
         <div className="time_bar">
-          sent: <Timestamp time={this.props.sent} />
+          requested: <Timestamp time={this.props.requested} />
+          packed: <Timestamp time={this.props.packed} />
           received: <Timestamp time={this.props.received} />
+        </div>
+        <div className="action_bar">
+          <button>Mark as Packed</button>
+          <button>Mark as Canceled</button>
         </div>
         <shipping_details>
           {from}
@@ -41,6 +45,7 @@ class Shipment extends React.Component {
           <div><label>Order: </label>{this.props.order_id}</div>
           <div><label>Tracking: </label>{this.props.tracking_code}</div>
         </shipping_details>
+        <div style={{clear:'both'}}/>
         <contents>{line_items}</contents>
       </shipment>
     )

@@ -103,6 +103,7 @@ class Item {
   }
 
   toJSON() {
+// FIXME this means the object and class structure don't line up
     return this.items;
   }
 

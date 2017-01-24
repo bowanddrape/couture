@@ -3,7 +3,10 @@ const React = require('react');
 
 class Item extends React.Component {
   render() {
-    let picklist = null;
+    let picklist = [];
+    for (let i=0; i<this.props.assembly.length; i++) {
+      picklist.push(<img key={i} src={this.props.assembly[i].props.image} />);
+    }
 
     return (
       <item>
@@ -14,8 +17,10 @@ class Item extends React.Component {
           <div>${this.props.props.price}</div>
           <div></div>
         </deets>
-        {picklist}
-        {JSON.stringify(this.props.assembly)}
+        <picklist>
+          {picklist}
+        </picklist>
+        {/*JSON.stringify(this.props.assembly)*/}
       </item>
     )
   }

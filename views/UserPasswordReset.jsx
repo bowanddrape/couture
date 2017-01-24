@@ -15,8 +15,6 @@ class UserPasswordReset extends React.Component {
   }
 
   sendResetPassword() {
-console.log("click");
-
     // login to bowanddrape
     let password = document.getElementById("password").value;
     let auth = this.getUser();
@@ -29,8 +27,9 @@ console.log("click");
       xhr.setRequestHeader("Authorization", "Bearer "+auth.token);
       xhr.onreadystatechange = function() {
         if (this.readyState!=4) { return; }
-console.log(this.responseText);
-        //BowAndDrape.dispatcher.handleAuth(JSON.parse(this.responseText));
+        // TODO display error on anything not status 200
+        BowAndDrape.dispatcher.handleAuth(JSON.parse(this.responseText));
+        document.location = '/';
       }
 
       xhr.send(JSON.stringify(payload));

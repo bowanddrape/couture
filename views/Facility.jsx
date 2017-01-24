@@ -1,6 +1,8 @@
 
 const React = require('react');
 const Shipment = require('./Shipment.jsx');
+const Tabs = require('./Tabs.jsx');
+const Scrollable = require('./Scrollable.jsx');
 
 class Facility extends React.Component {
   constructor(props) {
@@ -21,12 +23,33 @@ class Facility extends React.Component {
     return (
       <div>
         <h1>Facility "{this.props.facility.props.name}"</h1>
-        <shipments>
-          <h2>Pending Outbound Shipments</h2>
-          <div id="pending_outbound_shipments">
-            {pending_outbound_shipments}
-          </div>
-        </shipments>
+        <Tabs>
+          <shipments>
+            <h2>Pending Outbound Shipments</h2>
+            <Scrollable
+              component={Shipment}
+              endpoint={`/shipment?from_id=${this.props.facility.id}&packed=null`}
+              page = {{sort:"requested", direction:"ASC"}}
+              data={this.props.pending_outbound_shipments}
+            />
+          </shipments>
+          <shipments>
+            <h2>For/In Transit</h2>
+            <Scrollable
+              component={Shipment}
+              endpoint={`/shipment?from_id=${this.props.facility.id}&packed=not_null`}
+              page = {{sort:"requested", direction:"ASC"}}
+            />
+          </shipments>
+          <shipments>
+            <h2>Completed</h2>
+            <Scrollable
+              component={Shipment}
+              endpoint={`/shipment?from_id=${this.props.facility.id}&received=not_null`}
+              page = {{sort:"received", direction:"DESC"}}
+            />
+          </shipments>
+        </Tabs>
       </div>
     )
   }

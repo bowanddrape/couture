@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS shipments (
   to_id UUID,
   order_id UUID,
   contents JSONB,
-  sent INT DEFAULT date_part('epoch',NOW()),
+  requested INT DEFAULT date_part('epoch',NOW()),
+  packed INT,
   received INT,
   tracking_code VARCHAR(64)
 );

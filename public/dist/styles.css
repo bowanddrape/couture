@@ -28,6 +28,9 @@ shipment .time_bar {
   right: 0;
   top: 0;
 }
+shipment .action_bar {
+  float: right;
+}
 shipment shipping_details {
   display: block;
   margin-left: 130px;
@@ -49,13 +52,21 @@ shipment address {
   font-size: 10px;
   font-weight: normal;
 }
+shipment picklist {
+  display: block;
+  padding: 10px;
+}
+shipment picklist img {
+  height: 20px;
+}
 shipment:last-child {
   border-bottom: none;
 }
 .timestamp {
-  margin-right: 30px;
+  display: inline-block;
   color: #000000;
   opacity: 0.5;
+  width: 180px;
 }
 item {
   position: relative;
@@ -148,18 +159,21 @@ menu a {
 }
 button {
   font-family: "Zurich-Condensed-Bold", sans-serif;
-  color: #000000;
   display: block;
-  background-color: #fff;
-  color: #000;
+  background-color: #ffffff;
+  color: #000000;
   font-weight: bold;
   font-size: 20px;
   border: solid 5px #000000;
-  padding: 15px 32px;
+  padding: 5px;
   text-align: center;
   text-decoration: none;
-  margin-top: 10px;
+  margin: 10px;
   width: 300px;
+}
+button:hover {
+  background-color: #000000;
+  color: #ffffff;
 }
 address *:not(:first-child) {
   margin-left: 7px;

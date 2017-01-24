@@ -12,15 +12,16 @@ class UserMenu extends React.Component {
   render() {
 
     let menu_items = [];
-    menu_items.push(React.createElement(UserProfile, this.props));
-    menu_items.push(React.createElement(FacebookLogin, this.props));
-    if (this.props.user&&this.props.user.roles&&this.props.user.roles.length) {
-      menu_items.push(<a href="#" disabled>Admin</a>);
-    }
-    menu_items.push(<a href="#" disabled>Customize</a>);
-    menu_items.push(<a href="#" disabled>Gift Cards</a>);
+    let key = 0;
+
+    menu_items.push(<UserProfile key={key++} {...this.props}/>);
+    menu_items.push(<FacebookLogin key={key++} {...this.props}/>);
+    if (this.props.user&&this.props.user.roles&&this.props.user.roles.length)
+      menu_items.push(<a href="#" key={key++} disabled>Admin</a>);
+    menu_items.push(<a key={key++} href="#" disabled>Customize</a>);
+    menu_items.push(<a key={key++} href="#" disabled>Gift Cards</a>);
     if (this.props.user&&this.props.user.email)
-      menu_items.push(<button onClick={this.logout.bind(this)}>Logout</button>);
+      menu_items.push(<button key={key++} onClick={this.logout.bind(this)}>Logout</button>);
 
     return (
       React.createElement("menu", {},

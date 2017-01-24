@@ -37,12 +37,13 @@ var upload = multer({
 const User = require('./models/User.js');
 const Order = require('./models/Order.js');
 const Facility = require('./models/Facility.js');
+const Shipment = require('./models/Shipment.js');
 const Page = require('./models/Page.js');
 
 const LayoutMain = require('./views/LayoutMain');
 const BowAndDrape = require('./views/BowAndDrape.jsx');
 
-const NotFound = require('./views/NotFound.jsx');
+const Placeholder = require('./views/Placeholder.jsx');
 
 // populate req.body with json body content
 app.use(bodyParser.json());
@@ -75,6 +76,7 @@ app.use(User.handleHTTP);
 // handle API endpoints
 app.use(upload.single('image'), Order.handleHTTP);
 app.use(Facility.handleHTTP);
+app.use(Shipment.handleHTTP);
 
 // handle pages
 app.use(Page.handleHTTP);
@@ -85,17 +87,8 @@ app.use(function(req, res, next) {
   if (req.url!="/") {
     return next();
   }
-  let content = React.createElement("content", {},
-    React.createElement("img", {src:"/logo.svg"}),
-    React.createElement("placeholder_content", {},
-      React.createElement("button", {}, "Customize Your Own"),
-      React.createElement("img", {src:"/placeholder.png"})
-    )
-  );
 
-  let page = React.createElement(NotFound, {});
-  return res.end(ReactDOMServer.renderToString(page));
-  return Page.render(req, res, NotFound, {});
+  return Page.render(req, res, Placeholder, {});
 });
 
 

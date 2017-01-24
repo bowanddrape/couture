@@ -21,6 +21,9 @@ shipment {
     right: 0;
     top: 0;
   }
+  .action_bar {
+    float: right;
+  }
   shipping_details {
     display: block;
     margin-left: 130px;
@@ -42,15 +45,23 @@ shipment {
     font-size: 10px;
     font-weight: normal;
   }
+  picklist {
+    display: block;
+    padding: 10px;
+    img {
+      height: 20px;
+    }
+  }
 }
 shipment:last-child {
   border-bottom: none;
 }
 
 .timestamp {
-  margin-right: 30px;
+  display: inline-block;
   color: @color_secondary;
   opacity: 0.5;
+  width: 180px;
 }
 
 item {

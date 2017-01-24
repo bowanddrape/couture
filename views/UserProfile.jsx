@@ -69,7 +69,7 @@ class UserProfile extends React.Component {
   }
 
   static hashPassword(email, password, callback) {
-    let salt = ("$2a$10$bsalty"+email.replace(/[@+\.]/g,"")+"saltysaltsalt").substring(0,29);
+    let salt = ("$2a$10$bsalty"+email.replace(/[@+\.]/g,"").toLowerCase()+"saltysaltsalt").substring(0,29);
     bcrypt.hash(password, salt, (err, passhash) => {
       callback(err, passhash.substring(29));
     });

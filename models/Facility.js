@@ -36,8 +36,8 @@ class Facility extends SQLTable {
     if (req.path_tokens.length == 1)
       return Facility.handleList(req, res);
 
-    if (req.path_tokens.length == 2)
-      return Facility.handleDetails(req, res);
+    if (req.method=="GET" && req.path_tokens.length == 2)
+      return Facility.handleGetDetails(req, res);
 
     res.json({error: "invalid endpoint"}).end();
   }
@@ -51,7 +51,7 @@ class Facility extends SQLTable {
     });
   }
 
-  static handleDetails(req, res) {
+  static handleGetDetails(req, res) {
     // get facility
     Facility.get(req.path_tokens[1], (err, facility) => {
       if (err || !facility)
@@ -65,7 +65,7 @@ class Facility extends SQLTable {
       }
 
       // get pending outbound shipments
-      Shipment.getAll({from_id:facility.id, tracking_code:null}, (err, pending_outbound_shipments) => {
+      Shipment.getAll({from_id:facility.id, packed:null, page: {sort:"requested", direction:"ASC"}}, (err, pending_outbound_shipments) => {
         pending_outbound_shipments = pending_outbound_shipments ?
             pending_outbound_shipments : [];
         // this is a shipment, so all details are already fully hydrated

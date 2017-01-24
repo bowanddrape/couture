@@ -73,16 +73,20 @@ menu a {
 button {
   .headerfont;
   display: block;
-  background-color: #fff;
-  color: #000;
+  background-color: @color_primary;
+  color: @color_secondary;
   font-weight: bold;
   font-size: 20px;
   border: solid 5px @color_secondary;
-  padding: 15px 32px;
+  padding: 5px;
   text-align: center;
   text-decoration: none;
-  margin-top: 10px;
+  margin: 10px;
   width: 300px;
+  &:hover {
+    background-color: @color_secondary;
+    color: @color_primary;
+  }
 }
 
 address {
