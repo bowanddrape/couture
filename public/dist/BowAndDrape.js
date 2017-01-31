@@ -45768,7 +45768,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 module.exports = require('./lib/React');
 
 },{"./lib/React":239}],386:[function(require,module,exports){
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -45790,34 +45790,34 @@ var Address = function (_React$Component) {
   }
 
   _createClass(Address, [{
-    key: 'render',
+    key: "render",
     value: function render() {
       return React.createElement(
-        'address',
+        "address",
         null,
         React.createElement(
-          'street',
+          "street",
           null,
           this.props.street_address
         ),
         React.createElement(
-          'region',
+          "region",
           null,
           this.props.region,
-          ','
+          this.props.region ? "," : ""
         ),
         React.createElement(
-          'locality',
+          "locality",
           null,
           this.props.locality
         ),
         React.createElement(
-          'postal_code',
+          "postal_code",
           null,
           this.props.postal_code
         ),
         React.createElement(
-          'country',
+          "country",
           null,
           this.props.country
         )
@@ -45937,6 +45937,8 @@ module.exports = FacebookLogin;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -45954,10 +45956,29 @@ var Facility = function (_React$Component) {
   function Facility(props) {
     _classCallCheck(this, Facility);
 
-    return _possibleConstructorReturn(this, (Facility.__proto__ || Object.getPrototypeOf(Facility)).call(this, props));
+    // make a global map of known facilities?
+    var _this = _possibleConstructorReturn(this, (Facility.__proto__ || Object.getPrototypeOf(Facility)).call(this, props));
+
+    if (typeof BowAndDrape != "undefined") {
+      if (!BowAndDrape.facilities) {
+        BowAndDrape.facilities = {};
+      }
+      BowAndDrape.facilities = _this.props.facilities;
+    }
+    return _this;
   }
 
   _createClass(Facility, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      BowAndDrape.dispatcher.on("shipment", function (shipment) {
+        console.log(shipment);
+        _this2.setState(_defineProperty({ shipment: shipment }, 'shipment', shipment));
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       var pending_outbound_shipments = [];
@@ -45965,7 +45986,6 @@ var Facility = function (_React$Component) {
         var props = {};
         Object.assign(props, this.props.pending_outbound_shipments[i]);
         props.key = i;
-        props.facilities = this.props.facilities;
         pending_outbound_shipments.push(React.createElement(Shipment, props));
       }
       return React.createElement(
@@ -45991,7 +46011,7 @@ var Facility = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              endpoint: '/shipment?from_id=' + this.props.facility.id + '&packed=null',
+              endpoint: '/shipment?from_id=' + this.props.facility.id + '&packed=null&received=null',
               page: { sort: "requested", direction: "ASC" },
               data: this.props.pending_outbound_shipments
             })
@@ -46006,7 +46026,7 @@ var Facility = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              endpoint: '/shipment?from_id=' + this.props.facility.id + '&packed=not_null',
+              endpoint: '/shipment?from_id=' + this.props.facility.id + '&packed=not_null&received=null',
               page: { sort: "requested", direction: "ASC" }
             })
           ),
@@ -46222,8 +46242,6 @@ var LayoutMain = function (_React$Component) {
       var _this2 = this;
 
       BowAndDrape.dispatcher.on("user", function (user) {
-        console.log("got a user event!");
-        console.log(user);
         _this2.setState(_defineProperty({ user: user }, 'user', user));
       });
       // see if we have a user cookie set
@@ -46407,24 +46425,90 @@ var Address = require('./Address.jsx');
 var Shipment = function (_React$Component) {
   _inherits(Shipment, _React$Component);
 
-  function Shipment() {
+  function Shipment(props) {
     _classCallCheck(this, Shipment);
 
-    return _possibleConstructorReturn(this, (Shipment.__proto__ || Object.getPrototypeOf(Shipment)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (Shipment.__proto__ || Object.getPrototypeOf(Shipment)).call(this, props));
+
+    _this.state = _this.props;
+    _this.handlePack = _this.handlePack.bind(_this);
+    _this.handlePickup = _this.handlePickup.bind(_this);
+    _this.handleCancel = _this.handleCancel.bind(_this);
+    return _this;
   }
 
   _createClass(Shipment, [{
+    key: 'updateShipment',
+    value: function updateShipment(shipment, callback) {
+      if (!BowAndDrape.token) return;
+      var self = this;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", '/shipment', true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", "Bearer " + BowAndDrape.token);
+      xhr.onreadystatechange = function () {
+        if (this.readyState != 4) {
+          return;
+        }
+        var response = JSON.parse(this.responseText);
+        if (callback) return callback(response);
+        if (response.error) {
+          return console.log(response.error);
+        }
+        self.setState(response);
+      };
+      xhr.send(JSON.stringify(shipment));
+    }
+  }, {
+    key: 'setSink',
+    value: function setSink(sink) {
+      if (typeof BowAndDrape == "undefined") return;
+      // get id for sink
+      var id = null;
+      for (var index in BowAndDrape.facilities) {
+        if (BowAndDrape.facilities[index].props.name == sink) {
+          id = index;
+          break;
+        }
+      }
+      if (!id) return console.log("No shipment sink: " + sink);
+      var shipment = {};
+      Object.assign(shipment, this.state);
+      shipment.to_id = id;
+      shipment.received = Math.round(new Date().getTime() / 1000);
+      this.updateShipment(shipment);
+    }
+
+    // FIXME altering state on client-side without tracking updates makes races
+
+  }, {
+    key: 'handlePack',
+    value: function handlePack() {
+      var shipment = {};
+      Object.assign(shipment, this.state);
+      shipment.packed = Math.round(new Date().getTime() / 1000);
+      this.updateShipment(shipment);
+    }
+  }, {
+    key: 'handlePickup',
+    value: function handlePickup() {
+      this.setSink("customer_pickup");
+    }
+  }, {
+    key: 'handleCancel',
+    value: function handleCancel() {
+      this.setSink("canceled");
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
-
       var line_items = [];
-      if (this.props.contents) {
-        var item_array = typeof this.props.contents.items != 'undefined' ? this.props.contents.items : this.props.contents;
+      if (this.state.contents) {
+        var item_array = typeof this.state.contents.items != 'undefined' ? this.state.contents.items : this.state.contents;
         for (var i = 0; i < item_array.length; i++) {
           line_items.push(React.createElement(Item, _extends({ key: line_items.length, picklist: true }, item_array[i])));
         }
-      }
+      } // populate line_items
 
       var from = React.createElement(
         'div',
@@ -46434,29 +46518,72 @@ var Shipment = function (_React$Component) {
           null,
           'From: '
         ),
-        this.props.from_id
+        this.state.from_id
       );
-      var to = this.props.to_id;
-      if (this.props.facilities && this.props.facilities.length) {
-        this.props.facilities.map(function (facility) {
-          if (facility.id == _this2.props.from_id) {
-            from = React.createElement(
-              'div',
+      var to = React.createElement(
+        'div',
+        null,
+        React.createElement(
+          'label',
+          null,
+          'To: '
+        ),
+        this.state.to_id
+      );
+      if (typeof BowAndDrape != "undefined" && BowAndDrape.facilities) {
+        if (BowAndDrape.facilities[this.state.from_id]) {
+          var facility = BowAndDrape.facilities[this.state.from_id];
+          from = React.createElement(
+            'div',
+            null,
+            React.createElement(
+              'label',
               null,
-              React.createElement(
-                'label',
-                null,
-                'From: '
-              ),
-              facility.props.name,
-              ' ',
-              React.createElement(Address, facility.address)
-            );
-          }
-          if (facility.id == _this2.props.to_id) {
-            to = facility.props.name;
-          }
-        });
+              'From: '
+            ),
+            facility.props.name,
+            ' ',
+            React.createElement(Address, facility.address)
+          );
+        }
+        if (BowAndDrape.facilities[this.state.to_id]) {
+          var _facility = BowAndDrape.facilities[this.state.to_id];
+          to = React.createElement(
+            'div',
+            null,
+            React.createElement(
+              'label',
+              null,
+              'To: '
+            ),
+            _facility.props.name,
+            ' ',
+            React.createElement(Address, _facility.address)
+          );
+        }
+      } // lookup facilities
+
+      var actions = [];
+      if (!this.state.received) {
+        if (!this.state.packed) {
+          actions.push(React.createElement(
+            'button',
+            { key: actions.length, onClick: this.handlePack },
+            'Mark as Packed'
+          ));
+        }
+        if (this.state.packed) {
+          actions.push(React.createElement(
+            'button',
+            { key: actions.length, onClick: this.handlePickup },
+            'Marked as Pickedup'
+          ));
+        }
+        actions.push(React.createElement(
+          'button',
+          { key: actions.length, onClick: this.handleCancel },
+          'Mark as Canceled'
+        ));
       }
 
       return React.createElement(
@@ -46466,40 +46593,22 @@ var Shipment = function (_React$Component) {
           'div',
           { className: 'time_bar' },
           'requested: ',
-          React.createElement(Timestamp, { time: this.props.requested }),
+          React.createElement(Timestamp, { time: this.state.requested }),
           'packed: ',
-          React.createElement(Timestamp, { time: this.props.packed }),
+          React.createElement(Timestamp, { time: this.state.packed }),
           'received: ',
-          React.createElement(Timestamp, { time: this.props.received })
+          React.createElement(Timestamp, { time: this.state.received })
         ),
         React.createElement(
           'div',
           { className: 'action_bar' },
-          React.createElement(
-            'button',
-            null,
-            'Mark as Packed'
-          ),
-          React.createElement(
-            'button',
-            null,
-            'Mark as Canceled'
-          )
+          actions
         ),
         React.createElement(
           'shipping_details',
           null,
           from,
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'To: '
-            ),
-            this.props.to_id
-          ),
+          to,
           React.createElement(
             'div',
             null,
@@ -46508,7 +46617,7 @@ var Shipment = function (_React$Component) {
               null,
               'Order: '
             ),
-            this.props.order_id
+            this.state.order_id
           ),
           React.createElement(
             'div',
@@ -46518,7 +46627,7 @@ var Shipment = function (_React$Component) {
               null,
               'Tracking: '
             ),
-            this.props.tracking_code
+            this.state.tracking_code
           )
         ),
         React.createElement('div', { style: { clear: 'both' } }),

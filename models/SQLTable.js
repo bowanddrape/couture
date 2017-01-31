@@ -90,6 +90,7 @@ class SQLTable {
           where + ` AND ${column} IS NULL`:
           `WHERE ${column} IS NULL`;
       } else if (constraints[column]==="not_null") {
+        // kind of stinky, but still feels like the best way to query this
         where = where ?
           where + ` AND ${column} IS NOT NULL`:
           `WHERE ${column} IS NOT NULL`;

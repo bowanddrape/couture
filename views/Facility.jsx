@@ -7,6 +7,21 @@ const Scrollable = require('./Scrollable.jsx');
 class Facility extends React.Component {
   constructor(props) {
     super(props);
+
+    // make a global map of known facilities?
+    if (typeof(BowAndDrape)!="undefined") {
+      if(!BowAndDrape.facilities) {
+        BowAndDrape.facilities = {};
+      }
+      BowAndDrape.facilities = this.props.facilities;
+    }
+  }
+
+  componentDidMount() {
+    BowAndDrape.dispatcher.on("shipment", (shipment) => {
+console.log(shipment);
+      this.setState({shipment, shipment});
+    });
   }
 
   render() {
@@ -15,7 +30,6 @@ class Facility extends React.Component {
       let props = {};
       Object.assign(props, this.props.pending_outbound_shipments[i]);
       props.key = i;
-      props.facilities = this.props.facilities;
       pending_outbound_shipments.push(
         React.createElement(Shipment, props)
       );
@@ -28,7 +42,7 @@ class Facility extends React.Component {
             <h2>Pending Outbound Shipments</h2>
             <Scrollable
               component={Shipment}
-              endpoint={`/shipment?from_id=${this.props.facility.id}&packed=null`}
+              endpoint={`/shipment?from_id=${this.props.facility.id}&packed=null&received=null`}
               page = {{sort:"requested", direction:"ASC"}}
               data={this.props.pending_outbound_shipments}
             />
@@ -37,7 +51,7 @@ class Facility extends React.Component {
             <h2>For/In Transit</h2>
             <Scrollable
               component={Shipment}
-              endpoint={`/shipment?from_id=${this.props.facility.id}&packed=not_null`}
+              endpoint={`/shipment?from_id=${this.props.facility.id}&packed=not_null&received=null`}
               page = {{sort:"requested", direction:"ASC"}}
             />
           </shipments>

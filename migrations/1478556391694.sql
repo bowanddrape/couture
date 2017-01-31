@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS facilities (
   props JSONB DEFAULT '{}',
   address JSONB
 );
+INSERT INTO facilities (id, props, address) VALUES ('988e00d0-4b27-4ab4-ac00-59fcba6847d1', $${"name":"office","admins":["bowanddrape"]}$$, $${"street_address":"588 Broadway","locality":"New York","region":"NY","postal_code":"10012","country":"USA"}$$);
+INSERT INTO facilities (props) VALUES ($${"name":"customer_pickup"}$$);
+INSERT INTO facilities (props) VALUES ($${"name":"canceled"}$$);
 
 CREATE TABLE IF NOT EXISTS shipments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

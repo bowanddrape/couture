@@ -52,9 +52,18 @@ class Facility extends SQLTable {
   }
 
   static handleGetDetails(req, res) {
-    // get facility
-    Facility.get(req.path_tokens[1], (err, facility) => {
-      if (err || !facility)
+    // get facilities
+    Facility.getAll({}, (err, facility_list) => {
+      if (err || !facility_list.length)
+        return Page.renderNotFound(req, res);
+      // convert facilities list to array
+      let facilities = {};
+      facility_list.map((facility) => {
+        facilities[facility.id] = facility;
+      });
+
+      let facility = facilities[req.path_tokens[1]];
+      if (!facility)
         return Page.renderNotFound(req, res);
       // check permissions
       let authorized = facility.props.admins.filter(function(role) {
@@ -65,13 +74,13 @@ class Facility extends SQLTable {
       }
 
       // get pending outbound shipments
-      Shipment.getAll({from_id:facility.id, packed:null, page: {sort:"requested", direction:"ASC"}}, (err, pending_outbound_shipments) => {
+      Shipment.getAll({from_id:facility.id, packed:null, received:null, page: {sort:"requested", direction:"ASC"}}, (err, pending_outbound_shipments) => {
         pending_outbound_shipments = pending_outbound_shipments ?
             pending_outbound_shipments : [];
         // this is a shipment, so all details are already fully hydrated
         Page.render(req, res, View, {
           facility: facility,
-          facilities: [facility],
+          facilities: facilities,
           pending_outbound_shipments: pending_outbound_shipments
         });
       });

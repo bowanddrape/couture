@@ -1,4 +1,3 @@
-INSERT INTO facilities (id, props, address) VALUES ('988e00d0-4b27-4ab4-ac00-59fcba6847d1', $${"name":"office","admins":["bowanddrape"]}$$, $${"street_address":"588 Broadway","locality":"New York","region":"NY","postal_code":"10012","country":"USA"}$$);
 INSERT INTO components (sku, dims, image_url) VALUES ('test_sku0', $${"price":50.99,"weight":0.1}$$, 'https://upload.wikimedia.org/wikipedia/en/f/ff/SuccessKid.jpg');
 INSERT INTO shipments (from_id, to_id, contents) VALUES (null,'988e00d0-4b27-4ab4-ac00-59fcba6847d1',$$[{"sku":"test_sku0","assembly":{"sku":"test_sku1"}},{"sku":"test_sku0","quantity":1}]$$);
 

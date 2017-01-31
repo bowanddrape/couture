@@ -39,8 +39,6 @@ class LayoutMain extends React.Component {
 
   componentDidMount() {
     BowAndDrape.dispatcher.on("user", (user) => {
-      console.log("got a user event!");
-      console.log(user);
       this.setState({user, user});
     });
     // see if we have a user cookie set

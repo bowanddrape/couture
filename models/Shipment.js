@@ -27,22 +27,30 @@ class Shipment extends SQLTable {
       return next();
     }
 
-    // user must be logged in
-    if (!req.user) {
+    // user must be an admin
+    if (!req.user || req.user.roles.indexOf("bowanddrape")==-1) {
       return Page.renderNotFound(req, res);
     }
 
     if (req.method=='GET') {
-      if (req.query.page) {
-        req.query.page = JSON.parse(req.query.page);
-        if (!req.query.page.limit || req.query.page.limit>20)
-          req.query.page.limit = 20;
+      if (!req.query.page) {
+        req.query.page = "{}";
       }
+      req.query.page = JSON.parse(req.query.page);
+      // restrict how many entries we return
+      if (!req.query.page.limit || req.query.page.limit>20)
+        req.query.page.limit = 20;
       return Shipment.getAll(req.query, (err, shipments) => {
         res.json(shipments).end();
       });
     }
     if (req.method=='POST') {
+      let shipment = new Shipment(req.body);
+      return shipment.upsert((err, result) => {
+        if (err)
+          return res.json({error: err});
+        return res.json(shipment);
+      });
     }
     res.json({error: "invalid endpoint"}).end();
   }
