@@ -18,6 +18,18 @@ class Store extends SQLTable {
       fields: ["facility_id","products"]
     };
   }
+
+  static handleHTTP(req, res, next) {
+    if (req.path_tokens[0]!='facility') {
+      return next();
+    }
+
+    // user must be admin
+    if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
+      return Page.renderNotFound(req, res);
+
+    res.json({error: "invalid endpoint"}).end();
+  }
 }
 
 module.exports = Store;

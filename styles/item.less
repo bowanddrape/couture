@@ -1,0 +1,42 @@
+
+@import "./colors.less";
+@item_preview_width: 200px;
+@item_preview_height: 200px;
+
+item {
+  display: block;
+  background-color: #aaa;
+  deets {
+    display: block;
+    position: relative;
+    left: @item_preview_width + 20px;
+    min-height: @item_preview_height;
+    preview {
+      display: block;
+      position: absolute;
+      top: 0px;
+      left: -@item_preview_width - 20px;
+      width: @item_preview_width;
+      height: @item_preview_height;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: #000;
+    }
+    .sku {
+      font-style: italic;
+      font-size: 13px;
+      opacity: 0.8;
+    }
+    .name {
+      font-weight: bold;
+    }
+    props {
+      justify-content: space-between;
+    }
+  }
+  &:nth-child(2n) {
+    background-color: #fff;
+  }
+}
+

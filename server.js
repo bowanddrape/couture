@@ -69,6 +69,11 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(__dirname+'/public'));
 
+app.use((req, res, next) => {
+  req.path_tokens = req.url.split('?')[0].split('/').slice(1).filter((tok)=>{return tok});
+  next();
+});
+
 // handle user and auth endpoints
 app.use(User.handleAuthentication);
 app.use(User.handleHTTP);

@@ -22,8 +22,6 @@ class Facility extends SQLTable {
   }
 
   static handleHTTP(req, res, next) {
-    req.path_tokens = req.url.split('?')[0].split('/').slice(1);
-
     if (req.path_tokens[0]!='facility') {
       return next();
     }
@@ -74,7 +72,7 @@ class Facility extends SQLTable {
       }
 
       // get pending outbound shipments
-      Shipment.getAll({from_id:facility.id, packed:null, received:null, page: {sort:"requested", direction:"ASC"}}, (err, pending_outbound_shipments) => {
+      Shipment.getAll({from_id:facility.id, packed:null, received:null, page: {sort:"requested", direction:"ASC", limit:10}}, (err, pending_outbound_shipments) => {
         pending_outbound_shipments = pending_outbound_shipments ?
             pending_outbound_shipments : [];
         // this is a shipment, so all details are already fully hydrated

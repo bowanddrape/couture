@@ -34,8 +34,6 @@ class User extends SQLTable {
   }
 
   static handleHTTP(req, res, next) {
-    req.path_tokens = req.url.split('?')[0].split('/').slice(1);
-
     if (req.path_tokens[0]!='user') {
       return next();
     }
