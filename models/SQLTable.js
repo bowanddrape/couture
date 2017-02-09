@@ -1,16 +1,30 @@
 
 const pg = require('pg').native;
 
-let pg_pool = new pg.Pool({
-  user: 'root',
-  password: 'password',
-  database: 'couture',
-  host: '127.0.0.1',
+let pg_read_pool = new pg.Pool({
+  user: process.env.PG_USER,
+  password: process.env.PG_PASS,
+  database: process.env.PG_DBNAME,
+  host: process.env.PG_READ_HOST,
   port: 5432,
   max: 10,
   idleTimeoutMillis: 1000,
 });
-pg_pool.on('error', function (err, client) {
+pg_read_pool.on('error', function (err, client) {
+  // TODO escalate this
+  console.error('pg client error', err.message, err.stack)
+})
+
+let pg_write_pool = new pg.Pool({
+  user: process.env.PG_WRITE_USER,
+  password: process.env.PG_PASS,
+  database: process.env.PG_DBNAME,
+  host: process.env.PG_WRITE_HOST,
+  port: 5432,
+  max: 10,
+  idleTimeoutMillis: 1000,
+});
+pg_write_pool.on('error', function (err, client) {
   // TODO escalate this
   console.error('pg client error', err.message, err.stack)
 })
@@ -22,7 +36,7 @@ class SQLTable {
   // run a query, optionally returning an array of the provided model
   // TODO lockdown everything that isn't a select from being run here
   static sqlQuery(model, query, values, callback) {
-    pg_pool.connect(function(err, client, done) {
+    pg_read_pool.connect(function(err, client, done) {
       if(err) return callback(err);
 
       client.query(query, values, function(err, result) {
@@ -44,7 +58,7 @@ class SQLTable {
   // run a write statement, in the future this will go to master, where
   // as the sqlQuery function will go to a read replica
   static sqlExec(query, values, callback) {
-    pg_pool.connect(function(err, client, done) {
+    pg_write_pool.connect(function(err, client, done) {
       if(err) return callback(err);
 
       client.query(query, values, function(err, result) {

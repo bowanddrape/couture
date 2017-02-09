@@ -46055,7 +46055,7 @@ var Facility = function (_React$Component) {
 module.exports = Facility;
 
 },{"./Scrollable.jsx":392,"./Shipment.jsx":393,"./Tabs.jsx":394,"react":385}],389:[function(require,module,exports){
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -46077,40 +46077,73 @@ var Item = function (_React$Component) {
   }
 
   _createClass(Item, [{
-    key: 'render',
+    key: "render",
     value: function render() {
+      if (!this.props.props) {
+        return React.createElement(
+          "item",
+          null,
+          JSON.stringify(this.props.props)
+        );
+      }
       var picklist = [];
       for (var i = 0; i < this.props.assembly.length; i++) {
-        picklist.push(React.createElement('img', { key: i, src: this.props.assembly[i].props.image }));
+        if (this.props.assembly[i].props) {
+          picklist.push(React.createElement("img", { key: i, src: this.props.assembly[i].props.image }));
+        } else picklist.push(React.createElement(
+          "span",
+          { key: i },
+          this.props.assembly[i].sku,
+          " "
+        ));
+      }
+
+      var other_properties = [];
+      for (var prop in this.props.props) {
+        if (prop == "image" || prop == "name") continue;
+        other_properties.push(React.createElement(
+          "div",
+          { key: other_properties.length },
+          React.createElement(
+            "label",
+            null,
+            prop,
+            ":"
+          ),
+          " ",
+          React.createElement(
+            "value",
+            null,
+            this.props.props[prop]
+          )
+        ));
       }
 
       return React.createElement(
-        'item',
+        "item",
         null,
         React.createElement(
-          'deets',
+          "deets",
           null,
-          React.createElement('img', { src: this.props.props.image }),
+          React.createElement("preview", { style: { backgroundImage: "url(" + this.props.props.image + ")" } }),
           React.createElement(
-            'div',
-            null,
+            "div",
+            { className: "sku" },
             this.props.sku
           ),
           React.createElement(
-            'div',
-            null,
+            "div",
+            { className: "name" },
             this.props.props.name
           ),
           React.createElement(
-            'div',
+            "props",
             null,
-            '$',
-            this.props.props.price
-          ),
-          React.createElement('div', null)
+            other_properties
+          )
         ),
         React.createElement(
-          'picklist',
+          "picklist",
           null,
           picklist
         )

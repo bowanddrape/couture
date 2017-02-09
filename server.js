@@ -2,6 +2,8 @@
 require('newrelic');
 
 require('node-jsx-babel').install();
+require('dotenv').config();
+
 const fs = require('fs');
 
 const server = require('http').createServer();

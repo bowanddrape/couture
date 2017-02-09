@@ -69,17 +69,37 @@ shipment:last-child {
   width: 180px;
 }
 item {
-  position: relative;
   display: block;
   background-color: #aaa;
 }
 item deets {
-  display: flex;
-  justify-content: space-between;
+  display: block;
+  position: relative;
+  left: 220px;
+  min-height: 200px;
 }
-item deets img {
+item deets preview {
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: -220px;
   width: 200px;
-  height: 150px;
+  height: 200px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #000;
+}
+item deets .sku {
+  font-style: italic;
+  font-size: 13px;
+  opacity: 0.8;
+}
+item deets .name {
+  font-weight: bold;
+}
+item deets props {
+  justify-content: space-between;
 }
 item:nth-child(2n) {
   background-color: #fff;
