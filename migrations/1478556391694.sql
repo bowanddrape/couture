@@ -102,8 +102,12 @@ RETURNS TABLE(facility_id UUID, inventory JSONB) AS $$
        shipments and subtracting the outgoing shipments */
     var facility_id = facilities[i].id;
     var inventory = plv8.execute( "SELECT assembly_extract_skus(jsonb_agg(contents)) FROM shipments WHERE to_id=$1 AND received<date_part('epoch',NOW())", facility_id )[0].assembly_extract_skus;
+    if (!inventory) {
+      inventory = {};
+    }
     var sent = plv8.execute( "SELECT assembly_extract_skus(jsonb_agg(contents)) FROM shipments WHERE from_id=$1", facility_id )[0].assembly_extract_skus;
     for (var sku in sent) {
+      inventory[sku] = inventory[sku]?inventory[sku]:0;
       inventory[sku] -= sent[sku];
     }
     ret.push({facility_id:facility_id, inventory:inventory});

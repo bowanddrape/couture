@@ -64,8 +64,6 @@ class ProductList extends React.Component {
   };
 
   render() {
-console.log("product list render props");
-console.log(this.props);
     return (
       <div>product list
         {JSON.stringify(this.props)}

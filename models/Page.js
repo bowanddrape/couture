@@ -87,13 +87,13 @@ class Page extends SQLTable {
 
             // render react component
             let component = whitelisted_components[element.type]
-            if (!component) return res.status(500).end("Page Error: component not whitelisted");
+            if (!component) return res.status(500).json({error:"page component not whitelisted"});
             // have a place for optional async preprocessing?
             if (component.preprocessProps) {
               return component.preprocessProps(props, function(err, result) {
                 if (err) {
                   console.log(err); //TODO elevate this
-                  return res.status(500).end(err.toString());
+                  return res.status(500).json({error:err.toString()});
                 }
                 Page.render(req, res, component, result);
               });

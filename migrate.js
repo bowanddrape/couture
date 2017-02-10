@@ -1,11 +1,12 @@
 const fs = require('fs');
 const pg = require('pg').native;
+require('dotenv').config();
 
 var pg_pool = new pg.Pool({
-  user: 'root',
-  password: 'password',
-  database: 'couture',
-  host: '127.0.0.1',
+  user: process.env.PG_USER,
+  password: process.env.PG_PASS,
+  database: process.env.PG_DBNAME,
+  host: process.env.PG_WRITE_HOST,
   port: 5432,
   max: 10,
   idleTimeoutMillis: 1000,
@@ -18,6 +19,7 @@ pg_pool.connect(function(err, client, done) {
   }
 
   // create migration table if we don't have one
+  // TODO wrap all this in a transaction!
   client.query(`
     CREATE TABLE IF NOT EXISTS migrations (
       filename VARCHAR(32) PRIMARY KEY

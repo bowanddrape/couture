@@ -16,7 +16,7 @@ pg_read_pool.on('error', function (err, client) {
 })
 
 let pg_write_pool = new pg.Pool({
-  user: process.env.PG_WRITE_USER,
+  user: process.env.PG_USER,
   password: process.env.PG_PASS,
   database: process.env.PG_DBNAME,
   host: process.env.PG_WRITE_HOST,

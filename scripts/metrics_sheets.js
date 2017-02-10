@@ -1,5 +1,6 @@
 
 
+require('dotenv').config();
 
 var fs = require('fs');
 var readline = require('readline');
@@ -124,7 +125,7 @@ function callback(auth) {
     // populate sql queries
     date_range.map((range) => {
       dates = JSON.parse(range).map((datestring) => {return new Date(datestring).getTime()/1000});
-      let query = `SELECT count(1) FROM orders o WHERE o.placed>='${dates[0]}' AND o.placed<'${dates[1]}' AND o.props->>'imported'='haute' AND EXISTS (SELECT 1 FROM orders WHERE orders.email=o.email AND orders.placed<o.placed AND orders.props->>'imported'='haute');`;
+      let query = `SELECT count(1) FROM orders o WHERE o.placed>='${dates[0]}' AND o.placed<'${dates[1]}' AND o.props->>'imported'='haute' AND o.email NOT LIKE '%bowanddrape.com' AND EXISTS (SELECT 1 FROM orders WHERE orders.email=o.email AND orders.placed<o.placed AND orders.props->>'imported'='haute');`;
       repeat_customers_online.push(SQLTable.sqlQuery.bind(this, null, query, []));
 
       query = `SELECT count(1) FROM orders o WHERE o.placed>='${dates[0]}' AND o.placed<'${dates[1]}' AND o.props->>'imported'='kiosk' AND EXISTS (SELECT 1 FROM orders WHERE orders.email=o.email AND orders.placed+43200<o.placed AND orders.props->>'imported'='kiosk');`; // seperate orders by a half-day as they're entered individually
