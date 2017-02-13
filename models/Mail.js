@@ -23,8 +23,6 @@ class Mail {
       subject: subject,
       html: html,
     };
-console.log("sending email");
-console.log(options);
 
     sendmail(options, function(err, reply) {
       if (err) {

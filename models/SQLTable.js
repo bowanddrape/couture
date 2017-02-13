@@ -43,6 +43,7 @@ class SQLTable {
         done(); // release connection back to pool
         if(err) {
           // TODO log and escalate
+          console.error(err);
           return callback(err);
         }
 
@@ -65,6 +66,7 @@ class SQLTable {
         done(); // release connection back to pool
         if(err) {
           // TODO log and escalate
+          console.error(err);
           return callback(err);
         }
 

@@ -106,15 +106,12 @@ class Page extends SQLTable {
     });
   }
 
-  static render(req, res, component, props, layout=LayoutMain) {
-    // if json was requested, just return the props object
-    if (!req.accepts('*/*') && req.accepts('application/json'))
-      return res.json(props).end();
+  static renderString(component, props, layout) {
     // render the page server-side
     let content = React.createElement(component, props);
     let page = React.createElement(layout, {content_string:ReactDOMServer.renderToString(content), content_name:content.type.name.toString(), content_props: JSON.stringify(props)});
 
-    return res.end(ReactDOMServer.renderToString(page));
+    return ReactDOMServer.renderToString(page);
   }
 
   static renderNotFound(req, res) {
@@ -123,6 +120,13 @@ class Page extends SQLTable {
       return res.status(404).json({error:"Not Found"}).end();
     let page = React.createElement(NotFound, {});
     return res.status(404).end(ReactDOMServer.renderToString(page));
+  }
+
+  static render(req, res, component, props, layout=LayoutMain) {
+    // if json was requested, just return the props object
+    if (!req.accepts('*/*') && req.accepts('application/json'))
+      return res.json(props).end();
+    return res.end(Page.renderString(component, props, layout));
   }
 }
 
