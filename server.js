@@ -60,8 +60,14 @@ app.use(function(req, res, next) {
   next();
 });*/
 
+app.use((req, res, next) => {
+  if(req.header('x-forwarded-proto')=='http')
+    return res.redirect(301, `https://${req.headers.host}${req.path}`);
+  next();
+});
+
 // static assets
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   let options = {index:'index.html'};
   // dependant on our request headers, we may be looking to return json
   if (!req.accepts('*/*') && req.accepts('application/json')) {
