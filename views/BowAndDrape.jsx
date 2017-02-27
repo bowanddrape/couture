@@ -8,8 +8,6 @@ const jwt_decode = require('jwt-decode');
 const LayoutBasic = require('./LayoutBasic.jsx');
 const LayoutMain = require('./LayoutMain.jsx');
 
-const UserPasswordReset = require('./UserPasswordReset.jsx');
-
 class Dispatcher extends EventEmitter {
   constructor(props) {
     super(props);
@@ -27,7 +25,7 @@ class Dispatcher extends EventEmitter {
     this.emit('user', decoded);
     // save cookie
     var d = new Date();
-    d.setTime(d.getTime() + (7*24*60*60*1000));
+    d.setTime(decoded.exp*1000);
     var expires = "expires="+ d.toUTCString();
     document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
   }
@@ -37,11 +35,14 @@ class Dispatcher extends EventEmitter {
 module.exports = {
   React: React,
   ReactDOM: ReactDOM,
+  // any interactable view MUST be listed here
+  // FIXME script this?
   views: {
     LayoutMain: LayoutMain,
     LayoutBasic: LayoutBasic,
-    UserPasswordReset: UserPasswordReset,
+    UserPasswordReset: require('./UserPasswordReset.jsx'),
     Facility: require('./Facility.jsx'),
+    ProductList: require('./ProductList.jsx'),
   },
   dispatcher: new Dispatcher()
 };

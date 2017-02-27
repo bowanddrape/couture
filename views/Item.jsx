@@ -8,13 +8,15 @@ class Item extends React.Component {
         <item>{JSON.stringify(this.props.props)}</item>
       );
     }
-    let picklist = [];
-    for (let i=0; i<this.props.assembly.length; i++) {
-      if (this.props.assembly[i].props) {
-        picklist.push(<img key={i} src={this.props.assembly[i].props.image} />);
+    let assembly = [];
+    if (this.props.assembly) {
+      for (let i=0; i<this.props.assembly.length; i++) {
+        if (this.props.assembly[i].props) {
+          assembly.push(<img key={i} src={this.props.assembly[i].props.image} />);
+        }
+        else
+          assembly.push(<span key={i}>{this.props.assembly[i].sku} </span>);
       }
-      else
-        picklist.push(<span key={i}>{this.props.assembly[i].sku} </span>);
     }
 
     let other_properties = [];
@@ -31,9 +33,9 @@ class Item extends React.Component {
           <div className="name">{this.props.props.name}</div>
           <props>{other_properties}</props>
         </deets>
-        <picklist>
-          {picklist}
-        </picklist>
+        <assembly>
+          {assembly}
+        </assembly>
         {/*JSON.stringify(this.props.assembly)*/}
       </item>
     )

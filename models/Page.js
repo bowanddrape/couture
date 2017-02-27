@@ -5,27 +5,22 @@ const ReactDOMServer = require('react-dom/server');
 const async = require('async');
 
 const SQLTable = require('./SQLTable');
-const Store = require('./Store.js');
-const User = require('./User.js');
 
 const LayoutMain = require('../views/LayoutMain.jsx');
 
-const ProductList = require('../views/ProductList.jsx');
-const ItemProductionChecklist = require('../views/ItemProductionChecklist.jsx');
-const ItemProductionChecklistLegacy = require('../views/ItemProductionChecklistLegacy.jsx');
 const NotFound = require('../views/NotFound.jsx');
 
 // these are the models the page query will have access to
-const whitelisted_models = {
-  "Store": Store,
-  "User": User
-}
+const whitelisted_models = [
+  "Store",
+  "User"
+]
 // these are the react components the page query will have access to
-const whitelisted_components = {
-  "ProductList": ProductList,
-  "ItemProductionChecklist": ItemProductionChecklist,
-  "ItemProductionChecklistLegacy": ItemProductionChecklistLegacy,
-}
+const whitelisted_components = [
+  "ProductList",
+  "ItemProductionChecklist",
+  "ItemProductionChecklistLegacy",
+]
 
 class Page extends SQLTable {
   constructor(page) {
@@ -64,8 +59,9 @@ class Page extends SQLTable {
               continue;
             }
             // otherwise try the db fetch
-            let model = whitelisted_models[element.props[prop].model];
-            if (!model) return res.status(500).end("Page Error: model not whitelisted");
+            if (whitelisted_models.indexOf(element.props[prop].model)==-1)
+              return res.status(500).end("Page Error: model not whitelisted");
+            let model = require(`./${element.props[prop].model}.js`);
             let query = element.props[prop].query;
             queries.push(function(callback) {
               model.getAll(query, function(err, data) {
@@ -86,8 +82,9 @@ class Page extends SQLTable {
             Object.assign(props, immediate);
 
             // render react component
-            let component = whitelisted_components[element.type]
-            if (!component) return res.status(500).json({error:"page component not whitelisted"});
+            if (whitelisted_components.indexOf(element.type)==-1)
+              return res.status(500).json({error:"page component not whitelisted"});
+            let component = require(`../views/${element.type}.jsx`);
             // have a place for optional async preprocessing?
             if (component.preprocessProps) {
               return component.preprocessProps(props, function(err, result) {
@@ -114,8 +111,10 @@ class Page extends SQLTable {
     return ReactDOMServer.renderToString(page);
   }
 
+  // TODO render function for 5XX errors
+
+  // helper function to render 404
   static renderNotFound(req, res) {
-    // if json was requested, just return the props object
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.status(404).json({error:"Not Found"}).end();
     let page = React.createElement(NotFound, {});

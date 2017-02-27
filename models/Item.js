@@ -89,32 +89,28 @@ class Component extends SQLTable {
 // be families of products, it's intentionally open but could get messy
 // quickly but I suppose we'll deal with that problem later
 // TODO It's getting messy already, we need some more error handling and tests
-class Item {
+class Item extends Array {
   constructor(items) {
-    // if this is a single item, put it in an array
-    this.items = items.sku ? [items.sku] : items;
-    // if we got nothing, flaunt it
-    if (!this.items) {
-      this.items = [];
-    }
-    this.items = this.items.map(function(item) {
-      return new Component(item);
-    });
-  }
+    super();
+    this.length = 0;
 
-  toJSON() {
-// FIXME this means the object and class structure don't line up
-    return this.items;
+    if (items.sku) {
+      this.push(new Component(items));
+    } else if (items.length) {
+      items.forEach((item) => {
+        this.push(new Component(item));
+      });
+    }
   }
 
   // call corresponding function on all items
   recurseProductFamily(foreach, ancestor=null) {
-    return this.items.forEach((item) => {
+    return this.forEach((item) => {
       item.recurseProductFamily(foreach, null);
     });
   }
   recurseAssembly(foreach, ancestor=null) {
-    return this.items.forEach((item) => {
+    return this.forEach((item) => {
       item.recurseAssembly(foreach, null);
     });
   }
@@ -125,7 +121,8 @@ class Item {
     let option_query = [];
     let components = {};
     // fill sku list
-    this.items.forEach((item) => {
+    this.forEach((item) => {
+      if (!item.compatible_components) return;
       item.compatible_components.forEach((sku) => {
         if (typeof(sku)!="string") return;
         skus.push(sku);
@@ -162,8 +159,10 @@ class Item {
 
       async.parallel(option_query, (err) => {
         // replace sku string array with array of components
-        this.items.forEach((item) => {
+        this.forEach((item) => {
           let hydrated_components = [];
+          if (!item.compatible_components)
+            item.compatible_components = [];
           item.compatible_components.forEach((sku) => {
             if (typeof(sku)!="string") return;
             if (components[sku]) hydrated_components.push(components[sku]);

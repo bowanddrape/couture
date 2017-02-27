@@ -1,6 +1,10 @@
 
 const SQLTable = require('./SQLTable');
-const Item = require('../models/Item.js');
+const Item = require('./Item.js');
+const Page = require('./Page.js');
+const GenericList = require('../views/GenericList.jsx');
+const View = require('../views/Store.jsx');
+const ProductList = require('../views/ProductList.jsx')
 
 class Store extends SQLTable {
   constructor(store) {
@@ -20,7 +24,7 @@ class Store extends SQLTable {
   }
 
   static handleHTTP(req, res, next) {
-    if (req.path_tokens[0]!='facility') {
+    if (req.path_tokens[0]!='store') {
       return next();
     }
 
@@ -28,7 +32,39 @@ class Store extends SQLTable {
     if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
       return Page.renderNotFound(req, res);
 
+    if (req.path_tokens.length == 1)
+      return Store.handleList(req, res);
+
+    if (req.method=="GET" && req.path_tokens.length == 2)
+      return Store.handleGetDetails(req, res);
+
     res.json({error: "invalid endpoint"}).end();
+  }
+
+  static handleList(req, res) {
+    // query for all facilities that we have admin roles on
+    let query = "SELECT stores.*, facilities.props FROM stores, facilities WHERE stores.facility_id=facilities.id AND facilities.props#>'{admins}'?|"+`array['${req.user.roles.join(",")}']`;
+    Store.sqlQuery(null, query, [], (err, result) => {
+      if (err) return res.status(500).end(err.toString());
+      let stores = result.rows.map((store) => {
+        store.href = `/store/${store.id}`;
+        return store;
+      });
+      Page.render(req, res, GenericList, {
+        title: "Stores",
+        data: stores
+      });
+    });
+  }
+
+  static handleGetDetails(req, res) {
+    Store.get(req.path_tokens[1], (err, store) => {
+      if (err) return res.status(500).end(err.toString());
+      ProductList.preprocessProps({store:store}, (err, product_list) => {
+if (err) console.log(err);
+        Page.render(req, res, ProductList, product_list);
+      });
+    });
   }
 }
 

@@ -2,8 +2,10 @@
 
 @import "./colors.less";
 @import "./fonts.less";
+@import "./boilerplate.less";
 @import "./facility.less";
 @import "./item.less";
+@import "./customize.less";
 @import "../public/dist/sprite.less";
 
 
@@ -71,34 +73,10 @@ menu a {
   text-decoration: none;
 }
 
-button {
-  .headerfont;
-  display: block;
-  background-color: @color_primary;
-  color: @color_secondary;
-  font-weight: bold;
-  font-size: 20px;
-  border: solid 5px @color_secondary;
-  padding: 5px;
-  text-align: center;
-  text-decoration: none;
-  margin: 10px;
-  width: 300px;
-  &:hover {
-    background-color: @color_secondary;
-    color: @color_primary;
-  }
-}
-
 address {
   *:not(:first-child) {
     margin-left: 7px;
   }
-}
-
-input.error {
-  box-shadow: 0 0 10px @color_error;
-  color: @color_error;
 }
 
 placeholder_content img {

@@ -1,0 +1,66 @@
+
+@import "./colors.less";
+
+button, .button {
+  .headerfont;
+  display: block;
+  background-color: @color_primary;
+  color: @color_secondary;
+  font-weight: bold;
+  font-size: 20px;
+  border: solid 5px @color_secondary;
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  margin: 10px;
+  width: 300px;
+  &:hover {
+    background-color: @color_secondary;
+    color: @color_primary;
+  }
+}
+
+input.error {
+  box-shadow: 0 0 10px @color_error;
+  color: @color_error;
+}
+
+.deck {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+@card_width: 150px;
+@card_height: 200px;
+.card {
+  position: relative;
+  height: @card_height;
+  width: @card_width;
+  margin: 35px;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  label {
+    opacity: 0.5;
+    cursor: inherit;
+    text-align: center;
+    height: @card_height;
+    width: @card_width;
+    border: solid 3px #000;
+    position: absolute;
+    transform: rotate(-30deg);
+    left: -30px;
+  }
+}
+a.card {
+  cursor: pointer;
+  &:hover {
+    label {
+      opacity: 1;
+    }
+  }
+}

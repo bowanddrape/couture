@@ -5,6 +5,7 @@ const Shipment = require('./Shipment');
 const Page = require('./Page');
 
 const View = require('../views/Facility.jsx');
+const GenericList = require('../views/GenericList.jsx');
 
 class Facility extends SQLTable {
   constructor(facility) {
@@ -45,11 +46,18 @@ class Facility extends SQLTable {
     let query = "SELECT * FROM facilities WHERE facilities.props#>'{admins}'?|"+`array['${req.user.roles.join(",")}']`;
     Facility.sqlQuery(Facility, query, [], function(err, facilities) {
       if (err) return res.status(500).end(err.toString());
-      res.end(JSON.stringify(facilities));
+      facilities.map((facility) => {
+        facility.href = `/facility/${facility.id}`;
+      });
+      Page.render(req, res, GenericList, {
+        title: "Facilities",
+        data: facilities
+      });
     });
   }
 
   static handleGetDetails(req, res) {
+    // TODO only hand back facilities that the user has auth for
     // get facilities
     Facility.getAll({}, (err, facility_list) => {
       if (err || !facility_list.length)

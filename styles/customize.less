@@ -1,0 +1,47 @@
+
+@customize_emoji_key_height: 40px;
+@customize_emoji_key_width: 40px;
+@customize_emoji_key_margin: 5px;
+customize {
+  product_options {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    select {
+      font-size: 35px;
+    }
+  }
+  .canvas_container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    canvas {
+      flex-grow: 1;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      max-height: 100%;
+    }
+  }
+  .component_container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: (@customize_emoji_key_height + @customize_emoji_key_margin * 2) * 4 + 15px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-x: scroll;
+
+    background-color: rgba(0,0,0,0.5);
+    div {
+      height: @customize_emoji_key_height;
+      width: @customize_emoji_key_width;
+      margin: @customize_emoji_key_margin;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+  }
+}

@@ -11,7 +11,7 @@ class UserVerifyEmail extends React.Component {
     return (
       <table align="center">
         <tr><td style={styles.fullwidth}>
-            <img src="https://staging.bowanddrape.com/sprite.png" width="600" alt="some image" />
+            <img src="https://{this.props.host}/sprite.png" width="600" alt="some image" />
         </td></tr>
         <tr><td style={styles.fullwidth}>
             <a href={this.props.link}><img src="http://www.bowanddrape.com/public/images/bad-logo.png" width="600" alt="some image" />
