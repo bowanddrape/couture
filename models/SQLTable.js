@@ -101,6 +101,17 @@ class SQLTable {
     for (let column in constraints) {
       // ignore our special "page" object
       if (column == "page") continue;
+      // special handling for search object
+      if (column == "search") {
+        if (sql.fields.indexOf("props")>=0) {
+          values.push(`.*${constraints[column]}.*`);
+          where = where ?
+            where + ` AND (props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})`:
+            `WHERE (props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})`;
+        }
+        continue;
+      }
+      // parse the rest of constraints into a query
       if (constraints[column]===null || constraints[column]==="null") {
         where = where ?
           where + ` AND ${column} IS NULL`:

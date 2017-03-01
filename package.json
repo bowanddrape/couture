@@ -32,6 +32,7 @@
     "pg": "^6.1.0",
     "pg-native": "^1.10.0",
     "react": "~15.3.2",
+    "react-autocomplete": "^1.4.0",
     "react-swipeable": "^3.6.0",
     "sendgrid": "^4.7.1",
     "sendmail": "^1.1.1"

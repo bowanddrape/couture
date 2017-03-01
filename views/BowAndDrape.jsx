@@ -28,13 +28,33 @@ class Dispatcher extends EventEmitter {
     d.setTime(decoded.exp*1000);
     var expires = "expires="+ d.toUTCString();
     document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
+    // also save it in memory for API auth
+    BowAndDrape.token = auth_object.token;
   }
 }
 
+// edit a object
+let saveObject = function(type, object, callback) {
+  if (!BowAndDrape.token) return;
+  var self = this;
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", `/${type}`, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
+  xhr.onreadystatechange = function() {
+    if (this.readyState!=4) { return; }
+    if (this.status!=200)
+      return callback(JSON.parse(this.responseText));
+    callback(null, JSON.parse(this.responseText));
+  }
+  xhr.send(JSON.stringify(object));
+}
+let appendObject = function() {
+}
 
 module.exports = {
-  React: React,
-  ReactDOM: ReactDOM,
+  React,
+  ReactDOM,
   // any interactable view MUST be listed here
   // FIXME script this?
   views: {
@@ -44,5 +64,6 @@ module.exports = {
     Facility: require('./Facility.jsx'),
     ProductList: require('./ProductList.jsx'),
   },
-  dispatcher: new Dispatcher()
+  dispatcher: new Dispatcher(),
+  saveObject,
 };

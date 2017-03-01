@@ -55,7 +55,6 @@ class LayoutMain extends React.Component {
     let token = readCookie("token");
     if (token) {
       BowAndDrape.dispatcher.handleAuth({token:token});
-      BowAndDrape.token = token;
     }
 
     // bind resize

@@ -13,7 +13,8 @@ button, .button {
   text-align: center;
   text-decoration: none;
   margin: 10px;
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   &:hover {
     background-color: @color_secondary;
     color: @color_primary;
@@ -33,7 +34,7 @@ input.error {
   align-items: center;
 }
 
-@card_width: 150px;
+@card_width: 200px;
 @card_height: 200px;
 .card {
   position: relative;
@@ -41,10 +42,10 @@ input.error {
   width: @card_width;
   margin: 35px;
   border-radius: 4px;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  label {
+  label, .label {
     opacity: 0.5;
     cursor: inherit;
     text-align: center;
@@ -54,6 +55,20 @@ input.error {
     position: absolute;
     transform: rotate(-30deg);
     left: -30px;
+  }
+  .autocomplete {
+    position: relative;
+    top: @card_height + 5px;
+    & + div {
+      z-index: 9;
+    }
+  }
+  button {
+    &.disabled {
+      display: none;
+    }
+    position: relative;
+    top: @card_height + 5px;
   }
 }
 a.card {

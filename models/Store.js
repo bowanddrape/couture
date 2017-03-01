@@ -32,11 +32,30 @@ class Store extends SQLTable {
     if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
       return Page.renderNotFound(req, res);
 
-    if (req.path_tokens.length == 1)
-      return Store.handleList(req, res);
+    if (req.method=="GET") {
+      if (req.path_tokens.length == 1)
+        return Store.handleList(req, res);
 
-    if (req.method=="GET" && req.path_tokens.length == 2)
-      return Store.handleGetDetails(req, res);
+      if (req.path_tokens.length == 2)
+        return Store.handleGetDetails(req, res);
+    }
+
+    if (req.method=="POST") {
+      if (req.path_tokens.length == 3) {
+        if (req.path_tokens[2] == 'products') {
+          // FIXME race condition, need to make the select and update atomic!
+          return Store.get(req.path_tokens[1], (err, store) => {
+            if (err) return res.status(500).json({error:err.toString()});
+            if (!store) return res.status(404).json({error:"not found"})
+            store.products.push(req.body);
+            store.upsert((err, result) => {
+              if (err) return res.status(500).json({error:err.toString()});
+              return res.json(store);
+            });
+          });
+        }
+      }
+    }
 
     res.json({error: "invalid endpoint"}).end();
   }
@@ -45,7 +64,7 @@ class Store extends SQLTable {
     // query for all facilities that we have admin roles on
     let query = "SELECT stores.*, facilities.props FROM stores, facilities WHERE stores.facility_id=facilities.id AND facilities.props#>'{admins}'?|"+`array['${req.user.roles.join(",")}']`;
     Store.sqlQuery(null, query, [], (err, result) => {
-      if (err) return res.status(500).end(err.toString());
+      if (err) return res.status(500).json({error:err.toString()});
       let stores = result.rows.map((store) => {
         store.href = `/store/${store.id}`;
         return store;
@@ -61,7 +80,8 @@ class Store extends SQLTable {
     Store.get(req.path_tokens[1], (err, store) => {
       if (err) return res.status(500).end(err.toString());
       ProductList.preprocessProps({store:store}, (err, product_list) => {
-if (err) console.log(err);
+        if (err) console.log(err);
+        product_list.edit = true;
         Page.render(req, res, ProductList, product_list);
       });
     });

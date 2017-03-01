@@ -23,7 +23,8 @@ button,
   text-align: center;
   text-decoration: none;
   margin: 10px;
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
 }
 button:hover,
 .button:hover {
@@ -44,23 +45,38 @@ input.error {
 .card {
   position: relative;
   height: 200px;
-  width: 150px;
+  width: 200px;
   margin: 35px;
   border-radius: 4px;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
-.card label {
+.card label,
+.card .label {
   opacity: 0.5;
   cursor: inherit;
   text-align: center;
   height: 200px;
-  width: 150px;
+  width: 200px;
   border: solid 3px #000;
   position: absolute;
   transform: rotate(-30deg);
   left: -30px;
+}
+.card .autocomplete {
+  position: relative;
+  top: 205px;
+}
+.card .autocomplete + div {
+  z-index: 9;
+}
+.card button {
+  position: relative;
+  top: 205px;
+}
+.card button.disabled {
+  display: none;
 }
 a.card {
   cursor: pointer;

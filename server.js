@@ -41,6 +41,7 @@ const Order = require('./models/Order.js');
 const Facility = require('./models/Facility.js');
 const Store = require('./models/Store.js');
 const Shipment = require('./models/Shipment.js');
+const Component = require('./models/Component.js');
 const Page = require('./models/Page.js');
 
 const LayoutMain = require('./views/LayoutMain');
@@ -91,7 +92,8 @@ app.use(User.handleHTTP);
 app.use(upload.single('image'), Order.handleHTTP);
 app.use(Facility.handleHTTP);
 app.use(Store.handleHTTP);
-app.use(Shipment.handleHTTP);
+app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
+app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
 
 // handle pages
 app.use(Page.handleHTTP);

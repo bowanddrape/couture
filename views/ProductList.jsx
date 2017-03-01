@@ -3,6 +3,7 @@ const async = require('async');
 const React = require('react');
 
 const ProductCanvas = require('./ProductCanvas.jsx');
+const ProductListEdit = require('./ProductListEdit.jsx');
 
 class ProductList extends React.Component {
   constructor(props) {
@@ -89,10 +90,12 @@ class ProductList extends React.Component {
     // if no valid product selected, show list
     if (!selected_product) {
       let products = [];
-for (let i=0; i<3; i++)
       this.props.store.products.forEach((product) => {
         products.push(<a className="card" onClick={this.selectProduct.bind(this, [product.sku])} key={products.length} style={{backgroundImage:`url(${product.props.image})`}}><label>{product.props.name}</label></a>);
       });
+      if (this.props.edit) {
+        products.push(<ProductListEdit key={products.length} store={this.props.store}/>);
+      }
       return (
         <div>
           <product_list className="deck">
