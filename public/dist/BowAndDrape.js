@@ -57341,8 +57341,6 @@ module.exports = ProductCanvas;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -57365,108 +57363,32 @@ var ProductList = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (ProductList.__proto__ || Object.getPrototypeOf(ProductList)).call(this, props));
 
+    var product_map = {};
+    _this.props.store.products.forEach(function (product) {
+      product_map[product.sku] = product;
+    });
+
     _this.state = {
       selected_product: [null],
-      assembly: []
+      assembly: [],
+      product_map: product_map
     };
     return _this;
   }
 
   _createClass(ProductList, [{
-    key: 'selectProduct',
-    value: function selectProduct(selected_product) {
-      this.setState({ selected_product: selected_product });
-    }
-  }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
-
-      var product_map = {};
-      this.props.store.products.forEach(function (product) {
-        product_map[product.sku] = product;
-      });
-
-      // find out which product is selected
-      var selected_product = product_map[this.state.selected_product[0]];
+      var _populateProductOptio = this.populateProductOptions(),
+          product = _populateProductOptio.product,
+          product_options = _populateProductOptio.product_options;
 
       // if no valid product selected, show list
-      if (!selected_product) {
-        var _ret = function () {
-          var products = [];
-          _this2.props.store.products.forEach(function (product) {
-            products.push(React.createElement(
-              'a',
-              { className: 'card', onClick: _this2.selectProduct.bind(_this2, [product.sku]), key: products.length, style: { backgroundImage: 'url(' + product.props.image + ')' } },
-              React.createElement(
-                'label',
-                null,
-                product.props.name
-              )
-            ));
-          });
-          if (_this2.props.edit) {
-            products.push(React.createElement(ProductListEdit, { key: products.length, store: _this2.props.store }));
-          }
-          return {
-            v: React.createElement(
-              'div',
-              null,
-              React.createElement(
-                'product_list',
-                { className: 'deck' },
-                products
-              )
-            )
-          };
-        }();
 
-        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-      }
 
-      // figure out product options
-      var product_options = [];
-      // fill out option menus
-      var traverse_options = function traverse_options(product) {
-        var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+      if (!product) return this.renderProductList();
 
-        var options = [];
-        console.log(product);
-        // if no option is otherwise selected, default to the first option
-        var selected_option = _this2.state.selected_product[depth];
-        if (!selected_option && product.options) selected_option = Object.keys(product.options)[0];
-        for (var option in product.options) {
-          options.push(React.createElement(
-            'option',
-            { key: options.length },
-            option
-          ));
-        };
-        if (options.length) {
-          product_options.push(React.createElement(
-            'select',
-            { key: product_options.length, value: selected_option },
-            options
-          ));
-        }
-        selected_product = product;
-        if (selected_option && product.options[selected_option]) {
-          traverse_options(product.options[selected_option], depth + 1);
-        }
-      };
-      traverse_options(product_map[this.state.selected_product[0]]);
-
-      // populate components
-      var components = [];
-      for (var i = 0; i < selected_product.compatible_components.length && i < 20; i++) {
-        if (selected_product.compatible_components[i].options) {
-          for (var j = 0; j < selected_product.compatible_components[i].options.length; j++) {
-            components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + selected_product.compatible_components[i].options[j].props.image + ')' } }));
-          }
-          continue;
-        }
-        components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + selected_product.compatible_components[i].props.image + ')' } }));
-      }
+      var components = this.populateComponents(product);
 
       return React.createElement(
         'customize',
@@ -57479,7 +57401,7 @@ var ProductList = function (_React$Component) {
             null,
             product_options
           ),
-          React.createElement(ProductCanvas, _extends({ assembly: this.state.assembly }, selected_product))
+          React.createElement(ProductCanvas, _extends({ assembly: this.state.assembly }, product))
         ),
         React.createElement(
           'div',
@@ -57487,6 +57409,148 @@ var ProductList = function (_React$Component) {
           components
         )
       );
+    }
+  }, {
+    key: 'handleOptionChange',
+    value: function handleOptionChange(value, depth) {
+      var selected_product = this.state.selected_product;
+      selected_product[depth] = value;
+      var product = this.state.product_map[this.state.selected_product[0]];
+      if (!product) return this.setState({ selected_product: [null] });
+
+      // see which of the currently selected options are applicable
+      for (var i = 1; i < selected_product.length; i++) {
+        if (!product.options) {
+          selected_product.length = i;
+          break;
+        }
+        product = product.options[this.state.selected_product[i]];
+        if (!product) {
+          selected_product.length = i;
+          break;
+        }
+      }
+      this.setState({ selected_product: selected_product });
+    }
+  }, {
+    key: 'renderProductList',
+    value: function renderProductList() {
+      var _this2 = this;
+
+      var products = [];
+      this.props.store.products.forEach(function (product) {
+        products.push(React.createElement(
+          'a',
+          { className: 'card', onClick: function onClick(event) {
+              _this2.handleOptionChange(product.sku, 0);
+            }, key: products.length, style: { backgroundImage: 'url(' + product.props.image + ')' } },
+          React.createElement(
+            'label',
+            null,
+            product.props.name
+          )
+        ));
+      });
+      if (this.props.edit) {
+        products.push(React.createElement(ProductListEdit, { key: products.length, store: this.props.store }));
+      }
+      return React.createElement(
+        'div',
+        null,
+        React.createElement(
+          'product_list',
+          { className: 'deck' },
+          products
+        )
+      );
+    }
+  }, {
+    key: 'populateProductOptions',
+    value: function populateProductOptions() {
+      var _this3 = this;
+
+      var product_options = [];
+      // initialize selected_product
+      var product = this.state.product_map[this.state.selected_product[0]];
+      for (var i = 1; i < this.state.selected_product.length; i++) {
+        product = product.options[this.state.selected_product[i]];
+      }
+
+      // first have the top level product selector
+      var options = [];
+      this.props.store.products.forEach(function (product) {
+        options.push(React.createElement(
+          'option',
+          { key: options.length, value: product.sku },
+          product.props.name
+        ));
+      });
+      if (options.length) {
+        product_options.push(React.createElement(
+          'select',
+          { onChange: function onChange(event) {
+              _this3.handleOptionChange(event.target.value, 0);
+            }, value: this.state.selected_product[0], key: product_options.length },
+          options
+        ));
+      }
+
+      // recurse to fill out option menus
+      var traverse_options = function traverse_options(option_product) {
+        var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+        // if at a leaf, we're done
+        if (!option_product.options) return;
+
+        var options = [];
+        var available_options = Object.keys(option_product.options);
+        if (_this3.props.edit) available_options.unshift("unset");
+        // if no option is otherwise selected, default to the first option
+        var selected_option = _this3.state.selected_product[depth];
+        if (!selected_option && available_options.length) selected_option = available_options[0];
+        // populate options
+        for (var _i = 0; _i < available_options.length; _i++) {
+          options.push(React.createElement(
+            'option',
+            { key: options.length },
+            available_options[_i]
+          ));
+        };
+        if (options.length) {
+          product_options.push(React.createElement(
+            'select',
+            { onChange: function onChange(event) {
+                _this3.handleOptionChange(event.target.value, depth);
+              }, key: product_options.length, value: selected_option },
+            options
+          ));
+        }
+        // if not in edit mode, force product to displayed configuration
+        if (!_this3.props.edit) product = option_product;
+        // recurse in next option depth
+        if (selected_option && option_product.options[selected_option]) {
+          traverse_options(option_product.options[selected_option], depth + 1);
+        }
+      };
+      if (product) traverse_options(this.state.product_map[this.state.selected_product[0]]);
+
+      return { product: product, product_options: product_options };
+    }
+  }, {
+    key: 'populateComponents',
+    value: function populateComponents(product) {
+      // populate components
+      var components = [];
+      for (var i = 0; i < product.compatible_components.length && i < 20; i++) {
+        if (product.compatible_components[i].options) {
+          for (var j = 0; j < product.compatible_components[i].options.length; j++) {
+            components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' } }));
+          }
+          continue;
+        }
+        components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + product.compatible_components[i].props.image + ')' } }));
+      }
+      return components;
     }
   }], [{
     key: 'preprocessProps',
@@ -57534,12 +57598,6 @@ var ProductList = function (_React$Component) {
                   });
                 });
               });
-            });
-            // cull out un-needed fields from the virtual product family bits
-            store.products.recurseProductFamily(function (item, ancestor) {
-              if (item.options) {
-                delete item.compatible_components;
-              }
             });
 
             callback(null, options);
@@ -57608,14 +57666,12 @@ var ProductListEdit = function (_React$Component) {
           },
           onSelect: function onSelect(value, item) {
             _this2.setState({ autocomplete_items: [item], autocomplete_value: value, selected: item });
-            console.log(_this2.state);
           },
           onChange: function onChange(event, value) {
             // don't request more data until we've heard back
             if (_this2.state.autocomplete_loading) return;
             _this2.setState({ autocomplete_value: value, autocomplete_loading: true, selected: null });
             _this2.handleAutocompleteQuery(value, function (err, items) {
-              console.log(items);
               if (items.length == 1) _this2.setState({ autocomplete_items: items, autocomplete_loading: false, selected: items[0] });else _this2.setState({ autocomplete_items: items, autocomplete_loading: false });
             });
           },

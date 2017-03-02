@@ -8,9 +8,16 @@ const ProductListEdit = require('./ProductListEdit.jsx');
 class ProductList extends React.Component {
   constructor(props) {
     super(props);
+
+    let product_map = {};
+    this.props.store.products.forEach((product) => {
+      product_map[product.sku] = product;
+    });
+
     this.state = {
       selected_product: [null],
       assembly: [],
+      product_map: product_map,
     };
   }
 
@@ -60,12 +67,6 @@ class ProductList extends React.Component {
               });
             });
           });
-          // cull out un-needed fields from the virtual product family bits
-          store.products.recurseProductFamily(function(item, ancestor) {
-            if (item.options) {
-              delete item.compatible_components;
-            }
-          });
 
           callback(null, options);
 
@@ -74,77 +75,15 @@ class ProductList extends React.Component {
     }); // get store_inventory
   };
 
-  selectProduct(selected_product) {
-    this.setState({selected_product: selected_product});
-  }
-
   render() {
-    let product_map = {};
-    this.props.store.products.forEach((product) => {
-      product_map[product.sku] = product;
-    });
 
-    // find out which product is selected
-    let selected_product = product_map[this.state.selected_product[0]];
+    let {product, product_options} = this.populateProductOptions();
 
     // if no valid product selected, show list
-    if (!selected_product) {
-      let products = [];
-      this.props.store.products.forEach((product) => {
-        products.push(<a className="card" onClick={this.selectProduct.bind(this, [product.sku])} key={products.length} style={{backgroundImage:`url(${product.props.image})`}}><label>{product.props.name}</label></a>);
-      });
-      if (this.props.edit) {
-        products.push(<ProductListEdit key={products.length} store={this.props.store}/>);
-      }
-      return (
-        <div>
-          <product_list className="deck">
-            {products}
-          </product_list>
-        </div>
-      );
-    }
+    if (!product)
+      return this.renderProductList();
 
-    // figure out product options
-    let product_options = [];
-    // fill out option menus
-    let traverse_options = (product, depth=1) => {
-      let options = [];
-console.log(product);
-      // if no option is otherwise selected, default to the first option
-      let selected_option = this.state.selected_product[depth];
-      if (!selected_option && product.options)
-        selected_option = Object.keys(product.options)[0];
-      for (let option in product.options) {
-        options.push(<option key={options.length}>{option}</option>);
-      };
-      if (options.length) {
-        product_options.push(
-          <select key={product_options.length} value={selected_option}>{options}</select>
-        )
-      }
-      selected_product = product;
-      if (selected_option && product.options[selected_option]) {
-        traverse_options(product.options[selected_option], depth+1);
-      }
-    }
-    traverse_options(product_map[this.state.selected_product[0]]);
-
-    // populate components
-    let components = [];
-    for (let i=0; i<selected_product.compatible_components.length && i<20; i++) {
-      if (selected_product.compatible_components[i].options) {
-        for (let j=0; j<selected_product.compatible_components[i].options.length; j++) {
-          components.push(
-            <div key={i+'_'+j}  style={{backgroundImage:`url(${selected_product.compatible_components[i].options[j].props.image})`}}/>
-          );
-        }
-        continue;
-      }
-      components.push(
-        <div key={i+'_0'}  style={{backgroundImage:`url(${selected_product.compatible_components[i].props.image})`}}/>
-      );
-    }
+    let components = this.populateComponents(product);
 
     return (
       <customize>
@@ -152,15 +91,128 @@ console.log(product);
           <product_options>
             {product_options}
           </product_options>
-          <ProductCanvas assembly={this.state.assembly} {...selected_product} />
+          <ProductCanvas assembly={this.state.assembly} {...product} />
         </div>
         <div className="component_container">
           {components}
         </div>
       </customize>
     );
-
   }
+
+  handleOptionChange(value, depth) {
+    let selected_product = this.state.selected_product;
+    selected_product[depth] = value;
+    let product = this.state.product_map[this.state.selected_product[0]];
+    if (!product)
+      return this.setState({selected_product: [null]});
+
+    // see which of the currently selected options are applicable
+    for (let i=1; i<selected_product.length; i++) {
+      if (!product.options) {
+        selected_product.length = i;
+        break;
+      }
+      product = product.options[this.state.selected_product[i]];
+      if (!product) {
+        selected_product.length = i;
+        break;
+      }
+    }
+    this.setState({selected_product});
+  }
+
+  renderProductList() {
+    let products = [];
+    this.props.store.products.forEach((product) => {
+      products.push(<a className="card" onClick={(event)=>{this.handleOptionChange(product.sku, 0)}} key={products.length} style={{backgroundImage:`url(${product.props.image})`}}><label>{product.props.name}</label></a>);
+    });
+    if (this.props.edit) {
+      products.push(<ProductListEdit key={products.length} store={this.props.store}/>);
+    }
+    return (
+      <div>
+        <product_list className="deck">
+          {products}
+        </product_list>
+      </div>
+    );
+  }
+
+  populateProductOptions() {
+    let product_options = [];
+    // initialize selected_product
+    let product = this.state.product_map[this.state.selected_product[0]];
+    for (let i=1; i<this.state.selected_product.length; i++) {
+      product = product.options[this.state.selected_product[i]];
+    }
+
+    // first have the top level product selector
+    let options = [];
+    this.props.store.products.forEach((product) => {
+      options.push(<option key={options.length} value={product.sku}>{product.props.name}</option>);
+    });
+    if (options.length) {
+      product_options.push(
+        <select onChange={(event)=>{this.handleOptionChange(event.target.value, 0)}} value={this.state.selected_product[0]} key={product_options.length}>{options}</select>
+      )
+    }
+    
+    // recurse to fill out option menus
+    let traverse_options = (option_product, depth=1) => {
+      // if at a leaf, we're done
+      if (!option_product.options) return;
+
+      let options = [];
+      let available_options = Object.keys(option_product.options);
+      if (this.props.edit)
+        available_options.unshift("unset");
+      // if no option is otherwise selected, default to the first option
+      let selected_option = this.state.selected_product[depth];
+      if (!selected_option && available_options.length)
+        selected_option = available_options[0];
+      // populate options
+      for (let i=0; i<available_options.length; i++) {
+        options.push(<option key={options.length}>{available_options[i]}</option>);
+      };
+      if (options.length) {
+        product_options.push(
+          <select onChange={(event)=>{this.handleOptionChange(event.target.value, depth)}} key={product_options.length} value={selected_option}>{options}</select>
+        )
+      }
+      // if not in edit mode, force product to displayed configuration
+      if (!this.props.edit)
+        product = option_product;
+      // recurse in next option depth
+      if (selected_option && option_product.options[selected_option]) {
+        traverse_options(option_product.options[selected_option], depth+1);
+      }
+    }
+    if (product)
+      traverse_options(this.state.product_map[this.state.selected_product[0]]);
+
+    return {product, product_options};
+  }
+
+  populateComponents(product) {
+    // populate components
+    let components = [];
+    for (let i=0; i<product.compatible_components.length && i<20; i++) {
+      if (product.compatible_components[i].options) {
+        for (let j=0; j<product.compatible_components[i].options.length; j++) {
+          components.push(
+            <div key={i+'_'+j}  style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}}/>
+          );
+        }
+        continue;
+      }
+      components.push(
+        <div key={i+'_0'}  style={{backgroundImage:`url(${product.compatible_components[i].props.image})`}}/>
+      );
+    }
+    return components;
+  }
+
 }
 
 module.exports = ProductList;

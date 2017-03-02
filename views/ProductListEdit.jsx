@@ -29,7 +29,6 @@ class ProductListEdit extends React.Component {
           getItemValue={(item) => item.props.name}
           onSelect={(value, item) => {
             this.setState({ autocomplete_items: [ item ], autocomplete_value: value, selected:item })
-            console.log(this.state);
           }}
           onChange={(event, value) => {
             // don't request more data until we've heard back
@@ -37,7 +36,6 @@ class ProductListEdit extends React.Component {
               return;
             this.setState({ autocomplete_value: value, autocomplete_loading: true, selected: null })
             this.handleAutocompleteQuery(value, (err, items) => {
-console.log(items);
               if (items.length==1)
                 this.setState({ autocomplete_items: items, autocomplete_loading: false, selected: items[0] })
               else
