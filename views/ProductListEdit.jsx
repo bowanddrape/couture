@@ -69,7 +69,7 @@ class ProductListEdit extends React.Component {
           name: this.state.autocomplete_value
         }
       };
-      add_tasks.push(BowAndDrape.saveObject.bind(this, 'component', product));
+      add_tasks.push(BowAndDrape.api.bind(this, "POST", "/component", product));
     }
     // TODO update store to have this product
     add_tasks.push(this.updateStoreProducts.bind(this, product, "POST"));

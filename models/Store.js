@@ -40,20 +40,36 @@ class Store extends SQLTable {
         return Store.handleGetDetails(req, res);
     }
 
-    if (req.method=="POST") {
-      if (req.path_tokens.length == 3) {
-        if (req.path_tokens[2] == 'products') {
-          // FIXME race condition, need to make the select and update atomic!
-          return Store.get(req.path_tokens[1], (err, store) => {
-            if (err) return res.status(500).json({error:err.toString()});
-            if (!store) return res.status(404).json({error:"not found"})
+    if (req.method=="POST" || req.method=="PATCH") {
+      if (req.path_tokens[2] == 'products') {
+        // FIXME race condition, need to make the select and update atomic!
+        return Store.get(req.path_tokens[1], (err, store) => {
+          if (err) return res.status(500).json({error:err.toString()});
+          if (!store) return res.status(404).json({error:"not found"})
+          if (req.method=="POST") {
+            // just add a new product
             store.products.push(req.body);
-            store.upsert((err, result) => {
-              if (err) return res.status(500).json({error:err.toString()});
-              return res.json(store);
-            });
+          } else if (req.method=="PATCH") {
+            if (req.path_tokens.length==3) {
+              // update entire product array
+              store.products = req.body;
+            } else {
+              // update specific product index
+              let product = store.products[req.path_tokens[3]];
+              for (let i=4; product && i<req.path_tokens.length; i++) {
+                product = product.options[req.path_tokens[i]];
+              }
+              if (product) {
+                product = req.body;
+              }
+            } 
+          }
+          // save updated store
+          store.upsert((err, result) => {
+            if (err) return res.status(500).json({error:err.toString()});
+            return res.json(store);
           });
-        }
+        });
       }
     }
 

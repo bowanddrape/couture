@@ -57354,6 +57354,7 @@ var React = require('react');
 
 var ProductCanvas = require('./ProductCanvas.jsx');
 var ProductListEdit = require('./ProductListEdit.jsx');
+var Tabs = require('./Tabs.jsx');
 
 var ProductList = function (_React$Component) {
   _inherits(ProductList, _React$Component);
@@ -57404,8 +57405,8 @@ var ProductList = function (_React$Component) {
           React.createElement(ProductCanvas, _extends({ assembly: this.state.assembly }, product))
         ),
         React.createElement(
-          'div',
-          { className: 'component_container' },
+          Tabs,
+          { className: 'components' },
           components
         )
       );
@@ -57424,13 +57425,44 @@ var ProductList = function (_React$Component) {
           selected_product.length = i;
           break;
         }
-        product = product.options[this.state.selected_product[i]];
+        // fill in any null depths with default option
+        if (!selected_product[i]) {
+          selected_product[i] = Object.keys(product.options)[0];
+        }
+        product = product.options[selected_product[i]];
         if (!product) {
           selected_product.length = i;
           break;
         }
       }
       this.setState({ selected_product: selected_product });
+    }
+
+    // takes react synthetic key event
+
+  }, {
+    key: 'handleNewProductOption',
+    value: function handleNewProductOption(event) {
+      if (event.key != "Enter") return;
+
+      var products = this.props.store.products_raw;
+      var product = null;
+      for (var i = 0; i < products.length; i++) {
+        if (products[i].sku == this.state.selected_product[0]) {
+          product = products[i];
+          break;
+        }
+      };
+      for (var _i = 1; _i < this.state.selected_product.length; _i++) {
+        product = product.options[this.state.selected_product[_i]];
+      }
+      product.options[event.target.value] = {};
+
+      BowAndDrape.api("PATCH", '/store/' + this.props.store.id + '/products', products, function (err, result) {
+        if (err) return console.log(err);
+        // if we successfully updated, reload so we can see our changes 
+        location.reload();
+      });
     }
   }, {
     key: 'renderProductList',
@@ -57504,16 +57536,18 @@ var ProductList = function (_React$Component) {
 
         var options = [];
         var available_options = Object.keys(option_product.options);
-        if (_this3.props.edit) available_options.unshift("unset");
+        if (_this3.props.edit) {
+          available_options.unshift("no option selected");
+        }
         // if no option is otherwise selected, default to the first option
         var selected_option = _this3.state.selected_product[depth];
         if (!selected_option && available_options.length) selected_option = available_options[0];
         // populate options
-        for (var _i = 0; _i < available_options.length; _i++) {
+        for (var _i2 = 0; _i2 < available_options.length; _i2++) {
           options.push(React.createElement(
             'option',
             { key: options.length },
-            available_options[_i]
+            available_options[_i2]
           ));
         };
         if (options.length) {
@@ -57525,8 +57559,10 @@ var ProductList = function (_React$Component) {
             options
           ));
         }
-        // if not in edit mode, force product to displayed configuration
-        if (!_this3.props.edit) product = option_product;
+        if (selected_option == "no option selected") {
+          // allow adding new option
+          product_options.push(React.createElement('input', { type: 'text', key: product_options.length, placeholder: 'New Option', onKeyDown: _this3.handleNewProductOption.bind(_this3) }));
+        }
         // recurse in next option depth
         if (selected_option && option_product.options[selected_option]) {
           traverse_options(option_product.options[selected_option], depth + 1);
@@ -57541,14 +57577,29 @@ var ProductList = function (_React$Component) {
     value: function populateComponents(product) {
       // populate components
       var components = [];
+      var misc_components = [];
       for (var i = 0; i < product.compatible_components.length && i < 20; i++) {
         if (product.compatible_components[i].options) {
+          var tab_components = [];
           for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-            components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' } }));
+            tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' } }));
           }
+          components.push(React.createElement(
+            'div',
+            { name: product.compatible_components[i].props.name, className: 'component_container' },
+            tab_components
+          ));
           continue;
         }
-        components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + product.compatible_components[i].props.image + ')' } }));
+        misc_components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + product.compatible_components[i].props.image + ')' } }));
+      }
+
+      if (misc_components.length) {
+        components.push(React.createElement(
+          'div',
+          { name: 'misc sparkles', className: 'component_container' },
+          misc_components
+        ));
       }
       return components;
     }
@@ -57612,7 +57663,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ProductCanvas.jsx":452,"./ProductListEdit.jsx":454,"async":24,"react":445}],454:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ProductCanvas.jsx":452,"./ProductListEdit.jsx":454,"./Tabs.jsx":457,"async":24,"react":445}],454:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -57707,7 +57758,7 @@ var ProductListEdit = function (_React$Component) {
             name: this.state.autocomplete_value
           }
         };
-        add_tasks.push(BowAndDrape.saveObject.bind(this, 'component', product));
+        add_tasks.push(BowAndDrape.api.bind(this, "POST", "/component", product));
       }
       // TODO update store to have this product
       add_tasks.push(this.updateStoreProducts.bind(this, product, "POST"));
@@ -58115,6 +58166,7 @@ var fs = require('fs');
 var React = require('react');
 
 var colors = {
+  'color_primary': '#fff',
   'color_secondary': '#000',
   'color_support_0': '#eaeaea',
   'color_support_1': '#f5c9ca',
@@ -58133,6 +58185,7 @@ var styles = {
     opacity: '0.8',
     border: '2px solid ' + colors['color_secondary'],
     borderBottom: 'none',
+    backgroundColor: colors['color_primary'],
     borderTopLeftRadius: '20px',
     borderTopRightRadius: '20px'
   },
@@ -58199,7 +58252,7 @@ var Tabs = function (_React$Component) {
 
       return React.createElement(
         'tabs',
-        null,
+        { className: this.props.className },
         React.createElement(
           'tab_select',
           { style: styles.tab_select },
@@ -58641,14 +58694,11 @@ var Dispatcher = function (_EventEmitter) {
   return Dispatcher;
 }(EventEmitter);
 
-// edit a object
-
-
-var saveObject = function saveObject(type, object, callback) {
-  if (!BowAndDrape.token) return;
+var api = function api(method, endpoint, body, callback) {
+  if (!BowAndDrape.token) return callback({ error: "no auth" });
   var self = this;
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", '/' + type, true);
+  xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.setRequestHeader("Authorization", "Bearer " + BowAndDrape.token);
   xhr.onreadystatechange = function () {
@@ -58658,9 +58708,8 @@ var saveObject = function saveObject(type, object, callback) {
     if (this.status != 200) return callback(JSON.parse(this.responseText));
     callback(null, JSON.parse(this.responseText));
   };
-  xhr.send(JSON.stringify(object));
+  xhr.send(JSON.stringify(body));
 };
-var appendObject = function appendObject() {};
 
 module.exports = {
   React: React,
@@ -58675,7 +58724,7 @@ module.exports = {
     ProductList: require('./ProductList.jsx')
   },
   dispatcher: new Dispatcher(),
-  saveObject: saveObject
+  api: api
 };
 
 },{"./Facility.jsx":448,"./LayoutBasic.jsx":450,"./LayoutMain.jsx":451,"./ProductList.jsx":453,"./UserPasswordReset.jsx":460,"events":144,"jwt-decode":227,"react":445,"react-dom":271}]},{},[]);

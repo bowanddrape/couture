@@ -4,6 +4,7 @@ const React = require('react');
 
 const ProductCanvas = require('./ProductCanvas.jsx');
 const ProductListEdit = require('./ProductListEdit.jsx');
+const Tabs = require('./Tabs.jsx');
 
 class ProductList extends React.Component {
   constructor(props) {
@@ -93,9 +94,9 @@ class ProductList extends React.Component {
           </product_options>
           <ProductCanvas assembly={this.state.assembly} {...product} />
         </div>
-        <div className="component_container">
+        <Tabs className="components">
           {components}
-        </div>
+        </Tabs>
       </customize>
     );
   }
@@ -113,7 +114,11 @@ class ProductList extends React.Component {
         selected_product.length = i;
         break;
       }
-      product = product.options[this.state.selected_product[i]];
+      // fill in any null depths with default option
+      if (!selected_product[i]) {
+        selected_product[i] = Object.keys(product.options)[0];
+      }
+      product = product.options[selected_product[i]];
       if (!product) {
         selected_product.length = i;
         break;
@@ -121,6 +126,31 @@ class ProductList extends React.Component {
     }
     this.setState({selected_product});
   }
+
+  // takes react synthetic key event
+  handleNewProductOption(event) {
+    if(event.key!="Enter") return;
+
+    let products = this.props.store.products_raw;
+    let product = null;
+    for (let i=0; i<products.length; i++) {
+      if (products[i].sku == this.state.selected_product[0]) {
+        product = products[i];
+        break;
+      }
+    };
+    for (let i=1; i<this.state.selected_product.length; i++) {
+      product = product.options[this.state.selected_product[i]];
+    }
+    product.options[event.target.value] = {};
+
+    BowAndDrape.api("PATCH", `/store/${this.props.store.id}/products`, products, (err, result) => {
+      if (err) return console.log(err);
+      // if we successfully updated, reload so we can see our changes
+      location.reload();
+    });
+  }
+
 
   renderProductList() {
     let products = [];
@@ -165,8 +195,9 @@ class ProductList extends React.Component {
 
       let options = [];
       let available_options = Object.keys(option_product.options);
-      if (this.props.edit)
-        available_options.unshift("unset");
+      if (this.props.edit) {
+        available_options.unshift("no option selected");
+      }
       // if no option is otherwise selected, default to the first option
       let selected_option = this.state.selected_product[depth];
       if (!selected_option && available_options.length)
@@ -180,9 +211,12 @@ class ProductList extends React.Component {
           <select onChange={(event)=>{this.handleOptionChange(event.target.value, depth)}} key={product_options.length} value={selected_option}>{options}</select>
         )
       }
-      // if not in edit mode, force product to displayed configuration
-      if (!this.props.edit)
-        product = option_product;
+      if (selected_option=="no option selected") {
+        // allow adding new option
+        product_options.push(
+          <input type="text" key={product_options.length} placeholder="New Option" onKeyDown={this.handleNewProductOption.bind(this)} />
+        );
+      }
       // recurse in next option depth
       if (selected_option && option_product.options[selected_option]) {
         traverse_options(option_product.options[selected_option], depth+1);
@@ -197,17 +231,32 @@ class ProductList extends React.Component {
   populateComponents(product) {
     // populate components
     let components = [];
+    let misc_components = [];
     for (let i=0; i<product.compatible_components.length && i<20; i++) {
       if (product.compatible_components[i].options) {
+        let tab_components = [];
         for (let j=0; j<product.compatible_components[i].options.length; j++) {
-          components.push(
+          tab_components.push(
             <div key={i+'_'+j}  style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}}/>
           );
         }
+        components.push(
+          <div name={product.compatible_components[i].props.name} className="component_container">
+            {tab_components}
+          </div>
+        );
         continue;
       }
-      components.push(
+      misc_components.push(
         <div key={i+'_0'}  style={{backgroundImage:`url(${product.compatible_components[i].props.image})`}}/>
+      );
+    }
+
+    if (misc_components.length) {
+      components.push(
+        <div name="misc sparkles" className="component_container">
+          {misc_components}
+        </div>
       );
     }
     return components;

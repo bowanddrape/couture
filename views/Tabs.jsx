@@ -3,6 +3,7 @@ const fs = require('fs');
 const React = require('react');
 
 const colors = {
+  'color_primary': '#fff',
   'color_secondary': '#000',
   'color_support_0': '#eaeaea',
   'color_support_1': '#f5c9ca',
@@ -21,6 +22,7 @@ let styles = {
     opacity: '0.8',
     border: '2px solid '+colors['color_secondary'],
     borderBottom: 'none',
+    backgroundColor: colors['color_primary'],
     borderTopLeftRadius: '20px',
     borderTopRightRadius: '20px',
   },
@@ -68,7 +70,7 @@ class Tabs extends React.Component {
     };
 
     return (
-      <tabs>
+      <tabs className={this.props.className}>
         <tab_select style={styles.tab_select}>{tabs}</tab_select>
         <tab_contents>
           {children[this.state.selected_tab]}

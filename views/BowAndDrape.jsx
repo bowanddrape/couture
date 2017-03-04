@@ -33,12 +33,11 @@ class Dispatcher extends EventEmitter {
   }
 }
 
-// edit a object
-let saveObject = function(type, object, callback) {
-  if (!BowAndDrape.token) return;
+let api = function(method, endpoint, body, callback) {
+  if (!BowAndDrape.token) return callback({error:"no auth"});
   var self = this;
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", `/${type}`, true);
+  xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
   xhr.onreadystatechange = function() {
@@ -47,9 +46,7 @@ let saveObject = function(type, object, callback) {
       return callback(JSON.parse(this.responseText));
     callback(null, JSON.parse(this.responseText));
   }
-  xhr.send(JSON.stringify(object));
-}
-let appendObject = function() {
+  xhr.send(JSON.stringify(body));
 }
 
 module.exports = {
@@ -65,5 +62,5 @@ module.exports = {
     ProductList: require('./ProductList.jsx'),
   },
   dispatcher: new Dispatcher(),
-  saveObject,
+  api,
 };
