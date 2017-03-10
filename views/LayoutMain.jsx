@@ -38,6 +38,7 @@ class LayoutMain extends React.Component {
   }
 
   componentDidMount() {
+    BowAndDrape.dispatcher.emit("loaded");
     BowAndDrape.dispatcher.on("user", (user) => {
       this.setState({user, user});
     });
@@ -70,7 +71,7 @@ class LayoutMain extends React.Component {
     let content = null;
 
     if (typeof(document)=='undefined' || typeof(BowAndDrape.views[this.props.content_name])=='undefined') {
-      content = (<div dangerouslySetInnerHTML={{__html:this.props.content_string}} />);
+      content = (<div dangerouslySetInnerHTML={{__html:decodeURIComponent(this.props.content_string)}} />);
     } else {
       content = React.createElement(
         BowAndDrape.views[this.props.content_name],
@@ -86,10 +87,11 @@ class LayoutMain extends React.Component {
         trackMouse={true}
       >
           <meta httpEquiv="content-type" content="text/html; charset=utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1"/>
           <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/> 
           <link rel="stylesheet" href="/styles.css" type="text/css"></link>
           {content}
-          <div style={{position:"fixed",left:(this.state.viewport_width - (this.state.viewport_width*0.015) + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s"}}>
+          <div style={{position:"fixed",left:(this.state.viewport_width - (this.state.viewport_width*0.01) + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s"}}>
             {React.createElement(UserMenu, this.state)}
           </div>
         {/*<Swipeable
@@ -105,7 +107,7 @@ class LayoutMain extends React.Component {
           var React = BowAndDrape.React;
           var ReactDOM = BowAndDrape.ReactDOM;
           var layout = React.createElement(BowAndDrape.views.LayoutMain, {
-            content_string: \`${this.props.content_string}\`,
+            content_string: \`${encodeURIComponent(this.props.content_string)}\`,
             content_name: \`${this.props.content_name}\`,
             content_props: \`${this.props.content_props}\`}
           );

@@ -20,6 +20,7 @@ const whitelisted_components = [
   "ProductList",
   "ItemProductionChecklist",
   "ItemProductionChecklistLegacy",
+  "PayStripe",
 ]
 
 class Page extends SQLTable {

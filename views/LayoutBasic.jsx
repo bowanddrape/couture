@@ -6,6 +6,10 @@ class LayoutBasic extends React.Component {
     super(props);
   }
 
+  componentDidMount() {
+    BowAndDrape.dispatcher.emit("loaded");
+  }
+
   render() {
     let content = null;
 

@@ -4,7 +4,7 @@ const Shipment = require('./Shipment.jsx');
 const Tabs = require('./Tabs.jsx');
 const Scrollable = require('./Scrollable.jsx');
 
-class Facility extends React.Component {
+class FulfillShipments extends React.Component {
   constructor(props) {
     super(props);
 
@@ -36,13 +36,13 @@ console.log(shipment);
     }
     return (
       <div>
-        <h1>Facility "{this.props.facility.props.name}"</h1>
+        <h1>Store "{this.props.store.props.name}"</h1>
         <Tabs>
           <shipments>
             <h2>Pending Outbound Shipments</h2>
             <Scrollable
               component={Shipment}
-              endpoint={`/shipment?from_id=${this.props.facility.id}&packed=null&received=null`}
+              endpoint={`/shipment?store_id=${this.props.store.id}&packed=null&received=null`}
               page = {{sort:"requested", direction:"ASC"}}
               data={this.props.pending_outbound_shipments}
             />
@@ -51,7 +51,7 @@ console.log(shipment);
             <h2>For/In Transit</h2>
             <Scrollable
               component={Shipment}
-              endpoint={`/shipment?from_id=${this.props.facility.id}&packed=not_null&received=null`}
+              endpoint={`/shipment?store_id=${this.props.store.id}&packed=not_null&received=null`}
               page = {{sort:"requested", direction:"ASC"}}
             />
           </shipments>
@@ -59,7 +59,7 @@ console.log(shipment);
             <h2>Completed</h2>
             <Scrollable
               component={Shipment}
-              endpoint={`/shipment?from_id=${this.props.facility.id}&received=not_null`}
+              endpoint={`/shipment?store_id=${this.props.store.id}&received=not_null`}
               page = {{sort:"received", direction:"DESC"}}
             />
           </shipments>
@@ -69,4 +69,4 @@ console.log(shipment);
   }
 }
 
-module.exports = Facility;
+module.exports = FulfillShipments;

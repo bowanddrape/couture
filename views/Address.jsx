@@ -5,6 +5,7 @@ class Address extends React.Component {
     return (
       <address>
         <street>{this.props.street_address}</street>
+        <apt>{this.props.apt}</apt>
         <region>{this.props.region}{this.props.region?",":""}</region>
         <locality>{this.props.locality}</locality>
         <postal_code>{this.props.postal_code}</postal_code>

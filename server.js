@@ -38,7 +38,7 @@ var upload = multer({
 
 const User = require('./models/User.js');
 const Order = require('./models/Order.js');
-const Facility = require('./models/Facility.js');
+const Fulfillment = require('./models/Fulfillment.js');
 const Store = require('./models/Store.js');
 const Shipment = require('./models/Shipment.js');
 const Component = require('./models/Component.js');
@@ -90,7 +90,7 @@ app.use(User.handleHTTP);
 
 // handle API endpoints
 app.use(upload.single('image'), Order.handleHTTP);
-app.use(Facility.handleHTTP);
+app.use(Fulfillment.handleHTTP);
 app.use(Store.handleHTTP);
 app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
@@ -110,7 +110,7 @@ app.use(function(req, res, next) {
 
 
 app.use(function(req, res, next) {
-  res.end("hello universe");
+  return Page.renderNotFound(req, res);
 });
 
 server.on('request', app);

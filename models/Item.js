@@ -11,6 +11,7 @@ class Item extends Array {
     super();
     this.length = 0;
 
+    if (!items) items = [];
     if (items.sku) {
       this.push(new Component(items));
     } else if (items.length) {

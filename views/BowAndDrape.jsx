@@ -34,12 +34,14 @@ class Dispatcher extends EventEmitter {
 }
 
 let api = function(method, endpoint, body, callback) {
-  if (!BowAndDrape.token) return callback({error:"no auth"});
   var self = this;
   let xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
+  if (BowAndDrape.token)
+    xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
+  else
+    console.log("attempting api call while not logged in");
   xhr.onreadystatechange = function() {
     if (this.readyState!=4) { return; }
     if (this.status!=200)
@@ -58,8 +60,9 @@ module.exports = {
     LayoutMain: LayoutMain,
     LayoutBasic: LayoutBasic,
     UserPasswordReset: require('./UserPasswordReset.jsx'),
-    Facility: require('./Facility.jsx'),
+    FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),
+    PayStripe: require('./PayStripe.jsx'),
   },
   dispatcher: new Dispatcher(),
   api,

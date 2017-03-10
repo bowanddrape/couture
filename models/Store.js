@@ -10,8 +10,9 @@ class Store extends SQLTable {
   constructor(store) {
     super();
     this.id = store.id;
-    this.facility_id = store.facility_id;
     this.products = new Item(store.products);
+    this.props = store.props;
+    this.facility_id = store.facility_id;
   }
 
   // needed by SQLTable
@@ -19,7 +20,7 @@ class Store extends SQLTable {
     return {
       tablename: "stores",
       pkey: "id",
-      fields: ["facility_id","products"]
+      fields: ["products","props", "facility_id"]
     };
   }
 
@@ -78,7 +79,7 @@ class Store extends SQLTable {
 
   static handleList(req, res) {
     // query for all facilities that we have admin roles on
-    let query = "SELECT stores.*, facilities.props FROM stores, facilities WHERE stores.facility_id=facilities.id AND facilities.props#>'{admins}'?|"+`array['${req.user.roles.join(",")}']`;
+    let query = "SELECT * FROM stores WHERE props#>'{admins}'?|"+`array['${req.user.roles.join(",")}']`;
     Store.sqlQuery(null, query, [], (err, result) => {
       if (err) return res.status(500).json({error:err.toString()});
       let stores = result.rows.map((store) => {
@@ -95,6 +96,16 @@ class Store extends SQLTable {
   static handleGetDetails(req, res) {
     Store.get(req.path_tokens[1], (err, store) => {
       if (err) return res.status(500).end(err.toString());
+      if (!store) return Page.renderNotFound(req, res);
+      // check permissions
+      let authorized = store.props.admins.filter(function(role) {
+        return req.user.roles.indexOf(role) != -1;
+      });
+      if (!authorized.length) {
+        return Page.renderNotFound(req, res);
+      }
+
+console.log(store);
       ProductList.preprocessProps({store:store}, (err, product_list) => {
         if (err) console.log(err);
         product_list.edit = true;

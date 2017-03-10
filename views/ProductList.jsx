@@ -29,9 +29,11 @@ class ProductList extends React.Component {
     if (options.store.length)
       options.store = options.store[0];
     let store = options.store;
+console.log(store);
     // deep clone initial specification (needed for admin)
     store.products_raw = JSON.parse(JSON.stringify(store.products));
     // get store inventory
+console.log("getting inventory for "+store.facility_id);
     Inventory.get(store.facility_id, function(err, store_inventory) {
       if (err) return callback(err);
       if (!store_inventory || !store_inventory.inventory) return callback("Store has no inventory");

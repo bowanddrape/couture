@@ -28,14 +28,21 @@ class JSONAPI extends SQLTable {
     }
     if (req.method=='POST') {
       let object = new this.constructor(req.body);
-      return object.upsert((err, result) => {
-        if (err)
-          return res.json({error: err});
-        return res.json(object);
-      });
+      this.onApiSave(res, req, object);
     }
     res.json({error: "invalid endpoint"}).end();
   }
+
+  onApiSave(res, req, object, callback) {
+    object.upsert((err, result) => {
+      if (callback)
+        return (callback(err, result));
+      if (err)
+        return res.json({error: err});
+      return res.json(object);
+    });
+  }
+
 }
 
 module.exports = JSONAPI;

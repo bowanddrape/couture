@@ -116,7 +116,7 @@ class Shipment extends React.Component {
         <shipping_details>
           {from}
           {to}
-          <div><label>Order: </label>{this.state.order_id}</div>
+          <div><label>User: </label>{this.state.email}</div>
           <div><label>Tracking: </label>{this.state.tracking_code}</div>
         </shipping_details>
         <div style={{clear:'both'}}/>

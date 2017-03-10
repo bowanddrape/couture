@@ -99,20 +99,8 @@ class ProductListEdit extends React.Component {
     xhr.send();
   }
 
-  updateStoreProducts(product, action, callback) {
-    if (!BowAndDrape.token) return;
-    var self = this;
-    let xhr = new XMLHttpRequest();
-    xhr.open(action=="DELETE"?"DELETE":"POST", `/store/${this.props.store.id}/products`, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
-    xhr.onreadystatechange = function() {
-      if (this.readyState!=4) { return; }
-      if (this.status!=200)
-        return callback(JSON.parse(this.responseText));
-      callback(null, JSON.parse(this.responseText));
-    }
-    xhr.send(JSON.stringify(product));
+  updateStoreProducts(product, method, callback) {
+    BowAndDrape.api(method, `/store/${this.props.store.id}/products`, product, callback);
   }
 
 }

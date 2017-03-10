@@ -1,0 +1,56 @@
+
+@import "./colors.less";
+
+.checkout_section {
+  max-width: 460px;
+  display: block;
+  margin: auto;
+  margin-top: 35px;
+  position: relative;
+  border: solid 3px @color_tertiary;
+  padding: 5px;
+  section {
+    color: @color_tertiary;
+    position: absolute;
+    top: -35px;
+    display: block;
+    font-size: 22px;
+  }
+  row {
+    display: flex;
+    flex-flow: row wrap;
+    align-content: center;
+    justify-content: space-between;
+  }
+  label {
+    text-align: right;
+  }
+  div {
+    margin-right: 15px;
+  }
+  input {
+    background-color: @color_support_0;
+    border: solid 1px rgba(0,0,0,.1);
+    width: 230px;
+  }
+}
+
+input_address {
+  .checkout_section;
+  [name="apt"], [name="region"] {
+    width: 40px;
+  }
+  [name="locality"] {
+    width: 100px;
+  }
+  [name="postal"] {
+    width: 60px;
+  }
+}
+
+input_credit {
+  .checkout_section;
+  [name="cvc"], [name="exp_month"], [name="exp_year"] {
+    width: 40px;
+  }
+}

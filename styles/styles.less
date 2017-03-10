@@ -6,6 +6,7 @@
 @import "./facility.less";
 @import "./item.less";
 @import "./customize.less";
+@import "./checkout.less";
 @import "../public/dist/sprite.less";
 
 
@@ -22,7 +23,7 @@ menu {
   background-color: @color_tertiary;
   margin: 0;
   padding: 20px;
-  font-size: 40px;
+  font-size: 28px;
   width: 100%;
 }
 @user_img_width: 50px;
@@ -47,17 +48,17 @@ menu login msg {
   font-size: 20px;
   color: @color_error;
 }
-@menu_handle_width: 60px;
+@menu_handle_width: 30px;
 menu handle {
   .icon;
   .sprite(@hamburger_menu);
   background-color: @color_tertiary;
   display: block;
   position: absolute;
-  top: 50px;
+  top: 20px;
   left: -@menu_handle_width;
   width: @menu_handle_width;
-  height: @menu_handle_width;
+  height: @menu_handle_width + 4px;
   border: solid 1px @color_secondary;
   border-right: none;
   border-top-left-radius: 10px;
