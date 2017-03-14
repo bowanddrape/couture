@@ -49,6 +49,10 @@ class PayStripe extends React.Component {
     }
   }
 
+  componentDidMount() {
+    // TODO fill in shipping info if we know it
+  }
+
   handleSameBillingToggle(e) {
     this.setState({same_billing:!this.state.same_billing});
   }
@@ -131,7 +135,6 @@ class PayStripe extends React.Component {
         this.state.shipping.postal : this.state.billing.postal
     }
     Stripe.card.createToken(stripe_payload, (status, response) => {
-console.log(response);
       if (response.error) {
         this.setState({processing_payment:false});
         this.handleSetSectionState("card", {errors: [response.error.message]});

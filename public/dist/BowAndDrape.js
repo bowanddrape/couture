@@ -202,6 +202,20 @@ var SQLTable = function () {
       });
     }
 
+    // helper function to delete an object from the database
+
+  }, {
+    key: 'delete',
+    value: function _delete(primary_key_value, callback) {
+      if (!this.getSQLSettings) return callback("getSQLSettings not defined");
+      var sql = this.getSQLSettings();
+      var query = 'DELETE * FROM ' + sql.tablename + ' WHERE ' + sql.pkey + '=$1 LIMIT 1';
+      this.sqlExec(this, query, [primary_key_value], function (err, results) {
+        if (err) return callback(err);
+        callback(null, results);
+      });
+    }
+
     // helper function to build a query statement from an object
 
   }, {
@@ -56895,7 +56909,7 @@ var FacebookLogin = function (_React$Component) {
 
 module.exports = FacebookLogin;
 
-},{"./UserProfile.jsx":464,"https":152,"react":445}],448:[function(require,module,exports){
+},{"./UserProfile.jsx":466,"https":152,"react":445}],448:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -56937,7 +56951,6 @@ var FulfillShipments = function (_React$Component) {
       var _this2 = this;
 
       BowAndDrape.dispatcher.on("shipment", function (shipment) {
-        console.log(shipment);
         _this2.setState(_defineProperty({ shipment: shipment }, 'shipment', shipment));
       });
     }
@@ -57017,7 +57030,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./Scrollable.jsx":457,"./Shipment.jsx":458,"./Tabs.jsx":459,"react":445}],449:[function(require,module,exports){
+},{"./Scrollable.jsx":459,"./Shipment.jsx":460,"./Tabs.jsx":461,"react":445}],449:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -57325,7 +57338,7 @@ var LayoutBasic = function (_React$Component) {
       var content = null;
 
       if (typeof document == 'undefined' || typeof BowAndDrape.views[this.props.content_name] == 'undefined') {
-        content = React.createElement('div', { dangerouslySetInnerHTML: { __html: this.props.content_string } });
+        content = React.createElement('div', { dangerouslySetInnerHTML: { __html: unescape(this.props.content_string) } });
       } else {
         content = React.createElement(BowAndDrape.views[this.props.content_name], JSON.parse(this.props.content_props));
       }
@@ -57338,7 +57351,7 @@ var LayoutBasic = function (_React$Component) {
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         content,
         React.createElement('script', { src: '/BowAndDrape.js' }),
-        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var layout = React.createElement(BowAndDrape.views.LayoutBasic, {\n            content_string: `' + this.props.content_string + '`,\n            content_name: `' + this.props.content_name + '`,\n            content_props: `' + this.props.content_props + '`}\n          );\n          ReactDOM.render(\n            layout,\n            document.body\n          );\n        ' } })
+        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var layout = React.createElement(BowAndDrape.views.LayoutBasic, {\n            content_string: `' + escape(this.props.content_string) + '`,\n            content_name: `' + this.props.content_name + '`,\n            content_props: `' + this.props.content_props + '`}\n          );\n          ReactDOM.render(\n            layout,\n            document.body\n          );\n        ' } })
       );
     }
   }]);
@@ -57350,6 +57363,8 @@ module.exports = LayoutBasic;
 
 },{"react":445}],452:[function(require,module,exports){
 'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -57366,6 +57381,8 @@ var ReactDOMServer = require('react-dom/server');
 var Swipeable = require('react-swipeable');
 
 var UserMenu = require('./UserMenu.jsx');
+
+var menu_width = 350;
 
 var LayoutMain = function (_React$Component) {
   _inherits(LayoutMain, _React$Component);
@@ -57388,20 +57405,31 @@ var LayoutMain = function (_React$Component) {
     return _this;
   }
 
+  // blacklist certain elements from swipe actions
+
+
   _createClass(LayoutMain, [{
+    key: 'targetSwipable',
+    value: function targetSwipable(element) {
+      // ignore swipe actions on input tags
+      if (element.tagName.toLowerCase() == "input") return false;
+      return true;
+    }
+  }, {
     key: 'onSwiping',
-    value: function onSwiping(e, deltaX, deltaY, absX, absY, velocity) {
+    value: function onSwiping(event, deltaX, deltaY, absX, absY, velocity) {
+      if (!this.targetSwipable(event.target)) return;
       var menu = this.state.menu;
-      menu.offset = (menu.state ? -this.state.viewport_width + 100 : 0) - deltaX;
-      menu.offset = Math.max(Math.min(menu.offset, 0), -this.state.viewport_width + 100);
+      menu.offset = (menu.state ? -menu_width + 100 : 0) - deltaX;
+      menu.offset = Math.max(Math.min(menu.offset, 0), -menu_width);
+      menu.state = menu.offset < menu_width * -0.5;
       this.setState({ menu: menu });
     }
   }, {
     key: 'onSwiped',
     value: function onSwiped(event, x, y, isFlick, velocity) {
       var menu = this.state.menu;
-      menu.state = x > 100;
-      menu.offset = menu.state ? -this.state.viewport_width + 100 : 0;
+      menu.offset = menu.state ? -menu_width : 0;
       this.setState({ menu: menu });
     }
   }, {
@@ -57409,6 +57437,14 @@ var LayoutMain = function (_React$Component) {
     value: function onChildSwiping(e, deltaX, deltaY, absX, absY, velocity) {
       e.stopPropagation();
       console.log('child ' + deltaX + ' ' + deltaY);
+    }
+  }, {
+    key: 'handleToggleMenuState',
+    value: function handleToggleMenuState() {
+      var menu = this.state.menu;
+      menu.state = !menu.state;
+      menu.offset = menu.state ? -menu_width : 0;
+      this.setState({ menu: menu });
     }
   }, {
     key: 'componentDidMount',
@@ -57450,7 +57486,7 @@ var LayoutMain = function (_React$Component) {
       var content = null;
 
       if (typeof document == 'undefined' || typeof BowAndDrape.views[this.props.content_name] == 'undefined') {
-        content = React.createElement('div', { dangerouslySetInnerHTML: { __html: decodeURIComponent(this.props.content_string) } });
+        content = React.createElement('div', { dangerouslySetInnerHTML: { __html: unescape(this.props.content_string) } });
       } else {
         content = React.createElement(BowAndDrape.views[this.props.content_name], JSON.parse(this.props.content_props));
       }
@@ -57471,10 +57507,10 @@ var LayoutMain = function (_React$Component) {
         React.createElement(
           'div',
           { style: { position: "fixed", left: this.state.viewport_width - this.state.viewport_width * 0.01 + this.state.menu.offset + "px", top: "0px", backgroundColor: "#aaa", width: "100%", height: "100%", transition: "left 0.1s" } },
-          React.createElement(UserMenu, this.state)
+          React.createElement(UserMenu, _extends({ handleToggleMenu: this.handleToggleMenuState.bind(this) }, this.state))
         ),
         React.createElement('script', { src: '/BowAndDrape.js' }),
-        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n            content_string: `' + encodeURIComponent(this.props.content_string) + '`,\n            content_name: `' + this.props.content_name + '`,\n            content_props: `' + this.props.content_props + '`}\n          );\n          ReactDOM.render(\n            layout,\n            document.body\n          );\n\n        ' } })
+        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n            content_string: `' + escape(this.props.content_string) + '`,\n            content_name: `' + this.props.content_name + '`,\n            content_props: `' + this.props.content_props + '`}\n          );\n          ReactDOM.render(\n            layout,\n            document.body\n          );\n\n        ' } })
       );
     }
   }]);
@@ -57484,7 +57520,188 @@ var LayoutMain = function (_React$Component) {
 
 module.exports = LayoutMain;
 
-},{"./UserMenu.jsx":462,"react":445,"react-dom/server":272,"react-swipeable":273}],453:[function(require,module,exports){
+},{"./UserMenu.jsx":464,"react":445,"react-dom/server":272,"react-swipeable":273}],453:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+
+var PageEdit = function (_React$Component) {
+  _inherits(PageEdit, _React$Component);
+
+  function PageEdit(props) {
+    _classCallCheck(this, PageEdit);
+
+    var _this = _possibleConstructorReturn(this, (PageEdit.__proto__ || Object.getPrototypeOf(PageEdit)).call(this, props));
+
+    _this.state = {
+      path: _this.props.path,
+      elements: _this.props.elements
+    };
+    return _this;
+  }
+
+  _createClass(PageEdit, [{
+    key: "handleNewElement",
+    value: function handleNewElement() {
+      var elements = this.state.elements;
+      elements.push({ type: "", props: {} });
+      this.setState({ elements: elements });
+    }
+  }, {
+    key: "handleUpdateElement",
+    value: function handleUpdateElement(index, event) {
+      var elements = this.state.elements;
+      elements[index][event.target.getAttribute("name")] = event.target.value;
+      try {
+        elements[index][event.target.getAttribute("name")] = JSON.parse(event.target.value);
+      } catch (err) {
+        console.log(err);
+      }
+      console.log(elements);
+      this.setState({ elements: elements });
+    }
+  }, {
+    key: "handleSave",
+    value: function handleSave() {
+      // TODO some validation, maybe don't allow saving over other slugs
+      BowAndDrape.api("POST", "/page", this.state, function (err, result) {
+        if (err) return BowAndDrape.dispatcher.emit("error", err.error);
+        console.log(result);
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      var whitelisted_components = [];
+      for (var i = 0; i < this.props.whitelisted_components.length; i++) {
+        whitelisted_components.push(React.createElement(
+          "option",
+          { key: whitelisted_components.length },
+          this.props.whitelisted_components[i]
+        ));
+      }
+
+      var elements = [];
+      for (var _i = 0; _i < this.state.elements.length; _i++) {
+        elements.push(React.createElement(
+          "element",
+          { key: elements.length },
+          React.createElement(
+            "select",
+            { value: this.state.elements[_i].type, onChange: this.handleUpdateElement.bind(this, _i), name: "type" },
+            whitelisted_components
+          ),
+          React.createElement("input", { type: "text", name: "props", value: JSON.stringify(this.state.elements[_i].props), onChange: this.handleUpdateElement.bind(this, _i) }),
+          JSON.stringify(this.state.elements[_i])
+        ));
+      }
+
+      return React.createElement(
+        "page_edit",
+        null,
+        React.createElement(
+          "label",
+          null,
+          "path:"
+        ),
+        React.createElement("input", { type: "text", onChange: function onChange(e) {
+            _this2.setState({ path: e.target.value });
+          }, value: this.state.path, name: "path" }),
+        elements,
+        React.createElement(
+          "element",
+          { onClick: this.handleNewElement.bind(this) },
+          "Add Element"
+        ),
+        React.createElement(
+          "button",
+          { onClick: this.handleSave.bind(this) },
+          this.props.path ? "Save" : "Add New Page"
+        )
+      );
+    }
+  }]);
+
+  return PageEdit;
+}(React.Component);
+
+module.exports = PageEdit;
+
+},{"react":445}],454:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+var Scrollable = require('./Scrollable.jsx');
+var PageEdit = require('./PageEdit.jsx');
+
+var PageList = function (_React$Component) {
+  _inherits(PageList, _React$Component);
+
+  function PageList(props) {
+    _classCallCheck(this, PageList);
+
+    var _this = _possibleConstructorReturn(this, (PageList.__proto__ || Object.getPrototypeOf(PageList)).call(this, props));
+
+    _this.state = {
+      errors: []
+    };
+    return _this;
+  }
+
+  _createClass(PageList, [{
+    key: 'handleAddPage',
+    value: function handleAddPage() {
+      BowAndDrape.api("POST", "/page", { path: "", elements: [] }, function (err, result) {
+        if (err) return setState({ errors: [err.error] });
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
+        null,
+        'Page List',
+        this.state.errors.length ? React.createElement(
+          'errors',
+          null,
+          this.state.errors
+        ) : null,
+        React.createElement(PageEdit, { path: '', elements: [], whitelisted_components: this.props.whitelisted_components }),
+        React.createElement(Scrollable, {
+          component: PageEdit,
+          endpoint: "/page",
+          component_props: { whitelisted_components: this.props.whitelisted_components },
+          page: { sort: "path", direction: "ASC" }
+        })
+      );
+    }
+  }]);
+
+  return PageList;
+}(React.Component);
+
+module.exports = PageList;
+
+},{"./PageEdit.jsx":453,"./Scrollable.jsx":459,"react":445}],455:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -57562,6 +57779,11 @@ var PayStripe = function (_React$Component) {
   }
 
   _createClass(PayStripe, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      // TODO fill in shipping info if we know it
+    }
+  }, {
     key: 'handleSameBillingToggle',
     value: function handleSameBillingToggle(e) {
       this.setState({ same_billing: !this.state.same_billing });
@@ -57696,7 +57918,6 @@ var PayStripe = function (_React$Component) {
         address_zip: this.state.same_billing ? this.state.shipping.postal : this.state.billing.postal
       };
       Stripe.card.createToken(stripe_payload, function (status, response) {
-        console.log(response);
         if (response.error) {
           _this2.setState({ processing_payment: false });
           _this2.handleSetSectionState("card", { errors: [response.error.message] });
@@ -57754,7 +57975,7 @@ var PayStripe = function (_React$Component) {
 module.exports = PayStripe;
 
 }).call(this,require('_process'))
-},{"./InputAddress.jsx":449,"./ThanksPurchaseComplete.jsx":460,"_process":166,"react":445}],454:[function(require,module,exports){
+},{"./InputAddress.jsx":449,"./ThanksPurchaseComplete.jsx":462,"_process":166,"react":445}],456:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -57789,7 +58010,7 @@ var ProductCanvas = function (_React$Component) {
 
 module.exports = ProductCanvas;
 
-},{"react":445}],455:[function(require,module,exports){
+},{"react":445}],457:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -58118,7 +58339,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ProductCanvas.jsx":454,"./ProductListEdit.jsx":456,"./Tabs.jsx":459,"async":24,"react":445}],456:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ProductCanvas.jsx":456,"./ProductListEdit.jsx":458,"./Tabs.jsx":461,"async":24,"react":445}],458:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58257,7 +58478,7 @@ var ProductListEdit = function (_React$Component) {
 
 module.exports = ProductListEdit;
 
-},{"async":24,"react":445,"react-autocomplete":270}],457:[function(require,module,exports){
+},{"async":24,"react":445,"react-autocomplete":270}],459:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58289,7 +58510,7 @@ var Scrollable = function (_React$Component) {
   _createClass(Scrollable, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      this.handleScroll();
+      BowAndDrape.dispatcher.on("authenticated", this.handleScroll.bind(this));
       document.addEventListener('scroll', this.handleScroll);
     }
   }, {
@@ -58306,6 +58527,7 @@ var Scrollable = function (_React$Component) {
       for (var i = 0; i < this.state.data.length; i++) {
         var props = {};
         Object.assign(props, this.state.data[i]);
+        if (this.props.component_props) Object.assign(props, this.props.component_props);
         props.key = i;
         children.push(React.createElement(this.props.component, props));
       }
@@ -58330,8 +58552,9 @@ var Scrollable = function (_React$Component) {
         var xhr = new XMLHttpRequest();
         var page = {};
         Object.assign(page, this.props.page);
-        if (this.state.data.length) page.start = this.state.data[this.state.data.length - 1].requested;
-        xhr.open("GET", this.props.endpoint + "&page=" + JSON.stringify(page), true);
+        if (this.state.data.length) page.start = this.state.data[this.state.data.length - 1][this.props.page.sort];
+        xhr.open("GET", this.props.endpoint + (this.props.endpoint.indexOf('?') == -1 ? '?' : '&') + "page=" + JSON.stringify(page), true);
+        xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.setRequestHeader("Authorization", "Bearer " + BowAndDrape.token);
         xhr.onreadystatechange = function () {
@@ -58351,7 +58574,7 @@ var Scrollable = function (_React$Component) {
 
 module.exports = Scrollable;
 
-},{"react":445}],458:[function(require,module,exports){
+},{"react":445}],460:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -58593,7 +58816,7 @@ var Shipment = function (_React$Component) {
 
 module.exports = Shipment;
 
-},{"./Address.jsx":446,"./Item.jsx":450,"./Timestamp.jsx":461,"react":445}],459:[function(require,module,exports){
+},{"./Address.jsx":446,"./Item.jsx":450,"./Timestamp.jsx":463,"react":445}],461:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58714,7 +58937,7 @@ var Tabs = function (_React$Component) {
 
 module.exports = Tabs;
 
-},{"fs":115,"react":445}],460:[function(require,module,exports){
+},{"fs":115,"react":445}],462:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58756,7 +58979,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"react":445}],461:[function(require,module,exports){
+},{"react":445}],463:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58795,7 +59018,7 @@ var Timestamp = function (_React$Component) {
 
 module.exports = Timestamp;
 
-},{"react":445}],462:[function(require,module,exports){
+},{"react":445}],464:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -58819,7 +59042,10 @@ var UserMenu = function (_React$Component) {
   function UserMenu(props) {
     _classCallCheck(this, UserMenu);
 
-    return _possibleConstructorReturn(this, (UserMenu.__proto__ || Object.getPrototypeOf(UserMenu)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (UserMenu.__proto__ || Object.getPrototypeOf(UserMenu)).call(this, props));
+
+    _this.handleToggleMenu = _this.props.handleToggleMenu;
+    return _this;
   }
 
   _createClass(UserMenu, [{
@@ -58859,7 +59085,7 @@ var UserMenu = function (_React$Component) {
         'Logout'
       ));
 
-      return React.createElement("menu", {}, menu_items, React.createElement('handle', null));
+      return React.createElement("menu", {}, menu_items, React.createElement('handle', { onClick: this.handleToggleMenu }));
     }
   }, {
     key: 'logout',
@@ -58874,7 +59100,7 @@ var UserMenu = function (_React$Component) {
 
 module.exports = UserMenu;
 
-},{"./FacebookLogin.jsx":447,"./UserProfile.jsx":464,"react":445}],463:[function(require,module,exports){
+},{"./FacebookLogin.jsx":447,"./UserProfile.jsx":466,"react":445}],465:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58981,7 +59207,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserProfile.jsx":464,"jwt-decode":227,"react":445}],464:[function(require,module,exports){
+},{"./UserProfile.jsx":466,"jwt-decode":227,"react":445}],466:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59172,6 +59398,7 @@ var Dispatcher = function (_EventEmitter) {
       document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
       // also save it in memory for API auth
       BowAndDrape.token = auth_object.token;
+      BowAndDrape.dispatcher.emit("authenticated");
     }
   }]);
 
@@ -59182,6 +59409,7 @@ var api = function api(method, endpoint, body, callback) {
   var self = this;
   var xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
+  xhr.setRequestHeader("Accept", "application/json");
   xhr.setRequestHeader("Content-Type", "application/json");
   if (BowAndDrape.token) xhr.setRequestHeader("Authorization", "Bearer " + BowAndDrape.token);else console.log("attempting api call while not logged in");
   xhr.onreadystatechange = function () {
@@ -59205,10 +59433,11 @@ module.exports = {
     UserPasswordReset: require('./UserPasswordReset.jsx'),
     FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),
-    PayStripe: require('./PayStripe.jsx')
+    PayStripe: require('./PayStripe.jsx'),
+    PageList: require('./PageList.jsx')
   },
   dispatcher: new Dispatcher(),
   api: api
 };
 
-},{"./FulfillShipments.jsx":448,"./LayoutBasic.jsx":451,"./LayoutMain.jsx":452,"./PayStripe.jsx":453,"./ProductList.jsx":455,"./UserPasswordReset.jsx":463,"events":144,"jwt-decode":227,"react":445,"react-dom":271}]},{},[]);
+},{"./FulfillShipments.jsx":448,"./LayoutBasic.jsx":451,"./LayoutMain.jsx":452,"./PageList.jsx":454,"./PayStripe.jsx":455,"./ProductList.jsx":457,"./UserPasswordReset.jsx":465,"events":144,"jwt-decode":227,"react":445,"react-dom":271}]},{},[]);

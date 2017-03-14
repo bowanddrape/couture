@@ -5,6 +5,8 @@ const Swipeable = require('react-swipeable');
 
 const UserMenu = require('./UserMenu.jsx');
 
+const menu_width = 350;
+
 class LayoutMain extends React.Component {
   constructor(props) {
     super(props);
@@ -20,21 +22,37 @@ class LayoutMain extends React.Component {
     this.onChildSwiping = this.onChildSwiping.bind(this);
   }
 
-  onSwiping(e, deltaX, deltaY, absX, absY, velocity) {
+  // blacklist certain elements from swipe actions
+  targetSwipable(element) {
+    // ignore swipe actions on input tags
+    if (element.tagName.toLowerCase()=="input")
+      return false;
+    return true;
+  }
+
+  onSwiping(event, deltaX, deltaY, absX, absY, velocity) {
+    if (!this.targetSwipable(event.target))
+      return;
     let menu = this.state.menu;
-    menu.offset = (menu.state?-this.state.viewport_width+100:0) - deltaX;
-    menu.offset = Math.max(Math.min(menu.offset, 0),-this.state.viewport_width+100);
+    menu.offset = (menu.state?-menu_width+100:0) - deltaX;
+    menu.offset = Math.max(Math.min(menu.offset, 0),-menu_width);
+    menu.state = menu.offset < menu_width*-0.5;
     this.setState({menu:menu});
   }
   onSwiped(event, x, y, isFlick, velocity) {
     let menu = this.state.menu;
-    menu.state = x > 100;
-    menu.offset = menu.state?-this.state.viewport_width+100:0;
+    menu.offset = menu.state?-menu_width:0;
     this.setState({menu:menu});
   }
   onChildSwiping(e, deltaX, deltaY, absX, absY, velocity) {
     e.stopPropagation();
     console.log(`child ${deltaX} ${deltaY}`);
+  }
+  handleToggleMenuState() {
+    let menu = this.state.menu;
+    menu.state = !menu.state;
+    menu.offset = menu.state?-menu_width:0;
+    this.setState({menu:menu});
   }
 
   componentDidMount() {
@@ -71,7 +89,7 @@ class LayoutMain extends React.Component {
     let content = null;
 
     if (typeof(document)=='undefined' || typeof(BowAndDrape.views[this.props.content_name])=='undefined') {
-      content = (<div dangerouslySetInnerHTML={{__html:decodeURIComponent(this.props.content_string)}} />);
+      content = (<div dangerouslySetInnerHTML={{__html:unescape(this.props.content_string)}} />);
     } else {
       content = React.createElement(
         BowAndDrape.views[this.props.content_name],
@@ -92,7 +110,7 @@ class LayoutMain extends React.Component {
           <link rel="stylesheet" href="/styles.css" type="text/css"></link>
           {content}
           <div style={{position:"fixed",left:(this.state.viewport_width - (this.state.viewport_width*0.01) + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s"}}>
-            {React.createElement(UserMenu, this.state)}
+            <UserMenu handleToggleMenu={this.handleToggleMenuState.bind(this)} {...this.state}/>
           </div>
         {/*<Swipeable
           onSwiping={this.onChildSwiping}
@@ -107,7 +125,7 @@ class LayoutMain extends React.Component {
           var React = BowAndDrape.React;
           var ReactDOM = BowAndDrape.ReactDOM;
           var layout = React.createElement(BowAndDrape.views.LayoutMain, {
-            content_string: \`${encodeURIComponent(this.props.content_string)}\`,
+            content_string: \`${escape(this.props.content_string)}\`,
             content_name: \`${this.props.content_name}\`,
             content_props: \`${this.props.content_props}\`}
           );

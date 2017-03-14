@@ -4,7 +4,7 @@ const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const async = require('async');
 
-const SQLTable = require('./SQLTable');
+const JSONAPI = require('./JSONAPI');
 
 const LayoutMain = require('../views/LayoutMain.jsx');
 
@@ -23,11 +23,10 @@ const whitelisted_components = [
   "PayStripe",
 ]
 
-class Page extends SQLTable {
+class Page extends JSONAPI {
   constructor(page) {
     super();
-    this.path = page.path;
-    this.elements = page.elements;
+    Object.assign(this, page);
   }
 
   // needed by SQLTable
@@ -40,8 +39,10 @@ class Page extends SQLTable {
   }
 
   // if we have a matching path in our pages table, serve that page
-  static handleHTTP(req, res, next) {
-    let self = this;
+  static handleRenderPage(req, res, next) {
+    // see if we're drawing the admin view
+    if (req.path_tokens[0]=="page")
+      return Page.handleAdminPage(req, res);
 
     let pages = Page.getAll(null, function(err, pages) {
       for (let i=0; i<pages.length; i++) {
@@ -49,6 +50,7 @@ class Page extends SQLTable {
         if (matches) {
           // TODO go through all elements and do this
           let element = pages[i].elements[0];
+          if (!element) continue;
 
           // there are 2 ways of specifying prop data, immediate or from db
           let immediate = req.query; // can also be supplied from querystring
@@ -102,6 +104,14 @@ class Page extends SQLTable {
       }
       next();
     });
+  }
+
+  static handleAdminPage(req, res) {
+    // user must be an admin
+    if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
+      return Page.renderNotFound(req, res);
+
+    Page.render(req, res, require(`../views/PageList.jsx`), {whitelisted_models, whitelisted_components});
   }
 
   static renderString(component, props, layout) {

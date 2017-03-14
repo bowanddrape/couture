@@ -30,6 +30,7 @@ class Dispatcher extends EventEmitter {
     document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
     // also save it in memory for API auth
     BowAndDrape.token = auth_object.token;
+    BowAndDrape.dispatcher.emit("authenticated");
   }
 }
 
@@ -37,6 +38,7 @@ let api = function(method, endpoint, body, callback) {
   var self = this;
   let xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
+  xhr.setRequestHeader("Accept","application/json");
   xhr.setRequestHeader("Content-Type", "application/json");
   if (BowAndDrape.token)
     xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
@@ -63,6 +65,7 @@ module.exports = {
     FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),
     PayStripe: require('./PayStripe.jsx'),
+    PageList: require('./PageList.jsx'),
   },
   dispatcher: new Dispatcher(),
   api,

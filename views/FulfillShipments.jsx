@@ -19,7 +19,6 @@ class FulfillShipments extends React.Component {
 
   componentDidMount() {
     BowAndDrape.dispatcher.on("shipment", (shipment) => {
-console.log(shipment);
       this.setState({shipment, shipment});
     });
   }

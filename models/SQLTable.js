@@ -87,6 +87,17 @@ class SQLTable {
     });
   }
 
+  // helper function to delete an object from the database
+  static delete(primary_key_value, callback) {
+    if (!this.getSQLSettings) return callback("getSQLSettings not defined");
+    let sql = this.getSQLSettings();
+    let query = `DELETE * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
+    this.sqlExec(this, query, [primary_key_value], function(err, results) {
+      if (err) return callback(err);
+      callback(null, results);
+    });
+  }
+
   // helper function to build a query statement from an object
   static getAll(constraints, callback) {
     if (!this.getSQLSettings) return callback("getSQLSettings not defined");

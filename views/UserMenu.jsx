@@ -7,6 +7,8 @@ const UserProfile = require('./UserProfile.jsx');
 class UserMenu extends React.Component {
   constructor(props) {
     super(props);
+
+    this.handleToggleMenu = this.props.handleToggleMenu;
   }
 
   render() {
@@ -28,7 +30,7 @@ class UserMenu extends React.Component {
     return (
       React.createElement("menu", {},
         menu_items,
-        <handle/>
+        <handle onClick={this.handleToggleMenu}/>
       )
     );
   }

@@ -15,6 +15,7 @@ const cookieParser = require('cookie-parser');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const multer = require('multer');
+const compression = require('compression');
 var aws = require('aws-sdk');
 const multerS3 = require('multer-s3');
 // FIXME move these keys into the config file
@@ -48,6 +49,9 @@ const LayoutMain = require('./views/LayoutMain');
 const BowAndDrape = require('./views/BowAndDrape.jsx');
 
 const Placeholder = require('./views/Placeholder.jsx');
+
+// enable gzip compression
+app.use(compression());
 
 // populate req.body with json body content
 app.use(bodyParser.json());
@@ -94,9 +98,10 @@ app.use(Fulfillment.handleHTTP);
 app.use(Store.handleHTTP);
 app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
+app.use((req, res, next) => {new Page().handleHTTP(req, res, next);});
 
 // handle pages
-app.use(Page.handleHTTP);
+app.use(Page.handleRenderPage);
 
 
 // render homepage
