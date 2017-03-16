@@ -1,5 +1,6 @@
 
 const pg = require('pg').native;
+const Log = require('./Log.js');
 
 let pg_read_pool = new pg.Pool({
   user: process.env.PG_USER,
@@ -42,12 +43,14 @@ class SQLTable {
       client.query(query, values, function(err, result) {
         done(); // release connection back to pool
         if(err) {
-          // TODO log and escalate
-          console.error(err);
+          // TODO escalate?
+          Log.message(JSON.stringify(err));
           return callback(err);
         }
 
-        if (model && result.rows.length) {
+        if (model) {
+          if (!result.rows.length)
+            return callback(null, []);
           let ret = result.rows.map(function(row) {return new model(row)});
           return callback(null, ret);
         }
@@ -65,8 +68,8 @@ class SQLTable {
       client.query(query, values, function(err, result) {
         done(); // release connection back to pool
         if(err) {
-          // TODO log and escalate
-          console.error(err);
+          // TODO escalate?
+          Log.message(JSON.stringify(err));
           return callback(err);
         }
 
@@ -84,17 +87,6 @@ class SQLTable {
       if (err) return callback(err);
       if (!results.length) return callback(null, null);
       callback(null, results[0]);
-    });
-  }
-
-  // helper function to delete an object from the database
-  static delete(primary_key_value, callback) {
-    if (!this.getSQLSettings) return callback("getSQLSettings not defined");
-    let sql = this.getSQLSettings();
-    let query = `DELETE * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
-    this.sqlExec(this, query, [primary_key_value], function(err, results) {
-      if (err) return callback(err);
-      callback(null, results);
     });
   }
 
@@ -208,8 +200,18 @@ class SQLTable {
       }
       buildQueryAndExec(callback);
     })
-  }
+  } // upsert()
 
+  // helper function to delete an object from the database
+  remove(callback) {
+    if (!this.constructor.getSQLSettings) return callback("getSQLSettings not defined");
+    let sql = this.constructor.getSQLSettings();
+    let query = `DELETE FROM ${sql.tablename} WHERE ${sql.pkey}=$1`;
+    SQLTable.sqlExec(query, [this[sql.pkey]], (err, results) => {
+      if (err) return callback(err);
+      callback(null, results);
+    });
+  } // remove()
 }
 
 module.exports = SQLTable;

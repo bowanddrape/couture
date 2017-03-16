@@ -1,6 +1,7 @@
 
 const React = require('react');
 const InputAddress = require('./InputAddress.jsx');
+const Item = require('./Item.jsx');
 const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 
 class PayStripe extends React.Component {
@@ -9,6 +10,7 @@ class PayStripe extends React.Component {
 
     this.state = {
       errors: [],
+      items: this.props.items,
       card: {
         number: "",
         cvc: "",
@@ -72,8 +74,9 @@ class PayStripe extends React.Component {
       update[section] = Object.assign(this.state[section], state);
       // special handling for shipping to display warning about customs
       if (section=="shipping") {
-        if (update[section].country && update[section].country!="USA") {
-          if (!update[section].errors.length)
+        if (state.country) {
+          update[section].errors = [];
+          if (update[section].country!="USA")
             update[section].errors = [<div>Bow & Drape is not responsible for any additional import fees that arise after the item has left the United States</div>];
         }
       }
@@ -161,9 +164,16 @@ console.log(err);
     if (this.state.done)
       return <ThanksPurchaseComplete />;
 
+    // build cart view
+    let items = [];
+    for (let i=0; i<this.state.items.length; i++) {
+      items.push(<Item key={items.length} {...this.state.items[i]} />);
+    }
+
     return (
       <div>
         Bow & Drape Virtual Sample Sale
+        {items}
         {this.state.errors.length?<errors>{this.state.errors}</errors>:null}
         <InputAddress section_title="Shipping Address" handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
         same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} />

@@ -5,7 +5,7 @@ class Item extends React.Component {
   render() {
     if (!this.props.props) {
       return (
-        <item>{JSON.stringify(this.props.props)}</item>
+        <item>{JSON.stringify(this.props)}</item>
       );
     }
     let assembly = [];
@@ -28,7 +28,10 @@ class Item extends React.Component {
     return (
       <item>
         <deets>
-          <preview style={{backgroundImage: "url("+this.props.props.image+")"}}/>
+          {this.props.props.image ?
+            <preview style={{backgroundImage: "url("+this.props.props.image+")"}}/>
+            : <preview className="disabled" />
+          }
           <div className="sku">{this.props.sku}</div>
           <div className="name">{this.props.props.name}</div>
           <props>{other_properties}</props>

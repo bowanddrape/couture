@@ -14,27 +14,6 @@ class Shipment extends React.Component {
     this.handleCancel = this.handleCancel.bind(this);
   }
 
-  updateShipment(shipment, callback) {
-    if (!BowAndDrape.token) return;
-    var self = this;
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", '/shipment', true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
-    xhr.onreadystatechange = function() {
-      if (this.readyState!=4) {
-        return;
-      }
-      let response = JSON.parse(this.responseText);
-      if (callback) return callback(response);
-      if (response.error) {
-        return console.log(response.error);
-      }
-      self.setState(response);
-    }
-    xhr.send(JSON.stringify(shipment));
-  }
-
   setSink(sink) {
     if (typeof(BowAndDrape)=="undefined") return;
     // get id for sink
@@ -51,7 +30,9 @@ class Shipment extends React.Component {
     Object.assign(shipment, this.state);
     shipment.to_id = id;
     shipment.received = Math.round(new Date().getTime()/1000);
-    this.updateShipment(shipment);
+    BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
+      this.setState(shipment);
+    });
   }
 
   // FIXME altering state on client-side without tracking updates makes races
@@ -59,7 +40,9 @@ class Shipment extends React.Component {
     let shipment = {};
     Object.assign(shipment, this.state);
     shipment.packed = Math.round(new Date().getTime()/1000);
-    this.updateShipment(shipment);
+    BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
+      this.setState(shipment);
+    });
   }
 
   handlePickup() {

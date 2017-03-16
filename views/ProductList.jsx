@@ -90,6 +90,7 @@ console.log("getting inventory for "+store.facility_id);
 
     return (
       <customize>
+        <button style={{position:"fixed",top:"0px",right:"0px"}}>Add To Cart</button>
         <div className="canvas_container">
           <product_options>
             {product_options}
@@ -234,7 +235,7 @@ console.log("getting inventory for "+store.facility_id);
     // populate components
     let components = [];
     let misc_components = [];
-    for (let i=0; i<product.compatible_components.length && i<20; i++) {
+    for (let i=0; i<product.compatible_components.length && i<100; i++) {
       if (product.compatible_components[i].options) {
         let tab_components = [];
         for (let j=0; j<product.compatible_components[i].options.length; j++) {

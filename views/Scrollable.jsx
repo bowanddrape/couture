@@ -46,22 +46,14 @@ class Scrollable extends React.Component {
     let scrolled = (this.detector.getBoundingClientRect().top-20) < window.innerHeight;
     if (scrolled && !this.querying) {
       this.querying = true;
-      var self = this;
-      let xhr = new XMLHttpRequest();
       let page = {};
       Object.assign(page, this.props.page);
       if (this.state.data.length)
         page.start = this.state.data[this.state.data.length-1][this.props.page.sort];
-      xhr.open("GET", this.props.endpoint+(this.props.endpoint.indexOf('?')==-1?'?':'&')+"page="+JSON.stringify(page), true);
-      xhr.setRequestHeader("Accept","application/json");
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
-      xhr.onreadystatechange = function() {
-        if (this.readyState!=4) { return; }
-        self.querying = false;
-        self.setState({data: self.state.data.concat(JSON.parse(this.responseText))});
-      }
-      xhr.send();
+      BowAndDrape.api('GET', this.props.endpoint+(this.props.endpoint.indexOf('?')==-1?'?':'&')+"page="+JSON.stringify(page), null, (err, resp) => {
+        this.querying = false;
+        this.setState({data: this.state.data.concat(resp)});
+      });
     }
   }
 }

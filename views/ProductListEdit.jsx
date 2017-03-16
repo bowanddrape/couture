@@ -84,19 +84,7 @@ class ProductListEdit extends React.Component {
 
   // called by the add component autocomplete searchbox
   handleAutocompleteQuery(query, callback) {
-    if (!BowAndDrape.token) return;
-    var self = this;
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", `/component?search=${query}&page={"limit":8}`, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
-    xhr.onreadystatechange = function() {
-      if (this.readyState!=4) { return; }
-      if (this.status!=200)
-        return callback(JSON.parse(this.responseText));
-      callback(null, JSON.parse(this.responseText));
-    }
-    xhr.send();
+    BowAndDrape.api('GET', `/component?search=${query}&page={"limit":8}`, null, callback);
   }
 
   updateStoreProducts(product, method, callback) {

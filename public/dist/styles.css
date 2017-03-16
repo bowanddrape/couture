@@ -25,11 +25,15 @@ button,
   margin: 10px;
   width: 100%;
   max-width: 300px;
+  max-height: 50px;
 }
 button:hover,
 .button:hover {
   background-color: #000000;
   color: #ffffff;
+}
+actions {
+  display: flex;
 }
 errors {
   color: #ffffff;
@@ -159,25 +163,29 @@ shipment:last-child {
 }
 item {
   display: block;
-  background-color: #aaa;
+}
+item:last-of-type deets {
+  border-bottom: solid 1px #000000;
 }
 item deets {
-  display: block;
+  display: flex;
   position: relative;
-  left: 220px;
-  min-height: 200px;
+  justify-content: space-between;
+  padding-right: 50px;
+  margin: auto;
+  max-width: 700px;
+  border: solid 1px #000000;
+  border-bottom: none;
 }
 item deets preview {
   display: block;
-  position: absolute;
-  top: 0px;
-  left: -220px;
   width: 200px;
-  height: 200px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: #000;
+}
+item deets preview:not(.disabled) {
+  height: 200px;
 }
 item deets .sku {
   font-style: italic;
@@ -190,13 +198,11 @@ item deets .name {
 item deets props {
   justify-content: space-between;
 }
-item:nth-child(2n) {
-  background-color: #fff;
-}
 customize product_options {
   display: flex;
   flex-direction: column;
   min-width: 300px;
+  margin-top: 50px;
 }
 customize product_options select {
   font-size: 35px;
@@ -205,6 +211,8 @@ customize .canvas_container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  max-width: 100%;
+  margin-bottom: 270px;
 }
 customize .canvas_container canvas {
   flex-grow: 1;
@@ -229,6 +237,7 @@ customize .component_container {
   bottom: 0;
   left: 0;
   right: 0;
+  max-width: 100%;
   overflow-x: scroll;
   background-color: rgba(0, 0, 0, 0.5);
 }

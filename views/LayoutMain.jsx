@@ -27,6 +27,8 @@ class LayoutMain extends React.Component {
     // ignore swipe actions on input tags
     if (element.tagName.toLowerCase()=="input")
       return false;
+    if (element.classList.contains("component_container") || (element.parentNode&&element.parentNode.classList.contains("component_container")))
+      return false;
     return true;
   }
 

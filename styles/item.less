@@ -5,23 +5,27 @@
 
 item {
   display: block;
-  background-color: #aaa;
+  &:last-of-type deets {
+    border-bottom: solid 1px @color_secondary;
+  }
   deets {
-    display: block;
+    display: flex;
     position: relative;
-    left: @item_preview_width + 20px;
-    min-height: @item_preview_height;
+    justify-content: space-between;
+    padding-right: 50px;
+    margin: auto;
+    max-width: 700px;
+    border: solid 1px @color_secondary;
+    border-bottom: none;
     preview {
       display: block;
-      position: absolute;
-      top: 0px;
-      left: -@item_preview_width - 20px;
       width: @item_preview_width;
-      height: @item_preview_height;
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
-      background-color: #000;
+      &:not(.disabled) {
+        height: @item_preview_height;
+      }
     }
     .sku {
       font-style: italic;
@@ -34,9 +38,6 @@ item {
     props {
       justify-content: space-between;
     }
-  }
-  &:nth-child(2n) {
-    background-color: #fff;
   }
 }
 

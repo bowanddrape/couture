@@ -25,6 +25,9 @@ let styles = {
     backgroundColor: colors['color_primary'],
     borderTopLeftRadius: '20px',
     borderTopRightRadius: '20px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   tab_selected: {
     padding: '15px',
@@ -34,6 +37,7 @@ let styles = {
     backgroundColor: colors['color_support_0'],
     borderTopLeftRadius: '20px',
     borderTopRightRadius: '20px',
+    whiteSpace: 'nowrap',
   },
 }
 

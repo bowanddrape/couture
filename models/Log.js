@@ -1,4 +1,5 @@
 
+const os = require('os');
 const https = require('https');
 
 class Log {
@@ -13,7 +14,7 @@ class Log {
     slack_notify.on('error', function(err) {console.log(err);});
     slack_notify.end(JSON.stringify({
       as_user: false,
-      username: "couture",
+      username: "couture "+os.hostname(),
       icon_emoji: ":moneybag:",
       text: msg,
     }));

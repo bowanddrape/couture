@@ -33,6 +33,10 @@ class JSONAPI extends SQLTable {
       let object = new this.constructor(req.body);
       return this.onApiSave(res, req, object);
     }
+    if (req.method=='DELETE') {
+      let object = new this.constructor(req.body);
+      return this.onApiRemove(res, req, object);
+    }
     res.json({error: "invalid endpoint"}).end();
   }
 
@@ -46,6 +50,15 @@ class JSONAPI extends SQLTable {
     });
   }
 
+  onApiRemove(res, req, object, callback) {
+    object.remove((err, result) => {
+      if (callback)
+        return (callback(err, result));
+      if (err)
+        return res.json({error: err});
+      return res.json(object);
+    });
+  }
 }
 
 module.exports = JSONAPI;
