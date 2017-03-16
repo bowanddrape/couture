@@ -1,10 +1,11 @@
 
 require('node-jsx-babel').install();
+require('dotenv').config();
 const mysql = require('mysql');
 const async = require('async');
 
-const Order = require('../models/Order.js');
 const Shipment = require('../models/Shipment.js');
+const Store = require('../models/Store.js');
 const SQLTable = require('../models/SQLTable.js');
 
 function parseLegacyAssembly(mysql_connection, prerenderkey, callback) {
@@ -109,7 +110,6 @@ let getOrders = function(callback) {
           Object.assign(ret, rows[i]);
           ret.contents = items;
           ret.placed = ret.requested;
-          ret.props = {imported: "haute"};
           callback(err, ret);
         });
       });
@@ -123,43 +123,46 @@ let getOrders = function(callback) {
   });
 }
 
-// FIXME this is destructive
-//SQLTable.sqlExec("delete from shipments where from_id='c788aea6-4250-4a36-807c-47f7c9d46d14';", {}, (err) => {});
-//SQLTable.sqlExec("delete from orders where store_id='c788aea6-4250-4a36-807c-47f7c9d46d14';", {}, (err) => {});
+// get store ids
+let query = "SELECT * FROM stores WHERE props#>>'{name}'='haute' LIMIT 1";
+Store.sqlQuery(Store, query, [], function(err, stores) {
+  if (err) {
+    console.error(err);
+    process.exit(0);
+  }
+console.log(stores);
+  if (!stores || !stores.length) {
+    console.error("ERROR: no store named haute");
+    process.exit(0);
+  }
+  let store_id=stores[0].id;
 
+  getOrders((err, orders) => {
+    orders.map((order_object) => {
+console.log(order_object);
+      if (!order_object.contents.length) return;
+      if (!order_object.email) return;
 
-getOrders((err, orders) => {
-  orders.map((order_object) => {
-    if (!order_object.contents.length) return;
-    if (!order_object.email) return;
-
-//console.log(order_object);
-    order_object.store_id = 'c788aea6-4250-4a36-807c-47f7c9d46d14';
-
-    order = new Order(order_object);
-    order.upsert((err, result) => {
-      if (err) {
-        return console.log(err);
-      }
-
-      if (order_object.tracking_code.trim()) {
-        order_object.received = order_object.packed;
-      }
-
-      // add shipment detail
-      let shipment = new Shipment({
-        order_id: result.rows[0].id,
-        packed: order_object.packed,
-        requested: order_object.requested,
-        received: order_object.received,
-        tracking_code: order_object.tracking_code,
-        store_id: 'c788aea6-4250-4a36-807c-47f7c9d46d14',
-        from_id: 'c788aea6-4250-4a36-807c-47f7c9d46d14',
-        contents: order_object.contents
-      });
-      shipment.upsert((err)=> {
-        if (err) console.log(err);
-      });
-    });
-  });
-});
+      // see if this order was already imported
+      let query = `SELECT * FROM shipments WHERE props#>>'{imported}'='haute' AND props#>>'{legacy_id}'=${order_object.order_id} LIMIT 1;`;
+      SQLTable.sqlQuery(Shipment, query, [], (err, shipments) => {
+        let shipment = shipments&&shipments.length ? shipments[1] : {};
+        let imported_shipment = {
+          packed: order_object.packed,
+          requested: order_object.requested,
+          received: order_object.received,
+          tracking_code: order_object.tracking_code,
+          email: order_object.email,
+          store_id,
+          contents: order_object.contents,
+          props: {imported: "haute", legacy_id: order_object.order_id},
+        };
+        Object.assign(shipment, imported_shipment);
+        shipment = new Shipment(shipment);
+        shipment.upsert((err)=> {
+          if (err) console.log(err);
+        });
+      }); // get previous record if it was already imported
+    }); // orders.map()
+  }); // getOrders()
+}); // get store_id

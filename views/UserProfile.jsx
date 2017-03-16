@@ -19,6 +19,7 @@ class UserProfile extends React.Component {
       return (
         <login>
           <input id="email" className={errors.email?"error":""} placeholder={errors.email?errors.email:'email address'} type="text"/>
+          <br/>
           <input id="password" className={errors.password?"error":""} placeholder={errors.password?errors.password:"password"} type="password"/>
           <msg>{typeof(this.props.user.error)=="string"?this.props.user.error:""}</msg>
           <button onClick={this.login}>Login / Register</button>

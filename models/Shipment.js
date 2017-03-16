@@ -1,7 +1,6 @@
 
 const JSONAPI = require('./JSONAPI');
 const Item = require('./Item');
-const Page = require('./Page');
 
 class Shipment extends JSONAPI {
   constructor(shipment) {

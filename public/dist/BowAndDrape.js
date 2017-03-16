@@ -207,7 +207,7 @@ var SQLTable = function () {
           done(); // release connection back to pool
           if (err) {
             // TODO escalate?
-            Log.message(JSON.stringify(err));
+            console.error(JSON.stringify(err));
             return callback(err);
           }
 
@@ -236,7 +236,7 @@ var SQLTable = function () {
           done(); // release connection back to pool
           if (err) {
             // TODO escalate?
-            Log.message(JSON.stringify(err));
+            console.error(JSON.stringify(err));
             return callback(err);
           }
 
@@ -59346,6 +59346,7 @@ var UserProfile = function (_React$Component) {
           'login',
           null,
           React.createElement('input', { id: 'email', className: errors.email ? "error" : "", placeholder: errors.email ? errors.email : 'email address', type: 'text' }),
+          React.createElement('br', null),
           React.createElement('input', { id: 'password', className: errors.password ? "error" : "", placeholder: errors.password ? errors.password : "password", type: 'password' }),
           React.createElement(
             'msg',

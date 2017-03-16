@@ -1,6 +1,5 @@
 
 const SQLTable = require('./SQLTable');
-const Page = require('./Page');
 
 class JSONAPI extends SQLTable {
 
@@ -15,7 +14,7 @@ class JSONAPI extends SQLTable {
 
     // user must be an admin
     if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
-      return Page.renderNotFound(req, res);
+      return res.status(404).json({error:"Not Found"}).end();
 
     if (req.method=='GET') {
       if (!req.query.page) {

@@ -44,7 +44,7 @@ class SQLTable {
         done(); // release connection back to pool
         if(err) {
           // TODO escalate?
-          Log.message(JSON.stringify(err));
+          console.error(JSON.stringify(err));
           return callback(err);
         }
 
@@ -69,7 +69,7 @@ class SQLTable {
         done(); // release connection back to pool
         if(err) {
           // TODO escalate?
-          Log.message(JSON.stringify(err));
+          console.error(JSON.stringify(err));
           return callback(err);
         }
 

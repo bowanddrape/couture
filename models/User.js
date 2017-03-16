@@ -87,6 +87,7 @@ class User extends SQLTable {
           return res.status(401).json({"error":"invalid authorization"});
       }
       req.user.passhash = req.body.passhash;
+      delete req.user.verified;
       return req.user.upsert(function(err, result) {
         if (err) return res.status(500).json({"error":"could not update password"});
         User.sendJwtToken(res, req.user);
