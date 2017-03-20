@@ -130,7 +130,6 @@ Store.sqlQuery(Store, query, [], function(err, stores) {
     console.error(err);
     process.exit(0);
   }
-console.log(stores);
   if (!stores || !stores.length) {
     console.error("ERROR: no store named haute");
     process.exit(0);
@@ -139,14 +138,13 @@ console.log(stores);
 
   getOrders((err, orders) => {
     orders.map((order_object) => {
-console.log(order_object);
       if (!order_object.contents.length) return;
       if (!order_object.email) return;
 
       // see if this order was already imported
-      let query = `SELECT * FROM shipments WHERE props#>>'{imported}'='haute' AND props#>>'{legacy_id}'=${order_object.order_id} LIMIT 1;`;
+      let query = `SELECT * FROM shipments WHERE props#>>'{imported}'='haute' AND props#>>'{legacy_id}'='${order_object.order_id}' LIMIT 1;`;
       SQLTable.sqlQuery(Shipment, query, [], (err, shipments) => {
-        let shipment = shipments&&shipments.length ? shipments[1] : {};
+        let shipment = (shipments&&shipments.length) ? shipments[0] : {};
         let imported_shipment = {
           packed: order_object.packed,
           requested: order_object.requested,
