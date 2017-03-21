@@ -148,6 +148,7 @@ class PayStripe extends React.Component {
         email: this.state.shipping.email,
         contents: this.props.items,
         stripe_token: response.id,
+        address: this.state.shipping,
       }
       BowAndDrape.api("POST", "/order", payload, (err, resp) => {
         if (err) {

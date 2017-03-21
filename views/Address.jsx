@@ -4,11 +4,11 @@ class Address extends React.Component {
   render() {
     return (
       <address>
-        <street>{this.props.street_address}</street>
+        <street>{this.props.street}</street>
         <apt>{this.props.apt}</apt>
-        <region>{this.props.region}{this.props.region?",":""}</region>
-        <locality>{this.props.locality}</locality>
-        <postal_code>{this.props.postal_code}</postal_code>
+        <locality>{this.props.locality}{this.props.locality?",":""}</locality>
+        <region>{this.props.region}</region>
+        <postal>{this.props.postal}</postal>
         <country>{this.props.country}</country>
       </address>
     );

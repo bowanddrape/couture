@@ -5,8 +5,11 @@ const mysql = require('mysql');
 const async = require('async');
 
 const Shipment = require('../models/Shipment.js');
+const Facility = require('../models/Facility.js');
 const Store = require('../models/Store.js');
 const SQLTable = require('../models/SQLTable.js');
+const Address = require('../models/Address.js');
+
 
 function parseLegacyAssembly(mysql_connection, prerenderkey, callback) {
   // a b() in the prerenderkey means on the back
@@ -100,7 +103,7 @@ mysql_connection.connect();
 
 let getOrders = function(callback) {
   let get_items_queries = [];
-  let query = "SELECT orders.id as order_id, UNIX_TIMESTAMP(orders.created_at) AS requested, UNIX_TIMESTAMP(ship_date) AS packed, shipping_name AS name, email, CONCAT('{\"street_address\":\"',shipping_addr1,' ',shipping_addr2,'\",\"region\":',shipping_city,'\",\"locality\":\"',shipping_state,'\",\"postal_code\":\"',shipping_zip,'\",\"country\":\"',shipping_country,'\"}') AS address, tracking_code FROM orders, user WHERE orders.user_id=user.id ORDER BY orders.id DESC";
+  let query = "SELECT orders.id as order_id, UNIX_TIMESTAMP(orders.created_at) AS requested, UNIX_TIMESTAMP(ship_date) AS packed, shipping_name AS name, email, CONCAT('{\"street\":\"',shipping_addr1,' ',shipping_addr2,'\",\"region\":\"',shipping_city,'\",\"locality\":\"',shipping_state,'\",\"postal\":\"',shipping_zip,'\",\"country\":\"',shipping_country,'\"}') AS address, tracking_code, delivered_date FROM orders, user WHERE orders.user_id=user.id ORDER BY orders.id DESC LIMIT 5000";
   mysql_connection.query(query, function(err, rows, fields) {
     if (err) return console.error(err);
     for (let i=0; i<rows.length; i++) {
@@ -123,6 +126,7 @@ let getOrders = function(callback) {
   });
 }
 
+
 // get store ids
 let query = "SELECT * FROM stores WHERE props#>>'{name}'='haute' LIMIT 1";
 Store.sqlQuery(Store, query, [], function(err, stores) {
@@ -136,31 +140,45 @@ Store.sqlQuery(Store, query, [], function(err, stores) {
   }
   let store_id=stores[0].id;
 
-  getOrders((err, orders) => {
-    orders.map((order_object) => {
-      if (!order_object.contents.length) return;
-      if (!order_object.email) return;
+  Facility.initMandatoryFacilities((err, facility_ids) => {
 
-      // see if this order was already imported
-      let query = `SELECT * FROM shipments WHERE props#>>'{imported}'='haute' AND props#>>'{legacy_id}'='${order_object.order_id}' LIMIT 1;`;
-      SQLTable.sqlQuery(Shipment, query, [], (err, shipments) => {
-        let shipment = (shipments&&shipments.length) ? shipments[0] : {};
-        let imported_shipment = {
-          packed: order_object.packed,
-          requested: order_object.requested,
-          received: order_object.received,
-          tracking_code: order_object.tracking_code,
-          email: order_object.email,
-          store_id,
-          contents: order_object.contents,
-          props: {imported: "haute", legacy_id: order_object.order_id},
-        };
-        Object.assign(shipment, imported_shipment);
-        shipment = new Shipment(shipment);
-        shipment.upsert((err)=> {
-          if (err) console.log(err);
-        });
-      }); // get previous record if it was already imported
-    }); // orders.map()
-  }); // getOrders()
+    getOrders((err, orders) => {
+      orders.map((order_object) => {
+        if (!order_object.contents.length) return;
+        if (!order_object.email) return;
+
+        // see if this order was already imported
+        let query = `SELECT * FROM shipments WHERE props#>>'{imported}'='haute' AND props#>>'{legacy_id}'='${order_object.order_id}' LIMIT 1;`;
+        SQLTable.sqlQuery(Shipment, query, [], (err, shipments) => {
+          let shipment = (shipments&&shipments.length) ? shipments[0] : {};
+          let imported_shipment = {
+            to_id: facility_ids["customer_ship"],
+            packed: order_object.packed,
+            requested: order_object.requested,
+            tracking_code: order_object.tracking_code.trim(),
+            email: order_object.email,
+            store_id,
+            contents: order_object.contents,
+            props: {imported: "haute", legacy_id: order_object.order_id},
+          };
+          let received = new Date(order_object.delivered_date).getTime()/1000;
+          if (!isNaN(received))
+            imported_shipment.received = received;
+          try {
+            imported_shipment.address = new Address(JSON.parse(order_object.address.replace(/\s+/g," ")));
+          } catch (error) {
+            console.log(order_object.address);
+          }
+          Object.assign(shipment, imported_shipment);
+          shipment = new Shipment(shipment);
+          shipment.lookupTracking((err) => {
+
+            shipment.upsert((err)=> {
+              if (err) console.log(err);
+            });
+          }); // shipment.lookupTracking()
+        }); // get previous record if it was already imported
+      }); // orders.map()
+    }); // getOrders()
+  }); // Facility.initMandatoryFacilities()
 }); // get store_id

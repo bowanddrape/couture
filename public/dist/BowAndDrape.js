@@ -56861,7 +56861,7 @@ var Address = function (_React$Component) {
         React.createElement(
           "street",
           null,
-          this.props.street_address
+          this.props.street
         ),
         React.createElement(
           "apt",
@@ -56869,20 +56869,20 @@ var Address = function (_React$Component) {
           this.props.apt
         ),
         React.createElement(
-          "region",
-          null,
-          this.props.region,
-          this.props.region ? "," : ""
-        ),
-        React.createElement(
           "locality",
           null,
-          this.props.locality
+          this.props.locality,
+          this.props.locality ? "," : ""
         ),
         React.createElement(
-          "postal_code",
+          "region",
           null,
-          this.props.postal_code
+          this.props.region
+        ),
+        React.createElement(
+          "postal",
+          null,
+          this.props.postal
         ),
         React.createElement(
           "country",
@@ -58041,7 +58041,8 @@ var PayStripe = function (_React$Component) {
           store_id: _this2.props.store_id,
           email: _this2.state.shipping.email,
           contents: _this2.props.items,
-          stripe_token: response.id
+          stripe_token: response.id,
+          address: _this2.state.shipping
         };
         BowAndDrape.api("POST", "/order", payload, function (err, resp) {
           if (err) {
@@ -58706,7 +58707,12 @@ var Shipment = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Shipment.__proto__ || Object.getPrototypeOf(Shipment)).call(this, props));
 
-    _this.state = _this.props;
+    _this.state = {
+      from_id: _this.props.from_id,
+      to_id: _this.props.to_id,
+      packed: _this.props.packed,
+      received: _this.props.received
+    };
     _this.handlePack = _this.handlePack.bind(_this);
     _this.handlePickup = _this.handlePickup.bind(_this);
     _this.handleCancel = _this.handleCancel.bind(_this);
@@ -58765,8 +58771,8 @@ var Shipment = function (_React$Component) {
     key: 'render',
     value: function render() {
       var line_items = [];
-      if (this.state.contents) {
-        var item_array = typeof this.state.contents.items != 'undefined' ? this.state.contents.items : this.state.contents;
+      if (this.props.contents) {
+        var item_array = typeof this.props.contents.items != 'undefined' ? this.props.contents.items : this.props.contents;
         for (var i = 0; i < item_array.length; i++) {
           line_items.push(React.createElement(Item, _extends({ key: line_items.length, picklist: true }, item_array[i])));
         }
@@ -58855,7 +58861,7 @@ var Shipment = function (_React$Component) {
           'div',
           { className: 'time_bar' },
           'requested: ',
-          React.createElement(Timestamp, { time: this.state.requested }),
+          React.createElement(Timestamp, { time: this.props.requested }),
           'packed: ',
           React.createElement(Timestamp, { time: this.state.packed }),
           'received: ',
@@ -58879,8 +58885,18 @@ var Shipment = function (_React$Component) {
               null,
               'User: '
             ),
-            this.state.email
+            this.props.email
           ),
+          this.props.address ? React.createElement(
+            'div',
+            null,
+            React.createElement(
+              'label',
+              null,
+              'Address: '
+            ),
+            React.createElement(Address, this.props.address)
+          ) : null,
           React.createElement(
             'div',
             null,
@@ -58889,7 +58905,11 @@ var Shipment = function (_React$Component) {
               null,
               'Tracking: '
             ),
-            this.state.tracking_code
+            React.createElement(
+              'a',
+              { href: 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' + this.props.tracking_code, target: '_blank' },
+              this.props.tracking_code
+            )
           )
         ),
         React.createElement('div', { style: { clear: 'both' } }),

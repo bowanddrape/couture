@@ -42,6 +42,7 @@ const Order = require('./models/Order.js');
 const Fulfillment = require('./models/Fulfillment.js');
 const Store = require('./models/Store.js');
 const Shipment = require('./models/Shipment.js');
+const Facility = require('./models/Facility.js');
 const Component = require('./models/Component.js');
 const Page = require('./models/Page.js');
 
@@ -49,6 +50,8 @@ const LayoutMain = require('./views/LayoutMain');
 const BowAndDrape = require('./views/BowAndDrape.jsx');
 
 const Placeholder = require('./views/Placeholder.jsx');
+
+Facility.initMandatoryFacilities();
 
 // enable gzip compression
 app.use(compression());

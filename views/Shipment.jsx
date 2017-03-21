@@ -8,7 +8,12 @@ const Address = require('./Address.jsx');
 class Shipment extends React.Component {
   constructor(props) {
     super(props);
-    this.state = this.props;
+    this.state = {
+      from_id: this.props.from_id,
+      to_id: this.props.to_id,
+      packed: this.props.packed,
+      received: this.props.received,
+    }
     this.handlePack = this.handlePack.bind(this);
     this.handlePickup = this.handlePickup.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
@@ -55,8 +60,8 @@ class Shipment extends React.Component {
 
   render() {
     let line_items = [];
-    if (this.state.contents) {
-      let item_array = typeof(this.state.contents.items)!='undefined'?this.state.contents.items:this.state.contents;
+    if (this.props.contents) {
+      let item_array = typeof(this.props.contents.items)!='undefined'?this.props.contents.items:this.props.contents;
       for (let i=0; i<item_array.length; i++) {
         line_items.push(<Item key={line_items.length} picklist={true} {...item_array[i]} />);
       }
@@ -89,7 +94,7 @@ class Shipment extends React.Component {
     return (
       <shipment>
         <div className="time_bar">
-          requested: <Timestamp time={this.state.requested} />
+          requested: <Timestamp time={this.props.requested} />
           packed: <Timestamp time={this.state.packed} />
           received: <Timestamp time={this.state.received} />
         </div>
@@ -99,14 +104,16 @@ class Shipment extends React.Component {
         <shipping_details>
           {from}
           {to}
-          <div><label>User: </label>{this.state.email}</div>
-          <div><label>Tracking: </label>{this.state.tracking_code}</div>
+          <div><label>User: </label>{this.props.email}</div>
+          {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
+          <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.props.tracking_code}`} target="_blank">{this.props.tracking_code}</a></div>
         </shipping_details>
         <div style={{clear:'both'}}/>
         <contents>{line_items}</contents>
       </shipment>
     )
   }
+
 }
 
 module.exports = Shipment;

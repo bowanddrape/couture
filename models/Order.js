@@ -6,6 +6,7 @@ const Item = require('./Item');
 const User = require('./User');
 const Store = require('./Store');
 const Shipment = require('./Shipment');
+const Address = require('./Address');
 const Log = require('./Log');
 
 class Order {
@@ -27,6 +28,7 @@ class Order {
       let email = req.body.email;
       let stripe_token = req.body.stripe_token;
       let contents = new Item(req.body.contents);
+      let address = new Address(req.body.address);
 
       // TODO server-side order verification?
       // ensure tax and shipping at least
@@ -35,6 +37,7 @@ class Order {
         store_id,
         email,
         contents,
+        address,
       });
 
       // reject orders for nothing
