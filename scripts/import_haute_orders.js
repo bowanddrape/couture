@@ -128,19 +128,10 @@ let getOrders = function(callback) {
 
 
 // get store ids
-let query = "SELECT * FROM stores WHERE props#>>'{name}'='haute' LIMIT 1";
-Store.sqlQuery(Store, query, [], function(err, stores) {
-  if (err) {
-    console.error(err);
-    process.exit(0);
-  }
-  if (!stores || !stores.length) {
-    console.error("ERROR: no store named haute");
-    process.exit(0);
-  }
-  let store_id=stores[0].id;
+Store.initMandatory(["haute"], (err, store_ids) => {
+  let store_id = store_ids.haute;
 
-  Facility.initMandatoryFacilities((err, facility_ids) => {
+  Facility.initMandatory(["customer_ship"], (err, facility_ids) => {
 
     getOrders((err, orders) => {
       orders.map((order_object) => {
@@ -180,5 +171,5 @@ Store.sqlQuery(Store, query, [], function(err, stores) {
         }); // get previous record if it was already imported
       }); // orders.map()
     }); // getOrders()
-  }); // Facility.initMandatoryFacilities()
+  }); // Facility.initMandatory()
 }); // get store_id

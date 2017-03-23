@@ -95,6 +95,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var pg = require('pg').native;
+var async = require('async');
 var Log = require('./Log.js');
 
 var pg_read_pool = new pg.Pool({
@@ -186,12 +187,16 @@ var SQLTable = function () {
     value: function remove(callback) {
       if (!this.constructor.getSQLSettings) return callback("getSQLSettings not defined");
       var sql = this.constructor.getSQLSettings();
+      if (!this[sql.pkey]) return callback("cannot remove() without primary key");
       var query = 'DELETE FROM ' + sql.tablename + ' WHERE ' + sql.pkey + '=$1';
       SQLTable.sqlExec(query, [this[sql.pkey]], function (err, results) {
         if (err) return callback(err);
         callback(null, results);
       });
     } // remove()
+
+
+    // ensure that db entries exist for certain prop->names
 
   }], [{
     key: 'sqlQuery',
@@ -246,6 +251,7 @@ var SQLTable = function () {
     } // sqlExec
 
     // helper function to query an object from the database
+    // TODO maybe update this so that we can have a primary key that is multiple columns? (like for cart)
 
   }, {
     key: 'get',
@@ -315,6 +321,38 @@ var SQLTable = function () {
         return callback(null, result);
       });
     }
+  }, {
+    key: 'initMandatory',
+    value: function initMandatory(names, callback) {
+      if (!this.getSQLSettings) return callback("getSQLSettings not defined");
+      var sql = this.getSQLSettings();
+      var db_tasks = [];
+      names.forEach(function (name) {
+        db_tasks.push(function (callback) {
+          var query = 'SELECT * FROM ' + sql.tablename + ' WHERE props#>>\'{name}\'=$1 LIMIT 1;';
+          SQLTable.sqlQuery(null, query, [name], function (err, ret) {
+            if (err) return callback(err);
+            // if we found it, remember it
+            if (ret && ret.rows.length) {
+              return callback(null, [name, ret.rows[0].id]);
+            }
+            // otherwise make a new one
+            var query = 'INSERT INTO ' + sql.tablename + ' (props) VALUES ($1) RETURNING ' + sql.pkey;
+            SQLTable.sqlExec(query, [{ name: name }], function (err, ret) {
+              callback(null, [name, ret.rows[0].id]);
+            });
+          }); // query existed
+        });
+      });
+      async.parallel(db_tasks, function (err, ret) {
+        if (err) console.log(err);
+        var ids = {};
+        ret.forEach(function (name_val) {
+          ids[name_val[0]] = name_val[1];
+        });
+        if (callback) callback(err, ids);
+      });
+    }
   }]);
 
   return SQLTable;
@@ -323,7 +361,7 @@ var SQLTable = function () {
 module.exports = SQLTable;
 
 }).call(this,require('_process'))
-},{"./Log.js":2,"_process":168,"pg":242}],4:[function(require,module,exports){
+},{"./Log.js":2,"_process":168,"async":25,"pg":242}],4:[function(require,module,exports){
 exports = module.exports = ap;
 function ap (args, fn) {
     return function () {

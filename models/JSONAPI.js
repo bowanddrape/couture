@@ -12,8 +12,7 @@ class JSONAPI extends SQLTable {
     if (req.path_tokens[0]!=this.constructor.name.toLowerCase())
       return next();
 
-    // user must be an admin
-    if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
+    if (!this.hasApiPermission(res, req))
       return res.status(404).json({error:"Not Found"}).end();
 
     if (req.method=='GET') {
@@ -36,7 +35,12 @@ class JSONAPI extends SQLTable {
       let object = new this.constructor(req.body);
       return this.onApiRemove(res, req, object);
     }
-    res.json({error: "invalid endpoint"}).end();
+    res.status(404).json({error: "invalid endpoint"}).end();
+  }
+
+  hasApiPermission(res, req) {
+    // user must be an admin
+    return (req.user && req.user.roles.indexOf("bowanddrape")!=-1);
   }
 
   onApiSave(res, req, object, callback) {

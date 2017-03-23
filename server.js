@@ -51,7 +51,20 @@ const BowAndDrape = require('./views/BowAndDrape.jsx');
 
 const Placeholder = require('./views/Placeholder.jsx');
 
-Facility.initMandatoryFacilities();
+Facility.initMandatory([
+    "customer_ship",
+    "customer_pickup",
+    "canceled",
+    "returned",
+    "manual_adjustment",
+  ], (err, ids) => {
+    process.env.facility_ids = JSON.stringify(ids);
+});
+Store.initMandatory([
+    "webfront",
+  ], (err, ids) => {
+    process.env.store_ids = JSON.stringify(ids);
+});
 
 // enable gzip compression
 app.use(compression());

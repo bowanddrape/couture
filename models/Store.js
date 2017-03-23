@@ -105,7 +105,6 @@ class Store extends SQLTable {
         return Page.renderNotFound(req, res);
       }
 
-console.log(store);
       ProductList.preprocessProps({store:store}, (err, product_list) => {
         if (err) console.log(err);
         product_list.edit = true;

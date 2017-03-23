@@ -40,22 +40,20 @@ CREATE TABLE IF NOT EXISTS shipments (
   payments JSONB,
   tracking_code VARCHAR(64)
 );
-/*
-CREATE TABLE IF NOT EXISTS orders (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  placed INT DEFAULT date_part('epoch',NOW()),
-  store_id UUID,
-  email VARCHAR(254) NOT NULL,
-  contents JSONB,
-  props JSONB,
-  payments JSONB
-);*/
 
 CREATE TABLE IF NOT EXISTS stores (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   products JSONB,
   props JSONB,
   facility_id UUID,
+);
+
+CREATE TABLE IF NOT EXISTS carts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(254),
+  store_id UUID,
+  contents JSONB,
+  UNIQUE (email, store_id)
 );
 
 CREATE TABLE IF NOT EXISTS pages (

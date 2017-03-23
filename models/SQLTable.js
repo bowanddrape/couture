@@ -1,5 +1,6 @@
 
 const pg = require('pg').native;
+const async = require('async');
 const Log = require('./Log.js');
 
 let pg_read_pool = new pg.Pool({
@@ -79,6 +80,7 @@ class SQLTable {
   } // sqlExec
 
   // helper function to query an object from the database
+  // TODO maybe update this so that we can have a primary key that is multiple columns? (like for cart)
   static get(primary_key_value, callback) {
     if (!this.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.getSQLSettings();
@@ -206,12 +208,50 @@ class SQLTable {
   remove(callback) {
     if (!this.constructor.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.constructor.getSQLSettings();
+    if (!this[sql.pkey]) return callback("cannot remove() without primary key");
     let query = `DELETE FROM ${sql.tablename} WHERE ${sql.pkey}=$1`;
     SQLTable.sqlExec(query, [this[sql.pkey]], (err, results) => {
       if (err) return callback(err);
       callback(null, results);
     });
   } // remove()
+
+
+  // ensure that db entries exist for certain prop->names
+  static initMandatory(names, callback) {
+    if (!this.getSQLSettings) return callback("getSQLSettings not defined");
+    let sql = this.getSQLSettings();
+    let db_tasks = [];
+    names.forEach((name) => {
+      db_tasks.push(
+        function(callback) {
+          let query = `SELECT * FROM ${sql.tablename} WHERE props#>>'{name}'=$1 LIMIT 1;`;
+          SQLTable.sqlQuery(null, query, [name], (err, ret) => {
+            if (err) return callback(err);
+            // if we found it, remember it
+            if (ret && ret.rows.length) {
+              return callback(null, [name, ret.rows[0].id]);
+            }
+            // otherwise make a new one
+            let query = `INSERT INTO ${sql.tablename} (props) VALUES ($1) RETURNING ${sql.pkey}`;
+            SQLTable.sqlExec(query, [{name, admin:["bowanddrape"]}], (err, ret) => {
+              callback(null, [name, ret.rows[0].id]);
+            });
+          }); // query existed
+        }
+      );
+    });
+    async.parallel(db_tasks, (err, ret) => {
+      if (err) console.log(err);
+      let ids = {};
+      ret.forEach((name_val) => {
+        ids[name_val[0]] = name_val[1];
+      });
+      if (callback)
+        callback(err, ids);
+    });
+  }
+
 }
 
 module.exports = SQLTable;
