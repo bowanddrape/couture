@@ -71,10 +71,11 @@ class SQLTable {
         if(err) {
           // TODO escalate?
           console.error(JSON.stringify(err));
-          return callback(err);
+          if (callback) callback(err);
+          return;
         }
-
-        return callback(null, result);
+        if (callback)
+          return callback(null, result);
       }); // query
     }); // db connection
   } // sqlExec
@@ -194,7 +195,10 @@ class SQLTable {
     // otherwise we need to check if other properties existed and merge them
     let query = `SELECT * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
     SQLTable.sqlQuery(this.constructor, query, [this[sql.pkey]], (err, prev) => {
-      if (err) return callback(err);
+      if (err) {
+        if (callback) callback(err);
+        return;
+      }
       // if it existed before, merge props
       if (prev && prev.length) {
         prev[0].props = prev[0].props ? prev[0].props : {};

@@ -9,7 +9,7 @@ class UserVerifyEmail extends React.Component {
   render() {
 
     return (
-      <table align="center">
+      <table align="center"><tbody>
         <tr><td style={styles.fullwidth}>
             <img src="https://{this.props.host}/sprite.png" width="600" alt="some image" />
         </td></tr>
@@ -17,7 +17,7 @@ class UserVerifyEmail extends React.Component {
             <a href={this.props.link}><img src="http://www.bowanddrape.com/public/images/bad-logo.png" width="600" alt="some image" />
             </a>
           </td></tr>
-      </table>
+      </tbody></table>
     );
   }
 }

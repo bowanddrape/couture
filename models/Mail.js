@@ -1,9 +1,9 @@
 
 const sendmail = require('sendmail')({
   logger: {
-    debug: console.log,
-    info: console.info,
-    warn: console.warn,
+    debug: ()=>{},
+    info: ()=>{},
+    warn: ()=>{},
     error: console.error
   },
   silent: true,

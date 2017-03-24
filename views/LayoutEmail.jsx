@@ -22,12 +22,12 @@ class LayoutEmail extends React.Component {
       <body style={styles.body}>
         <center style={styles.wrapper}>
           <div style={styles.innerwrapper}>
-            <table style={styles.table} class="outer" align="center">
+            <table style={styles.table} class="outer" align="center"><tbody>
               <tr><td>
                 {content}
               </td></tr>
               {/*TODO needs an unsubscribe link*/}
-            </table>
+            </tbody></table>
           </div>
         </center>
       </body>

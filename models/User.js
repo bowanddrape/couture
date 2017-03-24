@@ -5,8 +5,8 @@ const jsonwebtoken = require('jsonwebtoken');
 
 const SQLTable = require('./SQLTable');
 const Mail = require('./Mail');
-
 const Page = require('./Page');
+
 const LayoutBasic = require('../views/LayoutBasic.jsx');
 const LayoutEmail = require('../views/LayoutEmail.jsx');
 
@@ -59,7 +59,6 @@ class User extends SQLTable {
           User.generateJwtToken(user, (err, token) => {
             let body = Page.renderString(UserVerifyEmail, {user: user, link:`https://${req.headers.host}/user/verify/${token}`, host:req.headers.host}, LayoutEmail);
             Mail.send(user.email, "Verify your Bow & Drape Account", body, (err) => {
-            //Mail.send(user.email, "Verify your Bow & Drape Account", `Click <a href="https://${req.headers.host}/user/verify/${token}">here</a> to verify ownership of your account`, (err) => {
               if (err) return res.json({error: err.toString()});
 
               res.json({error: 'email sent, please wait a few mins for it to reach your inbox'});
