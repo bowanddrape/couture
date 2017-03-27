@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS shipments (
   email VARCHAR(254),
   props JSONB,
   payments JSONB,
-  tracking_code VARCHAR(64)
+  tracking_code VARCHAR(64),
+  shipping_label VARCHAR(254),
+  address JSONB
 );
 
 CREATE TABLE IF NOT EXISTS stores (

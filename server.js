@@ -18,8 +18,7 @@ const multer = require('multer');
 const compression = require('compression');
 var aws = require('aws-sdk');
 const multerS3 = require('multer-s3');
-// FIXME move these keys into the config file
-var s3 = new aws.S3({ accessKeyId: 'AKIAI26A5CTDF6CFGPZA', secretAccessKey: '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', region: 'us-east-1' })
+var s3 = new aws.S3({ accessKeyId: process.env.AWS_ACCESS_KEY, secretAccessKey: process.env.AWS_SECRET_KEY, region: process.env.AWS_REGION })
 var upload = multer({
   storage: multerS3({
     s3: s3,
@@ -32,7 +31,7 @@ var upload = multer({
       cb(null, `attachment; filename=${file.originalname}`);
     },
     key: function (req, file, cb) {
-      cb(null, req.path.substring(1)+'_uploads/'+Date.now());
+      cb(null, ((process.env.ENV=='prod')?'':'staging/')+req.path.substring(1)+'_uploads/'+Date.now());
     }
   })
 })

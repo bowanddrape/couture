@@ -103,7 +103,7 @@ mysql_connection.connect();
 
 let getOrders = function(callback) {
   let get_items_queries = [];
-  let query = "SELECT orders.id as order_id, UNIX_TIMESTAMP(orders.created_at) AS requested, UNIX_TIMESTAMP(ship_date) AS packed, shipping_name AS name, email, CONCAT('{\"street\":\"',shipping_addr1,' ',shipping_addr2,'\",\"region\":\"',shipping_city,'\",\"locality\":\"',shipping_state,'\",\"postal\":\"',shipping_zip,'\",\"country\":\"',shipping_country,'\"}') AS address, tracking_code, delivered_date FROM orders, user WHERE orders.user_id=user.id ORDER BY orders.id DESC LIMIT 5000";
+  let query = "SELECT orders.id as order_id, UNIX_TIMESTAMP(orders.created_at) AS requested, UNIX_TIMESTAMP(ship_date) AS packed, shipping_name AS name, email, CONCAT('{\"street\":\"',shipping_addr1,' ',shipping_addr2,'\",\"locality\":\"',shipping_city,'\",\"region\":\"',shipping_state,'\",\"postal\":\"',shipping_zip,'\",\"country\":\"',shipping_country,'\"}') AS address, tracking_code, delivered_date FROM orders, user WHERE orders.user_id=user.id ORDER BY orders.id DESC LIMIT 5000";
   mysql_connection.query(query, function(err, rows, fields) {
     if (err) return console.error(err);
     for (let i=0; i<rows.length; i++) {
