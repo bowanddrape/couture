@@ -88,7 +88,7 @@ class Shipment extends JSONAPI {
     let request_options = {
         method: 'GET',
         hostname: 'secure.shippingapis.com',
-        path: encodeURI(`/ShippingAPI.dll?API=${usps_api_endpoint}&xml=<?xml version="1.0" encoding="UTF-8" ?><${usps_api_endpoint}.0Request USERID="717BOWDR0178"><Option>1</Option><ImageParameters><LabelSequence><PackageNumber>1</PackageNumber><TotalPackages>1</TotalPackages></LabelSequence></ImageParameters><FromName>Bow and Drape</FromName><FromFirm></FromFirm><FromAddress1>Suite 503</FromAddress1><FromAddress2>588 Broadway</FromAddress2><FromCity>New York</FromCity><FromState>NY</FromState><FromZip5>10012</FromZip5><FromZip4></FromZip4><ToName>${this.email}</ToName><ToFirm></ToFirm><ToAddress1>${this.address.apt}</ToAddress1><ToAddress2>${this.address.street}</ToAddress2><ToCity>${this.address.locality}</ToCity><ToState>${this.address.region}</ToState><ToZip5>${this.address.postal}</ToZip5><ToZip4></ToZip4><WeightInOunces>2</WeightInOunces><ServiceType>Priority</ServiceType><InsuredAmount></InsuredAmount><SeparateReceiptPage></SeparateReceiptPage><POZipCode></POZipCode><ImageType>TIF</ImageType><LabelDate></LabelDate><CustomerRefNo></CustomerRefNo><AddressServiceRequested></AddressServiceRequested><SenderName></SenderName><SenderEMail></SenderEMail><RecipientName></RecipientName><RecipientEMail></RecipientEMail><Container>Variable</Container><Size>Regular</Size><CommercialPrice>False</CommercialPrice></${usps_api_endpoint}.0Request>`)
+        path: encodeURI(`/ShippingAPI.dll?API=${usps_api_endpoint}&xml=<?xml version="1.0" encoding="UTF-8" ?><${usps_api_endpoint}.0Request USERID="717BOWDR0178"><Option>1</Option><ImageParameters><LabelSequence><PackageNumber>1</PackageNumber><TotalPackages>1</TotalPackages></LabelSequence></ImageParameters><FromName>Bow and Drape</FromName><FromFirm></FromFirm><FromAddress1>Suite 503</FromAddress1><FromAddress2>588 Broadway</FromAddress2><FromCity>New York</FromCity><FromState>NY</FromState><FromZip5>10012</FromZip5><FromZip4></FromZip4><ToName>${this.address.name}</ToName><ToFirm></ToFirm><ToAddress1>${this.address.apt}</ToAddress1><ToAddress2>${this.address.street}</ToAddress2><ToCity>${this.address.locality}</ToCity><ToState>${this.address.region}</ToState><ToZip5>${this.address.postal}</ToZip5><ToZip4></ToZip4><WeightInOunces>2</WeightInOunces><ServiceType>Priority</ServiceType><InsuredAmount></InsuredAmount><SeparateReceiptPage></SeparateReceiptPage><POZipCode></POZipCode><ImageType>TIF</ImageType><LabelDate></LabelDate><CustomerRefNo></CustomerRefNo><AddressServiceRequested></AddressServiceRequested><SenderName></SenderName><SenderEMail></SenderEMail><RecipientName></RecipientName><RecipientEMail></RecipientEMail><Container>Variable</Container><Size>Regular</Size><CommercialPrice>False</CommercialPrice></${usps_api_endpoint}.0Request>`)
       };
     let request = https.request(request_options,
       function (result) {
@@ -107,6 +107,7 @@ class Shipment extends JSONAPI {
               return callback(err);
             });*/
 
+            // upload to aws S3
             let buffer = Buffer.from(tracking[`${usps_api_endpoint}.0Response`].DeliveryConfirmationLabel[0], 'base64');
             let s3_options = {
               Bucket: 'www.bowanddrape.com',

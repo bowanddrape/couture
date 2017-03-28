@@ -1,6 +1,9 @@
 
 class Address {
   constructor(address) {
+    this.name = address.name;
+    if (this.name)
+      this.name = this.name.replace(/"/g, "'");
     this.street = address.street;
     this.apt = address.apt;
     this.locality = address.locality;

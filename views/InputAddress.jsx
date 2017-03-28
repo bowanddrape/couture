@@ -52,6 +52,10 @@ class InputAddress extends React.Component {
             <input type="text" onChange={this.handleFieldChange} value={this.props.email} name="email"/>
           </div></row> : null
         }
+        <row><div>
+          <label>Name</label>
+          <input type="text" onChange={this.handleFieldChange} value={this.props.name} name="name"/>
+        </div></row>
         <row>
           <div>
             <label>Street Address</label>

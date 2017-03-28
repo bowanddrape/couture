@@ -170,7 +170,10 @@ var SQLTable = function () {
       // otherwise we need to check if other properties existed and merge them
       var query = 'SELECT * FROM ' + sql.tablename + ' WHERE ' + sql.pkey + '=$1 LIMIT 1';
       SQLTable.sqlQuery(this.constructor, query, [this[sql.pkey]], function (err, prev) {
-        if (err) return callback(err);
+        if (err) {
+          if (callback) callback(err);
+          return;
+        }
         // if it existed before, merge props
         if (prev && prev.length) {
           prev[0].props = prev[0].props ? prev[0].props : {};
@@ -242,10 +245,10 @@ var SQLTable = function () {
           if (err) {
             // TODO escalate?
             console.error(JSON.stringify(err));
-            return callback(err);
+            if (callback) callback(err);
+            return;
           }
-
-          return callback(null, result);
+          if (callback) return callback(null, result);
         }); // query
       }); // db connection
     } // sqlExec
@@ -338,7 +341,7 @@ var SQLTable = function () {
             }
             // otherwise make a new one
             var query = 'INSERT INTO ' + sql.tablename + ' (props) VALUES ($1) RETURNING ' + sql.pkey;
-            SQLTable.sqlExec(query, [{ name: name }], function (err, ret) {
+            SQLTable.sqlExec(query, [{ name: name, admin: ["bowanddrape"] }], function (err, ret) {
               callback(null, [name, ret.rows[0].id]);
             });
           }); // query existed
@@ -56897,6 +56900,11 @@ var Address = function (_React$Component) {
         "address",
         null,
         React.createElement(
+          "name",
+          null,
+          this.props.name
+        ),
+        React.createElement(
           "street",
           null,
           this.props.street
@@ -57248,6 +57256,20 @@ var InputAddress = function (_React$Component) {
             React.createElement("input", { type: "text", onChange: this.handleFieldChange, value: this.props.email, name: "email" })
           )
         ) : null,
+        React.createElement(
+          "row",
+          null,
+          React.createElement(
+            "div",
+            null,
+            React.createElement(
+              "label",
+              null,
+              "Name"
+            ),
+            React.createElement("input", { type: "text", onChange: this.handleFieldChange, value: this.props.name, name: "name" })
+          )
+        ),
         React.createElement(
           "row",
           null,
@@ -57890,6 +57912,7 @@ var PayStripe = function (_React$Component) {
       },
       shipping: {
         email: "",
+        name: "",
         street: "",
         apt: "",
         locality: "",
@@ -57900,6 +57923,7 @@ var PayStripe = function (_React$Component) {
       },
       same_billing: true,
       billing: {
+        name: "",
         street: "",
         apt: "",
         locality: "",

@@ -21,6 +21,7 @@ class PayStripe extends React.Component {
       },
       shipping: {
         email: "",
+        name: "",
         street: "",
         apt: "",
         locality: "",
@@ -31,6 +32,7 @@ class PayStripe extends React.Component {
       },
       same_billing: true,
       billing: {
+        name: "",
         street: "",
         apt: "",
         locality: "",
