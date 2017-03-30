@@ -16,10 +16,11 @@ class InputAddress extends React.Component {
   }
 
   initAutocomplete() {
-    let autocomplete = new google.maps.places.Autocomplete(
+    if (this.autocomplete) return;
+    this.autocomplete = new google.maps.places.Autocomplete(
         (document.getElementById("address_autocomplete"+this.props.section_title.substring(0,4))),
         {types: ['geocode']});
-    autocomplete.addListener('place_changed', () => {
+    this.autocomplete.addListener('place_changed', () => {
       let place = autocomplete.getPlace();
       let parse_place = document.createElement("div");
       parse_place.innerHTML = place.adr_address;

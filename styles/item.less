@@ -5,7 +5,12 @@
 
 item {
   display: block;
-  &:last-of-type deets {
+  position: relative;
+  max-width: 700px;
+  margin: auto;
+  border: solid 1px #000000;
+  border-bottom: none;
+  &:last-of-type {
     border-bottom: solid 1px @color_secondary;
   }
   deets {
@@ -13,10 +18,6 @@ item {
     position: relative;
     justify-content: space-between;
     padding-right: 50px;
-    margin: auto;
-    max-width: 700px;
-    border: solid 1px @color_secondary;
-    border-bottom: none;
     preview {
       display: block;
       width: @item_preview_width;
@@ -38,6 +39,13 @@ item {
     props {
       justify-content: space-between;
     }
+  }
+  remove {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: @color_support_0;
+    padding: 5px;
   }
 }
 

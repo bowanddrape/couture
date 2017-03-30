@@ -32,10 +32,11 @@ class Item extends React.Component {
             <preview style={{backgroundImage: "url("+this.props.props.image+")"}}/>
             : <preview className="disabled" />
           }
-          <div className="sku">{this.props.sku}</div>
+          {/*<div className="sku">{this.props.sku}</div>*/}
           <div className="name">{this.props.props.name}</div>
           <props>{other_properties}</props>
         </deets>
+        {this.props.onRemove?<remove onClick={this.props.onRemove}>X</remove>:null}
         <assembly>
           {assembly}
         </assembly>

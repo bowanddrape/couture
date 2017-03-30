@@ -165,8 +165,13 @@ shipment:last-child {
 }
 item {
   display: block;
+  position: relative;
+  max-width: 700px;
+  margin: auto;
+  border: solid 1px #000000;
+  border-bottom: none;
 }
-item:last-of-type deets {
+item:last-of-type {
   border-bottom: solid 1px #000000;
 }
 item deets {
@@ -174,10 +179,6 @@ item deets {
   position: relative;
   justify-content: space-between;
   padding-right: 50px;
-  margin: auto;
-  max-width: 700px;
-  border: solid 1px #000000;
-  border-bottom: none;
 }
 item deets preview {
   display: block;
@@ -199,6 +200,13 @@ item deets .name {
 }
 item deets props {
   justify-content: space-between;
+}
+item remove {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background-color: #eaeaea;
+  padding: 5px;
 }
 customize product_options {
   display: flex;
@@ -439,6 +447,16 @@ menu a {
   white-space: nowrap;
   overflow-right: hidden;
   text-decoration: none;
+  position: relative;
+}
+menu a cart_bug {
+  position: relative;
+  top: -9px;
+  padding: 0px 10px;
+  border-radius: 500px;
+  background-color: #ffffff;
+  font-size: 16px;
+  right: -9px;
 }
 address *:not(:first-child) {
   margin-left: 7px;

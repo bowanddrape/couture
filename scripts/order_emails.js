@@ -26,6 +26,7 @@ let sendShippedEmail = function(shipment, callback) {
     if (err) return console.log(err);
     callback();
   });
+  Mail.send("shelly+testing@bowanddrape.com", "Your order has shipped!", body, (err) => {});
 }
 
 let sendSurveyEmail = function(shipment, callback) {
@@ -37,6 +38,7 @@ let sendSurveyEmail = function(shipment, callback) {
     if (err) return console.log(err);
     callback();
   });
+  Mail.send("shelly+testing@bowanddrape.com", "Bow & Drape Needs YOUR Feedback", body, (err) => {});
 }
 
 Shipment.getAll({tracking_code:"not_null"}, (err, shipments) => {

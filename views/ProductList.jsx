@@ -29,11 +29,9 @@ class ProductList extends React.Component {
     if (options.store.length)
       options.store = options.store[0];
     let store = options.store;
-console.log(store);
     // deep clone initial specification (needed for admin)
     store.products_raw = JSON.parse(JSON.stringify(store.products));
     // get store inventory
-console.log("getting inventory for "+store.facility_id);
     Inventory.get(store.facility_id, function(err, store_inventory) {
       if (err) return callback(err);
       if (!store_inventory || !store_inventory.inventory) return callback("Store has no inventory");
@@ -90,7 +88,7 @@ console.log("getting inventory for "+store.facility_id);
 
     return (
       <customize>
-        <button style={{position:"fixed",top:"0px",right:"0px"}}>Add To Cart</button>
+        {this.props.edit?null:<button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1"}}>Add To Cart</button>}
         <div className="canvas_container">
           <product_options>
             {product_options}
@@ -154,6 +152,19 @@ console.log("getting inventory for "+store.facility_id);
     });
   }
 
+  handleAddToCart(product, event) {
+    let item = {
+      sku: product.sku,
+      quantity: 1,
+      assembly: this.state.assembly,
+      props: product.props
+    };
+    /* TODO maybe save this if logged in?
+    BowAndDrape.api('POST', '/cart', item, (err, ret) => {});
+    */
+    BowAndDrape.cart.add(item);
+    location.href = "/cart";
+  }
 
   renderProductList() {
     let products = [];
@@ -193,6 +204,9 @@ console.log("getting inventory for "+store.facility_id);
     
     // recurse to fill out option menus
     let traverse_options = (option_product, depth=1) => {
+      // if we're not editing, select whatever product we end up on
+      if (!this.props.edit)
+        product = option_product;
       // if at a leaf, we're done
       if (!option_product.options) return;
 
@@ -224,12 +238,12 @@ console.log("getting inventory for "+store.facility_id);
       if (selected_option && option_product.options[selected_option]) {
         traverse_options(option_product.options[selected_option], depth+1);
       }
-    }
+    } // define traverse_options()
     if (product)
       traverse_options(this.state.product_map[this.state.selected_product[0]]);
 
     return {product, product_options};
-  }
+  } // populateProductOptions
 
   populateComponents(product) {
     // populate components
@@ -263,7 +277,7 @@ console.log("getting inventory for "+store.facility_id);
       );
     }
     return components;
-  }
+  } // populateComponents()
 
 }
 

@@ -58,25 +58,9 @@ class LayoutMain extends React.Component {
   }
 
   componentDidMount() {
-    BowAndDrape.dispatcher.emit("loaded");
     BowAndDrape.dispatcher.on("user", (user) => {
       this.setState({user, user});
     });
-    // see if we have a user cookie set
-    function readCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0;i < ca.length;i++) {
-            var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-        }
-        return null;
-    }
-    let token = readCookie("token");
-    if (token) {
-      BowAndDrape.dispatcher.handleAuth({token:token});
-    }
 
     // bind resize
     let self = this;
@@ -85,6 +69,8 @@ class LayoutMain extends React.Component {
     }
     window.addEventListener("resize", resize);
     resize();
+
+    BowAndDrape.dispatcher.emit("loaded");
   }
 
   render() {
@@ -111,7 +97,7 @@ class LayoutMain extends React.Component {
           <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/> 
           <link rel="stylesheet" href="/styles.css" type="text/css"></link>
           {content}
-          <div style={{position:"fixed",left:(this.state.viewport_width - (this.state.viewport_width*0.01) + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s"}}>
+          <div style={{position:"fixed",left:(this.state.viewport_width - (this.state.viewport_width*0.01) + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s",zIndex:"10"}}>
             <UserMenu handleToggleMenu={this.handleToggleMenuState.bind(this)} {...this.state}/>
           </div>
         {/*<Swipeable

@@ -1,7 +1,7 @@
 
 const React = require('react');
 const InputAddress = require('./InputAddress.jsx');
-const Item = require('./Item.jsx');
+const Items = require('./Items.jsx');
 const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 
 class PayStripe extends React.Component {
@@ -10,7 +10,7 @@ class PayStripe extends React.Component {
 
     this.state = {
       errors: [],
-      items: this.props.items,
+      items: this.props.items || [],
       card: {
         number: "",
         cvc: "",
@@ -45,9 +45,6 @@ class PayStripe extends React.Component {
       done: false,
     };
 
-    if (!this.props.items || !this.props.items.length) {
-      this.state.errors.push(<div>Cart is empty</div>);
-    }
     if (!this.props.store_id) {
       this.state.errors.push(<div>Config Error: Store not set</div>);
     }
@@ -55,6 +52,16 @@ class PayStripe extends React.Component {
 
   componentDidMount() {
     // TODO fill in shipping info if we know it
+    if (this.props.is_cart) {
+      if (BowAndDrape.cart) {
+        this.updateContents(BowAndDrape.cart.state.contents);
+      }
+      BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
+    }
+  }
+  updateContents(items) {
+    items = items || [];
+    this.setState({items});
   }
 
   handleSameBillingToggle(e) {
@@ -167,17 +174,11 @@ console.log(err);
     if (this.state.done)
       return <ThanksPurchaseComplete />;
 
-    // build cart view
-    let items = [];
-    for (let i=0; i<this.state.items.length; i++) {
-      items.push(<Item key={items.length} {...this.state.items[i]} />);
-    }
-
     return (
       <div>
-        Bow & Drape Virtual Sample Sale
-        {items}
+        <Items contents={this.state.items} is_cart={this.props.is_cart}/>
         {this.state.errors.length?<errors>{this.state.errors}</errors>:null}
+        {(!this.state.items.length)?<errors><div>Cart is empty</div></errors>:null}
         <InputAddress section_title="Shipping Address" handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
         same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} />
         {this.state.same_billing?null:<InputAddress section_title="Billing Address" handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}

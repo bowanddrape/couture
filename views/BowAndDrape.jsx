@@ -8,6 +8,19 @@ const jwt_decode = require('jwt-decode');
 const LayoutBasic = require('./LayoutBasic.jsx');
 const LayoutMain = require('./LayoutMain.jsx');
 
+// helper function for reading cookies
+let readCookie = function(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for(var i=0;i < ca.length;i++) {
+    var c = ca[i];
+    while (c.charAt(0)==' ') c = c.substring(1,c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+}
+
+// like reflux, but using the nodejs class EventEmitter
 class Dispatcher extends EventEmitter {
   constructor(props) {
     super(props);
@@ -30,9 +43,18 @@ class Dispatcher extends EventEmitter {
     document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
     // also save it in memory for API auth
     BowAndDrape.token = auth_object.token;
-    BowAndDrape.dispatcher.emit("authenticated");
+    this.emit("authenticated");
   }
 }
+// setup things we always run when mounted
+let dispatcher = new Dispatcher();
+dispatcher.on("loaded", () => {
+  // see if we have a user we need to set
+  let token = BowAndDrape.readCookie("token");
+  if (token) {
+    dispatcher.handleAuth({token:token});
+  }
+});
 
 let api = function(method, endpoint, body, callback) {
   var self = this;
@@ -56,6 +78,7 @@ let api = function(method, endpoint, body, callback) {
 module.exports = {
   React,
   ReactDOM,
+  readCookie,
   // any interactable view MUST be listed here
   // FIXME script this?
   views: {
@@ -66,7 +89,8 @@ module.exports = {
     ProductList: require('./ProductList.jsx'),
     PayStripe: require('./PayStripe.jsx'),
     PageList: require('./PageList.jsx'),
+    Items: require('./Items.jsx'),
   },
-  dispatcher: new Dispatcher(),
+  dispatcher,
   api,
 };
