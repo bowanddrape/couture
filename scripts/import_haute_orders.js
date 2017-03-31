@@ -103,7 +103,7 @@ mysql_connection.connect();
 
 let getOrders = function(callback) {
   let get_items_queries = [];
-  let query = "SELECT orders.id as order_id, UNIX_TIMESTAMP(orders.created_at) AS requested, UNIX_TIMESTAMP(ship_date) AS packed, email, CONCAT('{\"name\":\"',shipping_name,'\",\"street\":\"',shipping_addr1,' ',shipping_addr2,'\",\"locality\":\"',shipping_city,'\",\"region\":\"',shipping_state,'\",\"postal\":\"',shipping_zip,'\",\"country\":\"',shipping_country,'\"}') AS address, tracking_code, delivered_date FROM orders, user WHERE orders.user_id=user.id ORDER BY orders.id DESC";
+  let query = "SELECT orders.id as order_id, UNIX_TIMESTAMP(orders.created_at) AS requested, UNIX_TIMESTAMP(ship_date) AS packed, email, CONCAT('{\"name\":\"',shipping_name,'\",\"street\":\"',shipping_addr1,' ',shipping_addr2,'\",\"locality\":\"',shipping_city,'\",\"region\":\"',shipping_state,'\",\"postal\":\"',shipping_zip,'\",\"country\":\"',shipping_country,'\"}') AS address, tracking_code, delivered_date FROM orders, user WHERE orders.user_id=user.id ORDER BY orders.id DESC LIMIT 5000";
   mysql_connection.query(query, function(err, rows, fields) {
     if (err) return console.error(err);
     for (let i=0; i<rows.length; i++) {
@@ -160,13 +160,16 @@ Store.initMandatory(["haute"], (err, store_ids) => {
           } catch (error) {
             console.log(order_object.address);
           }
+          let serialized_old_shipment = JSON.stringify(shipment);
           Object.assign(shipment, imported_shipment);
           shipment = new Shipment(shipment);
           shipment.lookupTracking((err) => {
-
-            shipment.upsert((err)=> {
-              if (err) console.log(err);
-            });
+            let serialized_new_shipment = JSON.stringify(shipment);
+            if (serialized_old_shipment != serialized_new_shipment) {
+              shipment.upsert((err)=> {
+                if (err) console.log(err);
+              });
+            }
           }); // shipment.lookupTracking()
         }); // get previous record if it was already imported
       }); // orders.map()
