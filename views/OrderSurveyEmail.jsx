@@ -9,18 +9,15 @@ class OrderSurveyEmail extends React.Component {
   render() {
 
     return (
-      <table align="center"><tbody>
+      <table align="center" style={{width:"100%"}}><tbody>
         <tr><td style={styles.fullwidth}>
-          <img src="http://www.bowanddrape.com/public/images/bad-logo.png" width="300" alt="Bow & Drape" style={styles.centered} />
-        </td></tr>
-        <tr><td style={styles.fullwidth}>
-          Dear {this.props.username},<br/>
+          Dear {this.props.username},<br/><br/>
           Thank you for your recent purchase!<br/>
-          Please help us make your design experience the best it can be by answering 3 simple questions.<br/><br/>
+          Please help us make your design experience the best it can be by answering 3 simple questions.
         </td></tr>
         <tr><td style={styles.fullwidth}>
-          <a href="https://docs.google.com/spreadsheet/viewform?fromEmail=true&formkey=dF9xcU5LcDNXekZVanQtQXZZOF9kalE6MQ" style={styles.centered}>
-            <div style={{margin:"auto",display:"block",border:"1px solid #bababa", padding:"10px", width:"190px", fontSize:"12px"}}>
+          <a href="https://docs.google.com/spreadsheet/viewform?fromEmail=true&formkey=dF9xcU5LcDNXekZVanQtQXZZOF9kalE6MQ" style={styles.link}>
+            <div style={{margin:"10px 0px",display:"block",border:"1px solid #bababa",padding:"10px",textAlign:"center",fontSize:"12px"}}>
               SHARE YOUR THOUGHTS HERE
             </div>
           </a>
@@ -36,9 +33,8 @@ let styles = {
     maxWidth: "600px",
     height: "auto",
   },
-  centered: {
-    margin:"auto",
-    display:"block",
+  link: {
+    color: "#c79e6a"
   }
 }
 

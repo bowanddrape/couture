@@ -23,10 +23,21 @@ class LayoutEmail extends React.Component {
         <center style={styles.wrapper}>
           <div style={styles.innerwrapper}>
             <table style={styles.table} class="outer" align="center"><tbody>
+              <tr><td style={{width: "100%", maxWidth: "600px", height: "auto"}}>
+                <a href="http://www.bowanddrape.com"><img src="http://staging.bowanddrape.com/logo.jpg?cachebust=1" alt="" style={{margin:"auto"}} /></a>
+              </td></tr>
               <tr><td>
                 {content}
               </td></tr>
               {/*TODO needs an unsubscribe link*/}
+              <tr><td style={{width: "100%", maxWidth: "600px", backgroundColor: "#c79e6a"}}>
+                <table align="center" style={{width:"100%"}}><tbody><tr>
+                  <td style={{textAlign:"right"}}>Follow & Share:</td>
+                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="http://staging.bowanddrape.com/instagram.png" alt="instagram" /></a></td>
+                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="http://staging.bowanddrape.com/facebook.png" alt="facebook" /></a></td>
+                  <td style={{textAlign:"center"}}><a href="https://twitter.com/bowanddrape"><img src="http://staging.bowanddrape.com/twitter.png" alt="twitter" /></a></td>
+                </tr></tbody></table>
+              </td></tr>
             </tbody></table>
           </div>
         </center>

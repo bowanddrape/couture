@@ -17,7 +17,8 @@ let sendShippedEmail = function(shipment, callback) {
   // TODO see if we have the user's name
   // TODO this is the legacy haute props
   let props = {
-    username: shipment.email,
+    username: shipment.address.name,
+    order_id: shipment.props.legacy_id,
     order_link: "http://www.bowanddrape.com/account/order?id="+shipment.props.legacy_id,
     tracking_link: "https://tools.usps.com/go/TrackConfirmAction.action?tLabels="+shipment.tracking_code
   }
@@ -31,7 +32,7 @@ let sendShippedEmail = function(shipment, callback) {
 
 let sendSurveyEmail = function(shipment, callback) {
   let props = {
-    username: shipment.email,
+    username: shipment.address.name,
   }
   let body = Page.renderString(OrderSurveyEmail, props, LayoutEmail);
   Mail.send("peter+testing@bowanddrape.com", "Bow & Drape Needs YOUR Feedback", body, (err) => {

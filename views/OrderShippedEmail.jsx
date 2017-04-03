@@ -9,16 +9,17 @@ class OrderShippedEmail extends React.Component {
   render() {
 
     return (
-      <table align="center"><tbody>
+      <table align="center" style={{width:"100%"}}><tbody>
         <tr><td style={styles.fullwidth}>
-          <a href={this.props.order_link} style={{margin:"auto"}}><img src="http://www.bowanddrape.com/public/images/bad-logo.png" width="300" alt="Bow & Drape" />
+          Dear {this.props.username},<br/><br/>
+          Your order <a href={this.props.order_link} style={styles.link}>{this.props.order_id}</a> has shipped!
+        </td></tr>
+        <tr><td style={styles.fullwidth}>
+          <a href={this.props.tracking_link} style={styles.link}>
+            <div style={{margin:"10px 0px",display:"block",border:"1px solid #bababa",padding:"10px",textAlign:"center",fontSize:"12px"}}>
+              TRACK YOUR SHIPMENT
+            </div>
           </a>
-        </td></tr>
-        <tr><td style={styles.fullwidth}>
-          Dear {this.props.username},<br/>your <a href={this.props.order_link}>order {this.props.order_id}</a> has shipped!
-        </td></tr>
-        <tr><td style={styles.fullwidth}>
-          <a href={this.props.tracking_link} style={{margin:"auto",display:"block"}}>Track it</a>
         </td></tr>
       </tbody></table>
     );
@@ -26,10 +27,8 @@ class OrderShippedEmail extends React.Component {
 }
 
 let styles = {
-  fullwidth: {
-    width: "100%",
-    maxWidth: "600px",
-    height: "auto",
+  link: {
+    color: "#c79e6a"
   }
 }
 
