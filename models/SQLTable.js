@@ -238,7 +238,7 @@ class SQLTable {
             }
             // otherwise make a new one
             let query = `INSERT INTO ${sql.tablename} (props) VALUES ($1) RETURNING ${sql.pkey}`;
-            SQLTable.sqlExec(query, [{name, admin:["bowanddrape"]}], (err, ret) => {
+            SQLTable.sqlExec(query, [{name, admins:["bowanddrape"]}], (err, ret) => {
               callback(null, [name, ret.rows[0].id]);
             });
           }); // query existed

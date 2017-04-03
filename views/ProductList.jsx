@@ -34,7 +34,7 @@ class ProductList extends React.Component {
     // get store inventory
     Inventory.get(store.facility_id, function(err, store_inventory) {
       if (err) return callback(err);
-      if (!store_inventory || !store_inventory.inventory) return callback("Store has no inventory");
+      if (!store_inventory || !store_inventory.inventory) return callback(null, options);
       // set up sync with db components
       let sku_queries = [];
       store.products.recurseProductFamily(function(item, ancestor) {
@@ -145,6 +145,7 @@ class ProductList extends React.Component {
     }
     product.options[event.target.value] = {};
 
+// TODO modify the component, not the store listing
     BowAndDrape.api("PATCH", `/store/${this.props.store.id}/products`, products, (err, result) => {
       if (err) return console.log(err);
       // if we successfully updated, reload so we can see our changes
@@ -208,7 +209,11 @@ class ProductList extends React.Component {
       if (!this.props.edit)
         product = option_product;
       // if at a leaf, we're done
-      if (!option_product.options) return;
+      if (!option_product.options) {
+        if (this.props.edit) {
+        }
+        return;
+      }
 
       let options = [];
       let available_options = Object.keys(option_product.options);
@@ -249,7 +254,7 @@ class ProductList extends React.Component {
     // populate components
     let components = [];
     let misc_components = [];
-    for (let i=0; i<product.compatible_components.length && i<100; i++) {
+    for (let i=0; product.compatible_components && i<product.compatible_components.length; i++) {
       if (product.compatible_components[i].options) {
         let tab_components = [];
         for (let j=0; j<product.compatible_components[i].options.length; j++) {

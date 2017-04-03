@@ -38,12 +38,17 @@ class Page extends JSONAPI {
     };
   }
 
+  // extends JSONAPI
+  handleHTTPPage(req, res, next) {
+    // user must be an admin
+    if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
+      return Page.renderNotFound(req, res);
+
+    Page.render(req, res, require(`../views/PageList.jsx`), {whitelisted_models, whitelisted_components});
+  }
+
   // if we have a matching path in our pages table, serve that page
   static handleRenderPage(req, res, next) {
-    // see if we're drawing the admin view
-    if (req.path_tokens[0]=="page")
-      return Page.handleAdminPage(req, res);
-
     let pages = Page.getAll(null, function(err, pages) {
       for (let i=0; i<pages.length; i++) {
         let matches = req.path.match(pages[i].path);
@@ -104,14 +109,6 @@ class Page extends JSONAPI {
       }
       next();
     });
-  }
-
-  static handleAdminPage(req, res) {
-    // user must be an admin
-    if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
-      return Page.renderNotFound(req, res);
-
-    Page.render(req, res, require(`../views/PageList.jsx`), {whitelisted_models, whitelisted_components});
   }
 
   static renderString(component, props, layout) {

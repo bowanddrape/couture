@@ -20,7 +20,7 @@ class Cart extends JSONAPI {
   }
 
   // TODO if I enable multi-column primary keys, this won't be needed
-  onApiSave(res, req, object, callback) {
+  onApiSave(req, res, object, callback) {
     if (!object.email || !object.store_id) {
       let error = {error: "payload missing key fields"};
       if (callback) callback(error);

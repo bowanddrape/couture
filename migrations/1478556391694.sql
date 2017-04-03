@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS stores (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   products JSONB,
   props JSONB,
-  facility_id UUID,
+  facility_id UUID
 );
 
 CREATE TABLE IF NOT EXISTS carts (

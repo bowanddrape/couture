@@ -90,6 +90,7 @@ module.exports = {
     PayStripe: require('./PayStripe.jsx'),
     PageList: require('./PageList.jsx'),
     Items: require('./Items.jsx'),
+    ComponentsEdit: require('./ComponentsEdit.jsx'),
   },
   dispatcher,
   api,

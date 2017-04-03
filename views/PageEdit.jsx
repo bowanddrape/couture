@@ -26,6 +26,8 @@ class PageEdit extends React.Component {
   }
 
   handleSave() {
+    if (!this.state.path)
+      return alert("please set a path");
     // TODO some validation, maybe don't allow saving over other slugs
     let page = this.state;
     page.elements.forEach((element) => {

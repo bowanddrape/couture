@@ -106,7 +106,7 @@ class Store extends SQLTable {
       }
 
       ProductList.preprocessProps({store:store}, (err, product_list) => {
-        if (err) console.log(err);
+        if (err) res.status(500).end(err.toString());
         product_list.edit = true;
         Page.render(req, res, ProductList, product_list);
       });
