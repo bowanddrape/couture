@@ -13,6 +13,10 @@ const sendmail = require('sendmail')({
   },
 */
 });
+const LayoutEmail = require('../views/LayoutEmail.jsx');
+const OrderShippedEmail = require('../views/OrderShippedEmail.jsx');
+const OrderSurveyEmail = require('../views/OrderSurveyEmail.jsx');
+const Page = require('./Page');
 
 class Mail {
 
@@ -20,6 +24,7 @@ class Mail {
     let options = {
       from: 'no-reply@bowanddrape.com',
       to: to,
+      bcc: 'peter+testing@bowanddrape.com, shelly+testing@bowanddrape.com',
       subject: subject,
       html: html,
     };
@@ -33,6 +38,31 @@ class Mail {
     });
   }
 
+  static sendShippedEmail(shipment, callback) {
+    // TODO this is the legacy haute props
+    let props = {
+      username: shipment.address.name,
+      order_id: shipment.props.legacy_id,
+      order_link: "http://www.bowanddrape.com/account/order?id="+shipment.props.legacy_id,
+      tracking_link: "https://tools.usps.com/go/TrackConfirmAction.action?tLabels="+shipment.tracking_code
+    }
+    let body = Page.renderString(OrderShippedEmail, props, LayoutEmail);
+    Mail.send(null, "Your order has shipped!", body, (err) => {
+      if (err) console.log(err);
+      callback();
+    });
+  }
+
+  static sendSurveyEmail(shipment, callback) {
+    let props = {
+      username: shipment.address.name,
+    }
+    let body = Page.renderString(OrderSurveyEmail, props, LayoutEmail);
+    Mail.send(null, "Bow & Drape Needs YOUR Feedback", body, (err) => {
+      if (err) console.log(err);
+      callback();
+    });
+  }
 }
 
 module.exports = Mail;
