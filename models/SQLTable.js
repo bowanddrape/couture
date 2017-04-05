@@ -86,6 +86,8 @@ class SQLTable {
     if (!this.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.getSQLSettings();
     let query = `SELECT * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
+    if (!primary_key_value || primary_key_value=="undefined")
+      return callback(null, null);
     this.sqlQuery(this, query, [primary_key_value], function(err, results) {
       if (err) return callback(err);
       if (!results.length) return callback(null, null);

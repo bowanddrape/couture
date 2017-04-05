@@ -28,6 +28,12 @@ class JSONAPI extends SQLTable {
       });
     }
     if (req.method=='POST') {
+      // convert any parsable json field
+      for(let field in req.body) {
+        try {
+          req.body[field] = JSON.parse(req.body[field]);
+        } catch(err) {}
+      }
       let object = new this.constructor(req.body);
       return this.onApiSave(req, res, object);
     }

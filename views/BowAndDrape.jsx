@@ -61,7 +61,8 @@ let api = function(method, endpoint, body, callback) {
   let xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Accept","application/json");
-  xhr.setRequestHeader("Content-Type", "application/json");
+  // busboy doesn't like if you set the content type
+  //xhr.setRequestHeader("Content-Type", "multipart/form-data");
   if (BowAndDrape.token)
     xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
   else
@@ -72,7 +73,15 @@ let api = function(method, endpoint, body, callback) {
       return callback(JSON.parse(this.responseText));
     callback(null, JSON.parse(this.responseText));
   }
-  xhr.send(JSON.stringify(body));
+  let payload = new FormData();
+  Object.keys(body).forEach((key) => {
+    // if it's an object but not named file, stringify
+    if (typeof(body[key])=='object' && !/file/.test(key))
+      payload.append(key, JSON.stringify(body[key]));
+    else
+      payload.append(key, body[key]);
+  });
+  xhr.send(payload);
 }
 
 module.exports = {

@@ -47,6 +47,9 @@ class Cart extends React.Component {
     contents.unshift(item);
     this.setState({contents});
     this.updateCookie(contents);
+    /* TODO maybe save this if logged in?
+    BowAndDrape.api('POST', '/cart', item, (err, ret) => {});
+    */
   }
 
   remove(index) {

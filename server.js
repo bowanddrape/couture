@@ -10,7 +10,6 @@ const server = require('http').createServer();
 const async = require('async');
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
@@ -31,7 +30,12 @@ var upload = multer({
       cb(null, `attachment; filename=${file.originalname}`);
     },
     key: function (req, file, cb) {
-      cb(null, ((process.env.ENV=='prod')?'':'staging/')+req.path.substring(1)+'_uploads/'+Date.now());
+      let key = "test";
+      if (req.body.sku)
+        key = req.body.sku;
+      if (req.path.substring(1)=='order')
+        key = Date.now();
+      cb(null, ((process.env.ENV=='prod')?'':'staging/')+req.path.substring(1)+'_uploads/'+key);
     }
   })
 })
@@ -68,8 +72,10 @@ Store.initMandatory([
 // enable gzip compression
 app.use(compression());
 
-// populate req.body with json body content
-app.use(bodyParser.json());
+// parse multipart form data
+app.use(upload.any(), (req, res, next) => {
+  return next();
+});
 
 // nom nom cookies
 app.use(cookieParser());
@@ -108,7 +114,7 @@ app.use(User.handleAuthentication);
 app.use(User.handleHTTP);
 
 // handle API endpoints
-app.use(upload.single('image'), Order.handleHTTP);
+app.use(Order.handleHTTP);
 app.use(Fulfillment.handleHTTP);
 app.use(Store.handleHTTP);
 app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});

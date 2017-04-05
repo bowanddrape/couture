@@ -14,7 +14,6 @@
     "babel-preset-react": "~6.16.0",
     "babelify": "~7.3.0",
     "bcryptjs": "^2.4.0",
-    "body-parser": "^1.15.2",
     "browserify": "^13.0.1",
     "compression": "^1.6.2",
     "cookie-parser": "^1.4.3",

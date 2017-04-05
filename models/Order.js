@@ -45,8 +45,8 @@ class Order {
         return res.json({error: "Attempt to place empty order"});
 
       // if an image was uploaded, set the content's image to the resulting img
-      if (req.file && req.file.location)
-        order.contents.items[0].props.image = req.file.location;
+      if (req.files && req.files[0].location)
+        order.contents.items[0].props.image = req.files[0].location;
 
       // if we got an email subscription, edit/create user
       if (req.body.email && typeof(req.body.contact_me)!='undefined') {

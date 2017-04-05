@@ -5,7 +5,7 @@ const Component = require('./Component');
 // This class handles arrays of items, where items may have assemblies or
 // be families of products, it's intentionally open but could get messy
 // quickly but I suppose we'll deal with that problem later
-// TODO It's getting messy already, we need some more error handling and tests
+// TODO rename this class and file to 'Items' because plurality
 class Item extends Array {
   constructor(items) {
     super();
@@ -31,6 +31,12 @@ class Item extends Array {
     return this.forEach((item) => {
       item.recurseAssembly(foreach, null);
     });
+  }
+  populateFromDB(callback) {
+    let populate_tasks = this.map((component) => {
+      return component.populateFromDB.bind(component);
+    });
+    async.parallel(populate_tasks, callback);
   }
 
   hydrateCompatibleComponents(callback) {

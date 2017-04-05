@@ -21,20 +21,13 @@ class UserPasswordReset extends React.Component {
 
     UserProfile.hashPassword(auth.user.email, password, (err, passhash) => {
       let payload={passhash: passhash};
-      let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/user/reset_password", true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.setRequestHeader("Authorization", "Bearer "+auth.token);
-      xhr.onreadystatechange = function() {
-        if (this.readyState!=4) { return; }
-        // TODO display error on anything not status 200
-        BowAndDrape.dispatcher.handleAuth(JSON.parse(this.responseText));
+      BowAndDrape.api("POST", "/user/reset_password", payload, (err, response) => {
+        // TODO handle errors?
+        BowAndDrape.dispatcher.handleAuth(response);
         document.location = '/';
-      }
-
-      xhr.send(JSON.stringify(payload));
+      });
     });
- }
+  }
 
   getUser() {
     let token = document.location.href.substring(document.location.href.lastIndexOf('/')+1);

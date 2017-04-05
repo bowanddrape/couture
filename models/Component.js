@@ -55,10 +55,9 @@ class Component extends JSONAPI {
     Component.get(sku, callback);
   }
 
-  // if not set on our current component
+  // fill in from an ancestor if not set on our current component
   inheritDefaults(component) {
     if (!component) return;
-
     inherited_props.forEach((prop_name) => {
       this.props[prop_name] = this.props[prop_name] ?
                               this.props[prop_name] :
@@ -69,6 +68,32 @@ class Component extends JSONAPI {
                                    this.compatible_components :
                                    component.compatible_components;
     }
+  }
+
+  populateFromDB(callback) {
+    // TODO flag to shortcut lookup if we know we have everything
+    let option_tasks = [];
+
+    this.recurseProductFamily(function(item, ancestor) {
+      option_tasks.push(function(callback) {
+        item.get(item.sku, function(err, db_item) {
+          if (!db_item) return callback(err);
+
+          item.inheritDefaults(db_item);
+          // also grab product options
+          if (db_item.options) {
+            item.options = item.options || db_item.options;
+          }
+          // populate grabbed item if need be
+          let option_tasks = [];
+          Object.keys(item.options).forEach((option) => {
+            option_tasks.push(item.options[option].populateFromDB.bind(item.options[option]));
+          });
+          async.parallel(option_tasks, callback);
+        });
+      });
+    });
+    async.parallel(option_tasks, callback);
   }
 
   // run a function for each option in family
@@ -95,5 +120,20 @@ class Component extends JSONAPI {
       return Page.renderNotFound(req, res);
     Page.render(req, res, ComponentsEdit, {});
   }
-  
+
+  // extends JSONAPI
+  onApiSave(req, res, object, callback) {
+    // if an image was uploaded, set the image to the resulting img path
+    if (req.files && req.files.length && req.files[0].location)
+      object.props.image = req.files[0].location;
+
+    object.upsert((err, result) => {
+      if (callback)
+        return (callback(err, result));
+      if (err)
+        return res.json({error: err});
+      return res.json(object);
+    });
+  }
+
 } module.exports = Component;

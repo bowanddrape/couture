@@ -65,7 +65,9 @@ class UserProfile extends React.Component {
         email: email,
         passhash: passhash,
       }
-      UserProfile.sendLoginRequest(payload);
+      BowAndDrape.api("POST", "/user/login", payload, (err, response) => {
+        BowAndDrape.dispatcher.handleAuth(response);
+      });
     });
   }
 
@@ -81,29 +83,11 @@ class UserProfile extends React.Component {
     if (!email)
       return BowAndDrape.dispatcher.emit('user', {error: {email: "Must enter email"}});
     let payload = {email: email};
-    var self = this;
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/user/verify", true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onreadystatechange = function() {
-      if (this.readyState!=4) { return; }
-      return BowAndDrape.dispatcher.emit('user', JSON.parse(this.responseText));
-    }
-    xhr.send(JSON.stringify(payload));
+    BowAndDrape.api("POST", "/user/verify", payload, (err, response) => {
+      BowAndDrape.dispatcher.emit('user', response);
+    });
   }
 
-  static sendLoginRequest(payload) {
-    // login to bowanddrape
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/user/login", true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onreadystatechange = function() {
-      if (this.readyState!=4) { return; }
-      BowAndDrape.dispatcher.handleAuth(JSON.parse(this.responseText));
-    }
-
-    xhr.send(JSON.stringify(payload));
-  }
 }
 
 module.exports = UserProfile;

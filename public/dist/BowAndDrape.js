@@ -262,6 +262,7 @@ var SQLTable = function () {
       if (!this.getSQLSettings) return callback("getSQLSettings not defined");
       var sql = this.getSQLSettings();
       var query = 'SELECT * FROM ' + sql.tablename + ' WHERE ' + sql.pkey + '=$1 LIMIT 1';
+      if (!primary_key_value || primary_key_value == "undefined") return callback(null, null);
       this.sqlQuery(this, query, [primary_key_value], function (err, results) {
         if (err) return callback(err);
         if (!results.length) return callback(null, null);
@@ -56901,6 +56902,9 @@ var Cart = function (_React$Component) {
       contents.unshift(item);
       this.setState({ contents: contents });
       this.updateCookie(contents);
+      /* TODO maybe save this if logged in?
+      BowAndDrape.api('POST', '/cart', item, (err, ret) => {});
+      */
     }
   }, {
     key: "remove",
@@ -56934,7 +56938,7 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 },{"react":346}],397:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -56954,59 +56958,104 @@ var ComponentEdit = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (ComponentEdit.__proto__ || Object.getPrototypeOf(ComponentEdit)).call(this, props));
 
-    _this.state = {
-      sku: "",
-      name: "",
-      price: ""
-    };
+    _this.state = JSON.parse(JSON.stringify(_this.props));
+    delete _this.state.inherits;
     return _this;
   }
 
   _createClass(ComponentEdit, [{
-    key: "handleFieldChange",
+    key: 'handleFieldChange',
     value: function handleFieldChange(event) {
+      var name_toks = event.target.getAttribute("name").split('_');
       var update = {};
-      if (section) {
-        update[section] = this.state[section];
-        update[section][event.target.getAttribute("name")] = event.target.value;
+      update[name_toks.pop()] = event.target.value;
+      while (name_toks.length) {
+        var updated = {};
+        updated[name_toks.pop()] = update;
+        update = updated;
       }
       this.setState(update);
     }
   }, {
-    key: "handleSave",
-    value: function handleSave() {
-      if (!this.state.sku) return alert("need to set sku");
+    key: 'handleFileChange',
+    value: function handleFileChange(event) {
+      this.file = event.target.files[0];
     }
   }, {
-    key: "render",
+    key: 'handleSave',
+    value: function handleSave() {
+      if (!this.state.sku) return alert("need to set sku");
+      var payload = this.state;
+      if (this.file) payload.image_file = this.file;
+      BowAndDrape.api("POST", '/component', payload, function (err, result) {
+        if (err) return console.log(err);
+        location.reload();
+      });
+    }
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      // ensure we clear previous state
+      var props = {};
+      props.options = props.options || {};
+      props.props = props.props || {};
+      props.compatible_components = props.compatible_components || [];
+      props.sku = props.sku || "";
+      this.setState(props);
+    }
+  }, {
+    key: 'render',
     value: function render() {
       var _this2 = this;
 
       var fields = [];
 
-      [{ name: "sku", type: "text" }, { name: "name", type: "text" }, { name: "price", type: "text" }].forEach(function (spec) {
+      [{ name: "sku", type: "text" }, { name: "props_name", type: "text" }, { name: "props_price", type: "text" }, { name: "props_image", type: "file" }].forEach(function (spec) {
+        // use underscores to navigate child fields
+        var name_toks = spec.name.split('_');
+        var value = _this2.state[name_toks[0]] || "";
+        var placeholder = _this2.props.inherits[name_toks[0]] || "";
+        for (var i = 1; i < name_toks.length; i++) {
+          if (value) value = value[name_toks[i]] || "";
+          if (placeholder) placeholder = placeholder[name_toks[i]] || "";
+        }
+
         if (spec.type == "text") return fields.push(React.createElement(
-          "div",
+          'div',
           { key: fields.length },
           React.createElement(
-            "label",
+            'label',
             null,
             spec.name,
-            ":"
+            ':'
           ),
-          React.createElement("input", { type: "text", onChange: _this2.handleFieldChange.bind(_this2), value: _this2.state[spec.name], name: spec.name })
+          React.createElement('input', { type: 'text', onChange: _this2.handleFieldChange.bind(_this2), value: value, placeholder: placeholder, name: spec.name })
+        ));
+        if (spec.type == "file") return fields.push(React.createElement(
+          'div',
+          { key: fields.length },
+          React.createElement(
+            'label',
+            null,
+            spec.name,
+            '(',
+            value ? "set" : "inherited",
+            '):'
+          ),
+          React.createElement('input', { type: 'file', onChange: _this2.handleFileChange.bind(_this2), value: value, placeholder: placeholder, name: spec.name })
         ));
       });
 
       return React.createElement(
-        "component_edit",
+        'component_edit',
         null,
         fields,
         React.createElement(
-          "button",
+          'button',
           { onClick: this.handleSave.bind(this) },
-          this.props.new ? "New" : "Save"
-        )
+          'Save'
+        ),
+        this.props.children
       );
     }
   }]);
@@ -58420,6 +58469,7 @@ var React = require('react');
 
 var ProductCanvas = require('./ProductCanvas.jsx');
 var ProductListEdit = require('./ProductListEdit.jsx');
+var ComponentEdit = require('./ComponentEdit.jsx');
 var Tabs = require('./Tabs.jsx');
 
 var ProductList = function (_React$Component) {
@@ -58456,11 +58506,16 @@ var ProductList = function (_React$Component) {
       if (!product) return this.renderProductList();
 
       var components = this.populateComponents(product);
+      var product_raw = this.getSelectedProductRaw();
 
       return React.createElement(
         'customize',
         null,
-        this.props.edit ? null : React.createElement(
+        this.props.edit ? React.createElement(
+          ComponentEdit,
+          _extends({}, product_raw, { inherits: product }),
+          JSON.stringify(product_raw)
+        ) : React.createElement(
           'button',
           { onClick: this.handleAddToCart.bind(this, product), style: { position: "fixed", top: "0px", right: "0px", zIndex: "1" } },
           'Add To Cart'
@@ -58509,6 +58564,25 @@ var ProductList = function (_React$Component) {
       this.setState({ selected_product: selected_product });
     }
 
+    // get the non-inherited version of the selected product (used for saving)
+
+  }, {
+    key: 'getSelectedProductRaw',
+    value: function getSelectedProductRaw() {
+      var products = this.props.store.products_raw;
+      var product_raw = null;
+      for (var i = 0; i < products.length; i++) {
+        if (products[i].sku == this.state.selected_product[0]) {
+          product_raw = products[i];
+          break;
+        }
+      };
+      for (var _i = 1; _i < this.state.selected_product.length; _i++) {
+        product_raw = product_raw.options[this.state.selected_product[_i]];
+      }
+      return product_raw;
+    }
+
     // takes react synthetic key event
 
   }, {
@@ -58516,20 +58590,11 @@ var ProductList = function (_React$Component) {
     value: function handleNewProductOption(event) {
       if (event.key != "Enter") return;
 
-      var products = this.props.store.products_raw;
-      var product = null;
-      for (var i = 0; i < products.length; i++) {
-        if (products[i].sku == this.state.selected_product[0]) {
-          product = products[i];
-          break;
-        }
-      };
-      for (var _i = 1; _i < this.state.selected_product.length; _i++) {
-        product = product.options[this.state.selected_product[_i]];
-      }
-      product.options[event.target.value] = {};
+      var product_raw = this.getSelectedProductRaw();
+      product_raw.options = product_raw.options || {};
+      product_raw.options[event.target.value] = { sku: product_raw.sku + '_' + event.target.value.toLowerCase().replace(/\s/g, "") };
 
-      BowAndDrape.api("PATCH", '/store/' + this.props.store.id + '/products', products, function (err, result) {
+      BowAndDrape.api("POST", '/component', product_raw, function (err, result) {
         if (err) return console.log(err);
         // if we successfully updated, reload so we can see our changes
         location.reload();
@@ -58544,9 +58609,6 @@ var ProductList = function (_React$Component) {
         assembly: this.state.assembly,
         props: product.props
       };
-      /* TODO maybe save this if logged in?
-      BowAndDrape.api('POST', '/cart', item, (err, ret) => {});
-      */
       BowAndDrape.cart.add(item);
       location.href = "/cart";
     }
@@ -58620,7 +58682,13 @@ var ProductList = function (_React$Component) {
         // if we're not editing, select whatever product we end up on
         if (!_this3.props.edit) product = option_product;
         // if at a leaf, we're done
-        if (!option_product.options) return;
+        if (!option_product.options) {
+          if (_this3.props.edit) {
+            // allow adding new option
+            product_options.push(React.createElement('input', { type: 'text', key: product_options.length, placeholder: 'New Option', onKeyDown: _this3.handleNewProductOption.bind(_this3) }));
+          }
+          return;
+        }
 
         var options = [];
         var available_options = Object.keys(option_product.options);
@@ -58656,6 +58724,7 @@ var ProductList = function (_React$Component) {
           traverse_options(option_product.options[selected_option], depth + 1);
         }
       }; // define traverse_options()
+
       if (product) traverse_options(this.state.product_map[this.state.selected_product[0]]);
 
       return { product: product, product_options: product_options };
@@ -58701,24 +58770,13 @@ var ProductList = function (_React$Component) {
       // if we got an array of stores, use the first one
       if (options.store.length) options.store = options.store[0];
       var store = options.store;
-      // deep clone initial specification (needed for admin)
-      store.products_raw = JSON.parse(JSON.stringify(store.products));
       // get store inventory
       Inventory.get(store.facility_id, function (err, store_inventory) {
         if (err) return callback(err);
         if (!store_inventory || !store_inventory.inventory) return callback(null, options);
-        // set up sync with db components
-        var sku_queries = [];
-        store.products.recurseProductFamily(function (item, ancestor) {
-          sku_queries.push(function (callback) {
-            item.get(item.sku, function (err, db_item) {
-              item.inheritDefaults(db_item);
-              callback(err);
-            });
-          });
-        });
-
-        async.parallel(sku_queries, function (err) {
+        store.products.populateFromDB(function (err) {
+          // deep clone initial specification (needed for admin)
+          store.products_raw = JSON.parse(JSON.stringify(store.products));
 
           // convert compatible_component from sku list to component list
           store.products.hydrateCompatibleComponents(function (err) {
@@ -58739,11 +58797,11 @@ var ProductList = function (_React$Component) {
                   });
                 });
               });
-            });
+            }); // inherit unset fields through product families
 
             callback(null, options);
           }); // hydrate compatible_components
-        }); // sync with db components
+        }); // populate with db components
       }); // get store_inventory
     }
   }]);
@@ -58753,7 +58811,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ProductCanvas.jsx":409,"./ProductListEdit.jsx":411,"./Tabs.jsx":414,"async":20,"react":346}],411:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ComponentEdit.jsx":397,"./ProductCanvas.jsx":409,"./ProductListEdit.jsx":411,"./Tabs.jsx":414,"async":20,"react":346}],411:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59558,20 +59616,11 @@ var UserPasswordReset = function (_React$Component) {
 
       UserProfile.hashPassword(auth.user.email, password, function (err, passhash) {
         var payload = { passhash: passhash };
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/user/reset_password", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("Authorization", "Bearer " + auth.token);
-        xhr.onreadystatechange = function () {
-          if (this.readyState != 4) {
-            return;
-          }
-          // TODO display error on anything not status 200
-          BowAndDrape.dispatcher.handleAuth(JSON.parse(this.responseText));
+        BowAndDrape.api("POST", "/user/reset_password", payload, function (err, response) {
+          // TODO handle errors?
+          BowAndDrape.dispatcher.handleAuth(response);
           document.location = '/';
-        };
-
-        xhr.send(JSON.stringify(payload));
+        });
       });
     }
   }, {
@@ -59716,7 +59765,9 @@ var UserProfile = function (_React$Component) {
           email: email,
           passhash: passhash
         };
-        UserProfile.sendLoginRequest(payload);
+        BowAndDrape.api("POST", "/user/login", payload, function (err, response) {
+          BowAndDrape.dispatcher.handleAuth(response);
+        });
       });
     }
   }, {
@@ -59725,17 +59776,9 @@ var UserProfile = function (_React$Component) {
       var email = document.getElementById("email").value;
       if (!email) return BowAndDrape.dispatcher.emit('user', { error: { email: "Must enter email" } });
       var payload = { email: email };
-      var self = this;
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", "/user/verify", true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.onreadystatechange = function () {
-        if (this.readyState != 4) {
-          return;
-        }
-        return BowAndDrape.dispatcher.emit('user', JSON.parse(this.responseText));
-      };
-      xhr.send(JSON.stringify(payload));
+      BowAndDrape.api("POST", "/user/verify", payload, function (err, response) {
+        BowAndDrape.dispatcher.emit('user', response);
+      });
     }
   }], [{
     key: 'hashPassword',
@@ -59744,22 +59787,6 @@ var UserProfile = function (_React$Component) {
       bcrypt.hash(password, salt, function (err, passhash) {
         callback(err, passhash.substring(29));
       });
-    }
-  }, {
-    key: 'sendLoginRequest',
-    value: function sendLoginRequest(payload) {
-      // login to bowanddrape
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", "/user/login", true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.onreadystatechange = function () {
-        if (this.readyState != 4) {
-          return;
-        }
-        BowAndDrape.dispatcher.handleAuth(JSON.parse(this.responseText));
-      };
-
-      xhr.send(JSON.stringify(payload));
     }
   }]);
 
@@ -59770,6 +59797,8 @@ module.exports = UserProfile;
 
 },{"bcryptjs":22,"react":346}],"BowAndDrape":[function(require,module,exports){
 "use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -59854,7 +59883,8 @@ var api = function api(method, endpoint, body, callback) {
   var xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Accept", "application/json");
-  xhr.setRequestHeader("Content-Type", "application/json");
+  // busboy doesn't like if you set the content type
+  //xhr.setRequestHeader("Content-Type", "multipart/form-data");
   if (BowAndDrape.token) xhr.setRequestHeader("Authorization", "Bearer " + BowAndDrape.token);else console.log("attempting api call while not logged in");
   xhr.onreadystatechange = function () {
     if (this.readyState != 4) {
@@ -59863,7 +59893,12 @@ var api = function api(method, endpoint, body, callback) {
     if (this.status != 200) return callback(JSON.parse(this.responseText));
     callback(null, JSON.parse(this.responseText));
   };
-  xhr.send(JSON.stringify(body));
+  var payload = new FormData();
+  Object.keys(body).forEach(function (key) {
+    // if it's an object but not named file, stringify
+    if (_typeof(body[key]) == 'object' && !/file/.test(key)) payload.append(key, JSON.stringify(body[key]));else payload.append(key, body[key]);
+  });
+  xhr.send(payload);
 };
 
 module.exports = {

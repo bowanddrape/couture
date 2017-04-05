@@ -4,6 +4,7 @@ const React = require('react');
 
 const ProductCanvas = require('./ProductCanvas.jsx');
 const ProductListEdit = require('./ProductListEdit.jsx');
+const ComponentEdit = require('./ComponentEdit.jsx');
 const Tabs = require('./Tabs.jsx');
 
 class ProductList extends React.Component {
@@ -29,24 +30,13 @@ class ProductList extends React.Component {
     if (options.store.length)
       options.store = options.store[0];
     let store = options.store;
-    // deep clone initial specification (needed for admin)
-    store.products_raw = JSON.parse(JSON.stringify(store.products));
     // get store inventory
     Inventory.get(store.facility_id, function(err, store_inventory) {
       if (err) return callback(err);
       if (!store_inventory || !store_inventory.inventory) return callback(null, options);
-      // set up sync with db components
-      let sku_queries = [];
-      store.products.recurseProductFamily(function(item, ancestor) {
-        sku_queries.push(function(callback) {
-          item.get(item.sku, function(err, db_item) {
-            item.inheritDefaults(db_item);
-            callback(err);
-          });
-        });
-      });
-
-      async.parallel(sku_queries, function(err) {
+      store.products.populateFromDB((err) => {
+        // deep clone initial specification (needed for admin)
+        store.products_raw = JSON.parse(JSON.stringify(store.products));
 
         // convert compatible_component from sku list to component list
         store.products.hydrateCompatibleComponents(function(err) {
@@ -67,12 +57,12 @@ class ProductList extends React.Component {
                 });
               });
             });
-          });
+          }); // inherit unset fields through product families
 
           callback(null, options);
 
         }); // hydrate compatible_components
-      }); // sync with db components
+      }); // populate with db components
     }); // get store_inventory
   };
 
@@ -85,10 +75,14 @@ class ProductList extends React.Component {
       return this.renderProductList();
 
     let components = this.populateComponents(product);
+    let product_raw = this.getSelectedProductRaw();
 
     return (
       <customize>
-        {this.props.edit?null:<button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1"}}>Add To Cart</button>}
+        {this.props.edit ?
+          <ComponentEdit {...product_raw} inherits={product}>{JSON.stringify(product_raw)}</ComponentEdit> :
+          <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1"}}>Add To Cart</button>
+        }
         <div className="canvas_container">
           <product_options>
             {product_options}
@@ -128,25 +122,31 @@ class ProductList extends React.Component {
     this.setState({selected_product});
   }
 
-  // takes react synthetic key event
-  handleNewProductOption(event) {
-    if(event.key!="Enter") return;
-
+  // get the non-inherited version of the selected product (used for saving)
+  getSelectedProductRaw() {
     let products = this.props.store.products_raw;
-    let product = null;
+    let product_raw = null;
     for (let i=0; i<products.length; i++) {
       if (products[i].sku == this.state.selected_product[0]) {
-        product = products[i];
+        product_raw = products[i];
         break;
       }
     };
     for (let i=1; i<this.state.selected_product.length; i++) {
-      product = product.options[this.state.selected_product[i]];
+      product_raw = product_raw.options[this.state.selected_product[i]];
     }
-    product.options[event.target.value] = {};
+    return product_raw;
+  }
 
-// TODO modify the component, not the store listing
-    BowAndDrape.api("PATCH", `/store/${this.props.store.id}/products`, products, (err, result) => {
+  // takes react synthetic key event
+  handleNewProductOption(event) {
+    if(event.key!="Enter") return;
+
+    let product_raw = this.getSelectedProductRaw();
+    product_raw.options = product_raw.options || {};
+    product_raw.options[event.target.value] = {sku:`${product_raw.sku}_${event.target.value.toLowerCase().replace(/\s/g,"")}`};
+
+    BowAndDrape.api("POST", `/component`, product_raw, (err, result) => {
       if (err) return console.log(err);
       // if we successfully updated, reload so we can see our changes
       location.reload();
@@ -160,9 +160,6 @@ class ProductList extends React.Component {
       assembly: this.state.assembly,
       props: product.props
     };
-    /* TODO maybe save this if logged in?
-    BowAndDrape.api('POST', '/cart', item, (err, ret) => {});
-    */
     BowAndDrape.cart.add(item);
     location.href = "/cart";
   }
@@ -211,6 +208,10 @@ class ProductList extends React.Component {
       // if at a leaf, we're done
       if (!option_product.options) {
         if (this.props.edit) {
+          // allow adding new option
+          product_options.push(
+            <input type="text" key={product_options.length} placeholder="New Option" onKeyDown={this.handleNewProductOption.bind(this)} />
+          );
         }
         return;
       }
@@ -244,6 +245,7 @@ class ProductList extends React.Component {
         traverse_options(option_product.options[selected_option], depth+1);
       }
     } // define traverse_options()
+
     if (product)
       traverse_options(this.state.product_map[this.state.selected_product[0]]);
 
