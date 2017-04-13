@@ -7,6 +7,7 @@ const jwt_decode = require('jwt-decode');
 
 const LayoutBasic = require('./LayoutBasic.jsx');
 const LayoutMain = require('./LayoutMain.jsx');
+const Customizer = require('./Customizer.js');
 
 // helper function for reading cookies
 let readCookie = function(name) {
@@ -74,13 +75,15 @@ let api = function(method, endpoint, body, callback) {
     callback(null, JSON.parse(this.responseText));
   }
   let payload = new FormData();
-  Object.keys(body).forEach((key) => {
-    // if it's an object but not named file, stringify
-    if (typeof(body[key])=='object' && !/file/.test(key))
-      payload.append(key, JSON.stringify(body[key]));
-    else
-      payload.append(key, body[key]);
-  });
+  if (body) {
+    Object.keys(body).forEach((key) => {
+      // if it's an object but not named file, stringify
+      if (typeof(body[key])=='object' && !/file/.test(key))
+        payload.append(key, JSON.stringify(body[key]));
+      else
+        payload.append(key, body[key]);
+    });
+  }
   xhr.send(payload);
 }
 
@@ -103,4 +106,5 @@ module.exports = {
   },
   dispatcher,
   api,
+  Customizer,
 };

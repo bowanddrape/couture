@@ -68,7 +68,7 @@ class Item extends Array {
     async.parallel(sku_query, (err) => {
       // if these components in turn have options, fetch those too
       for (let sku in components) {
-        if (!components[sku].options) continue;
+        if (!components[sku] || !components[sku].options) continue;
         components[sku].options.forEach((option) => {
           option.recurseProductFamily(function(item, ancestor) {
             option_query.push(function(callback) {

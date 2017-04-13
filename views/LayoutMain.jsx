@@ -19,7 +19,6 @@ class LayoutMain extends React.Component {
 
     this.onSwiping = this.onSwiping.bind(this);
     this.onSwiped = this.onSwiped.bind(this);
-    this.onChildSwiping = this.onChildSwiping.bind(this);
   }
 
   // blacklist certain elements from swipe actions
@@ -45,10 +44,6 @@ class LayoutMain extends React.Component {
     let menu = this.state.menu;
     menu.offset = menu.state?-menu_width:0;
     this.setState({menu:menu});
-  }
-  onChildSwiping(e, deltaX, deltaY, absX, absY, velocity) {
-    e.stopPropagation();
-    console.log(`child ${deltaX} ${deltaY}`);
   }
   handleToggleMenuState() {
     let menu = this.state.menu;
@@ -100,13 +95,11 @@ class LayoutMain extends React.Component {
           <div style={{position:"fixed",left:(this.state.viewport_width - (this.state.viewport_width*0.01) + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s",zIndex:"10"}}>
             <UserMenu handleToggleMenu={this.handleToggleMenuState.bind(this)} {...this.state}/>
           </div>
-        {/*<Swipeable
-          onSwiping={this.onChildSwiping}
-          style={{width:"100px",height:"100px",backgroundColor:"#666"}}
-          trackMouse={true}
-        ></Swipeable>*/}
 
         <script src="/BowAndDrape.js"></script>
+        <script src="/sylvester.js" type="text/javascript"></script>
+        <script src="/glUtils.js" type="text/javascript"></script>
+
         <script dangerouslySetInnerHTML={{__html:`
 
           var BowAndDrape = require("BowAndDrape");

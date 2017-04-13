@@ -30302,6 +30302,15 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var React = require('react');
 
+function getInitialState() {
+  return {
+    x: null,
+    y: null,
+    swiping: false,
+    start: 0
+  };
+}
+
 var Swipeable = React.createClass({
   displayName: 'Swipeable',
 
@@ -30316,20 +30325,14 @@ var Swipeable = React.createClass({
     onSwipedRight: React.PropTypes.func,
     onSwipedDown: React.PropTypes.func,
     onSwipedLeft: React.PropTypes.func,
+    onTap: React.PropTypes.func,
     flickThreshold: React.PropTypes.number,
     delta: React.PropTypes.number,
     preventDefaultTouchmoveEvent: React.PropTypes.bool,
     stopPropagation: React.PropTypes.bool,
-    nodeName: React.PropTypes.string
-  },
-
-  getInitialState: function getInitialState() {
-    return {
-      x: null,
-      y: null,
-      swiping: false,
-      start: 0
-    };
+    nodeName: React.PropTypes.string,
+    trackMouse: React.PropTypes.bool,
+    children: React.PropTypes.node
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -30341,18 +30344,28 @@ var Swipeable = React.createClass({
       nodeName: 'div'
     };
   },
-
+  componentWillMount: function componentWillMount() {
+    this.swipeable = getInitialState();
+  },
   calculatePos: function calculatePos(e) {
-    var x = e.changedTouches[0].clientX;
-    var y = e.changedTouches[0].clientY;
+    var x = void 0;
+    var y = void 0;
 
-    var xd = this.state.x - x;
-    var yd = this.state.y - y;
+    if (e.changedTouches) {
+      x = e.changedTouches[0].clientX;
+      y = e.changedTouches[0].clientY;
+    } else {
+      x = e.clientX;
+      y = e.clientY;
+    }
+
+    var xd = this.swipeable.x - x;
+    var yd = this.swipeable.y - y;
 
     var axd = Math.abs(xd);
     var ayd = Math.abs(yd);
 
-    var time = Date.now() - this.state.start;
+    var time = Date.now() - this.swipeable.start;
     var velocity = Math.sqrt(axd * axd + ayd * ayd) / time;
 
     return {
@@ -30363,24 +30376,42 @@ var Swipeable = React.createClass({
       velocity: velocity
     };
   },
+  eventStart: function eventStart(e) {
+    if (typeof this.props.onMouseDown === 'function') {
+      this.props.onMouseDown(e);
+    }
 
-  touchStart: function touchStart(e) {
-    if (e.touches.length > 1) {
+    if (e.type === 'mousedown' && !this.props.trackMouse) {
       return;
     }
 
+    if (e.touches && e.touches.length > 1) {
+      return;
+    }
+
+    var touches = e.touches;
+    if (!touches) {
+      touches = [{ clientX: e.clientX, clientY: e.clientY }];
+    }
     if (this.props.stopPropagation) e.stopPropagation();
 
-    this.setState({
+    this.swipeable = {
       start: Date.now(),
-      x: e.touches[0].clientX,
-      y: e.touches[0].clientY,
+      x: touches[0].clientX,
+      y: touches[0].clientY,
       swiping: false
-    });
+    };
   },
+  eventMove: function eventMove(e) {
+    if (typeof this.props.onMouseMove === 'function') {
+      this.props.onMouseMove(e);
+    }
 
-  touchMove: function touchMove(e) {
-    if (!this.state.x || !this.state.y || e.touches.length > 1) {
+    if (e.type === 'mousemove' && !this.props.trackMouse) {
+      return;
+    }
+
+    if (!this.swipeable.x || !this.swipeable.y || e.touches && e.touches.length > 1) {
       return;
     }
 
@@ -30403,35 +30434,36 @@ var Swipeable = React.createClass({
           this.props.onSwipingLeft && this.props.onSwipingLeft(e, pos.absX);
           cancelPageSwipe = true;
         }
-      } else {
-        if (this.props.onSwipingRight || this.props.onSwipedRight) {
-          this.props.onSwipingRight && this.props.onSwipingRight(e, pos.absX);
-          cancelPageSwipe = true;
-        }
+      } else if (this.props.onSwipingRight || this.props.onSwipedRight) {
+        this.props.onSwipingRight && this.props.onSwipingRight(e, pos.absX);
+        cancelPageSwipe = true;
       }
-    } else {
-      if (pos.deltaY > 0) {
-        if (this.props.onSwipingUp || this.props.onSwipedUp) {
-          this.props.onSwipingUp && this.props.onSwipingUp(e, pos.absY);
-          cancelPageSwipe = true;
-        }
-      } else {
-        if (this.props.onSwipingDown || this.props.onSwipedDown) {
-          this.props.onSwipingDown && this.props.onSwipingDown(e, pos.absY);
-          cancelPageSwipe = true;
-        }
+    } else if (pos.deltaY > 0) {
+      if (this.props.onSwipingUp || this.props.onSwipedUp) {
+        this.props.onSwipingUp && this.props.onSwipingUp(e, pos.absY);
+        cancelPageSwipe = true;
       }
+    } else if (this.props.onSwipingDown || this.props.onSwipedDown) {
+      this.props.onSwipingDown && this.props.onSwipingDown(e, pos.absY);
+      cancelPageSwipe = true;
     }
 
-    this.setState({ swiping: true });
+    this.swipeable.swiping = true;
 
     if (cancelPageSwipe && this.props.preventDefaultTouchmoveEvent) {
       e.preventDefault();
     }
   },
+  eventEnd: function eventEnd(e) {
+    if (typeof this.props.onMouseUp === 'function') {
+      this.props.onMouseUp(e);
+    }
 
-  touchEnd: function touchEnd(e) {
-    if (this.state.swiping) {
+    if (e.type === 'mouseup' && !this.props.trackMouse) {
+      return;
+    }
+
+    if (this.swipeable.swiping) {
       var pos = this.calculatePos(e);
 
       if (this.props.stopPropagation) e.stopPropagation();
@@ -30446,23 +30478,25 @@ var Swipeable = React.createClass({
         } else {
           this.props.onSwipedRight && this.props.onSwipedRight(e, pos.deltaX, isFlick);
         }
+      } else if (pos.deltaY > 0) {
+        this.props.onSwipedUp && this.props.onSwipedUp(e, pos.deltaY, isFlick);
       } else {
-        if (pos.deltaY > 0) {
-          this.props.onSwipedUp && this.props.onSwipedUp(e, pos.deltaY, isFlick);
-        } else {
-          this.props.onSwipedDown && this.props.onSwipedDown(e, pos.deltaY, isFlick);
-        }
+        this.props.onSwipedDown && this.props.onSwipedDown(e, pos.deltaY, isFlick);
       }
+    } else {
+      this.props.onTap && this.props.onTap(e);
     }
 
-    this.setState(this.getInitialState());
+    this.swipeable = getInitialState();
   },
-
   render: function render() {
     var newProps = _extends({}, this.props, {
-      onTouchStart: this.touchStart,
-      onTouchMove: this.touchMove,
-      onTouchEnd: this.touchEnd
+      onTouchStart: this.eventStart,
+      onTouchMove: this.eventMove,
+      onTouchEnd: this.eventEnd,
+      onMouseDown: this.eventStart,
+      onMouseMove: this.eventMove,
+      onMouseUp: this.eventEnd
     });
 
     delete newProps.onSwiped;
@@ -30475,18 +30509,21 @@ var Swipeable = React.createClass({
     delete newProps.onSwipedRight;
     delete newProps.onSwipedDown;
     delete newProps.onSwipedLeft;
+    delete newProps.onTap;
     delete newProps.flickThreshold;
     delete newProps.delta;
     delete newProps.preventDefaultTouchmoveEvent;
     delete newProps.stopPropagation;
     delete newProps.nodeName;
     delete newProps.children;
+    delete newProps.trackMouse;
 
     return React.createElement(this.props.nodeName, newProps, this.props.children);
   }
 });
 
 module.exports = Swipeable;
+
 },{"react":346}],201:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -56938,6 +56975,77 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 },{"react":346}],397:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Component = function () {
+  function Component() {
+    _classCallCheck(this, Component);
+
+    this.bounds = {
+      min: [-4, -4, -5],
+      max: [4, 4, -1]
+    };
+    this.scale = [0.508, 0.508, 1];
+    this.position = [0, 0, 0];
+    this.velocity = [0, 0, 0];
+    this.rotation = 0;
+    //this.randomizePosition();
+    this.rotation_axis = [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5];
+  }
+
+  _createClass(Component, [{
+    key: "randomizePosition",
+    value: function randomizePosition() {
+      this.position = [Math.random() * (this.bounds.max[0] - this.bounds.min[0]) + this.bounds.min[0], this.bounds.max[1], Math.random() * (this.bounds.max[2] - this.bounds.min[2]) + this.bounds.min[2]];
+      this.velocity = [0, 0, 0];
+    }
+  }, {
+    key: "isOutOfBounds",
+    value: function isOutOfBounds() {
+      return this.position[0] < this.bounds.min[0] || this.position[0] > this.bounds.max[0] || this.position[1] < this.bounds.min[1] || this.position[1] > this.bounds.max[1] || this.position[2] < this.bounds.min[2] || this.position[2] > this.bounds.max[2];
+    }
+  }, {
+    key: "updatePosition",
+    value: function updatePosition(time) {
+      // rotate
+      this.rotation += 30 * time / 100000.0;
+
+      // gravity
+      if (this.velocity[1] > -.001) {
+        this.velocity[1] -= 0.000001;
+      }
+
+      // random drift
+      for (var i = 0; i < 3; i++) {
+        if (Math.abs(this.velocity[i]) < 0.001) {
+          this.velocity[i] += Math.random() * 0.00002 - 0.00001;
+        } else {
+          this.velocity[i] *= 0.9;
+        }
+      }
+
+      // update position
+      for (var i = 0; i < 3; i++) {
+        this.position[i] += this.velocity[i] * time;
+      }
+
+      // respawn if out of bounds
+      if (this.isOutOfBounds()) {
+        this.randomizePosition();
+      }
+    }
+  }]);
+
+  return Component;
+}();
+
+module.exports = Component;
+
+},{}],398:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -56966,14 +57074,29 @@ var ComponentEdit = function (_React$Component) {
   _createClass(ComponentEdit, [{
     key: 'handleFieldChange',
     value: function handleFieldChange(event) {
-      var name_toks = event.target.getAttribute("name").split('_');
       var update = {};
-      update[name_toks.pop()] = event.target.value;
-      while (name_toks.length) {
-        var updated = {};
-        updated[name_toks.pop()] = update;
-        update = updated;
+      var name = event.target.getAttribute("name");
+      var name_toks = name.split('_');
+      if (name_toks.length == 1) {
+        update[name] = event.target.value;
+        return this.setState(update);
       }
+
+      var key = void 0;
+      key = name_toks.shift();
+      var prev_state = JSON.parse(JSON.stringify(this.state));
+      update[key] = prev_state[key] || {};
+      var update_pointer = update[key];
+      while (true) {
+        key = name_toks.shift();
+        if (!name_toks.length) {
+          update_pointer[key] = event.target.value;
+          break;
+        }
+        update_pointer[key] = update_pointer[key] || {};
+        update_pointer = update_pointer[key];
+      }
+
       this.setState(update);
     }
   }, {
@@ -56997,10 +57120,10 @@ var ComponentEdit = function (_React$Component) {
     value: function componentWillReceiveProps(nextProps) {
       // ensure we clear previous state
       var props = {};
-      props.options = props.options || {};
-      props.props = props.props || {};
-      props.compatible_components = props.compatible_components || [];
-      props.sku = props.sku || "";
+      props.options = nextProps.options || {};
+      props.props = nextProps.props || {};
+      props.compatible_components = nextProps.compatible_components || [];
+      props.sku = nextProps.sku || "";
       this.setState(props);
     }
   }, {
@@ -57010,7 +57133,7 @@ var ComponentEdit = function (_React$Component) {
 
       var fields = [];
 
-      [{ name: "sku", type: "text" }, { name: "props_name", type: "text" }, { name: "props_price", type: "text" }, { name: "props_image", type: "file" }].forEach(function (spec) {
+      [{ name: "sku", type: "text" }, { name: "props_name", type: "text" }, { name: "props_price", type: "text" }, { name: "props_imagewidth", type: "text" }, { name: "props_imageheight", type: "text" }, { name: "props_image", type: "file" }].forEach(function (spec) {
         // use underscores to navigate child fields
         var name_toks = spec.name.split('_');
         var value = _this2.state[name_toks[0]] || "";
@@ -57065,7 +57188,7 @@ var ComponentEdit = function (_React$Component) {
 
 module.exports = ComponentEdit;
 
-},{"react":346}],398:[function(require,module,exports){
+},{"react":346}],399:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -57133,7 +57256,350 @@ var ComponentsEdit = function (_React$Component) {
 
 module.exports = ComponentsEdit;
 
-},{"./ComponentEdit.jsx":397,"react":346}],399:[function(require,module,exports){
+},{"./ComponentEdit.jsx":398,"react":346}],400:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Component = require('./Component.js');
+
+var Customizer = function () {
+  function Customizer(options) {
+    _classCallCheck(this, Customizer);
+
+    this.options = options;
+    this.options.vfov = this.options.vfov || 45; // vfov in degrees
+
+    this.gl = null;
+
+    this.particleVerticesBuffer;
+    this.particleVerticesTextureCoordBuffer;
+    this.particleVerticesIndexBuffer;
+    this.particleVerticesIndexBuffer;
+    this.particleRotation = 0.0;
+    this.lastParticleUpdateTime = new Date().getTime();
+
+    this.particleTexture;
+
+    this.mvMatrix;
+    this.mvMatrixStack = [];
+    this.shaderProgram;
+    this.vertexPositionAttribute;
+    this.textureCoordAttribute;
+    this.pMatrix;
+
+    this.components = [];
+
+    for (var i = 0; i < 12; i++) {
+      this.components.push(new Component());
+    }
+    this.cursor = new Component();
+  }
+
+  _createClass(Customizer, [{
+    key: "resizeViewport",
+    value: function resizeViewport() {
+      // set canvas space to be 1-to-1 with browser space
+      this.options.canvas.width = this.options.canvas.offsetWidth;
+      this.options.canvas.height = this.options.canvas.offsetHeight;
+      this.gl.viewport(0, 0, this.options.canvas.width, this.options.canvas.height);
+
+      // init pMatrix with view frustrum
+      this.pMatrix = makePerspective(this.options.vfov, this.options.canvas.width / this.options.canvas.height, 0.1, 100.0);
+      // move camera upwards by elevation
+      this.camera_elevation = 3.0;
+      this.pMatrix = this.translate(this.pMatrix, [-0.0, 0.0, -this.camera_elevation]);
+
+      this.focal_length_pixels = this.options.canvas.offsetHeight / 2 / Math.tan(this.options.vfov * Math.PI / 360);
+
+      this.updateCanvasScreenPosition();
+    }
+  }, {
+    key: "updateCanvasScreenPosition",
+    value: function updateCanvasScreenPosition() {
+      var position = [0, 0];
+      var element = this.options.canvas;
+      while (element) {
+        if (element.tagName.toLowerCase() == "body") {
+          // deal with body scroll seperately
+          position[0] += element.offsetLeft + element.clientLeft;
+          position[1] += element.offsetTop + element.clientTop;
+        } else {
+          // for all other non-BODY elements
+          position[0] += element.offsetLeft - element.scrollLeft + element.clientLeft;
+          position[1] += element.offsetTop - element.scrollTop + element.clientTop;
+        }
+        element = element.offsetParent;
+      }
+      this.canvas_offset = position;
+    }
+  }, {
+    key: "init",
+    value: function init() {
+      this.gl = this.initWebGL();
+      var gl = this.gl;
+
+      gl.clearColor(0.0, 0.0, 0.0, 0.0);
+      gl.clearDepth(1.0);
+      gl.disable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.LEQUAL);
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+      this.resizeViewport();
+      this.initShaders();
+      this.initBuffers();
+      this.initTextures();
+
+      // init mvMatrix
+      this.mvMatrix = Matrix.I(4);
+
+      // Set up to draw the scene periodically.
+      window.requestAnimationFrame(this.drawScene.bind(this));
+    }
+  }, {
+    key: "browserToWorld",
+    value: function browserToWorld(browser) {
+      //    let scroll = document.body.scrollTop || document.documentElement.scrollTop;
+      return this.screenToWorld([browser[0] - this.canvas_offset[0], browser[1] - this.canvas_offset[1]]);
+    }
+  }, {
+    key: "screenToWorld",
+    value: function screenToWorld(screen) {
+      var ret = [screen[0] - this.options.canvas.offsetWidth / 2, this.options.canvas.offsetHeight / 2 - screen[1], 0, 1];
+      ret[0] = ret[0] * this.camera_elevation / this.focal_length_pixels;
+      ret[1] = ret[1] * this.camera_elevation / this.focal_length_pixels;
+      return ret;
+    }
+  }, {
+    key: "worldToScreen",
+    value: function worldToScreen(world) {
+      var ret = [world[0] * this.focal_length_pixels / this.camera_elevation + this.options.canvas.offsetWidth / 2, this.options.canvas.offsetHeight / 2 - world[1] * this.focal_length_pixels / this.camera_elevation, 0, 1];
+      return ret;
+    }
+  }, {
+    key: "initWebGL",
+    value: function initWebGL() {
+      var gl = null;
+      try {
+        gl = this.options.canvas.getContext("webgl");
+      } catch (e) {}
+      if (!gl) {
+        alert("Unable to initialize WebGL. Your browser may not support it.");
+      }
+      return gl;
+    }
+  }, {
+    key: "initBuffers",
+    value: function initBuffers() {
+      var gl = this.gl;
+
+      // vertex buffer object
+      this.particleVerticesBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesBuffer);
+
+      var vertices = [-1.0, -1.0, 0.0, 1.0, -1.0, 0.0, 1.0, 1.0, 0.0, -1.0, 1.0, 0.0];
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+      // texture coordinate buffer object
+      this.particleVerticesTextureCoordBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesTextureCoordBuffer);
+      var textureCoordinates = [0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0];
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
+
+      // index buffer object
+      this.particleVerticesIndexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.particleVerticesIndexBuffer);
+      var particleVertexIndices = [0, 1, 2, 0, 2, 3];
+
+      // Now send the element array to GL
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(particleVertexIndices), gl.STATIC_DRAW);
+    }
+  }, {
+    key: "initTextures",
+    value: function initTextures() {
+      var gl = this.gl;
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      this.particleTexture = gl.createTexture();
+      var particleImage = new Image();
+      var self = this;
+      particleImage.onload = function () {
+        self.handleTextureLoaded(particleImage, self.particleTexture);
+      };
+      particleImage.src = "/petal.png";
+
+      this.cursorTexture = gl.createTexture();
+      var cursorImage = new Image();
+      cursorImage.onload = function () {
+        self.handleTextureLoaded(cursorImage, self.cursorTexture);
+      };
+      cursorImage.src = "/cursor.png";
+    }
+  }, {
+    key: "handleTextureLoaded",
+    value: function handleTextureLoaded(image, texture) {
+      var gl = this.gl;
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+  }, {
+    key: "drawScene",
+    value: function drawScene() {
+      var gl = this.gl;
+
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+      // Draw the particle by binding the array buffer to the particle's vertices
+      // array, setting attributes, and pushing it to GL
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesBuffer);
+      gl.vertexAttribPointer(this.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+      // Set the texture coordinates attribute for the vertices
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesTextureCoordBuffer);
+      gl.vertexAttribPointer(this.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+
+      // Specify geometry
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.particleVerticesIndexBuffer);
+
+      // update time
+      var currentTime = new Date().getTime();
+      this.time_delta = currentTime - this.lastParticleUpdateTime;
+      this.lastParticleUpdateTime = currentTime;
+
+      // debug cursor
+      gl.activeTexture(gl.TEXTURE0 + 1);
+      gl.bindTexture(gl.TEXTURE_2D, this.cursorTexture);
+      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 1);
+
+      this.mvPushMatrix();
+      this.mvMatrix = this.translate(this.mvMatrix, this.cursor.position);
+      this.mvMatrix = this.rotate(this.mvMatrix, this.cursor.rotation, this.cursor.rotation_axis);
+      this.mvMatrix = this.scale(this.mvMatrix, this.cursor.scale);
+      this.setMatrixUniforms();
+      gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+      this.mvPopMatrix();
+
+      // Specify the texture to map onto the components
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.particleTexture);
+      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 0);
+
+      // draw components
+      for (var i = 0; i < this.components.length; i++) {
+
+        this.components[i].updatePosition(this.time_delta);
+
+        this.mvPushMatrix();
+        // TODO pre-multiply these into a single transform matrix
+        this.mvMatrix = this.translate(this.mvMatrix, this.components[i].position);
+        this.mvMatrix = this.rotate(this.mvMatrix, this.components[i].rotation, this.components[i].rotation_axis);
+        this.mvMatrix = this.scale(this.mvMatrix, this.components[i].scale);
+
+        this.setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+
+        this.mvPopMatrix();
+      }
+
+      window.requestAnimationFrame(this.drawScene.bind(this));
+    }
+  }, {
+    key: "initShaders",
+    value: function initShaders() {
+      var gl = this.gl;
+      var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(fragmentShader, "\n        varying highp vec2 vTextureCoord;\n        uniform sampler2D uSampler;\n        void main(void) {\n          gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n        }\n    ");
+      gl.compileShader(fragmentShader);
+      if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+        alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(fragmentShader));
+      }
+
+      var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(vertexShader, "\n        attribute vec3 aVertexPosition;\n        attribute vec2 aTextureCoord;\n        uniform mat4 uMVMatrix;\n        uniform mat4 uPMatrix;\n        varying highp vec2 vTextureCoord;\n        void main(void) {\n          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n          vTextureCoord = aTextureCoord;\n        }\n    ");
+      gl.compileShader(vertexShader);
+      if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+        alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(vertexShader));
+      }
+
+      // Create the shader program
+      this.shaderProgram = gl.createProgram();
+      gl.attachShader(this.shaderProgram, vertexShader);
+      gl.attachShader(this.shaderProgram, fragmentShader);
+      gl.linkProgram(this.shaderProgram);
+
+      // If creating the shader program failed, alert
+      if (!gl.getProgramParameter(this.shaderProgram, gl.LINK_STATUS)) {
+        alert("Unable to initialize the shader program: " + gl.getProgramInfoLog(shader));
+      }
+
+      gl.useProgram(this.shaderProgram);
+
+      this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
+      gl.enableVertexAttribArray(this.vertexPositionAttribute);
+
+      this.textureCoordAttribute = gl.getAttribLocation(this.shaderProgram, "aTextureCoord");
+      gl.enableVertexAttribArray(this.textureCoordAttribute);
+    }
+  }, {
+    key: "setMatrixUniforms",
+    value: function setMatrixUniforms() {
+      var gl = this.gl;
+      var pUniform = gl.getUniformLocation(this.shaderProgram, "uPMatrix");
+      gl.uniformMatrix4fv(pUniform, false, new Float32Array(this.pMatrix.flatten()));
+
+      var mvUniform = gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
+      gl.uniformMatrix4fv(mvUniform, false, new Float32Array(this.mvMatrix.flatten()));
+    }
+  }, {
+    key: "mvPushMatrix",
+    value: function mvPushMatrix(m) {
+      if (m) {
+        this.mvMatrixStack.push(m.dup());
+        this.mvMatrix = m.dup();
+      } else {
+        this.mvMatrixStack.push(this.mvMatrix.dup());
+      }
+    }
+  }, {
+    key: "mvPopMatrix",
+    value: function mvPopMatrix() {
+      if (!this.mvMatrixStack.length) {
+        throw "Can't pop from an empty matrix stack.";
+      }
+
+      this.mvMatrix = this.mvMatrixStack.pop();
+      return this.mvMatrix;
+    }
+  }, {
+    key: "rotate",
+    value: function rotate(m, angle, v) {
+      var r = Matrix.Rotation(angle, $V([v[0], v[1], v[2]])).ensure4x4();
+      return m.x(r);
+    }
+  }, {
+    key: "translate",
+    value: function translate(m, v) {
+      return m.x(Matrix.Translation($V([v[0], v[1], v[2]])).ensure4x4());
+    }
+  }, {
+    key: "scale",
+    value: function scale(m, v) {
+      return m.x(Matrix.Diagonal([v[0], v[1], v[2], 1]));
+    }
+  }]);
+
+  return Customizer;
+}();
+
+module.exports = Customizer;
+
+},{"./Component.js":397}],401:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -57235,7 +57701,7 @@ var FacebookLogin = function (_React$Component) {
 
 module.exports = FacebookLogin;
 
-},{"./UserProfile.jsx":419,"https":130,"react":346}],400:[function(require,module,exports){
+},{"./UserProfile.jsx":421,"https":130,"react":346}],402:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -57356,7 +57822,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./Scrollable.jsx":412,"./Shipment.jsx":413,"./Tabs.jsx":414,"react":346}],401:[function(require,module,exports){
+},{"./Scrollable.jsx":414,"./Shipment.jsx":415,"./Tabs.jsx":416,"react":346}],403:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -57542,7 +58008,7 @@ var InputAddress = function (_React$Component) {
 
 module.exports = InputAddress;
 
-},{"react":346}],402:[function(require,module,exports){
+},{"react":346}],404:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -57646,7 +58112,7 @@ var Item = function (_React$Component) {
 
 module.exports = Item;
 
-},{"react":346}],403:[function(require,module,exports){
+},{"react":346}],405:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -57721,7 +58187,7 @@ var Items = function (_React$Component) {
 
 module.exports = Items;
 
-},{"./Item.jsx":402,"react":346}],404:[function(require,module,exports){
+},{"./Item.jsx":404,"react":346}],406:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -57777,7 +58243,7 @@ var LayoutBasic = function (_React$Component) {
 
 module.exports = LayoutBasic;
 
-},{"react":346}],405:[function(require,module,exports){
+},{"react":346}],407:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -57817,7 +58283,6 @@ var LayoutMain = function (_React$Component) {
 
     _this.onSwiping = _this.onSwiping.bind(_this);
     _this.onSwiped = _this.onSwiped.bind(_this);
-    _this.onChildSwiping = _this.onChildSwiping.bind(_this);
     return _this;
   }
 
@@ -57848,12 +58313,6 @@ var LayoutMain = function (_React$Component) {
       var menu = this.state.menu;
       menu.offset = menu.state ? -menu_width : 0;
       this.setState({ menu: menu });
-    }
-  }, {
-    key: 'onChildSwiping',
-    value: function onChildSwiping(e, deltaX, deltaY, absX, absY, velocity) {
-      e.stopPropagation();
-      console.log('child ' + deltaX + ' ' + deltaY);
     }
   }, {
     key: 'handleToggleMenuState',
@@ -57912,6 +58371,8 @@ var LayoutMain = function (_React$Component) {
           React.createElement(UserMenu, _extends({ handleToggleMenu: this.handleToggleMenuState.bind(this) }, this.state))
         ),
         React.createElement('script', { src: '/BowAndDrape.js' }),
+        React.createElement('script', { src: '/sylvester.js', type: 'text/javascript' }),
+        React.createElement('script', { src: '/glUtils.js', type: 'text/javascript' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n            content_string: `' + escape(this.props.content_string) + '`,\n            content_name: `' + this.props.content_name + '`,\n            content_props: `' + this.props.content_props + '`}\n          );\n          ReactDOM.render(\n            layout,\n            document.body\n          );\n\n        ' } })
       );
     }
@@ -57922,7 +58383,7 @@ var LayoutMain = function (_React$Component) {
 
 module.exports = LayoutMain;
 
-},{"./UserMenu.jsx":417,"react":346,"react-dom/server":199,"react-swipeable":200}],406:[function(require,module,exports){
+},{"./UserMenu.jsx":419,"react":346,"react-dom/server":199,"react-swipeable":200}],408:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58059,7 +58520,7 @@ var PageEdit = function (_React$Component) {
 
 module.exports = PageEdit;
 
-},{"react":346}],407:[function(require,module,exports){
+},{"react":346}],409:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58123,7 +58584,7 @@ var PageList = function (_React$Component) {
 
 module.exports = PageList;
 
-},{"./PageEdit.jsx":406,"./Scrollable.jsx":412,"react":346}],408:[function(require,module,exports){
+},{"./PageEdit.jsx":408,"./Scrollable.jsx":414,"react":346}],410:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -58417,8 +58878,8 @@ var PayStripe = function (_React$Component) {
 module.exports = PayStripe;
 
 }).call(this,require('_process'))
-},{"./InputAddress.jsx":401,"./Items.jsx":403,"./ThanksPurchaseComplete.jsx":415,"_process":185,"react":346}],409:[function(require,module,exports){
-"use strict";
+},{"./InputAddress.jsx":403,"./Items.jsx":405,"./ThanksPurchaseComplete.jsx":417,"_process":185,"react":346}],411:[function(require,module,exports){
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -58429,20 +58890,87 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+var Swipeable = require('react-swipeable');
 
 var ProductCanvas = function (_React$Component) {
   _inherits(ProductCanvas, _React$Component);
 
-  function ProductCanvas() {
+  function ProductCanvas(props) {
     _classCallCheck(this, ProductCanvas);
 
-    return _possibleConstructorReturn(this, (ProductCanvas.__proto__ || Object.getPrototypeOf(ProductCanvas)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (ProductCanvas.__proto__ || Object.getPrototypeOf(ProductCanvas)).call(this, props));
+
+    _this.onSwipe = _this.onSwipe.bind(_this);
+
+    return _this;
   }
 
   _createClass(ProductCanvas, [{
-    key: "render",
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.canvas = document.querySelector("canvas");
+      this.canvas.setAttribute("width", document.body.offsetWidth);
+      this.customizer = new BowAndDrape.Customizer({ canvas: this.canvas });
+      this.customizer.init();
+      this.forceUpdate();
+    }
+  }, {
+    key: 'handleComponentMove',
+    value: function handleComponentMove(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (event.touches && event.touches.length > 1) return;
+      if (event.type == "mousemove" && !event.buttons & 0x1) return;
+      var client_pos = event.touches ? [event.touches[0].pageX, event.touches[0].pageY] : [event.clientX, event.clientY + (document.body.scrollTop ? document.body.scrollTop : document.documentElement.scrollTop)];
+
+      this.customizer.cursor.position = this.customizer.browserToWorld(client_pos);
+      this.forceUpdate();
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      var _this2 = this;
+
+      // handle actions on hitboxes
+      this.canvas.parentNode.childNodes.forEach(function (node) {
+        if (node.tagName.toLowerCase() != "component_hitbox") return;
+        node.ontouchmove = _this2.handleComponentMove.bind(_this2);
+        node.onmousemove = _this2.handleComponentMove.bind(_this2);
+      });
+    }
+  }, {
+    key: 'onSwipe',
+    value: function onSwipe(event, deltaX, deltaY, absX, absY, velocity) {
+      event.stopPropagation();
+    }
+  }, {
+    key: 'render',
     value: function render() {
-      return React.createElement("canvas", { width: "200px", height: "300px", style: { backgroundImage: "url(" + this.props.props.image + ")", position: "relative" } });
+      var component_hitboxes = [];
+
+      var cursor_position_screen = this.customizer ? this.customizer.worldToScreen(this.customizer.cursor.position) : [0, -100];
+      var cursor_dims_screen = [100, 100];
+      if (this.canvas) {
+        component_hitboxes.push(React.createElement('component_hitbox', {
+          style: {
+            position: "absolute",
+            left: cursor_position_screen[0] - cursor_dims_screen[0] / 2 + 'px',
+            top: cursor_position_screen[1] - cursor_dims_screen[1] / 2 + 'px',
+            width: cursor_dims_screen[0] + 'px',
+            height: cursor_dims_screen[1] + 'px',
+            backgroundColor: "rgba(0,0,0,0)",
+            border: "solid 1px #000"
+          }
+        }));
+      }
+
+      return React.createElement(
+        'div',
+        { style: { position: "relative" } },
+        React.createElement('canvas', { height: '300', style: { backgroundImage: 'url(' + this.props.product.props.image + ')', position: "relative" } }),
+        component_hitboxes
+      );
     }
   }]);
 
@@ -58451,7 +58979,7 @@ var ProductCanvas = function (_React$Component) {
 
 module.exports = ProductCanvas;
 
-},{"react":346}],410:[function(require,module,exports){
+},{"react":346,"react-swipeable":200}],412:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -58511,11 +59039,7 @@ var ProductList = function (_React$Component) {
       return React.createElement(
         'customize',
         null,
-        this.props.edit ? React.createElement(
-          ComponentEdit,
-          _extends({}, product_raw, { inherits: product }),
-          JSON.stringify(product_raw)
-        ) : React.createElement(
+        this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : React.createElement(
           'button',
           { onClick: this.handleAddToCart.bind(this, product), style: { position: "fixed", top: "0px", right: "0px", zIndex: "1" } },
           'Add To Cart'
@@ -58528,7 +59052,7 @@ var ProductList = function (_React$Component) {
             null,
             product_options
           ),
-          React.createElement(ProductCanvas, _extends({ assembly: this.state.assembly }, product))
+          React.createElement(ProductCanvas, { assembly: this.state.assembly, product: product })
         ),
         React.createElement(
           Tabs,
@@ -58811,7 +59335,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ComponentEdit.jsx":397,"./ProductCanvas.jsx":409,"./ProductListEdit.jsx":411,"./Tabs.jsx":414,"async":20,"react":346}],411:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ComponentEdit.jsx":398,"./ProductCanvas.jsx":411,"./ProductListEdit.jsx":413,"./Tabs.jsx":416,"async":20,"react":346}],413:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -58937,7 +59461,7 @@ var ProductListEdit = function (_React$Component) {
 
 module.exports = ProductListEdit;
 
-},{"async":20,"react":346,"react-autocomplete":197}],412:[function(require,module,exports){
+},{"async":20,"react":346,"react-autocomplete":197}],414:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59025,7 +59549,7 @@ var Scrollable = function (_React$Component) {
 
 module.exports = Scrollable;
 
-},{"react":346}],413:[function(require,module,exports){
+},{"react":346}],415:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -59272,7 +59796,7 @@ var Shipment = function (_React$Component) {
 
 module.exports = Shipment;
 
-},{"./Address.jsx":395,"./Item.jsx":402,"./Timestamp.jsx":416,"react":346}],414:[function(require,module,exports){
+},{"./Address.jsx":395,"./Item.jsx":404,"./Timestamp.jsx":418,"react":346}],416:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59397,7 +59921,7 @@ var Tabs = function (_React$Component) {
 
 module.exports = Tabs;
 
-},{"fs":51,"react":346}],415:[function(require,module,exports){
+},{"fs":51,"react":346}],417:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59439,7 +59963,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"react":346}],416:[function(require,module,exports){
+},{"react":346}],418:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59478,7 +60002,7 @@ var Timestamp = function (_React$Component) {
 
 module.exports = Timestamp;
 
-},{"react":346}],417:[function(require,module,exports){
+},{"react":346}],419:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -59575,7 +60099,7 @@ var UserMenu = function (_React$Component) {
 
 module.exports = UserMenu;
 
-},{"./Cart.jsx":396,"./FacebookLogin.jsx":399,"./UserProfile.jsx":419,"react":346}],418:[function(require,module,exports){
+},{"./Cart.jsx":396,"./FacebookLogin.jsx":401,"./UserProfile.jsx":421,"react":346}],420:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59673,7 +60197,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserProfile.jsx":419,"jwt-decode":137,"react":346}],419:[function(require,module,exports){
+},{"./UserProfile.jsx":421,"jwt-decode":137,"react":346}],421:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59815,6 +60339,7 @@ var jwt_decode = require('jwt-decode');
 
 var LayoutBasic = require('./LayoutBasic.jsx');
 var LayoutMain = require('./LayoutMain.jsx');
+var Customizer = require('./Customizer.js');
 
 // helper function for reading cookies
 var readCookie = function readCookie(name) {
@@ -59894,10 +60419,12 @@ var api = function api(method, endpoint, body, callback) {
     callback(null, JSON.parse(this.responseText));
   };
   var payload = new FormData();
-  Object.keys(body).forEach(function (key) {
-    // if it's an object but not named file, stringify
-    if (_typeof(body[key]) == 'object' && !/file/.test(key)) payload.append(key, JSON.stringify(body[key]));else payload.append(key, body[key]);
-  });
+  if (body) {
+    Object.keys(body).forEach(function (key) {
+      // if it's an object but not named file, stringify
+      if (_typeof(body[key]) == 'object' && !/file/.test(key)) payload.append(key, JSON.stringify(body[key]));else payload.append(key, body[key]);
+    });
+  }
   xhr.send(payload);
 };
 
@@ -59919,7 +60446,8 @@ module.exports = {
     ComponentsEdit: require('./ComponentsEdit.jsx')
   },
   dispatcher: dispatcher,
-  api: api
+  api: api,
+  Customizer: Customizer
 };
 
-},{"./ComponentsEdit.jsx":398,"./FulfillShipments.jsx":400,"./Items.jsx":403,"./LayoutBasic.jsx":404,"./LayoutMain.jsx":405,"./PageList.jsx":407,"./PayStripe.jsx":408,"./ProductList.jsx":410,"./UserPasswordReset.jsx":418,"events":96,"jwt-decode":137,"react":346,"react-dom":198}]},{},[]);
+},{"./ComponentsEdit.jsx":399,"./Customizer.js":400,"./FulfillShipments.jsx":402,"./Items.jsx":405,"./LayoutBasic.jsx":406,"./LayoutMain.jsx":407,"./PageList.jsx":409,"./PayStripe.jsx":410,"./ProductList.jsx":412,"./UserPasswordReset.jsx":420,"events":96,"jwt-decode":137,"react":346,"react-dom":198}]},{},[]);

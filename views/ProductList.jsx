@@ -80,14 +80,14 @@ class ProductList extends React.Component {
     return (
       <customize>
         {this.props.edit ?
-          <ComponentEdit {...product_raw} inherits={product}>{JSON.stringify(product_raw)}</ComponentEdit> :
+          <ComponentEdit {...product_raw} inherits={product} /> :
           <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1"}}>Add To Cart</button>
         }
         <div className="canvas_container">
           <product_options>
             {product_options}
           </product_options>
-          <ProductCanvas assembly={this.state.assembly} {...product} />
+          <ProductCanvas assembly={this.state.assembly} product={product} />
         </div>
         <Tabs className="components">
           {components}

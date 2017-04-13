@@ -10,14 +10,29 @@ class ComponentEdit extends React.Component {
   }
 
   handleFieldChange(event) {
-    let name_toks = event.target.getAttribute("name").split('_');
     let update = {};
-    update[name_toks.pop()] = event.target.value;
-    while (name_toks.length) {
-      let updated = {};
-      updated[name_toks.pop()] = update;
-      update = updated;
+    let name = event.target.getAttribute("name");
+    let name_toks = name.split('_');
+    if (name_toks.length==1) {
+      update[name] = event.target.value;
+      return this.setState(update);
     }
+
+    let key;
+    key = name_toks.shift();
+    let prev_state = JSON.parse(JSON.stringify(this.state));
+    update[key] = prev_state[key] || {};
+    let update_pointer = update[key];
+    while (true) {
+      key = name_toks.shift();
+      if (!name_toks.length) {
+        update_pointer[key] = event.target.value;
+        break;
+      }
+      update_pointer[key] = update_pointer[key] || {};
+      update_pointer = update_pointer[key];
+    }
+
     this.setState(update);
   }
 
@@ -39,10 +54,10 @@ class ComponentEdit extends React.Component {
   componentWillReceiveProps(nextProps) {
     // ensure we clear previous state
     let props = {};
-    props.options = props.options || {};
-    props.props = props.props || {};
-    props.compatible_components = props.compatible_components || [];
-    props.sku = props.sku || "";
+    props.options = nextProps.options || {};
+    props.props = nextProps.props || {};
+    props.compatible_components = nextProps.compatible_components || [];
+    props.sku = nextProps.sku || "";
     this.setState(props);
   }
 
@@ -50,7 +65,12 @@ class ComponentEdit extends React.Component {
     let fields = [];
 
     [
-      {name:"sku",type:"text"},{name:"props_name",type:"text"},{name:"props_price",type:"text"},{name:"props_image",type:"file"}
+      {name:"sku",type:"text"},
+      {name:"props_name",type:"text"},
+      {name:"props_price",type:"text"},
+      {name:"props_imagewidth", type:"text"},
+      {name:"props_imageheight", type:"text"},
+      {name:"props_image",type:"file"},
     ].forEach((spec) => {
       // use underscores to navigate child fields
       let name_toks = spec.name.split('_');

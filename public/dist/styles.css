@@ -379,8 +379,11 @@ component_edit {
   display: flex;
   flex-wrap: row;
 }
+component_edit input[type="text"] {
+  width: 50px;
+}
 .icon {
-  background-image: url('/sprite.png?950e22c5d40c3a0579aad06efeef3e2d296b998f');
+  background-image: url('/sprite.png?e5391c4e06632e78701f66e1fd8061355432a34e');
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
@@ -404,8 +407,8 @@ menu user {
   margin-bottom: 15px;
 }
 menu user img {
-  background-image: url('/sprite.png?950e22c5d40c3a0579aad06efeef3e2d296b998f');
-  background-position: 0px -35px;
+  background-image: url('/sprite.png?e5391c4e06632e78701f66e1fd8061355432a34e');
+  background-position: 0px -155px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: inline;
@@ -424,7 +427,7 @@ menu login msg {
   color: #a00;
 }
 menu handle {
-  background-image: url('/sprite.png?950e22c5d40c3a0579aad06efeef3e2d296b998f');
+  background-image: url('/sprite.png?e5391c4e06632e78701f66e1fd8061355432a34e');
   background-position: 0px 0px;
   background-repeat: no-repeat;
   overflow: hidden;
