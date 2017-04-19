@@ -64,7 +64,8 @@ class Component extends JSONAPI {
                               component.props[prop_name];
     });
     if (component.compatible_components) {
-      this.compatible_components = this.compatible_components ?
+      this.compatible_components = this.compatible_components || [];
+      this.compatible_components = this.compatible_components.length ?
                                    this.compatible_components :
                                    component.compatible_components;
     }

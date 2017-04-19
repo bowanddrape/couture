@@ -23,7 +23,7 @@ class LayoutEmail extends React.Component {
         <center style={styles.wrapper}>
           <div style={styles.innerwrapper}>
             <table style={styles.table} class="outer" align="center"><tbody>
-              <tr><td style={{width: "100%", maxWidth: "600px", height: "auto"}}>
+              <tr><td style={{width: "100%", maxWidth: "300px", height: "auto"}}>
                 <a href="http://www.bowanddrape.com"><img src="http://staging.bowanddrape.com/logo.jpg?cachebust=1" alt="" style={{margin:"auto"}} /></a>
               </td></tr>
               <tr><td>

@@ -18,10 +18,9 @@ class UserMenu extends React.Component {
     let key = 0;
 
     menu_items.push(<UserProfile key={key++} {...this.props}/>);
-    menu_items.push(<Cart key={key++} />);
     menu_items.push(<FacebookLogin key={key++} {...this.props}/>);
+    menu_items.push(<Cart key={key++} />);
     menu_items.push(<a key={key++} href="/customize-your-own" disabled>Customize</a>);
-    menu_items.push(<a key={key++} href="#" disabled>Gift Cards</a>);
     // links to admin pages
     if (this.props.user&&this.props.user.roles&&this.props.user.roles.length) {
       menu_items.push(<a href="/store" key={key++} disabled>Admin Store</a>);

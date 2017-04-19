@@ -34,7 +34,7 @@ let styles = {
     height: "auto",
   },
   link: {
-    color: "#c79e6a"
+    color: "#F5C9CA"
   }
 }
 

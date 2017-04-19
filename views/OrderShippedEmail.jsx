@@ -28,7 +28,7 @@ class OrderShippedEmail extends React.Component {
 
 let styles = {
   link: {
-    color: "#c79e6a"
+    color: "#F5C9CA"
   }
 }
 

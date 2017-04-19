@@ -56993,11 +56993,38 @@ var Component = function () {
     this.position = [0, 0, 0];
     this.velocity = [0, 0, 0];
     this.rotation = 0;
-    //this.randomizePosition();
     this.rotation_axis = [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5];
+    this.props = {};
   }
 
   _createClass(Component, [{
+    key: "set",
+    value: function set(gl, state) {
+      var _this = this;
+
+      // handle image
+      if (state.props.image && state.props.image != this.props.image) {
+        (function () {
+          var image_load = new Image();
+          image_load.crossOrigin = "anonymous";
+          image_load.onload = function () {
+            if (_this.texture) {
+              gl.deleteTexture(_this.texture);
+            }
+            _this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, _this.texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image_load);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.bindTexture(gl.TEXTURE_2D, null);
+          };
+          image_load.src = state.props.image;
+        })();
+      }
+      this.props = state.props || {};
+    }
+  }, {
     key: "randomizePosition",
     value: function randomizePosition() {
       this.position = [Math.random() * (this.bounds.max[0] - this.bounds.min[0]) + this.bounds.min[0], this.bounds.max[1], Math.random() * (this.bounds.max[2] - this.bounds.min[2]) + this.bounds.min[2]];
@@ -57290,15 +57317,33 @@ var Customizer = function () {
     this.textureCoordAttribute;
     this.pMatrix;
 
-    this.components = [];
-
+    this.particles = [];
     for (var i = 0; i < 12; i++) {
-      this.components.push(new Component());
+      this.particles.push(new Component());
     }
-    this.cursor = new Component();
+
+    this.components = [];
   }
 
   _createClass(Customizer, [{
+    key: "set",
+    value: function set(construction) {
+      var components = [];
+      // TODO recurse assemblies
+      construction.assembly.forEach(function (assembly) {
+        components.push(assembly);
+      });
+      // sync component list the same
+      while (this.components.length < components.length) {
+        this.components.push(new Component());
+      }
+      // TODO unbind textures here so we don't leak
+      this.components.length = components.length;
+      for (var i = 0; i < components.length; i++) {
+        this.components[i].set(this.gl, components[i]);
+      }
+    }
+  }, {
     key: "resizeViewport",
     value: function resizeViewport() {
       // set canvas space to be 1-to-1 with browser space
@@ -57406,7 +57451,7 @@ var Customizer = function () {
       // texture coordinate buffer object
       this.particleVerticesTextureCoordBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesTextureCoordBuffer);
-      var textureCoordinates = [0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0];
+      var textureCoordinates = [0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0];
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
 
       // index buffer object
@@ -57429,13 +57474,6 @@ var Customizer = function () {
         self.handleTextureLoaded(particleImage, self.particleTexture);
       };
       particleImage.src = "/petal.png";
-
-      this.cursorTexture = gl.createTexture();
-      var cursorImage = new Image();
-      cursorImage.onload = function () {
-        self.handleTextureLoaded(cursorImage, self.cursorTexture);
-      };
-      cursorImage.src = "/cursor.png";
     }
   }, {
     key: "handleTextureLoaded",
@@ -57472,38 +57510,37 @@ var Customizer = function () {
       this.time_delta = currentTime - this.lastParticleUpdateTime;
       this.lastParticleUpdateTime = currentTime;
 
-      // debug cursor
-      gl.activeTexture(gl.TEXTURE0 + 1);
-      gl.bindTexture(gl.TEXTURE_2D, this.cursorTexture);
-      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 1);
-
-      this.mvPushMatrix();
-      this.mvMatrix = this.translate(this.mvMatrix, this.cursor.position);
-      this.mvMatrix = this.rotate(this.mvMatrix, this.cursor.rotation, this.cursor.rotation_axis);
-      this.mvMatrix = this.scale(this.mvMatrix, this.cursor.scale);
-      this.setMatrixUniforms();
-      gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-      this.mvPopMatrix();
-
-      // Specify the texture to map onto the components
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.particleTexture);
-      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 0);
-
       // draw components
       for (var i = 0; i < this.components.length; i++) {
 
-        this.components[i].updatePosition(this.time_delta);
+        if (this.components[i].texture) {
+          gl.activeTexture(gl.TEXTURE0 + 1);
+          gl.bindTexture(gl.TEXTURE_2D, this.components[i].texture);
+          gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 1);
+        }
 
         this.mvPushMatrix();
         // TODO pre-multiply these into a single transform matrix
         this.mvMatrix = this.translate(this.mvMatrix, this.components[i].position);
-        this.mvMatrix = this.rotate(this.mvMatrix, this.components[i].rotation, this.components[i].rotation_axis);
         this.mvMatrix = this.scale(this.mvMatrix, this.components[i].scale);
-
         this.setMatrixUniforms();
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+        this.mvPopMatrix();
+      }
 
+      // Specify the texture to map onto the particles
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.particleTexture);
+      gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 0);
+      for (var _i = 0; _i < this.particles.length; _i++) {
+        this.particles[_i].updatePosition(this.time_delta);
+        this.mvPushMatrix();
+        // TODO pre-multiply these into a single transform matrix
+        this.mvMatrix = this.translate(this.mvMatrix, this.particles[_i].position);
+        this.mvMatrix = this.rotate(this.mvMatrix, this.particles[_i].rotation, this.particles[_i].rotation_axis);
+        this.mvMatrix = this.scale(this.mvMatrix, this.particles[_i].scale);
+        this.setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
         this.mvPopMatrix();
       }
 
@@ -58900,8 +58937,9 @@ var ProductCanvas = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (ProductCanvas.__proto__ || Object.getPrototypeOf(ProductCanvas)).call(this, props));
 
-    _this.onSwipe = _this.onSwipe.bind(_this);
-
+    _this.state = {
+      assembly: _this.props.assembly || []
+    };
     return _this;
   }
 
@@ -58915,8 +58953,18 @@ var ProductCanvas = function (_React$Component) {
       this.forceUpdate();
     }
   }, {
+    key: 'handleAddComponent',
+    value: function handleAddComponent(component) {
+      this.setState(function (prevState, props) {
+        var assembly = JSON.parse(JSON.stringify(prevState.assembly));
+        assembly.push(component);
+        return { assembly: assembly };
+      });
+      console.log("productCanvas", component);
+    }
+  }, {
     key: 'handleComponentMove',
-    value: function handleComponentMove(event) {
+    value: function handleComponentMove(index, event) {
       event.preventDefault();
       event.stopPropagation();
 
@@ -58924,45 +58972,43 @@ var ProductCanvas = function (_React$Component) {
       if (event.type == "mousemove" && !event.buttons & 0x1) return;
       var client_pos = event.touches ? [event.touches[0].pageX, event.touches[0].pageY] : [event.clientX, event.clientY + (document.body.scrollTop ? document.body.scrollTop : document.documentElement.scrollTop)];
 
-      this.customizer.cursor.position = this.customizer.browserToWorld(client_pos);
+      this.customizer.components[index].position = this.customizer.browserToWorld(client_pos);
       this.forceUpdate();
     }
   }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate() {
-      var _this2 = this;
-
-      // handle actions on hitboxes
-      this.canvas.parentNode.childNodes.forEach(function (node) {
-        if (node.tagName.toLowerCase() != "component_hitbox") return;
-        node.ontouchmove = _this2.handleComponentMove.bind(_this2);
-        node.onmousemove = _this2.handleComponentMove.bind(_this2);
-      });
+    key: 'componentWillUpdate',
+    value: function componentWillUpdate(nextProps, nextState) {
+      this.customizer.set(nextState);
     }
   }, {
-    key: 'onSwipe',
-    value: function onSwipe(event, deltaX, deltaY, absX, absY, velocity) {
-      event.stopPropagation();
-    }
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {}
   }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       var component_hitboxes = [];
 
-      var cursor_position_screen = this.customizer ? this.customizer.worldToScreen(this.customizer.cursor.position) : [0, -100];
-      var cursor_dims_screen = [100, 100];
       if (this.canvas) {
-        component_hitboxes.push(React.createElement('component_hitbox', {
-          style: {
-            position: "absolute",
-            left: cursor_position_screen[0] - cursor_dims_screen[0] / 2 + 'px',
-            top: cursor_position_screen[1] - cursor_dims_screen[1] / 2 + 'px',
-            width: cursor_dims_screen[0] + 'px',
-            height: cursor_dims_screen[1] + 'px',
-            backgroundColor: "rgba(0,0,0,0)",
-            border: "solid 1px #000"
-          }
-        }));
+        this.customizer.components.forEach(function (component) {
+          var position_screen = _this2.customizer ? _this2.customizer.worldToScreen(component.position) : [0, -100];
+          var dims_screen = [100, 100];
+          component_hitboxes.push(React.createElement('component_hitbox', {
+            key: component_hitboxes.length,
+            onTouchMove: _this2.handleComponentMove.bind(_this2, component_hitboxes.length),
+            onMouseMove: _this2.handleComponentMove.bind(_this2, component_hitboxes.length),
+            style: {
+              position: "absolute",
+              left: position_screen[0] - dims_screen[0] / 2 + 'px',
+              top: position_screen[1] - dims_screen[1] / 2 + 'px',
+              width: dims_screen[0] + 'px',
+              height: dims_screen[1] + 'px',
+              backgroundColor: "rgba(0,0,0,0)",
+              border: "solid 1px #000"
+            }
+          }));
+        });
       }
 
       return React.createElement(
@@ -59015,7 +59061,6 @@ var ProductList = function (_React$Component) {
 
     _this.state = {
       selected_product: [null],
-      assembly: [],
       product_map: product_map
     };
     return _this;
@@ -59052,7 +59097,7 @@ var ProductList = function (_React$Component) {
             null,
             product_options
           ),
-          React.createElement(ProductCanvas, { assembly: this.state.assembly, product: product })
+          React.createElement(ProductCanvas, { ref: 'ProductCanvas', product: product })
         ),
         React.createElement(
           Tabs,
@@ -59130,7 +59175,7 @@ var ProductList = function (_React$Component) {
       var item = {
         sku: product.sku,
         quantity: 1,
-        assembly: this.state.assembly,
+        assembly: this.refs.ProductCanvas.state.assembly,
         props: product.props
       };
       BowAndDrape.cart.add(item);
@@ -59255,6 +59300,11 @@ var ProductList = function (_React$Component) {
     } // populateProductOptions
 
   }, {
+    key: 'handleAddComponent',
+    value: function handleAddComponent(component) {
+      this.refs.ProductCanvas.handleAddComponent(component);
+    }
+  }, {
     key: 'populateComponents',
     value: function populateComponents(product) {
       // populate components
@@ -59264,7 +59314,7 @@ var ProductList = function (_React$Component) {
         if (product.compatible_components[i].options) {
           var tab_components = [];
           for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-            tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' } }));
+            tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' }, onClick: this.handleAddComponent.bind(this, product.compatible_components[i].options[j]) }));
           }
           components.push(React.createElement(
             'div',
@@ -60041,17 +60091,12 @@ var UserMenu = function (_React$Component) {
       var key = 0;
 
       menu_items.push(React.createElement(UserProfile, _extends({ key: key++ }, this.props)));
-      menu_items.push(React.createElement(Cart, { key: key++ }));
       menu_items.push(React.createElement(FacebookLogin, _extends({ key: key++ }, this.props)));
+      menu_items.push(React.createElement(Cart, { key: key++ }));
       menu_items.push(React.createElement(
         'a',
         { key: key++, href: '/customize-your-own', disabled: true },
         'Customize'
-      ));
-      menu_items.push(React.createElement(
-        'a',
-        { key: key++, href: '#', disabled: true },
-        'Gift Cards'
       ));
       // links to admin pages
       if (this.props.user && this.props.user.roles && this.props.user.roles.length) {

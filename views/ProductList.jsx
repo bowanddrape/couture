@@ -18,7 +18,6 @@ class ProductList extends React.Component {
 
     this.state = {
       selected_product: [null],
-      assembly: [],
       product_map: product_map,
     };
   }
@@ -87,7 +86,7 @@ class ProductList extends React.Component {
           <product_options>
             {product_options}
           </product_options>
-          <ProductCanvas assembly={this.state.assembly} product={product} />
+          <ProductCanvas ref="ProductCanvas" product={product} />
         </div>
         <Tabs className="components">
           {components}
@@ -157,7 +156,7 @@ class ProductList extends React.Component {
     let item = {
       sku: product.sku,
       quantity: 1,
-      assembly: this.state.assembly,
+      assembly: this.refs.ProductCanvas.state.assembly,
       props: product.props
     };
     BowAndDrape.cart.add(item);
@@ -252,6 +251,10 @@ class ProductList extends React.Component {
     return {product, product_options};
   } // populateProductOptions
 
+  handleAddComponent(component) {
+    this.refs.ProductCanvas.handleAddComponent(component);
+  }
+
   populateComponents(product) {
     // populate components
     let components = [];
@@ -261,7 +264,7 @@ class ProductList extends React.Component {
         let tab_components = [];
         for (let j=0; j<product.compatible_components[i].options.length; j++) {
           tab_components.push(
-            <div key={i+'_'+j}  style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}}/>
+            <div key={i+'_'+j} style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}} onClick={this.handleAddComponent.bind(this, product.compatible_components[i].options[j])}/>
           );
         }
         components.push(

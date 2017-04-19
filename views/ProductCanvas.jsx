@@ -5,8 +5,9 @@ const Swipeable = require('react-swipeable');
 class ProductCanvas extends React.Component {
   constructor(props) {
     super(props);
-    this.onSwipe = this.onSwipe.bind(this);
-
+    this.state = {
+      assembly: this.props.assembly || [],
+    }
   }
 
   componentDidMount() {
@@ -17,51 +18,56 @@ class ProductCanvas extends React.Component {
     this.forceUpdate();
   }
 
-  handleComponentMove(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (event.touches && event.touches.length>1) return;
-        if (event.type=="mousemove" && !event.buttons&0x1) return;
-        let client_pos = event.touches ?
-          [event.touches[0].pageX, event.touches[0].pageY] :
-          [event.clientX, event.clientY+(document.body.scrollTop?document.body.scrollTop:document.documentElement.scrollTop)];
-        
-        this.customizer.cursor.position = this.customizer.browserToWorld(client_pos);
-        this.forceUpdate();
-  }
-  componentDidUpdate() {
-    // handle actions on hitboxes
-    this.canvas.parentNode.childNodes.forEach((node) => {
-      if (node.tagName.toLowerCase()!="component_hitbox") return;
-      node.ontouchmove = this.handleComponentMove.bind(this);
-      node.onmousemove = this.handleComponentMove.bind(this);
+  handleAddComponent(component) {
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      assembly.push(component);
+      return {assembly};
     });
+    console.log("productCanvas", component);
   }
 
-  onSwipe(event, deltaX, deltaY, absX, absY, velocity) {
+  handleComponentMove(index, event) {
+    event.preventDefault();
     event.stopPropagation();
+
+    if (event.touches && event.touches.length>1) return;
+    if (event.type=="mousemove" && !event.buttons&0x1) return;
+    let client_pos = event.touches ?
+      [event.touches[0].pageX, event.touches[0].pageY] :
+      [event.clientX, event.clientY+(document.body.scrollTop?document.body.scrollTop:document.documentElement.scrollTop)];
+    
+    this.customizer.components[index].position = this.customizer.browserToWorld(client_pos);
+    this.forceUpdate();
+  }
+  componentWillUpdate(nextProps, nextState) {
+    this.customizer.set(nextState);
   }
 
   render() {
     let component_hitboxes = [];
 
-    let cursor_position_screen = this.customizer?this.customizer.worldToScreen(this.customizer.cursor.position):[0,-100];
-    let cursor_dims_screen = [100, 100];
-    if (this.canvas) {
-      component_hitboxes.push(
-        <component_hitbox
-          style={{
-            position:"absolute",
-            left:`${cursor_position_screen[0]-cursor_dims_screen[0]/2}px`,
-            top:`${cursor_position_screen[1]-cursor_dims_screen[1]/2}px`,
-            width:`${cursor_dims_screen[0]}px`,
-            height:`${cursor_dims_screen[1]}px`,
-            backgroundColor:"rgba(0,0,0,0)",
-            border:"solid 1px #000",
-          }}
-        />
-      )
+    if (this.customizer) {
+      this.customizer.components.forEach((component) => {
+        let position_screen = this.customizer.worldToScreen(component.position);
+        let dims_screen = [100, 100];
+        component_hitboxes.push(
+          <component_hitbox
+            key={component_hitboxes.length}
+            onTouchMove={this.handleComponentMove.bind(this, component_hitboxes.length)}
+            onMouseMove={this.handleComponentMove.bind(this, component_hitboxes.length)}
+            style={{
+              position:"absolute",
+              left:`${position_screen[0]-dims_screen[0]/2}px`,
+              top:`${position_screen[1]-dims_screen[1]/2}px`,
+              width:`${dims_screen[0]}px`,
+              height:`${dims_screen[1]}px`,
+              backgroundColor:"rgba(0,0,0,0)",
+              border:"solid 1px #000",
+            }}
+          />
+        );
+      });
     }
 
     return (

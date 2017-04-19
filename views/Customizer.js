@@ -24,12 +24,29 @@ class Customizer {
     this.textureCoordAttribute;
     this.pMatrix;
 
-    this.components = [];
-
+    this.particles = [];
     for (let i=0; i<12; i++) {
+      this.particles.push(new Component());
+    }
+
+    this.components = [];
+  }
+
+  set(construction) {
+    let components = [];
+    // TODO recurse assemblies
+    construction.assembly.forEach((assembly) => {
+      components.push(assembly);
+    });
+    // sync component list the same
+    while (this.components.length < components.length) {
       this.components.push(new Component());
     }
-    this.cursor = new Component();
+    // TODO unbind textures here so we don't leak
+    this.components.length = components.length;
+    for (let i=0; i<components.length; i++) {
+      this.components[i].set(this.gl, components[i]);
+    }
   }
 
   resizeViewport() {
@@ -150,10 +167,10 @@ class Customizer {
     this.particleVerticesTextureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesTextureCoordBuffer);
     let textureCoordinates = [
-      0.0,  0.0,
-      1.0,  0.0,
-      1.0,  1.0,
       0.0,  1.0,
+      1.0,  1.0,
+      1.0,  0.0,
+      0.0,  0.0,
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
 
@@ -177,11 +194,6 @@ class Customizer {
     let self = this;
     particleImage.onload = function() { self.handleTextureLoaded(particleImage, self.particleTexture); }
     particleImage.src = "/petal.png";
-
-    this.cursorTexture = gl.createTexture();
-    let cursorImage = new Image();
-    cursorImage.onload = function() { self.handleTextureLoaded(cursorImage, self.cursorTexture); }
-    cursorImage.src = "/cursor.png";
   }
 
   handleTextureLoaded(image, texture) {
@@ -216,38 +228,37 @@ class Customizer {
     this.time_delta = currentTime - this.lastParticleUpdateTime;
     this.lastParticleUpdateTime = currentTime;
 
-    // debug cursor
-    gl.activeTexture(gl.TEXTURE0 + 1);
-    gl.bindTexture(gl.TEXTURE_2D, this.cursorTexture);
-    gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 1);
-
-    this.mvPushMatrix();
-      this.mvMatrix = this.translate(this.mvMatrix, this.cursor.position);
-      this.mvMatrix = this.rotate(this.mvMatrix, this.cursor.rotation, this.cursor.rotation_axis);
-      this.mvMatrix = this.scale(this.mvMatrix, this.cursor.scale);
-      this.setMatrixUniforms();
-      gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-    this.mvPopMatrix();
-
-    // Specify the texture to map onto the components
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.particleTexture);
-    gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 0);
-
     // draw components
     for (let i=0; i<this.components.length; i++) {
 
-      this.components[i].updatePosition(this.time_delta);
+      if (this.components[i].texture) {
+        gl.activeTexture(gl.TEXTURE0 + 1);
+        gl.bindTexture(gl.TEXTURE_2D, this.components[i].texture);
+        gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 1);
+      }
 
       this.mvPushMatrix();
-      // TODO pre-multiply these into a single transform matrix
-      this.mvMatrix = this.translate(this.mvMatrix, this.components[i].position);
-      this.mvMatrix = this.rotate(this.mvMatrix, this.components[i].rotation, this.components[i].rotation_axis);
-      this.mvMatrix = this.scale(this.mvMatrix, this.components[i].scale);
+        // TODO pre-multiply these into a single transform matrix
+        this.mvMatrix = this.translate(this.mvMatrix, this.components[i].position);
+        this.mvMatrix = this.scale(this.mvMatrix, this.components[i].scale);
+        this.setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+      this.mvPopMatrix();
+    }
 
-      this.setMatrixUniforms();
-      gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-
+    // Specify the texture to map onto the particles
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.particleTexture);
+    gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 0);
+    for (let i=0; i<this.particles.length; i++) {
+      this.particles[i].updatePosition(this.time_delta);
+      this.mvPushMatrix();
+        // TODO pre-multiply these into a single transform matrix
+        this.mvMatrix = this.translate(this.mvMatrix, this.particles[i].position);
+        this.mvMatrix = this.rotate(this.mvMatrix, this.particles[i].rotation, this.particles[i].rotation_axis);
+        this.mvMatrix = this.scale(this.mvMatrix, this.particles[i].scale);
+        this.setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
       this.mvPopMatrix();
     }
 

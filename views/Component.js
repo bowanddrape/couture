@@ -9,12 +9,34 @@ class Component {
     this.position = [0, 0, 0];
     this.velocity = [0, 0, 0];
     this.rotation = 0;
-    //this.randomizePosition();
     this.rotation_axis = [
       Math.random() - 0.5,
       Math.random() - 0.5,
       Math.random() - 0.5
     ];
+    this.props = {};
+  }
+
+  set(gl, state) {
+    // handle image
+    if (state.props.image && state.props.image!=this.props.image) {
+      let image_load = new Image();
+      image_load.crossOrigin = "anonymous";
+      image_load.onload = () => {
+        if (this.texture) {
+          gl.deleteTexture(this.texture)
+        }
+        this.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image_load);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+      }
+      image_load.src = state.props.image;
+    }
+    this.props = state.props || {};
   }
 
   randomizePosition() {
