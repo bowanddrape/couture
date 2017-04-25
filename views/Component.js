@@ -5,7 +5,7 @@ class Component {
       min: [-4, -4, -5],
       max: [4, 4, -1]
     };
-    this.scale = [0.508, 0.508, 1];
+    this.scale = [1, 1, 1];
     this.position = [0, 0, 0];
     this.velocity = [0, 0, 0];
     this.rotation = 0;
@@ -15,6 +15,7 @@ class Component {
       Math.random() - 0.5
     ];
     this.props = {};
+    this.assembly = [];
   }
 
   set(gl, state) {
@@ -36,7 +37,61 @@ class Component {
       }
       image_load.src = state.props.image;
     }
+    this.scale[0] = state.props.imagewidth || 1;
+    this.scale[1] = state.props.imageheight || 1;
     this.props = state.props || {};
+    // fill out if we got an internal assembly
+    state.assembly = state.assembly || [];
+    if (state.assembly) {
+      while (this.assembly.length < state.assembly.length) {
+        this.assembly.push(new Component());
+      }
+      // TODO unbind textures here so we don't leak
+      this.assembly.length = state.assembly.length;
+      for (let i=0; i<this.assembly.length; i++) {
+        this.assembly[i].set(gl, state.assembly[i]);
+      }
+    } else {
+      this.assembly = [];
+    }
+  }
+
+  render(gl, mvMatrix, shaderProgram) {
+
+    // TODO pre-multiply these into a single transform matrix
+    let modelview;
+    modelview = mvMatrix.x(Matrix.Translation($V([this.position[0], this.position[1], this.position[2]])).ensure4x4());
+
+    modelview = modelview.x(Matrix.Rotation(this.rotation, $V([this.rotation_axis[0], this.rotation_axis[1], this.rotation_axis[2]])).ensure4x4());
+    modelview = modelview.x(Matrix.Diagonal([this.scale[0], this.scale[1], this.scale[2], 1]));
+    let mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+    gl.uniformMatrix4fv(mvUniform, false, new Float32Array(modelview.flatten()));
+    if (this.texture) {
+      gl.activeTexture(gl.TEXTURE0 + 1);
+      gl.bindTexture(gl.TEXTURE_2D, this.texture);
+      gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 1);
+
+      gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+    }
+
+    let width = this.getWorldWidth();
+    modelview = Matrix.Translation($V([-width/2, 0, 0])).ensure4x4().x(modelview);
+    for (let i=0; i<this.assembly.length; i++) {
+      modelview = Matrix.Translation($V([this.assembly[i].scale[0]/2, 0, 0])).ensure4x4().x(modelview);
+      this.assembly[i].render(gl, modelview, shaderProgram);
+      modelview = Matrix.Translation($V([this.assembly[i].scale[0]/2, 0, 0])).ensure4x4().x(modelview);
+    }
+
+  }
+
+  getWorldWidth() {
+    if (!this.assembly || !this.assembly.length)
+      return this.scale[0];
+    let width = 0;
+    this.assembly.forEach((component) => {
+      width += component.scale[0];
+    });
+    return width;
   }
 
   randomizePosition() {

@@ -35,8 +35,8 @@ class Customizer {
   set(construction) {
     let components = [];
     // TODO recurse assemblies
-    construction.assembly.forEach((assembly) => {
-      components.push(assembly);
+    construction.assembly.forEach((component) => {
+      components.push(component);
     });
     // sync component list the same
     while (this.components.length < components.length) {
@@ -156,10 +156,10 @@ class Customizer {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesBuffer);
 
     let vertices = [
-      -1.0, -1.0, 0.0, 
-       1.0, -1.0, 0.0, 
-       1.0,  1.0, 0.0, 
-      -1.0,  1.0, 0.0, 
+      -0.5, -0.5, 0.0, 
+       0.5, -0.5, 0.0, 
+       0.5,  0.5, 0.0, 
+      -0.5,  0.5, 0.0, 
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
@@ -192,7 +192,11 @@ class Customizer {
     this.particleTexture = gl.createTexture();
     let particleImage = new Image();
     let self = this;
-    particleImage.onload = function() { self.handleTextureLoaded(particleImage, self.particleTexture); }
+    particleImage.onload = function() {
+      self.handleTextureLoaded(particleImage, self.particleTexture);
+      for (let i=0; i<self.particles.length; i++)
+        self.particles[i].texture = self.particleTexture;
+    }
     particleImage.src = "/petal.png";
   }
 
@@ -210,6 +214,10 @@ class Customizer {
     let gl = this.gl;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // set projection matrix
+    let pUniform = gl.getUniformLocation(this.shaderProgram, "uPMatrix");
+    gl.uniformMatrix4fv(pUniform, false, new Float32Array(this.pMatrix.flatten()));
 
     // Draw the particle by binding the array buffer to the particle's vertices
     // array, setting attributes, and pushing it to GL
@@ -230,36 +238,12 @@ class Customizer {
 
     // draw components
     for (let i=0; i<this.components.length; i++) {
-
-      if (this.components[i].texture) {
-        gl.activeTexture(gl.TEXTURE0 + 1);
-        gl.bindTexture(gl.TEXTURE_2D, this.components[i].texture);
-        gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 1);
-      }
-
-      this.mvPushMatrix();
-        // TODO pre-multiply these into a single transform matrix
-        this.mvMatrix = this.translate(this.mvMatrix, this.components[i].position);
-        this.mvMatrix = this.scale(this.mvMatrix, this.components[i].scale);
-        this.setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-      this.mvPopMatrix();
+      this.components[i].render(gl, this.mvMatrix, this.shaderProgram);
     }
 
-    // Specify the texture to map onto the particles
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.particleTexture);
-    gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uSampler"), 0);
     for (let i=0; i<this.particles.length; i++) {
+      this.particles[i].render(gl, this.mvMatrix, this.shaderProgram);
       this.particles[i].updatePosition(this.time_delta);
-      this.mvPushMatrix();
-        // TODO pre-multiply these into a single transform matrix
-        this.mvMatrix = this.translate(this.mvMatrix, this.particles[i].position);
-        this.mvMatrix = this.rotate(this.mvMatrix, this.particles[i].rotation, this.particles[i].rotation_axis);
-        this.mvMatrix = this.scale(this.mvMatrix, this.particles[i].scale);
-        this.setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-      this.mvPopMatrix();
     }
 
     window.requestAnimationFrame(this.drawScene.bind(this));
@@ -319,9 +303,6 @@ class Customizer {
 
   setMatrixUniforms() {
     let gl = this.gl;
-    let pUniform = gl.getUniformLocation(this.shaderProgram, "uPMatrix");
-    gl.uniformMatrix4fv(pUniform, false, new Float32Array(this.pMatrix.flatten()));
-
     let mvUniform = gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
     gl.uniformMatrix4fv(mvUniform, false, new Float32Array(this.mvMatrix.flatten()));
   }

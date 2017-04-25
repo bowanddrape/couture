@@ -21,10 +21,20 @@ class ProductCanvas extends React.Component {
   handleAddComponent(component) {
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
-      assembly.push(component);
+      // TODO have a selected component
+      if (!assembly.length) {
+        assembly.push({
+          props: {
+            position: component.props.position,
+          },
+          assembly: [component],
+        });
+        return {assembly};
+      }
+      let selected = assembly[0];
+      selected.assembly.push(component);
       return {assembly};
     });
-    console.log("productCanvas", component);
   }
 
   handleComponentMove(index, event) {
@@ -50,7 +60,7 @@ class ProductCanvas extends React.Component {
     if (this.customizer) {
       this.customizer.components.forEach((component) => {
         let position_screen = this.customizer.worldToScreen(component.position);
-        let dims_screen = [100, 100];
+        let dims_screen = [120, 120];
         component_hitboxes.push(
           <component_hitbox
             key={component_hitboxes.length}
