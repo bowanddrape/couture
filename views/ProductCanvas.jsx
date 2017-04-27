@@ -36,6 +36,17 @@ class ProductCanvas extends React.Component {
       return {assembly};
     });
   }
+  componentDidUpdate() {
+    // handle actions on hitboxes
+    let index = 0;
+    this.canvas.parentNode.childNodes.forEach((node) => {
+      if (node.tagName.toLowerCase()!="component_hitbox") return;
+      node.ontouchmove = this.handleComponentMove.bind(this, index);
+      node.onmousemove = this.handleComponentMove.bind(this, index);
+      index++;
+    });
+  }
+
 
   handleComponentMove(index, event) {
     event.preventDefault();
@@ -64,8 +75,6 @@ class ProductCanvas extends React.Component {
         component_hitboxes.push(
           <component_hitbox
             key={component_hitboxes.length}
-            onTouchMove={this.handleComponentMove.bind(this, component_hitboxes.length)}
-            onMouseMove={this.handleComponentMove.bind(this, component_hitboxes.length)}
             style={{
               position:"absolute",
               left:`${position_screen[0]-dims_screen[0]/2}px`,

@@ -23,14 +23,14 @@ class LayoutEmail extends React.Component {
         <center style={styles.wrapper}>
           <div style={styles.innerwrapper}>
             <table style={styles.table} class="outer" align="center"><tbody>
-              <tr><td style={{width: "100%", maxWidth: "300px", height: "auto"}}>
-                <a href="http://www.bowanddrape.com"><img src="http://staging.bowanddrape.com/logo.jpg?cachebust=1" alt="" style={{margin:"auto"}} /></a>
+              <tr><td style={{width: "100%", margin: "auto"}}>
+                <a href="http://www.bowanddrape.com"><img src="http://staging.bowanddrape.com/logo.jpg?cachebust=1" alt="" style={{maxWidth: "300px", margin:"auto", display:"block"}} /></a>
               </td></tr>
               <tr><td>
                 {content}
               </td></tr>
               {/*TODO needs an unsubscribe link*/}
-              <tr><td style={{width: "100%", maxWidth: "600px", backgroundColor: "#c79e6a"}}>
+              <tr><td style={{width: "100%", maxWidth: "600px", backgroundColor: "#F5C9CA"}}>
                 <table align="center" style={{width:"100%"}}><tbody><tr>
                   <td style={{textAlign:"right"}}>Follow & Share:</td>
                   <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="http://staging.bowanddrape.com/instagram.png" alt="instagram" /></a></td>
@@ -67,6 +67,7 @@ var styles = {
     textSizeAdjust: "100%",
   },
   innerwrapper: {
+    width: "100%",
     margin: "0 auto",
   },
 }

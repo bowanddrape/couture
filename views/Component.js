@@ -22,7 +22,7 @@ class Component {
     // handle image
     if (state.props.image && state.props.image!=this.props.image) {
       let image_load = new Image();
-      image_load.crossOrigin = "anonymous";
+      image_load.crossOrigin = "";
       image_load.onload = () => {
         if (this.texture) {
           gl.deleteTexture(this.texture)
@@ -35,7 +35,8 @@ class Component {
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D, null);
       }
-      image_load.src = state.props.image;
+      // mobile needs cachebust or it won't load it?
+      image_load.src = state.props.image+"?cachebust="+(new Date());
     }
     this.scale[0] = state.props.imagewidth || 1;
     this.scale[1] = state.props.imageheight || 1;
