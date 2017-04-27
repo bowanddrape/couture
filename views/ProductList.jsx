@@ -261,6 +261,41 @@ class ProductList extends React.Component {
     let misc_components = [];
     for (let i=0; product.compatible_components && i<product.compatible_components.length; i++) {
       if (product.compatible_components[i].options) {
+        // handle if keyboard
+        if (product.compatible_components[i].props.is_letters) {
+          // array => map
+          let component_letters = {};
+          let tab_components = [];
+          for (let j=0; j<product.compatible_components[i].options.length; j++) {
+            let letter = product.compatible_components[i].options[j];
+            let toks = letter.props.name.split('_');
+            let character = toks[toks.length-1].toLowerCase();
+            if (character.match(/^[a-z]$/))
+              component_letters[character] = letter;
+            else
+              tab_components.push(
+                <div key={i+'_'+j} style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}} onClick={this.handleAddComponent.bind(this, product.compatible_components[i].options[j])}/>
+              );
+          }
+          components.push(
+            <div key={components.length} name={product.compatible_components[i].props.name} className="component_keyboard_container">
+              <row>{['q','w','e','r','t','y','u','i','o','p'].map((character)=>{
+                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
+              })}</row>
+              <row>{['a','s','d','f','g','h','j','k','l'].map((character)=>{
+                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
+              })}</row>
+              <row>{['z','x','c','v','b','n','m'].map((character)=>{
+                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
+              })}</row>
+            </div>
+          );
+          components.push(
+            <div key={components.length} name={product.compatible_components[i].props.name+"_cont"} className="component_container">{tab_components}</div>
+          );
+          continue;
+        }
+        // otherwise just list them
         let tab_components = [];
         for (let j=0; j<product.compatible_components[i].options.length; j++) {
           tab_components.push(
@@ -268,7 +303,7 @@ class ProductList extends React.Component {
           );
         }
         components.push(
-          <div name={product.compatible_components[i].props.name} className="component_container">
+          <div key={components.length} name={product.compatible_components[i].props.name} className="component_container">
             {tab_components}
           </div>
         );
@@ -281,7 +316,7 @@ class ProductList extends React.Component {
 
     if (misc_components.length) {
       components.push(
-        <div name="misc sparkles" className="component_container">
+        <div key={components.length} name="misc sparkles" className="component_container">
           {misc_components}
         </div>
       );

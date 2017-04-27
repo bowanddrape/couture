@@ -90,7 +90,7 @@ class Component {
       return this.scale[0];
     let width = 0;
     this.assembly.forEach((component) => {
-      width += component.scale[0];
+      width += component.getWorldWidth();
     });
     return width;
   }
