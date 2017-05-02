@@ -48,7 +48,7 @@ customize {
     max-width: 100%;
     overflow-x: scroll;
 
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(200,200,200,0.9);
     div {
       height: @customize_emoji_key_height;
       width: @customize_emoji_key_width;
@@ -68,6 +68,18 @@ customize {
         display: inline-block;
         flex: 0 1 auto;
       }
+    }
+    div.backspace {
+      .icon;
+      .sprite(@backspace);
+      background-size: auto;
+      height: @customize_emoji_key_height;
+      margin: @customize_emoji_key_margin;
+    }
+    div.halfgap {
+      height: @customize_emoji_key_height;
+      width: @customize_emoji_key_width/2;
+      margin: 0 @customize_emoji_key_margin;
     }
   }
 }

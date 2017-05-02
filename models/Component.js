@@ -87,6 +87,7 @@ class Component extends JSONAPI {
           }
           // populate grabbed item if need be
           let option_tasks = [];
+          item.options = item.options || {};
           Object.keys(item.options).forEach((option) => {
             option_tasks.push(item.options[option].populateFromDB.bind(item.options[option]));
           });

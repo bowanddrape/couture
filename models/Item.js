@@ -60,8 +60,10 @@ class Item extends Array {
     skus.forEach((sku) =>{
       sku_query.push(function(callback) {
         Component.get(sku, function(err, component) {
-          components[sku] = component;
-          callback(err);
+          component.populateFromDB(() => {
+            components[sku] = component;
+            callback(err);
+          });
         });
       });
     });
@@ -78,6 +80,7 @@ class Item extends Array {
               });
             });
           });
+          option.inheritDefaults(components[sku]);
         });
       };
 

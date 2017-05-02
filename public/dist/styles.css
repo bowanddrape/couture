@@ -251,7 +251,7 @@ customize .component_container {
   right: 0;
   max-width: 100%;
   overflow-x: scroll;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(200, 200, 200, 0.9);
 }
 customize .component_container div {
   height: 40px;
@@ -273,7 +273,7 @@ customize .component_keyboard_container {
   right: 0;
   max-width: 100%;
   overflow-x: scroll;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(200, 200, 200, 0.9);
   align-content: center;
 }
 customize .component_keyboard_container div {
@@ -291,6 +291,23 @@ customize .component_keyboard_container row {
 customize .component_keyboard_container row div {
   display: inline-block;
   flex: 0 1 auto;
+}
+customize .component_keyboard_container div.backspace {
+  background-image: url('/sprite.png?2ac2210093c36c9defbb42e4045f69f2777c5230');
+  background-position: 0px -155px;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  display: block;
+  width: 48px;
+  height: 48px;
+  background-size: auto;
+  height: 40px;
+  margin: 5px;
+}
+customize .component_keyboard_container div.halfgap {
+  height: 40px;
+  width: 20px;
+  margin: 0 5px;
 }
 .checkout_section {
   max-width: 460px;
@@ -410,13 +427,39 @@ page_edit element input[type="text"] {
 }
 component_edit {
   display: flex;
-  flex-wrap: row;
+  flex-wrap: wrap;
+}
+component_edit div {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  height: 23px;
+}
+component_edit div label {
+  background-color: #eaeaea;
+  color: rgba(0, 0, 0, 0.5);
+  display: inline-block;
+  height: 100%;
+  border-radius: 15px 0 0 15px;
+  padding-left: 10px;
+  box-sizing: border-box;
 }
 component_edit input[type="text"] {
   width: 50px;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+  top: -2px;
+}
+component_edit input[type="text"][name="sku"] {
+  width: 150px;
+  cursor: not-allowed;
+  color: #f88;
+}
+component_edit input[type="text"][name="props_name"] {
+  width: 150px;
 }
 .icon {
-  background-image: url('/sprite.png?e5391c4e06632e78701f66e1fd8061355432a34e');
+  background-image: url('/sprite.png?2ac2210093c36c9defbb42e4045f69f2777c5230');
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
@@ -440,8 +483,8 @@ menu user {
   margin-bottom: 15px;
 }
 menu user img {
-  background-image: url('/sprite.png?e5391c4e06632e78701f66e1fd8061355432a34e');
-  background-position: 0px -155px;
+  background-image: url('/sprite.png?2ac2210093c36c9defbb42e4045f69f2777c5230');
+  background-position: 0px -203px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: inline;
@@ -460,7 +503,7 @@ menu login msg {
   color: #a00;
 }
 menu handle {
-  background-image: url('/sprite.png?e5391c4e06632e78701f66e1fd8061355432a34e');
+  background-image: url('/sprite.png?2ac2210093c36c9defbb42e4045f69f2777c5230');
   background-position: 0px 0px;
   background-repeat: no-repeat;
   overflow: hidden;

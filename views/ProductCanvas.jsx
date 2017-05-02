@@ -36,6 +36,23 @@ class ProductCanvas extends React.Component {
       return {assembly};
     });
   }
+  handlePopComponent() {
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      // TODO have a selected component
+      if (!assembly.length) {
+        return {};
+      }
+      let selected_index = 0;
+      let selected = assembly[selected_index];
+      selected.assembly.pop();
+      if (!selected.assembly.length) {
+        assembly.splice(selected_index, 1);
+      }
+      return {assembly};
+    });
+  }
+
   componentDidUpdate() {
     // handle actions on hitboxes
     let index = 0;
@@ -57,12 +74,13 @@ class ProductCanvas extends React.Component {
     let client_pos = event.touches ?
       [event.touches[0].pageX, event.touches[0].pageY] :
       [event.clientX, event.clientY+(document.body.scrollTop?document.body.scrollTop:document.documentElement.scrollTop)];
-    
+
     this.customizer.components[index].position = this.customizer.browserToWorld(client_pos);
+
     this.forceUpdate();
   }
   componentWillUpdate(nextProps, nextState) {
-    this.customizer.set(nextState);
+    this.customizer.set(nextProps.product, nextState);
   }
 
   render() {
@@ -71,7 +89,7 @@ class ProductCanvas extends React.Component {
     if (this.customizer) {
       this.customizer.components.forEach((component) => {
         let position_screen = this.customizer.worldToScreen(component.position);
-        let dims_screen = [120*component.getWorldWidth(), 120];
+        let dims_screen = [689*component.getWorldWidth(), 35];
         component_hitboxes.push(
           <component_hitbox
             key={component_hitboxes.length}
@@ -91,7 +109,7 @@ class ProductCanvas extends React.Component {
 
     return (
       <div style={{position:"relative"}}>
-        <canvas height="300" style={{backgroundImage:`url(${this.props.product.props.image})`,position:"relative"}}>
+        <canvas height="300" style={{position:"relative"}}>
         </canvas>
         {component_hitboxes}
       </div>

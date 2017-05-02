@@ -65,7 +65,7 @@ class ComponentEdit extends React.Component {
     let fields = [];
 
     [
-      {name:"sku",type:"text"},
+      {name:"sku",type:"readonly"},
       {name:"props_name",type:"text"},
       {name:"props_price",type:"text"},
       {name:"props_imagewidth", type:"text"},
@@ -83,16 +83,23 @@ class ComponentEdit extends React.Component {
           placeholder = placeholder[name_toks[i]] || "";
       }
 
-      if (spec.type=="text") 
+
+      if (spec.type=="readonly")
         return fields.push(<div key={fields.length}>
-          <label>{spec.name}:</label>
+          <label>{spec.name}</label>
+          <input type="text" value={value} placeholder={placeholder} name={spec.name} disabled={true}/>
+        </div>);
+      if (spec.type=="text")
+        return fields.push(<div key={fields.length}>
+          <label>{spec.name}</label>
           <input type="text" onChange={this.handleFieldChange.bind(this)} value={value} placeholder={placeholder} name={spec.name}/>
         </div>);
-      if (spec.type=="file")
+      if (spec.type=="file") {
         return fields.push(<div key={fields.length}>
-          <label>{spec.name}({value?"set":"inherited"}):</label>
-          <input type="file" onChange={this.handleFileChange.bind(this)} value={value} placeholder={placeholder} name={spec.name}/>
+          <label>{spec.name}({value?"set":"inherited"})</label>
+          <input type="file" onChange={this.handleFileChange.bind(this)} placeholder={placeholder} name={spec.name}/>
         </div>);
+      }
     });
 
 

@@ -1,8 +1,36 @@
 
+@import "./colors.less";
+
 component_edit {
   display: flex;
-  flex-wrap: row;
+  flex-wrap: wrap;
+  div {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    height: 23px;
+    label {
+      background-color: #eaeaea;
+      color: rgba(0,0,0,.5);
+      display: inline-block;
+      height: 100%;
+      border-radius: 15px 0 0 15px;
+      padding-left: 10px;
+      box-sizing: border-box;
+    }
+  }
   input[type="text"] {
     width: 50px;
+    height: 100%;
+    box-sizing: border-box;
+    position: relative;
+    top: -2px;
+  }
+  input[type="text"][name="sku"] {
+    width: 150px;
+    cursor: not-allowed;
+    color: #f88;
+  }
+  input[type="text"][name="props_name"] {
+    width: 150px;
   }
 }

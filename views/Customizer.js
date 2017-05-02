@@ -5,6 +5,7 @@ class Customizer {
   constructor(options) {
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
+    this.camera_elevation = this.options.camera_elevation || 0.5;
 
     this.gl = null;
 
@@ -30,10 +31,13 @@ class Customizer {
     }
 
     this.components = [];
+    this.product = new Component();
   }
 
-  set(construction) {
+  set(product, construction) {
     let components = [];
+    // set product
+    this.product.set(this.gl, {props: product.props});
     // TODO recurse assemblies
     construction.assembly.forEach((component) => {
       components.push(component);
@@ -58,7 +62,6 @@ class Customizer {
     // init pMatrix with view frustrum
     this.pMatrix = makePerspective(this.options.vfov, this.options.canvas.width/this.options.canvas.height, 0.1, 100.0);
     // move camera upwards by elevation
-    this.camera_elevation = 3.0;
     this.pMatrix = this.translate(this.pMatrix, [-0.0, 0.0, -this.camera_elevation]);
 
     this.focal_length_pixels = this.options.canvas.offsetHeight/2/Math.tan(this.options.vfov*Math.PI/360);
@@ -105,7 +108,7 @@ class Customizer {
     this.mvMatrix = Matrix.I(4);
 
     // Set up to draw the scene periodically.
-    window.requestAnimationFrame(this.drawScene.bind(this));
+    window.requestAnimationFrame(this.render.bind(this));
   }
 
   browserToWorld(browser) {
@@ -210,7 +213,7 @@ class Customizer {
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
-  drawScene() {
+  render() {
     let gl = this.gl;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -236,6 +239,9 @@ class Customizer {
     this.time_delta = currentTime - this.lastParticleUpdateTime;
     this.lastParticleUpdateTime = currentTime;
 
+    // draw product
+    this.product.render(gl, this.mvMatrix, this.shaderProgram);
+
     // draw components
     for (let i=0; i<this.components.length; i++) {
       this.components[i].render(gl, this.mvMatrix, this.shaderProgram);
@@ -246,7 +252,7 @@ class Customizer {
       this.particles[i].updatePosition(this.time_delta);
     }
 
-    window.requestAnimationFrame(this.drawScene.bind(this));
+    window.requestAnimationFrame(this.render.bind(this));
   }
 
   initShaders() {

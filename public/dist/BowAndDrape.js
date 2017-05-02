@@ -56990,6 +56990,8 @@ var Component = function () {
       max: [4, 4, -1]
     };
     this.scale = [1, 1, 1];
+    // iff we padded texture to get a power of 2, expand our scale that amount
+    this.texture_scale = [1, 1];
     this.position = [0, 0, 0];
     this.velocity = [0, 0, 0];
     this.rotation = 0;
@@ -57013,10 +57015,37 @@ var Component = function () {
               gl.deleteTexture(_this.texture);
             }
             _this.texture = gl.createTexture();
+
+            // special handling if image is not power of 2
+            var isPowerOfTwo = function isPowerOfTwo(x) {
+              return (x & x - 1) == 0;
+            };
+            var nextHighestPowerOfTwo = function nextHighestPowerOfTwo(x) {
+              --x;
+              for (var i = 1; i < 32; i <<= 1) {
+                x = x | x >> i;
+              }
+              return x + 1;
+            };
+            if (!isPowerOfTwo(image_load.width) || !isPowerOfTwo(image_load.height)) {
+              // Scale up the texture to the next highest power of two dimensions.
+              var canvas = document.createElement("canvas");
+              canvas.width = nextHighestPowerOfTwo(image_load.width);
+              canvas.height = nextHighestPowerOfTwo(image_load.height);
+              _this.texture_scale = [canvas.width / image_load.width, canvas.height / image_load.height];
+              var ctx = canvas.getContext("2d");
+              ctx.drawImage(image_load, (canvas.width - image_load.width) / 2, (canvas.height - image_load.height) / 2, image_load.width, image_load.height);
+              image_load = canvas;
+            }
+
             gl.bindTexture(gl.TEXTURE_2D, _this.texture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image_load);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.CUBIC);
+            // mipmapping the sequins looks bad
+            //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.generateMipmap(gl.TEXTURE_2D);
             gl.bindTexture(gl.TEXTURE_2D, null);
           };
@@ -57024,8 +57053,8 @@ var Component = function () {
           image_load.src = state.props.image + "?cachebust=" + new Date();
         })();
       }
-      this.scale[0] = state.props.imagewidth || 1;
-      this.scale[1] = state.props.imageheight || 1;
+      this.scale[0] = parseFloat(state.props.imagewidth) || 1;
+      this.scale[1] = parseFloat(state.props.imageheight) || 1;
       this.props = state.props || {};
       // fill out if we got an internal assembly
       state.assembly = state.assembly || [];
@@ -57051,7 +57080,7 @@ var Component = function () {
       modelview = mvMatrix.x(Matrix.Translation($V([this.position[0], this.position[1], this.position[2]])).ensure4x4());
 
       modelview = modelview.x(Matrix.Rotation(this.rotation, $V([this.rotation_axis[0], this.rotation_axis[1], this.rotation_axis[2]])).ensure4x4());
-      modelview = modelview.x(Matrix.Diagonal([this.scale[0], this.scale[1], this.scale[2], 1]));
+      modelview = modelview.x(Matrix.Diagonal([this.scale[0] * this.texture_scale[0], this.scale[1] * this.texture_scale[1], this.scale[2], 1]));
       var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
       gl.uniformMatrix4fv(mvUniform, false, new Float32Array(modelview.flatten()));
       if (this.texture) {
@@ -57216,7 +57245,7 @@ var ComponentEdit = function (_React$Component) {
 
       var fields = [];
 
-      [{ name: "sku", type: "text" }, { name: "props_name", type: "text" }, { name: "props_price", type: "text" }, { name: "props_imagewidth", type: "text" }, { name: "props_imageheight", type: "text" }, { name: "props_image", type: "file" }].forEach(function (spec) {
+      [{ name: "sku", type: "readonly" }, { name: "props_name", type: "text" }, { name: "props_price", type: "text" }, { name: "props_imagewidth", type: "text" }, { name: "props_imageheight", type: "text" }, { name: "props_image", type: "file" }].forEach(function (spec) {
         // use underscores to navigate child fields
         var name_toks = spec.name.split('_');
         var value = _this2.state[name_toks[0]] || "";
@@ -57226,30 +57255,41 @@ var ComponentEdit = function (_React$Component) {
           if (placeholder) placeholder = placeholder[name_toks[i]] || "";
         }
 
+        if (spec.type == "readonly") return fields.push(React.createElement(
+          'div',
+          { key: fields.length },
+          React.createElement(
+            'label',
+            null,
+            spec.name
+          ),
+          React.createElement('input', { type: 'text', value: value, placeholder: placeholder, name: spec.name, disabled: true })
+        ));
         if (spec.type == "text") return fields.push(React.createElement(
           'div',
           { key: fields.length },
           React.createElement(
             'label',
             null,
-            spec.name,
-            ':'
+            spec.name
           ),
           React.createElement('input', { type: 'text', onChange: _this2.handleFieldChange.bind(_this2), value: value, placeholder: placeholder, name: spec.name })
         ));
-        if (spec.type == "file") return fields.push(React.createElement(
-          'div',
-          { key: fields.length },
-          React.createElement(
-            'label',
-            null,
-            spec.name,
-            '(',
-            value ? "set" : "inherited",
-            '):'
-          ),
-          React.createElement('input', { type: 'file', onChange: _this2.handleFileChange.bind(_this2), value: value, placeholder: placeholder, name: spec.name })
-        ));
+        if (spec.type == "file") {
+          return fields.push(React.createElement(
+            'div',
+            { key: fields.length },
+            React.createElement(
+              'label',
+              null,
+              spec.name,
+              '(',
+              value ? "set" : "inherited",
+              ')'
+            ),
+            React.createElement('input', { type: 'file', onChange: _this2.handleFileChange.bind(_this2), placeholder: placeholder, name: spec.name })
+          ));
+        }
       });
 
       return React.createElement(
@@ -57354,6 +57394,7 @@ var Customizer = function () {
 
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
+    this.camera_elevation = this.options.camera_elevation || 0.5;
 
     this.gl = null;
 
@@ -57379,12 +57420,15 @@ var Customizer = function () {
     }
 
     this.components = [];
+    this.product = new Component();
   }
 
   _createClass(Customizer, [{
     key: "set",
-    value: function set(construction) {
+    value: function set(product, construction) {
       var components = [];
+      // set product
+      this.product.set(this.gl, { props: product.props });
       // TODO recurse assemblies
       construction.assembly.forEach(function (component) {
         components.push(component);
@@ -57410,7 +57454,6 @@ var Customizer = function () {
       // init pMatrix with view frustrum
       this.pMatrix = makePerspective(this.options.vfov, this.options.canvas.width / this.options.canvas.height, 0.1, 100.0);
       // move camera upwards by elevation
-      this.camera_elevation = 3.0;
       this.pMatrix = this.translate(this.pMatrix, [-0.0, 0.0, -this.camera_elevation]);
 
       this.focal_length_pixels = this.options.canvas.offsetHeight / 2 / Math.tan(this.options.vfov * Math.PI / 360);
@@ -57458,7 +57501,7 @@ var Customizer = function () {
       this.mvMatrix = Matrix.I(4);
 
       // Set up to draw the scene periodically.
-      window.requestAnimationFrame(this.drawScene.bind(this));
+      window.requestAnimationFrame(this.render.bind(this));
     }
   }, {
     key: "browserToWorld",
@@ -57546,8 +57589,8 @@ var Customizer = function () {
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
   }, {
-    key: "drawScene",
-    value: function drawScene() {
+    key: "render",
+    value: function render() {
       var gl = this.gl;
 
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -57573,6 +57616,9 @@ var Customizer = function () {
       this.time_delta = currentTime - this.lastParticleUpdateTime;
       this.lastParticleUpdateTime = currentTime;
 
+      // draw product
+      this.product.render(gl, this.mvMatrix, this.shaderProgram);
+
       // draw components
       for (var i = 0; i < this.components.length; i++) {
         this.components[i].render(gl, this.mvMatrix, this.shaderProgram);
@@ -57583,7 +57629,7 @@ var Customizer = function () {
         this.particles[_i].updatePosition(this.time_delta);
       }
 
-      window.requestAnimationFrame(this.drawScene.bind(this));
+      window.requestAnimationFrame(this.render.bind(this));
     }
   }, {
     key: "initShaders",
@@ -59009,6 +59055,24 @@ var ProductCanvas = function (_React$Component) {
       });
     }
   }, {
+    key: 'handlePopComponent',
+    value: function handlePopComponent() {
+      this.setState(function (prevState, props) {
+        var assembly = JSON.parse(JSON.stringify(prevState.assembly));
+        // TODO have a selected component
+        if (!assembly.length) {
+          return {};
+        }
+        var selected_index = 0;
+        var selected = assembly[selected_index];
+        selected.assembly.pop();
+        if (!selected.assembly.length) {
+          assembly.splice(selected_index, 1);
+        }
+        return { assembly: assembly };
+      });
+    }
+  }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
       var _this2 = this;
@@ -59033,12 +59097,13 @@ var ProductCanvas = function (_React$Component) {
       var client_pos = event.touches ? [event.touches[0].pageX, event.touches[0].pageY] : [event.clientX, event.clientY + (document.body.scrollTop ? document.body.scrollTop : document.documentElement.scrollTop)];
 
       this.customizer.components[index].position = this.customizer.browserToWorld(client_pos);
+
       this.forceUpdate();
     }
   }, {
     key: 'componentWillUpdate',
     value: function componentWillUpdate(nextProps, nextState) {
-      this.customizer.set(nextState);
+      this.customizer.set(nextProps.product, nextState);
     }
   }, {
     key: 'render',
@@ -59050,7 +59115,7 @@ var ProductCanvas = function (_React$Component) {
       if (this.customizer) {
         this.customizer.components.forEach(function (component) {
           var position_screen = _this3.customizer.worldToScreen(component.position);
-          var dims_screen = [120 * component.getWorldWidth(), 120];
+          var dims_screen = [689 * component.getWorldWidth(), 35];
           component_hitboxes.push(React.createElement('component_hitbox', {
             key: component_hitboxes.length,
             style: {
@@ -59069,7 +59134,7 @@ var ProductCanvas = function (_React$Component) {
       return React.createElement(
         'div',
         { style: { position: "relative" } },
-        React.createElement('canvas', { height: '300', style: { backgroundImage: 'url(' + this.props.product.props.image + ')', position: "relative" } }),
+        React.createElement('canvas', { height: '300', style: { position: "relative" } }),
         component_hitboxes
       );
     }
@@ -59294,7 +59359,7 @@ var ProductList = function (_React$Component) {
           'select',
           { onChange: function onChange(event) {
               _this3.handleOptionChange(event.target.value, 0);
-            }, value: this.state.selected_product[0], key: product_options.length },
+            }, value: this.state.selected_product[0], key: Math.random() },
           options
         ));
       }
@@ -59309,7 +59374,7 @@ var ProductList = function (_React$Component) {
         if (!option_product.options) {
           if (_this3.props.edit) {
             // allow adding new option
-            product_options.push(React.createElement('input', { type: 'text', key: product_options.length, placeholder: 'New Option', onKeyDown: _this3.handleNewProductOption.bind(_this3) }));
+            product_options.push(React.createElement('input', { type: 'text', key: Math.random(), placeholder: 'New Option', onKeyDown: _this3.handleNewProductOption.bind(_this3) }));
           }
           return;
         }
@@ -59335,13 +59400,13 @@ var ProductList = function (_React$Component) {
             'select',
             { onChange: function onChange(event) {
                 _this3.handleOptionChange(event.target.value, depth);
-              }, key: product_options.length, value: selected_option },
+              }, key: Math.random(), value: selected_option },
             options
           ));
         }
         if (selected_option == "no option selected") {
           // allow adding new option
-          product_options.push(React.createElement('input', { type: 'text', key: product_options.length, placeholder: 'New Option', onKeyDown: _this3.handleNewProductOption.bind(_this3) }));
+          product_options.push(React.createElement('input', { type: 'text', key: Math.random(), placeholder: 'New Option', onKeyDown: _this3.handleNewProductOption.bind(_this3) }));
         }
         // recurse in next option depth
         if (selected_option && option_product.options[selected_option]) {
@@ -59358,6 +59423,11 @@ var ProductList = function (_React$Component) {
     key: 'handleAddComponent',
     value: function handleAddComponent(component) {
       this.refs.ProductCanvas.handleAddComponent(component);
+    }
+  }, {
+    key: 'handlePopComponent',
+    value: function handlePopComponent(component) {
+      this.refs.ProductCanvas.handlePopComponent(component);
     }
   }, {
     key: 'populateComponents',
@@ -59379,7 +59449,10 @@ var ProductList = function (_React$Component) {
                 var letter = product.compatible_components[i].options[j];
                 var toks = letter.props.name.split('_');
                 var character = toks[toks.length - 1].toLowerCase();
-                if (character.match(/^[a-z]$/)) component_letters[character] = letter;else tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' }, onClick: _this4.handleAddComponent.bind(_this4, product.compatible_components[i].options[j]) }));
+                if (character.match(/^[a-z]$/)) component_letters[character] = letter;else {
+                  var component = product.compatible_components[i].options[j];
+                  tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + component.props.image + ')', backgroundSize: component.props.imagewidth / component.props.imageheight * 100 + '% 100%' }, onClick: _this4.handleAddComponent.bind(_this4, component) }));
+                }
               }
               components.push(React.createElement(
                 'div',
@@ -59388,22 +59461,28 @@ var ProductList = function (_React$Component) {
                   'row',
                   null,
                   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')' }, onClick: _this4.handleAddComponent.bind(_this4, component_letters[character]) });
+                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this4.handleAddComponent.bind(_this4, component_letters[character]) });
                   })
                 ),
                 React.createElement(
                   'row',
                   null,
+                  React.createElement('div', { key: 'spacer0', className: 'halfgap' }),
                   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')' }, onClick: _this4.handleAddComponent.bind(_this4, component_letters[character]) });
-                  })
+                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this4.handleAddComponent.bind(_this4, component_letters[character]) });
+                  }),
+                  React.createElement('div', { key: 'spacer1', className: 'halfgap' })
                 ),
                 React.createElement(
                   'row',
                   null,
+                  React.createElement('div', { key: 'spacer2', className: 'halfgap' }),
+                  React.createElement('div', { key: 'spacer2a', className: 'halfgap' }),
                   ['z', 'x', 'c', 'v', 'b', 'n', 'm'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')' }, onClick: _this4.handleAddComponent.bind(_this4, component_letters[character]) });
-                  })
+                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this4.handleAddComponent.bind(_this4, component_letters[character]) });
+                  }),
+                  React.createElement('div', { key: 'spacer3', className: 'halfgap' }),
+                  React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this4.handlePopComponent.bind(_this4) })
                 )
               ));
               components.push(React.createElement(
@@ -59459,7 +59538,6 @@ var ProductList = function (_React$Component) {
 
           // convert compatible_component from sku list to component list
           store.products.hydrateCompatibleComponents(function (err) {
-
             store.products.recurseProductFamily(function (item, ancestor) {
               // merge inventory count with products in family
               item.quantity = store_inventory.inventory[item.sku] ? store_inventory.inventory[item.sku] : 0;

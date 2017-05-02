@@ -39,7 +39,6 @@ class ProductList extends React.Component {
 
         // convert compatible_component from sku list to component list
         store.products.hydrateCompatibleComponents(function(err) {
-
           store.products.recurseProductFamily(function(item, ancestor) {
             // merge inventory count with products in family
             item.quantity = store_inventory.inventory[item.sku]?store_inventory.inventory[item.sku]:0;
@@ -195,7 +194,7 @@ class ProductList extends React.Component {
     });
     if (options.length) {
       product_options.push(
-        <select onChange={(event)=>{this.handleOptionChange(event.target.value, 0)}} value={this.state.selected_product[0]} key={product_options.length}>{options}</select>
+        <select onChange={(event)=>{this.handleOptionChange(event.target.value, 0)}} value={this.state.selected_product[0]} key={Math.random()}>{options}</select>
       )
     }
     
@@ -209,7 +208,7 @@ class ProductList extends React.Component {
         if (this.props.edit) {
           // allow adding new option
           product_options.push(
-            <input type="text" key={product_options.length} placeholder="New Option" onKeyDown={this.handleNewProductOption.bind(this)} />
+            <input type="text" key={Math.random()} placeholder="New Option" onKeyDown={this.handleNewProductOption.bind(this)} />
           );
         }
         return;
@@ -230,13 +229,13 @@ class ProductList extends React.Component {
       };
       if (options.length) {
         product_options.push(
-          <select onChange={(event)=>{this.handleOptionChange(event.target.value, depth)}} key={product_options.length} value={selected_option}>{options}</select>
+          <select onChange={(event)=>{this.handleOptionChange(event.target.value, depth)}} key={Math.random()} value={selected_option}>{options}</select>
         )
       }
       if (selected_option=="no option selected") {
         // allow adding new option
         product_options.push(
-          <input type="text" key={product_options.length} placeholder="New Option" onKeyDown={this.handleNewProductOption.bind(this)} />
+          <input type="text" key={Math.random()} placeholder="New Option" onKeyDown={this.handleNewProductOption.bind(this)} />
         );
       }
       // recurse in next option depth
@@ -253,6 +252,9 @@ class ProductList extends React.Component {
 
   handleAddComponent(component) {
     this.refs.ProductCanvas.handleAddComponent(component);
+  }
+  handlePopComponent(component) {
+    this.refs.ProductCanvas.handlePopComponent(component);
   }
 
   populateComponents(product) {
@@ -272,22 +274,34 @@ class ProductList extends React.Component {
             let character = toks[toks.length-1].toLowerCase();
             if (character.match(/^[a-z]$/))
               component_letters[character] = letter;
-            else
+            else {
+              let component = product.compatible_components[i].options[j];
               tab_components.push(
-                <div key={i+'_'+j} style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}} onClick={this.handleAddComponent.bind(this, product.compatible_components[i].options[j])}/>
+                <div key={i+'_'+j} style={{backgroundImage:`url(${component.props.image})`,backgroundSize:`${component.props.imagewidth/component.props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component)}/>
               );
+            }
           }
           components.push(
             <div key={components.length} name={product.compatible_components[i].props.name} className="component_keyboard_container">
               <row>{['q','w','e','r','t','y','u','i','o','p'].map((character)=>{
-                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
+                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
               })}</row>
-              <row>{['a','s','d','f','g','h','j','k','l'].map((character)=>{
-                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
-              })}</row>
-              <row>{['z','x','c','v','b','n','m'].map((character)=>{
-                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
-              })}</row>
+              <row>
+                <div key="spacer0" className="halfgap"/>
+                {['a','s','d','f','g','h','j','k','l'].map((character)=>{
+                  return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
+                })}
+                <div key="spacer1" className="halfgap"/>
+              </row>
+              <row>
+                <div key="spacer2" className="halfgap"/>
+                <div key="spacer2a" className="halfgap"/>
+                {['z','x','c','v','b','n','m'].map((character)=>{
+                  return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
+                })}
+                <div key="spacer3" className="halfgap"/>
+                <div key="backspace" className="backspace" onClick={this.handlePopComponent.bind(this)}/>
+              </row>
             </div>
           );
           components.push(
