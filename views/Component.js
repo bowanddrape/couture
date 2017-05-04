@@ -100,7 +100,7 @@ class Component {
       gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
     }
 
-    let width = this.getWorldWidth();
+    let width = this.getWorldDims()[0];
     modelview = Matrix.Translation($V([-width/2, 0, 0])).ensure4x4().x(modelview);
     for (let i=0; i<this.assembly.length; i++) {
       modelview = Matrix.Translation($V([this.assembly[i].scale[0]/2, 0, 0])).ensure4x4().x(modelview);
@@ -110,14 +110,22 @@ class Component {
 
   }
 
-  getWorldWidth() {
+  getWorldDims() {
     if (!this.assembly || !this.assembly.length)
-      return this.scale[0];
+      return [
+        this.scale[0]*this.texture_scale[0],
+        this.scale[1]*this.texture_scale[1]
+      ];
     let width = 0;
+    let height = 0;
+    let samples = 0;
     this.assembly.forEach((component) => {
-      width += component.getWorldWidth();
+      let dim = component.getWorldDims();
+      width += dim[0];
+      height = (dim[1] + height*samples)/(samples+1);
+      samples++;
     });
-    return width;
+    return [width, height];
   }
 
   randomizePosition() {

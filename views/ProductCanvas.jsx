@@ -89,7 +89,7 @@ class ProductCanvas extends React.Component {
     if (this.customizer) {
       this.customizer.components.forEach((component) => {
         let position_screen = this.customizer.worldToScreen(component.position);
-        let dims_screen = [689*component.getWorldWidth(), 35];
+        let dims_screen = this.customizer.getScreenDims(component);
         component_hitboxes.push(
           <component_hitbox
             key={component_hitboxes.length}

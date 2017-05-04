@@ -33,6 +33,13 @@ class Component extends JSONAPI {
 
     // if not present, props is empty
     if (!this.props) this.props = {};
+    if (typeof(this.props)=="string") {
+      try {
+        this.props = JSON.parse(this.props);
+      } catch(err) {
+        console.log(err);
+      }
+    }
     // options apply to product families only, virtual groups of components
     // convert these into Components
     if (this.options) {

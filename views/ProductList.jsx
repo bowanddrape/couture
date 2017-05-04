@@ -29,19 +29,18 @@ class ProductList extends React.Component {
     if (options.store.length)
       options.store = options.store[0];
     let store = options.store;
-    // get store inventory
-    Inventory.get(store.facility_id, function(err, store_inventory) {
-      if (err) return callback(err);
-      if (!store_inventory || !store_inventory.inventory) return callback(null, options);
-      store.products.populateFromDB((err) => {
-        // deep clone initial specification (needed for admin)
-        store.products_raw = JSON.parse(JSON.stringify(store.products));
-
-        // convert compatible_component from sku list to component list
-        store.products.hydrateCompatibleComponents(function(err) {
+    store.products.populateFromDB((err) => {
+      // deep clone initial specification (needed for admin)
+      store.products_raw = JSON.parse(JSON.stringify(store.products));
+      // convert compatible_component from sku list to component list
+      store.products.hydrateCompatibleComponents(function(err) {
+        // get store inventory
+        Inventory.get(store.facility_id, function(err, store_inventory) {
+          if (err) return callback(err);
+          if (!store_inventory || !store_inventory.inventory) store_inventory={inventory:{}};
           store.products.recurseProductFamily(function(item, ancestor) {
             // merge inventory count with products in family
-            item.quantity = store_inventory.inventory[item.sku]?store_inventory.inventory[item.sku]:0;
+            item.quantity = store_inventory.inventory[item.sku] || 0;
             // inherit props through product families
             item.inheritDefaults(ancestor);
             // get inventory for any compatible families
@@ -59,9 +58,9 @@ class ProductList extends React.Component {
 
           callback(null, options);
 
-        }); // hydrate compatible_components
-      }); // populate with db components
-    }); // get store_inventory
+        }); // get store_inventory
+      }); // hydrate compatible_components
+    }); // populate with db components
   };
 
   render() {

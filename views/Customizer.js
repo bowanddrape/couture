@@ -5,7 +5,7 @@ class Customizer {
   constructor(options) {
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
-    this.camera_elevation = this.options.camera_elevation || 0.5;
+    this.camera_elevation = this.options.camera_elevation || 1.0;
 
     this.gl = null;
 
@@ -137,6 +137,21 @@ class Customizer {
       1
     ];
     return ret;
+  }
+  getScreenDims(component) {
+    let world_dims = component.getWorldDims();
+    let top_left = this.worldToScreen([
+      component.position[0] - world_dims[0]/2,
+      component.position[1] - world_dims[1]/2,
+    ]);
+    let bottom_right = this.worldToScreen([
+      component.position[0] + world_dims[0]/2,
+      component.position[1] + world_dims[1]/2,
+    ]);
+    return [
+      Math.abs(bottom_right[0]-top_left[0]),
+      Math.abs(bottom_right[1]-top_left[1]),
+    ];
   }
 
   initWebGL() {

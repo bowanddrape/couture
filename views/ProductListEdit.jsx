@@ -71,8 +71,8 @@ class ProductListEdit extends React.Component {
       };
       add_tasks.push(BowAndDrape.api.bind(this, "POST", "/component", product));
     }
-    // TODO update store to have this product
-    add_tasks.push(this.updateStoreProducts.bind(this, product, "POST"));
+    // update store to have this product
+    add_tasks.push(this.updateStoreProducts.bind(this, {sku: this.state.autocomplete_value}, "POST"));
 
     async.series(add_tasks, (err, data) => {
       if (err) return console.log(err);
