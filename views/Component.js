@@ -51,7 +51,7 @@ class Component {
 
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image_load);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.CUBIC);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         // mipmapping the sequins looks bad
         //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -65,6 +65,10 @@ class Component {
     }
     this.scale[0] = parseFloat(state.props.imagewidth) || 1;
     this.scale[1] = parseFloat(state.props.imageheight) || 1;
+    if (state.props.position) {
+      this.position[0] = parseFloat(state.props.position[0]) || 0;
+      this.position[1] = parseFloat(state.props.position[1]) || 0;
+    }
     this.props = state.props || {};
     // fill out if we got an internal assembly
     state.assembly = state.assembly || [];

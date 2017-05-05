@@ -7,6 +7,7 @@ class ProductCanvas extends React.Component {
     super(props);
     this.state = {
       assembly: this.props.assembly || [],
+      selected_component: -1,
     }
   }
 
@@ -21,35 +22,41 @@ class ProductCanvas extends React.Component {
   handleAddComponent(component) {
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
-      // TODO have a selected component
-      if (!assembly.length) {
-        assembly.push({
-          props: {
-            position: component.props.position,
-          },
-          assembly: [component],
-        });
+      let selected = assembly[prevState.selected_component];
+      if (selected) {
+        selected.assembly.push(component);
         return {assembly};
       }
-      let selected = assembly[0];
-      selected.assembly.push(component);
-      return {assembly};
+      // if nothing is selected make a new selected component
+      let position = [0,0,0];
+      // if there was an existing component, place new one a line lower
+      if (this.customizer.components.length) {
+        let prev_component = this.customizer.components[this.customizer.components.length-1];
+        position[0] = prev_component.position[0];
+        position[1] = prev_component.position[1] - prev_component.getWorldDims()[1];
+      }
+      assembly.push({
+        props: {
+          position: position,
+        },
+        assembly: [component],
+      });
+      return {assembly, selected_component: assembly.length-1};
     });
   }
   handlePopComponent() {
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
-      // TODO have a selected component
-      if (!assembly.length) {
-        return {};
+      let selected = assembly[prevState.selected_component];
+      if (selected) {
+        selected.assembly.pop();
+        if (!selected.assembly.length) {
+          assembly.splice(prevState.selected_component, 1);
+          return {assembly, selected_component: -1};
+        }
+        return {assembly};
       }
-      let selected_index = 0;
-      let selected = assembly[selected_index];
-      selected.assembly.pop();
-      if (!selected.assembly.length) {
-        assembly.splice(selected_index, 1);
-      }
-      return {assembly};
+      return {};
     });
   }
 
@@ -75,9 +82,19 @@ class ProductCanvas extends React.Component {
       [event.touches[0].pageX, event.touches[0].pageY] :
       [event.clientX, event.clientY+(document.body.scrollTop?document.body.scrollTop:document.documentElement.scrollTop)];
 
-    this.customizer.components[index].position = this.customizer.browserToWorld(client_pos);
+    // update the component position
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      let selected = assembly[index];
+      if (selected) {
+        selected.props.position = this.customizer.browserToWorld(client_pos);
+      }
+      return {assembly, selected_component: index};
+    });
 
-    this.forceUpdate();
+  }
+  handleSelectComponent(index) {
+    this.setState({selected_component: index});
   }
   componentWillUpdate(nextProps, nextState) {
     this.customizer.set(nextProps.product, nextState);
@@ -100,7 +117,7 @@ class ProductCanvas extends React.Component {
               width:`${dims_screen[0]}px`,
               height:`${dims_screen[1]}px`,
               backgroundColor:"rgba(0,0,0,0)",
-              border:"solid 1px #000",
+              border:component_hitboxes.length==this.state.selected_component?"solid 1px #000":"none",
             }}
           />
         );

@@ -293,7 +293,7 @@ customize .component_keyboard_container row div {
   flex: 0 1 auto;
 }
 customize .component_keyboard_container div.backspace {
-  background-image: url('/sprite.png?2ac2210093c36c9defbb42e4045f69f2777c5230');
+  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
   background-position: 0px -155px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -301,8 +301,29 @@ customize .component_keyboard_container div.backspace {
   width: 48px;
   height: 48px;
   background-size: auto;
-  height: 40px;
-  margin: 5px;
+  margin: 0;
+}
+customize .component_keyboard_container div.enter {
+  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-position: 0px -203px;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  display: block;
+  width: 48px;
+  height: 48px;
+  background-size: auto;
+  margin: 0;
+}
+customize .component_keyboard_container div.spacebar {
+  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-position: 0px -251px;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  display: block;
+  width: 168px;
+  height: 48px;
+  background-size: auto;
+  margin: 0;
 }
 customize .component_keyboard_container div.halfgap {
   height: 40px;
@@ -459,7 +480,7 @@ component_edit input[type="text"][name="props_name"] {
   width: 150px;
 }
 .icon {
-  background-image: url('/sprite.png?2ac2210093c36c9defbb42e4045f69f2777c5230');
+  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
@@ -483,8 +504,8 @@ menu user {
   margin-bottom: 15px;
 }
 menu user img {
-  background-image: url('/sprite.png?2ac2210093c36c9defbb42e4045f69f2777c5230');
-  background-position: 0px -203px;
+  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-position: 0px -299px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: inline;
@@ -503,7 +524,7 @@ menu login msg {
   color: #a00;
 }
 menu handle {
-  background-image: url('/sprite.png?2ac2210093c36c9defbb42e4045f69f2777c5230');
+  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
   background-position: 0px 0px;
   background-repeat: no-repeat;
   overflow: hidden;

@@ -78,7 +78,7 @@ class ProductList extends React.Component {
       <customize>
         {this.props.edit ?
           <ComponentEdit {...product_raw} inherits={product} /> :
-          <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1"}}>Add To Cart</button>
+          <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1",maxWidth:"none",margin:"0px"}}>Add To Cart</button>
         }
         <div className="canvas_container">
           <product_options>
@@ -252,8 +252,11 @@ class ProductList extends React.Component {
   handleAddComponent(component) {
     this.refs.ProductCanvas.handleAddComponent(component);
   }
-  handlePopComponent(component) {
-    this.refs.ProductCanvas.handlePopComponent(component);
+  handlePopComponent() {
+    this.refs.ProductCanvas.handlePopComponent();
+  }
+  handleSelectComponent(component) {
+    this.refs.ProductCanvas.handleSelectComponent(component);
   }
 
   populateComponents(product) {
@@ -274,9 +277,9 @@ class ProductList extends React.Component {
             if (character.match(/^[a-z]$/))
               component_letters[character] = letter;
             else {
-              let component = product.compatible_components[i].options[j];
+              component_letters[character] = letter;
               tab_components.push(
-                <div key={i+'_'+j} style={{backgroundImage:`url(${component.props.image})`,backgroundSize:`${component.props.imagewidth/component.props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component)}/>
+                <div key={i+'_'+j} style={{backgroundImage:`url(${letter.props.image})`,backgroundSize:`${letter.props.imagewidth/letter.props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, letter)}/>
               );
             }
           }
@@ -300,6 +303,13 @@ class ProductList extends React.Component {
                 })}
                 <div key="spacer3" className="halfgap"/>
                 <div key="backspace" className="backspace" onClick={this.handlePopComponent.bind(this)}/>
+              </row>
+              <row>
+                <div key="spacer3a" className="halfgap"/>
+                <div key="spacer3b" className="halfgap"/>
+                <div key="spacebar" className="spacebar" onClick={this.handleAddComponent.bind(this, component_letters["space"])}/>
+                <div key="spacer3c" className="halfgap"/>
+                <div key="enter" className="enter" onClick={this.handleSelectComponent.bind(this, -1)}/>
               </row>
             </div>
           );
