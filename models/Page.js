@@ -58,7 +58,17 @@ class Page extends JSONAPI {
           if (!element) continue;
 
           // there are 2 ways of specifying prop data, immediate or from db
-          let immediate = req.query; // can also be supplied from querystring
+          let immediate = {};
+          // can also be supplied from querystring?
+          for (let key in req.query) {
+            try {
+              // parse it if it's json
+              immediate[key] = JSON.parse(req.query[key]);
+            } catch(err) {
+              // otherwise strip quotes as they mess with JSON format
+              immediate[key] = req.query[key].replace(/"/g, '');
+            }
+          }
           let queries = [];
           for (let prop in element.props) {
             // if the prop was not in model-query form, just copy it

@@ -1,11 +1,13 @@
 
 const async = require('async');
 const React = require('react');
+const querystring = require('querystring');
 
 const ProductCanvas = require('./ProductCanvas.jsx');
 const ProductListEdit = require('./ProductListEdit.jsx');
 const ComponentEdit = require('./ComponentEdit.jsx');
 const Tabs = require('./Tabs.jsx');
+const ComponentSerializer = require('./ComponentSerializer.js');
 
 class ProductList extends React.Component {
   constructor(props) {
@@ -63,8 +65,53 @@ class ProductList extends React.Component {
     }); // populate with db components
   };
 
-  render() {
+  componentWillMount() {
+    if (this.props.c) {
+      let customization = ComponentSerializer.parse(this.props.c);
+      this.setState({selected_product: customization.selected_product});
 
+      let product = this.state.product_map[customization.selected_product[0]];
+      for (let i=1; product && i<customization.selected_product.length; i++) {
+        product = product.options[customization.selected_product[i]];
+      }
+      // fill in our customization
+      let initial_assembly = customization.assembly;
+      let components = {};
+      // slow, but touch all of everything?
+      let traverse_item_options = (item_collection, foreach) => {
+        if (!item_collection) return;
+        if (typeof(item_collection)=='array') {
+          return item_array.forEach((component) => {
+            foreach(component);
+            traverse_item_options(component.options, foreach);
+            traverse_item_options(component.assembly, foreach);
+          });
+        }
+        if (typeof(item_collection)=='object') {
+          return Object.keys(item_collection).forEach((key) => {
+            let component = item_collection[key];
+            foreach(component);
+            traverse_item_options(component.options, foreach);
+            traverse_item_options(component.assembly, foreach);
+          });
+        }
+      };
+      // memory intensive, but make a map of all components?
+      traverse_item_options(product.compatible_components, (component) => {
+        if (component && component.sku)
+          components[component.sku] = component;
+      });
+      // fill in things we just have the sku for
+      traverse_item_options(initial_assembly, (component) => {
+        if (component && component.sku) {
+          component.props = JSON.parse(JSON.stringify(components[component.sku].props));
+        }
+      });
+      this.initial_assembly = initial_assembly;
+    } // this.props.c
+  }
+
+  render() {
     let {product, product_options} = this.populateProductOptions();
 
     // if no valid product selected, show list
@@ -84,7 +131,7 @@ class ProductList extends React.Component {
           <product_options>
             {product_options}
           </product_options>
-          <ProductCanvas ref="ProductCanvas" product={product} />
+          <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
         </div>
         <Tabs className="components">
           {components}
@@ -182,7 +229,7 @@ class ProductList extends React.Component {
     let product_options = [];
     // initialize selected_product
     let product = this.state.product_map[this.state.selected_product[0]];
-    for (let i=1; i<this.state.selected_product.length; i++) {
+    for (let i=1; product && i<this.state.selected_product.length; i++) {
       product = product.options[this.state.selected_product[i]];
     }
 
@@ -257,6 +304,25 @@ class ProductList extends React.Component {
   }
   handleSelectComponent(component) {
     this.refs.ProductCanvas.handleSelectComponent(component);
+  }
+  handleUpdateProduct() {
+    // call this whenever there was an update to base_product or assembly
+    let item = {
+      selected_product: this.state.selected_product,
+      assembly: this.refs.ProductCanvas.state.assembly,
+    };
+    // TODO only do the following when done with a component drag!
+    ComponentSerializer.stringify(item, (err, serialized) => {
+      let toks = location.href.split('?');
+      let url = toks[0];
+      let query_params = {}
+      if (toks.length>1) {
+        query_params = querystring.parse(toks.slice(1).join('?'));
+      }
+      query_params.c = serialized;
+      url += '?' + querystring.stringify(query_params);
+      history.replaceState(history.state, "", url);
+    });
   }
 
   populateComponents(product) {

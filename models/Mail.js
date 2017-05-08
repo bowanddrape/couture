@@ -47,7 +47,7 @@ class Mail {
       tracking_link: "https://tools.usps.com/go/TrackConfirmAction.action?tLabels="+shipment.tracking_code
     }
     let body = Page.renderString(OrderShippedEmail, props, LayoutEmail);
-    Mail.send(null, "Your order has shipped!", body, (err) => {
+    Mail.send(null, `Bow & Drape order ${props.order_id}`, body, (err) => {
       if (err) console.log(err);
       callback();
     });
@@ -55,10 +55,11 @@ class Mail {
 
   static sendSurveyEmail(shipment, callback) {
     let props = {
+      order_id: shipment.props.legacy_id,
       username: shipment.address.name,
     }
     let body = Page.renderString(OrderSurveyEmail, props, LayoutEmail);
-    Mail.send(null, "Bow & Drape Needs YOUR Feedback", body, (err) => {
+    Mail.send(null, `Bow & Drape order ${props.order_id}`, body, (err) => {
       if (err) console.log(err);
       callback();
     });

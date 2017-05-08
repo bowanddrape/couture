@@ -63,6 +63,7 @@ class Customizer {
     this.pMatrix = makePerspective(this.options.vfov, this.options.canvas.width/this.options.canvas.height, 0.1, 100.0);
     // move camera upwards by elevation
     this.pMatrix = this.translate(this.pMatrix, [-0.0, 0.0, -this.camera_elevation]);
+    // TODO if camera_elevation is negative, then rotate Y 180
 
     this.focal_length_pixels = this.options.canvas.offsetHeight/2/Math.tan(this.options.vfov*Math.PI/360);
 

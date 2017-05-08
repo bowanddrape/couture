@@ -9,6 +9,7 @@ class ProductCanvas extends React.Component {
       assembly: this.props.assembly || [],
       selected_component: -1,
     }
+    this.handleUpdateProduct = props.handleUpdateProduct;
   }
 
   componentDidMount() {
@@ -60,7 +61,7 @@ class ProductCanvas extends React.Component {
     });
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     // handle actions on hitboxes
     let index = 0;
     this.canvas.parentNode.childNodes.forEach((node) => {
@@ -69,6 +70,7 @@ class ProductCanvas extends React.Component {
       node.onmousemove = this.handleComponentMove.bind(this, index);
       index++;
     });
+    this.handleUpdateProduct();
   }
 
 
