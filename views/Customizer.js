@@ -1,5 +1,9 @@
+const async = require('async');
 
 const Component = require('./Component.js');
+const SylvestorGlUtils = require('sylvester-es6');
+const Matrix = SylvestorGlUtils.Matrix;
+const Vector = SylvestorGlUtils.Vector;
 
 class Customizer {
   constructor(options) {
@@ -34,10 +38,12 @@ class Customizer {
     this.product = new Component();
   }
 
-  set(product, construction) {
+  set(product, construction, callback) {
+    let set_tasks = [];
+
     let components = [];
     // set product
-    this.product.set(this.gl, {props: product.props});
+    set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props}));
     // TODO recurse assemblies
     construction.assembly.forEach((component) => {
       components.push(component);
@@ -49,23 +55,24 @@ class Customizer {
     // TODO unbind textures here so we don't leak
     this.components.length = components.length;
     for (let i=0; i<components.length; i++) {
-      this.components[i].set(this.gl, components[i]);
+      set_tasks.push(this.components[i].set.bind(this.components[i], this.gl, components[i]));
     }
+    async.parallel(set_tasks, (err) => {
+      if (callback) callback();
+    });
   }
 
   resizeViewport() {
     // set canvas space to be 1-to-1 with browser space
-    this.options.canvas.width = this.options.canvas.offsetWidth;
-    this.options.canvas.height = this.options.canvas.offsetHeight;
-    this.gl.viewport(0, 0, this.options.canvas.width, this.options.canvas.height);
+    this.gl.viewport(0, 0, this.options.width, this.options.height);
 
     // init pMatrix with view frustrum
-    this.pMatrix = makePerspective(this.options.vfov, this.options.canvas.width/this.options.canvas.height, 0.1, 100.0);
+    this.pMatrix = SylvestorGlUtils.makePerspective(this.options.vfov, this.options.width/this.options.height, 0.1, 100.0);
     // move camera upwards by elevation
     this.pMatrix = this.translate(this.pMatrix, [-0.0, 0.0, -this.camera_elevation]);
     // TODO if camera_elevation is negative, then rotate Y 180
 
-    this.focal_length_pixels = this.options.canvas.offsetHeight/2/Math.tan(this.options.vfov*Math.PI/360);
+    this.focal_length_pixels = this.options.height/2/Math.tan(this.options.vfov*Math.PI/360);
 
     this.updateCanvasScreenPosition();
   }
@@ -107,9 +114,6 @@ class Customizer {
 
     // init mvMatrix
     this.mvMatrix = Matrix.I(4);
-
-    // Set up to draw the scene periodically.
-    window.requestAnimationFrame(this.render.bind(this));
   }
 
   browserToWorld(browser) {
@@ -158,9 +162,20 @@ class Customizer {
   initWebGL() {
     let gl = null;
     try {
-      gl = this.options.canvas.getContext("webgl");
+      if (this.options.canvas) {
+        gl = this.options.canvas.getContext("webgl");
+        this.options.canvas.width = this.options.canvas.offsetWidth;
+        this.options.canvas.height = this.options.canvas.offsetHeight;
+        this.options.width = this.options.canvas.width;
+        this.options.height = this.options.canvas.height;
+      } else {
+        // if we didn't get passed a canvas, we're doing a server side render
+        gl = require('gl')(this.options.width, this.options.height);
+      }
     }
     catch(e) {}
+
+
     if (!gl) {
       alert("Unable to initialize WebGL. Your browser may not support it.");
     }
@@ -209,14 +224,21 @@ class Customizer {
     let gl = this.gl;
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     this.particleTexture = gl.createTexture();
-    let particleImage = new Image();
-    let self = this;
-    particleImage.onload = function() {
-      self.handleTextureLoaded(particleImage, self.particleTexture);
-      for (let i=0; i<self.particles.length; i++)
-        self.particles[i].texture = self.particleTexture;
+    if (typeof(Image)!="undefined") {
+      let particleImage = new Image();
+      let self = this;
+      particleImage.onload = function() {
+        self.handleTextureLoaded(particleImage, self.particleTexture);
+        for (let i=0; i<self.particles.length; i++)
+          self.particles[i].texture = self.particleTexture;
+      }
+      particleImage.src = "/petal.png";
+    } else {
+      const getPixels = require("get-pixels")
+      getPixels("http://localhost/petal.png", (err, pixels) => {
+        this.handleTextureLoaded(pixels, this.particleTexture);
+      });
     }
-    particleImage.src = "/petal.png";
   }
 
   handleTextureLoaded(image, texture) {
@@ -267,8 +289,11 @@ class Customizer {
       this.particles[i].render(gl, this.mvMatrix, this.shaderProgram);
       this.particles[i].updatePosition(this.time_delta);
     }
+  }
 
-    window.requestAnimationFrame(this.render.bind(this));
+  animate() {
+    this.render();
+    window.requestAnimationFrame(this.animate.bind(this));
   }
 
   initShaders() {
@@ -283,7 +308,7 @@ class Customizer {
     `);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-      alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(fragmentShader));
+      console.log("An error occurred compiling the shaders: " + gl.getShaderInfoLog(fragmentShader));
     }
 
     let vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -300,7 +325,7 @@ class Customizer {
     `);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-      alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(vertexShader));
+      console.log("An error occurred compiling the shaders: " + gl.getShaderInfoLog(vertexShader));
     }
 
     // Create the shader program
@@ -311,7 +336,7 @@ class Customizer {
 
     // If creating the shader program failed, alert
     if (!gl.getProgramParameter(this.shaderProgram, gl.LINK_STATUS)) {
-      alert("Unable to initialize the shader program: " + gl.getProgramInfoLog(shader));
+      console.log("Unable to initialize the shader program: " + gl.getProgramInfoLog(shader));
     }
 
     gl.useProgram(this.shaderProgram);
@@ -348,12 +373,12 @@ class Customizer {
   }
 
   rotate(m, angle, v) {
-    let r = Matrix.Rotation(angle, $V([v[0], v[1], v[2]])).ensure4x4();
+    let r = Matrix.Rotation(angle, new Vector([v[0], v[1], v[2]])).ensure4x4();
     return m.x(r); 
   }
 
   translate(m, v) {
-    return m.x(Matrix.Translation($V([v[0], v[1], v[2]])).ensure4x4());
+    return m.x(Matrix.Translation(new Vector([v[0], v[1], v[2]])).ensure4x4());
   }
 
   scale(m, v) {

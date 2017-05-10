@@ -18,6 +18,7 @@ class ProductCanvas extends React.Component {
     this.customizer = new BowAndDrape.Customizer({canvas: this.canvas});
     this.customizer.init();
     this.forceUpdate();
+    this.customizer.animate();
   }
 
   handleAddComponent(component) {

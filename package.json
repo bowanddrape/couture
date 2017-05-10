@@ -19,6 +19,8 @@
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "express": "~4.13.4",
+    "get-pixels": "^3.3.0",
+    "gl": "^4.0.3",
     "html-pdf": "^2.1.0",
     "jsonwebtoken": "^7.1.9",
     "jwt-decode": "^2.1.0",
@@ -34,10 +36,14 @@
     "react": "~15.3.2",
     "react-autocomplete": "^1.4.0",
     "react-swipeable": "^3.9.2",
+    "save-pixels": "^2.3.4",
     "sendgrid": "^4.7.1",
     "sendmail": "^1.1.1",
+    "sharp": "^0.17.3",
     "stripe": "^4.15.0",
-    "xml2js": "^0.4.17"
+    "sylvester-es6": "0.0.2",
+    "xml2js": "^0.4.17",
+    "zeros": "^1.0.0"
   },
   "devDependencies": {
     "babel-loader": "^6.2.5",

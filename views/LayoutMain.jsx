@@ -97,8 +97,6 @@ class LayoutMain extends React.Component {
           </div>
 
         <script src="/BowAndDrape.js"></script>
-        <script src="/sylvester.js" type="text/javascript"></script>
-        <script src="/glUtils.js" type="text/javascript"></script>
 
         <script dangerouslySetInnerHTML={{__html:`
 

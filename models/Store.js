@@ -1,10 +1,14 @@
 
+const zeros = require('zeros');
+const sharp = require('sharp');
+
 const SQLTable = require('./SQLTable');
 const Item = require('./Item.js');
 const Page = require('./Page.js');
 const GenericList = require('../views/GenericList.jsx');
 const View = require('../views/Store.jsx');
 const ProductList = require('../views/ProductList.jsx')
+const Customizer = require('../views/Customizer.js')
 
 class Store extends SQLTable {
   constructor(store) {
@@ -28,6 +32,10 @@ class Store extends SQLTable {
     if (req.path_tokens[0]!='store') {
       return next();
     }
+
+    // server side customization rendering
+    if (req.path_tokens.length == 3 && req.path_tokens[2]=="preview")
+      return Store.drawCustomization(req, res);
 
     // user must be admin
     if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
@@ -112,6 +120,38 @@ class Store extends SQLTable {
       });
     });
   }
+
+  static drawCustomization(req, res) {
+    Store.get(req.path_tokens[1], (err, store) => {
+      if (err) return res.status(500).end(err.toString());
+      if (!store) return Page.renderNotFound(req, res);
+      ProductList.preprocessProps({store:store}, (err, product_list) => {
+        product_list.c = req.query['c'];
+        product_list = new ProductList(product_list);
+        product_list.componentWillMount();
+
+let width = 700;
+let height = 200;
+        let customizer = new Customizer({width:width, height:height});
+        customizer.init();
+        customizer.set(product_list.initial_product, {assembly:product_list.initial_assembly}, () => {
+
+          var pixel_buffer = new Uint8Array(width * height * 4);
+          let gl = customizer.gl;
+          gl.clearColor(1, 1, 1, 0);
+          customizer.render();
+          gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixel_buffer);
+          // these 2 lines shouldn't be needed but it's having some type problems
+          let pixels = zeros([height, width, 4]);
+          pixels.data = pixel_buffer;
+
+          var savePixels = require("save-pixels");
+          savePixels(pixels, "png").pipe(sharp().rotate(270)).pipe(res);
+        }); // customizer.set()
+      }); // ProductList.preprocessProps()
+    }); // Store.get()
+  }
+
 }
 
 module.exports = Store;

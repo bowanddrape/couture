@@ -84,7 +84,7 @@ var Log = function () {
 
 module.exports = Log;
 
-},{"https":139,"os":151}],3:[function(require,module,exports){
+},{"https":145,"os":162}],3:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -365,7 +365,7 @@ var SQLTable = function () {
 module.exports = SQLTable;
 
 }).call(this,require('_process'))
-},{"./Log.js":2,"_process":205,"async":20,"pg":188}],4:[function(require,module,exports){
+},{"./Log.js":2,"_process":216,"async":20,"pg":199}],4:[function(require,module,exports){
 exports = module.exports = ap;
 function ap (args, fn) {
     return function () {
@@ -489,7 +489,7 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
   return this._getEncoder(enc).encode(data, reporter);
 };
 
-},{"../asn1":5,"inherits":142,"vm":412}],7:[function(require,module,exports){
+},{"../asn1":5,"inherits":148,"vm":437}],7:[function(require,module,exports){
 var inherits = require('inherits');
 var Reporter = require('../base').Reporter;
 var Buffer = require('buffer').Buffer;
@@ -607,7 +607,7 @@ EncoderBuffer.prototype.join = function join(out, offset) {
   return out;
 };
 
-},{"../base":8,"buffer":64,"inherits":142}],8:[function(require,module,exports){
+},{"../base":8,"buffer":64,"inherits":148}],8:[function(require,module,exports){
 var base = exports;
 
 base.Reporter = require('./reporter').Reporter;
@@ -1246,7 +1246,7 @@ Node.prototype._isPrintstr = function isPrintstr(str) {
   return /^[A-Za-z0-9 '\(\)\+,\-\.\/:=\?]*$/.test(str);
 };
 
-},{"../base":8,"minimalistic-assert":149}],10:[function(require,module,exports){
+},{"../base":8,"minimalistic-assert":156}],10:[function(require,module,exports){
 var inherits = require('inherits');
 
 function Reporter(options) {
@@ -1369,7 +1369,7 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
   return this;
 };
 
-},{"inherits":142}],11:[function(require,module,exports){
+},{"inherits":148}],11:[function(require,module,exports){
 var constants = require('../constants');
 
 exports.tagClass = {
@@ -1758,7 +1758,7 @@ function derDecodeLen(buf, primitive, fail) {
   return len;
 }
 
-},{"../../asn1":5,"inherits":142}],14:[function(require,module,exports){
+},{"../../asn1":5,"inherits":148}],14:[function(require,module,exports){
 var decoders = exports;
 
 decoders.der = require('./der');
@@ -1815,7 +1815,7 @@ PEMDecoder.prototype.decode = function decode(data, options) {
   return DERDecoder.prototype.decode.call(this, input, options);
 };
 
-},{"./der":13,"buffer":64,"inherits":142}],16:[function(require,module,exports){
+},{"./der":13,"buffer":64,"inherits":148}],16:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -2110,7 +2110,7 @@ function encodeTag(tag, primitive, cls, reporter) {
   return res;
 }
 
-},{"../../asn1":5,"buffer":64,"inherits":142}],17:[function(require,module,exports){
+},{"../../asn1":5,"buffer":64,"inherits":148}],17:[function(require,module,exports){
 var encoders = exports;
 
 encoders.der = require('./der');
@@ -2139,7 +2139,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
   return out.join('\n');
 };
 
-},{"./der":16,"inherits":142}],19:[function(require,module,exports){
+},{"./der":16,"inherits":148}],19:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -2500,7 +2500,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":411}],20:[function(require,module,exports){
+},{"util/":436}],20:[function(require,module,exports){
 (function (process,global){
 /*!
  * async
@@ -3769,7 +3769,7 @@ var objectKeys = Object.keys || function (obj) {
 }());
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":205}],21:[function(require,module,exports){
+},{"_process":216}],21:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -5268,7 +5268,7 @@ function fromByteArray (uint8) {
 }));
 
 }).call(this,require('_process'))
-},{"_process":205,"crypto":74}],23:[function(require,module,exports){
+},{"_process":216,"crypto":74}],23:[function(require,module,exports){
 (function (process,__filename){
 
 /**
@@ -5438,7 +5438,7 @@ exports.getRoot = function getRoot (file) {
 }
 
 }).call(this,require('_process'),"/node_modules/bindings/bindings.js")
-},{"_process":205,"fs":53,"path":168}],24:[function(require,module,exports){
+},{"_process":216,"fs":53,"path":179}],24:[function(require,module,exports){
 (function (module, exports) {
   'use strict';
 
@@ -9210,7 +9210,7 @@ function xorTest (a, b) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./aes":27,"./ghash":32,"buffer":64,"buffer-xor":63,"cipher-base":67,"inherits":142}],29:[function(require,module,exports){
+},{"./aes":27,"./ghash":32,"buffer":64,"buffer-xor":63,"cipher-base":67,"inherits":148}],29:[function(require,module,exports){
 var ciphers = require('./encrypter')
 exports.createCipher = exports.Cipher = ciphers.createCipher
 exports.createCipheriv = exports.Cipheriv = ciphers.createCipheriv
@@ -9364,7 +9364,7 @@ exports.createDecipher = createDecipher
 exports.createDecipheriv = createDecipheriv
 
 }).call(this,require("buffer").Buffer)
-},{"./aes":27,"./authCipher":28,"./modes":33,"./modes/cbc":34,"./modes/cfb":35,"./modes/cfb1":36,"./modes/cfb8":37,"./modes/ctr":38,"./modes/ecb":39,"./modes/ofb":40,"./streamCipher":41,"buffer":64,"cipher-base":67,"evp_bytestokey":106,"inherits":142}],31:[function(require,module,exports){
+},{"./aes":27,"./authCipher":28,"./modes":33,"./modes/cbc":34,"./modes/cfb":35,"./modes/cfb1":36,"./modes/cfb8":37,"./modes/ctr":38,"./modes/ecb":39,"./modes/ofb":40,"./streamCipher":41,"buffer":64,"cipher-base":67,"evp_bytestokey":110,"inherits":148}],31:[function(require,module,exports){
 (function (Buffer){
 var aes = require('./aes')
 var Transform = require('cipher-base')
@@ -9490,7 +9490,7 @@ exports.createCipheriv = createCipheriv
 exports.createCipher = createCipher
 
 }).call(this,require("buffer").Buffer)
-},{"./aes":27,"./authCipher":28,"./modes":33,"./modes/cbc":34,"./modes/cfb":35,"./modes/cfb1":36,"./modes/cfb8":37,"./modes/ctr":38,"./modes/ecb":39,"./modes/ofb":40,"./streamCipher":41,"buffer":64,"cipher-base":67,"evp_bytestokey":106,"inherits":142}],32:[function(require,module,exports){
+},{"./aes":27,"./authCipher":28,"./modes":33,"./modes/cbc":34,"./modes/cfb":35,"./modes/cfb1":36,"./modes/cfb8":37,"./modes/ctr":38,"./modes/ecb":39,"./modes/ofb":40,"./streamCipher":41,"buffer":64,"cipher-base":67,"evp_bytestokey":110,"inherits":148}],32:[function(require,module,exports){
 (function (Buffer){
 var zeros = new Buffer(16)
 zeros.fill(0)
@@ -9968,7 +9968,7 @@ StreamCipher.prototype._final = function () {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./aes":27,"buffer":64,"cipher-base":67,"inherits":142}],42:[function(require,module,exports){
+},{"./aes":27,"buffer":64,"cipher-base":67,"inherits":148}],42:[function(require,module,exports){
 var ebtk = require('evp_bytestokey')
 var aes = require('browserify-aes/browser')
 var DES = require('browserify-des')
@@ -10043,7 +10043,7 @@ function getCiphers () {
 }
 exports.listCiphers = exports.getCiphers = getCiphers
 
-},{"browserify-aes/browser":29,"browserify-aes/modes":33,"browserify-des":43,"browserify-des/modes":44,"evp_bytestokey":106}],43:[function(require,module,exports){
+},{"browserify-aes/browser":29,"browserify-aes/modes":33,"browserify-des":43,"browserify-des/modes":44,"evp_bytestokey":110}],43:[function(require,module,exports){
 (function (Buffer){
 var CipherBase = require('cipher-base')
 var des = require('des.js')
@@ -10090,7 +10090,7 @@ DES.prototype._final = function () {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64,"cipher-base":67,"des.js":75,"inherits":142}],44:[function(require,module,exports){
+},{"buffer":64,"cipher-base":67,"des.js":79,"inherits":148}],44:[function(require,module,exports){
 exports['des-ecb'] = {
   key: 8,
   iv: 0
@@ -10160,7 +10160,7 @@ function getr(priv) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bn.js":24,"buffer":64,"randombytes":216}],46:[function(require,module,exports){
+},{"bn.js":24,"buffer":64,"randombytes":227}],46:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 exports['RSA-SHA224'] = exports.sha224WithRSAEncryption = {
@@ -10343,7 +10343,7 @@ module.exports = {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./algos":46,"./sign":49,"./verify":50,"buffer":64,"create-hash":70,"inherits":142,"stream":378}],48:[function(require,module,exports){
+},{"./algos":46,"./sign":49,"./verify":50,"buffer":64,"create-hash":70,"inherits":148,"stream":389}],48:[function(require,module,exports){
 'use strict'
 exports['1.3.132.0.10'] = 'secp256k1'
 
@@ -10546,7 +10546,7 @@ module.exports.getKey = getKey
 module.exports.makeKey = makeKey
 
 }).call(this,require("buffer").Buffer)
-},{"./curves":48,"bn.js":24,"browserify-rsa":45,"buffer":64,"create-hmac":73,"elliptic":88,"parse-asn1":167}],50:[function(require,module,exports){
+},{"./curves":48,"bn.js":24,"browserify-rsa":45,"buffer":64,"create-hmac":73,"elliptic":92,"parse-asn1":178}],50:[function(require,module,exports){
 (function (Buffer){
 // much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var curves = require('./curves')
@@ -10653,7 +10653,7 @@ function checkValue (b, q) {
 module.exports = verify
 
 }).call(this,require("buffer").Buffer)
-},{"./curves":48,"bn.js":24,"buffer":64,"elliptic":88,"parse-asn1":167}],51:[function(require,module,exports){
+},{"./curves":48,"bn.js":24,"buffer":64,"elliptic":92,"parse-asn1":178}],51:[function(require,module,exports){
 (function (process,Buffer){
 var msg = require('pako/lib/zlib/messages');
 var zstream = require('pako/lib/zlib/zstream');
@@ -10893,7 +10893,7 @@ Zlib.prototype._error = function(status) {
 exports.Zlib = Zlib;
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":205,"buffer":64,"pako/lib/zlib/constants":155,"pako/lib/zlib/deflate.js":157,"pako/lib/zlib/inflate.js":159,"pako/lib/zlib/messages":161,"pako/lib/zlib/zstream":163}],52:[function(require,module,exports){
+},{"_process":216,"buffer":64,"pako/lib/zlib/constants":166,"pako/lib/zlib/deflate.js":168,"pako/lib/zlib/inflate.js":170,"pako/lib/zlib/messages":172,"pako/lib/zlib/zstream":174}],52:[function(require,module,exports){
 (function (process,Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -11507,7 +11507,7 @@ util.inherits(InflateRaw, Zlib);
 util.inherits(Unzip, Zlib);
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"./binding":51,"_process":205,"_stream_transform":60,"assert":19,"buffer":64,"util":411}],53:[function(require,module,exports){
+},{"./binding":51,"_process":216,"_stream_transform":60,"assert":19,"buffer":64,"util":436}],53:[function(require,module,exports){
 arguments[4][26][0].apply(exports,arguments)
 },{"dup":26}],54:[function(require,module,exports){
 var toString = {}.toString;
@@ -11592,7 +11592,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":56,"./_stream_writable":58,"core-util-is":68,"inherits":142,"process-nextick-args":204}],56:[function(require,module,exports){
+},{"./_stream_readable":56,"./_stream_writable":58,"core-util-is":68,"inherits":148,"process-nextick-args":215}],56:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -12532,7 +12532,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":55,"./internal/streams/BufferList":59,"_process":205,"buffer":64,"buffer-shims":61,"core-util-is":68,"events":105,"inherits":142,"isarray":54,"process-nextick-args":204,"string_decoder/":403,"util":26}],57:[function(require,module,exports){
+},{"./_stream_duplex":55,"./internal/streams/BufferList":59,"_process":216,"buffer":64,"buffer-shims":61,"core-util-is":68,"events":109,"inherits":148,"isarray":54,"process-nextick-args":215,"string_decoder/":414,"util":26}],57:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -12713,7 +12713,7 @@ function done(stream, er) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":55,"core-util-is":68,"inherits":142}],58:[function(require,module,exports){
+},{"./_stream_duplex":55,"core-util-is":68,"inherits":148}],58:[function(require,module,exports){
 (function (process){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
@@ -13242,7 +13242,7 @@ function CorkedRequest(state) {
   };
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":55,"_process":205,"buffer":64,"buffer-shims":61,"core-util-is":68,"events":105,"inherits":142,"process-nextick-args":204,"util-deprecate":408}],59:[function(require,module,exports){
+},{"./_stream_duplex":55,"_process":216,"buffer":64,"buffer-shims":61,"core-util-is":68,"events":109,"inherits":148,"process-nextick-args":215,"util-deprecate":433}],59:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('buffer').Buffer;
@@ -15362,7 +15362,7 @@ function isnan (val) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":21,"ieee754":140,"isarray":65}],65:[function(require,module,exports){
+},{"base64-js":21,"ieee754":146,"isarray":65}],65:[function(require,module,exports){
 arguments[4][54][0].apply(exports,arguments)
 },{"dup":54}],66:[function(require,module,exports){
 module.exports = {
@@ -15523,7 +15523,7 @@ CipherBase.prototype._toString = function (value, enc, fin) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64,"inherits":142,"stream":378,"string_decoder":403}],68:[function(require,module,exports){
+},{"buffer":64,"inherits":148,"stream":389,"string_decoder":414}],68:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -15634,7 +15634,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":143}],69:[function(require,module,exports){
+},{"../../is-buffer/index.js":150}],69:[function(require,module,exports){
 (function (Buffer){
 var elliptic = require('elliptic');
 var BN = require('bn.js');
@@ -15760,7 +15760,7 @@ function formatReturnValue(bn, enc, len) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bn.js":24,"buffer":64,"elliptic":88}],70:[function(require,module,exports){
+},{"bn.js":24,"buffer":64,"elliptic":92}],70:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 var inherits = require('inherits')
@@ -15816,7 +15816,7 @@ module.exports = function createHash (alg) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./md5":72,"buffer":64,"cipher-base":67,"inherits":142,"ripemd160":367,"sha.js":370}],71:[function(require,module,exports){
+},{"./md5":72,"buffer":64,"cipher-base":67,"inherits":148,"ripemd160":378,"sha.js":381}],71:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 var intSize = 4;
@@ -16082,7 +16082,7 @@ module.exports = function createHmac(alg, key) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64,"create-hash/browser":70,"inherits":142,"stream":378}],74:[function(require,module,exports){
+},{"buffer":64,"create-hash/browser":70,"inherits":148,"stream":389}],74:[function(require,module,exports){
 'use strict'
 
 exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = require('randombytes')
@@ -16161,7 +16161,620 @@ var publicEncrypt = require('public-encrypt')
   }
 })
 
-},{"browserify-cipher":42,"browserify-sign":47,"browserify-sign/algos":46,"create-ecdh":69,"create-hash":70,"create-hmac":73,"diffie-hellman":81,"pbkdf2":169,"public-encrypt":206,"randombytes":216}],75:[function(require,module,exports){
+},{"browserify-cipher":42,"browserify-sign":47,"browserify-sign/algos":46,"create-ecdh":69,"create-hash":70,"create-hmac":73,"diffie-hellman":85,"pbkdf2":180,"public-encrypt":217,"randombytes":227}],75:[function(require,module,exports){
+"use strict"
+
+var createThunk = require("./lib/thunk.js")
+
+function Procedure() {
+  this.argTypes = []
+  this.shimArgs = []
+  this.arrayArgs = []
+  this.arrayBlockIndices = []
+  this.scalarArgs = []
+  this.offsetArgs = []
+  this.offsetArgIndex = []
+  this.indexArgs = []
+  this.shapeArgs = []
+  this.funcName = ""
+  this.pre = null
+  this.body = null
+  this.post = null
+  this.debug = false
+}
+
+function compileCwise(user_args) {
+  //Create procedure
+  var proc = new Procedure()
+  
+  //Parse blocks
+  proc.pre    = user_args.pre
+  proc.body   = user_args.body
+  proc.post   = user_args.post
+
+  //Parse arguments
+  var proc_args = user_args.args.slice(0)
+  proc.argTypes = proc_args
+  for(var i=0; i<proc_args.length; ++i) {
+    var arg_type = proc_args[i]
+    if(arg_type === "array" || (typeof arg_type === "object" && arg_type.blockIndices)) {
+      proc.argTypes[i] = "array"
+      proc.arrayArgs.push(i)
+      proc.arrayBlockIndices.push(arg_type.blockIndices ? arg_type.blockIndices : 0)
+      proc.shimArgs.push("array" + i)
+      if(i < proc.pre.args.length && proc.pre.args[i].count>0) {
+        throw new Error("cwise: pre() block may not reference array args")
+      }
+      if(i < proc.post.args.length && proc.post.args[i].count>0) {
+        throw new Error("cwise: post() block may not reference array args")
+      }
+    } else if(arg_type === "scalar") {
+      proc.scalarArgs.push(i)
+      proc.shimArgs.push("scalar" + i)
+    } else if(arg_type === "index") {
+      proc.indexArgs.push(i)
+      if(i < proc.pre.args.length && proc.pre.args[i].count > 0) {
+        throw new Error("cwise: pre() block may not reference array index")
+      }
+      if(i < proc.body.args.length && proc.body.args[i].lvalue) {
+        throw new Error("cwise: body() block may not write to array index")
+      }
+      if(i < proc.post.args.length && proc.post.args[i].count > 0) {
+        throw new Error("cwise: post() block may not reference array index")
+      }
+    } else if(arg_type === "shape") {
+      proc.shapeArgs.push(i)
+      if(i < proc.pre.args.length && proc.pre.args[i].lvalue) {
+        throw new Error("cwise: pre() block may not write to array shape")
+      }
+      if(i < proc.body.args.length && proc.body.args[i].lvalue) {
+        throw new Error("cwise: body() block may not write to array shape")
+      }
+      if(i < proc.post.args.length && proc.post.args[i].lvalue) {
+        throw new Error("cwise: post() block may not write to array shape")
+      }
+    } else if(typeof arg_type === "object" && arg_type.offset) {
+      proc.argTypes[i] = "offset"
+      proc.offsetArgs.push({ array: arg_type.array, offset:arg_type.offset })
+      proc.offsetArgIndex.push(i)
+    } else {
+      throw new Error("cwise: Unknown argument type " + proc_args[i])
+    }
+  }
+  
+  //Make sure at least one array argument was specified
+  if(proc.arrayArgs.length <= 0) {
+    throw new Error("cwise: No array arguments specified")
+  }
+  
+  //Make sure arguments are correct
+  if(proc.pre.args.length > proc_args.length) {
+    throw new Error("cwise: Too many arguments in pre() block")
+  }
+  if(proc.body.args.length > proc_args.length) {
+    throw new Error("cwise: Too many arguments in body() block")
+  }
+  if(proc.post.args.length > proc_args.length) {
+    throw new Error("cwise: Too many arguments in post() block")
+  }
+
+  //Check debug flag
+  proc.debug = !!user_args.printCode || !!user_args.debug
+  
+  //Retrieve name
+  proc.funcName = user_args.funcName || "cwise"
+  
+  //Read in block size
+  proc.blockSize = user_args.blockSize || 64
+
+  return createThunk(proc)
+}
+
+module.exports = compileCwise
+
+},{"./lib/thunk.js":77}],76:[function(require,module,exports){
+"use strict"
+
+var uniq = require("uniq")
+
+// This function generates very simple loops analogous to how you typically traverse arrays (the outermost loop corresponds to the slowest changing index, the innermost loop to the fastest changing index)
+// TODO: If two arrays have the same strides (and offsets) there is potential for decreasing the number of "pointers" and related variables. The drawback is that the type signature would become more specific and that there would thus be less potential for caching, but it might still be worth it, especially when dealing with large numbers of arguments.
+function innerFill(order, proc, body) {
+  var dimension = order.length
+    , nargs = proc.arrayArgs.length
+    , has_index = proc.indexArgs.length>0
+    , code = []
+    , vars = []
+    , idx=0, pidx=0, i, j
+  for(i=0; i<dimension; ++i) { // Iteration variables
+    vars.push(["i",i,"=0"].join(""))
+  }
+  //Compute scan deltas
+  for(j=0; j<nargs; ++j) {
+    for(i=0; i<dimension; ++i) {
+      pidx = idx
+      idx = order[i]
+      if(i === 0) { // The innermost/fastest dimension's delta is simply its stride
+        vars.push(["d",j,"s",i,"=t",j,"p",idx].join(""))
+      } else { // For other dimensions the delta is basically the stride minus something which essentially "rewinds" the previous (more inner) dimension
+        vars.push(["d",j,"s",i,"=(t",j,"p",idx,"-s",pidx,"*t",j,"p",pidx,")"].join(""))
+      }
+    }
+  }
+  code.push("var " + vars.join(","))
+  //Scan loop
+  for(i=dimension-1; i>=0; --i) { // Start at largest stride and work your way inwards
+    idx = order[i]
+    code.push(["for(i",i,"=0;i",i,"<s",idx,";++i",i,"){"].join(""))
+  }
+  //Push body of inner loop
+  code.push(body)
+  //Advance scan pointers
+  for(i=0; i<dimension; ++i) {
+    pidx = idx
+    idx = order[i]
+    for(j=0; j<nargs; ++j) {
+      code.push(["p",j,"+=d",j,"s",i].join(""))
+    }
+    if(has_index) {
+      if(i > 0) {
+        code.push(["index[",pidx,"]-=s",pidx].join(""))
+      }
+      code.push(["++index[",idx,"]"].join(""))
+    }
+    code.push("}")
+  }
+  return code.join("\n")
+}
+
+// Generate "outer" loops that loop over blocks of data, applying "inner" loops to the blocks by manipulating the local variables in such a way that the inner loop only "sees" the current block.
+// TODO: If this is used, then the previous declaration (done by generateCwiseOp) of s* is essentially unnecessary.
+//       I believe the s* are not used elsewhere (in particular, I don't think they're used in the pre/post parts and "shape" is defined independently), so it would be possible to make defining the s* dependent on what loop method is being used.
+function outerFill(matched, order, proc, body) {
+  var dimension = order.length
+    , nargs = proc.arrayArgs.length
+    , blockSize = proc.blockSize
+    , has_index = proc.indexArgs.length > 0
+    , code = []
+  for(var i=0; i<nargs; ++i) {
+    code.push(["var offset",i,"=p",i].join(""))
+  }
+  //Generate loops for unmatched dimensions
+  // The order in which these dimensions are traversed is fairly arbitrary (from small stride to large stride, for the first argument)
+  // TODO: It would be nice if the order in which these loops are placed would also be somehow "optimal" (at the very least we should check that it really doesn't hurt us if they're not).
+  for(var i=matched; i<dimension; ++i) {
+    code.push(["for(var j"+i+"=SS[", order[i], "]|0;j", i, ">0;){"].join("")) // Iterate back to front
+    code.push(["if(j",i,"<",blockSize,"){"].join("")) // Either decrease j by blockSize (s = blockSize), or set it to zero (after setting s = j).
+    code.push(["s",order[i],"=j",i].join(""))
+    code.push(["j",i,"=0"].join(""))
+    code.push(["}else{s",order[i],"=",blockSize].join(""))
+    code.push(["j",i,"-=",blockSize,"}"].join(""))
+    if(has_index) {
+      code.push(["index[",order[i],"]=j",i].join(""))
+    }
+  }
+  for(var i=0; i<nargs; ++i) {
+    var indexStr = ["offset"+i]
+    for(var j=matched; j<dimension; ++j) {
+      indexStr.push(["j",j,"*t",i,"p",order[j]].join(""))
+    }
+    code.push(["p",i,"=(",indexStr.join("+"),")"].join(""))
+  }
+  code.push(innerFill(order, proc, body))
+  for(var i=matched; i<dimension; ++i) {
+    code.push("}")
+  }
+  return code.join("\n")
+}
+
+//Count the number of compatible inner orders
+// This is the length of the longest common prefix of the arrays in orders.
+// Each array in orders lists the dimensions of the correspond ndarray in order of increasing stride.
+// This is thus the maximum number of dimensions that can be efficiently traversed by simple nested loops for all arrays.
+function countMatches(orders) {
+  var matched = 0, dimension = orders[0].length
+  while(matched < dimension) {
+    for(var j=1; j<orders.length; ++j) {
+      if(orders[j][matched] !== orders[0][matched]) {
+        return matched
+      }
+    }
+    ++matched
+  }
+  return matched
+}
+
+//Processes a block according to the given data types
+// Replaces variable names by different ones, either "local" ones (that are then ferried in and out of the given array) or ones matching the arguments that the function performing the ultimate loop will accept.
+function processBlock(block, proc, dtypes) {
+  var code = block.body
+  var pre = []
+  var post = []
+  for(var i=0; i<block.args.length; ++i) {
+    var carg = block.args[i]
+    if(carg.count <= 0) {
+      continue
+    }
+    var re = new RegExp(carg.name, "g")
+    var ptrStr = ""
+    var arrNum = proc.arrayArgs.indexOf(i)
+    switch(proc.argTypes[i]) {
+      case "offset":
+        var offArgIndex = proc.offsetArgIndex.indexOf(i)
+        var offArg = proc.offsetArgs[offArgIndex]
+        arrNum = offArg.array
+        ptrStr = "+q" + offArgIndex // Adds offset to the "pointer" in the array
+      case "array":
+        ptrStr = "p" + arrNum + ptrStr
+        var localStr = "l" + i
+        var arrStr = "a" + arrNum
+        if (proc.arrayBlockIndices[arrNum] === 0) { // Argument to body is just a single value from this array
+          if(carg.count === 1) { // Argument/array used only once(?)
+            if(dtypes[arrNum] === "generic") {
+              if(carg.lvalue) {
+                pre.push(["var ", localStr, "=", arrStr, ".get(", ptrStr, ")"].join("")) // Is this necessary if the argument is ONLY used as an lvalue? (keep in mind that we can have a += something, so we would actually need to check carg.rvalue)
+                code = code.replace(re, localStr)
+                post.push([arrStr, ".set(", ptrStr, ",", localStr,")"].join(""))
+              } else {
+                code = code.replace(re, [arrStr, ".get(", ptrStr, ")"].join(""))
+              }
+            } else {
+              code = code.replace(re, [arrStr, "[", ptrStr, "]"].join(""))
+            }
+          } else if(dtypes[arrNum] === "generic") {
+            pre.push(["var ", localStr, "=", arrStr, ".get(", ptrStr, ")"].join("")) // TODO: Could we optimize by checking for carg.rvalue?
+            code = code.replace(re, localStr)
+            if(carg.lvalue) {
+              post.push([arrStr, ".set(", ptrStr, ",", localStr,")"].join(""))
+            }
+          } else {
+            pre.push(["var ", localStr, "=", arrStr, "[", ptrStr, "]"].join("")) // TODO: Could we optimize by checking for carg.rvalue?
+            code = code.replace(re, localStr)
+            if(carg.lvalue) {
+              post.push([arrStr, "[", ptrStr, "]=", localStr].join(""))
+            }
+          }
+        } else { // Argument to body is a "block"
+          var reStrArr = [carg.name], ptrStrArr = [ptrStr]
+          for(var j=0; j<Math.abs(proc.arrayBlockIndices[arrNum]); j++) {
+            reStrArr.push("\\s*\\[([^\\]]+)\\]")
+            ptrStrArr.push("$" + (j+1) + "*t" + arrNum + "b" + j) // Matched index times stride
+          }
+          re = new RegExp(reStrArr.join(""), "g")
+          ptrStr = ptrStrArr.join("+")
+          if(dtypes[arrNum] === "generic") {
+            /*if(carg.lvalue) {
+              pre.push(["var ", localStr, "=", arrStr, ".get(", ptrStr, ")"].join("")) // Is this necessary if the argument is ONLY used as an lvalue? (keep in mind that we can have a += something, so we would actually need to check carg.rvalue)
+              code = code.replace(re, localStr)
+              post.push([arrStr, ".set(", ptrStr, ",", localStr,")"].join(""))
+            } else {
+              code = code.replace(re, [arrStr, ".get(", ptrStr, ")"].join(""))
+            }*/
+            throw new Error("cwise: Generic arrays not supported in combination with blocks!")
+          } else {
+            // This does not produce any local variables, even if variables are used multiple times. It would be possible to do so, but it would complicate things quite a bit.
+            code = code.replace(re, [arrStr, "[", ptrStr, "]"].join(""))
+          }
+        }
+      break
+      case "scalar":
+        code = code.replace(re, "Y" + proc.scalarArgs.indexOf(i))
+      break
+      case "index":
+        code = code.replace(re, "index")
+      break
+      case "shape":
+        code = code.replace(re, "shape")
+      break
+    }
+  }
+  return [pre.join("\n"), code, post.join("\n")].join("\n").trim()
+}
+
+function typeSummary(dtypes) {
+  var summary = new Array(dtypes.length)
+  var allEqual = true
+  for(var i=0; i<dtypes.length; ++i) {
+    var t = dtypes[i]
+    var digits = t.match(/\d+/)
+    if(!digits) {
+      digits = ""
+    } else {
+      digits = digits[0]
+    }
+    if(t.charAt(0) === 0) {
+      summary[i] = "u" + t.charAt(1) + digits
+    } else {
+      summary[i] = t.charAt(0) + digits
+    }
+    if(i > 0) {
+      allEqual = allEqual && summary[i] === summary[i-1]
+    }
+  }
+  if(allEqual) {
+    return summary[0]
+  }
+  return summary.join("")
+}
+
+//Generates a cwise operator
+function generateCWiseOp(proc, typesig) {
+
+  //Compute dimension
+  // Arrays get put first in typesig, and there are two entries per array (dtype and order), so this gets the number of dimensions in the first array arg.
+  var dimension = (typesig[1].length - Math.abs(proc.arrayBlockIndices[0]))|0
+  var orders = new Array(proc.arrayArgs.length)
+  var dtypes = new Array(proc.arrayArgs.length)
+  for(var i=0; i<proc.arrayArgs.length; ++i) {
+    dtypes[i] = typesig[2*i]
+    orders[i] = typesig[2*i+1]
+  }
+  
+  //Determine where block and loop indices start and end
+  var blockBegin = [], blockEnd = [] // These indices are exposed as blocks
+  var loopBegin = [], loopEnd = [] // These indices are iterated over
+  var loopOrders = [] // orders restricted to the loop indices
+  for(var i=0; i<proc.arrayArgs.length; ++i) {
+    if (proc.arrayBlockIndices[i]<0) {
+      loopBegin.push(0)
+      loopEnd.push(dimension)
+      blockBegin.push(dimension)
+      blockEnd.push(dimension+proc.arrayBlockIndices[i])
+    } else {
+      loopBegin.push(proc.arrayBlockIndices[i]) // Non-negative
+      loopEnd.push(proc.arrayBlockIndices[i]+dimension)
+      blockBegin.push(0)
+      blockEnd.push(proc.arrayBlockIndices[i])
+    }
+    var newOrder = []
+    for(var j=0; j<orders[i].length; j++) {
+      if (loopBegin[i]<=orders[i][j] && orders[i][j]<loopEnd[i]) {
+        newOrder.push(orders[i][j]-loopBegin[i]) // If this is a loop index, put it in newOrder, subtracting loopBegin, to make sure that all loopOrders are using a common set of indices.
+      }
+    }
+    loopOrders.push(newOrder)
+  }
+
+  //First create arguments for procedure
+  var arglist = ["SS"] // SS is the overall shape over which we iterate
+  var code = ["'use strict'"]
+  var vars = []
+  
+  for(var j=0; j<dimension; ++j) {
+    vars.push(["s", j, "=SS[", j, "]"].join("")) // The limits for each dimension.
+  }
+  for(var i=0; i<proc.arrayArgs.length; ++i) {
+    arglist.push("a"+i) // Actual data array
+    arglist.push("t"+i) // Strides
+    arglist.push("p"+i) // Offset in the array at which the data starts (also used for iterating over the data)
+    
+    for(var j=0; j<dimension; ++j) { // Unpack the strides into vars for looping
+      vars.push(["t",i,"p",j,"=t",i,"[",loopBegin[i]+j,"]"].join(""))
+    }
+    
+    for(var j=0; j<Math.abs(proc.arrayBlockIndices[i]); ++j) { // Unpack the strides into vars for block iteration
+      vars.push(["t",i,"b",j,"=t",i,"[",blockBegin[i]+j,"]"].join(""))
+    }
+  }
+  for(var i=0; i<proc.scalarArgs.length; ++i) {
+    arglist.push("Y" + i)
+  }
+  if(proc.shapeArgs.length > 0) {
+    vars.push("shape=SS.slice(0)") // Makes the shape over which we iterate available to the user defined functions (so you can use width/height for example)
+  }
+  if(proc.indexArgs.length > 0) {
+    // Prepare an array to keep track of the (logical) indices, initialized to dimension zeroes.
+    var zeros = new Array(dimension)
+    for(var i=0; i<dimension; ++i) {
+      zeros[i] = "0"
+    }
+    vars.push(["index=[", zeros.join(","), "]"].join(""))
+  }
+  for(var i=0; i<proc.offsetArgs.length; ++i) { // Offset arguments used for stencil operations
+    var off_arg = proc.offsetArgs[i]
+    var init_string = []
+    for(var j=0; j<off_arg.offset.length; ++j) {
+      if(off_arg.offset[j] === 0) {
+        continue
+      } else if(off_arg.offset[j] === 1) {
+        init_string.push(["t", off_arg.array, "p", j].join(""))      
+      } else {
+        init_string.push([off_arg.offset[j], "*t", off_arg.array, "p", j].join(""))
+      }
+    }
+    if(init_string.length === 0) {
+      vars.push("q" + i + "=0")
+    } else {
+      vars.push(["q", i, "=", init_string.join("+")].join(""))
+    }
+  }
+
+  //Prepare this variables
+  var thisVars = uniq([].concat(proc.pre.thisVars)
+                      .concat(proc.body.thisVars)
+                      .concat(proc.post.thisVars))
+  vars = vars.concat(thisVars)
+  code.push("var " + vars.join(","))
+  for(var i=0; i<proc.arrayArgs.length; ++i) {
+    code.push("p"+i+"|=0")
+  }
+  
+  //Inline prelude
+  if(proc.pre.body.length > 3) {
+    code.push(processBlock(proc.pre, proc, dtypes))
+  }
+
+  //Process body
+  var body = processBlock(proc.body, proc, dtypes)
+  var matched = countMatches(loopOrders)
+  if(matched < dimension) {
+    code.push(outerFill(matched, loopOrders[0], proc, body)) // TODO: Rather than passing loopOrders[0], it might be interesting to look at passing an order that represents the majority of the arguments for example.
+  } else {
+    code.push(innerFill(loopOrders[0], proc, body))
+  }
+
+  //Inline epilog
+  if(proc.post.body.length > 3) {
+    code.push(processBlock(proc.post, proc, dtypes))
+  }
+  
+  if(proc.debug) {
+    console.log("-----Generated cwise routine for ", typesig, ":\n" + code.join("\n") + "\n----------")
+  }
+  
+  var loopName = [(proc.funcName||"unnamed"), "_cwise_loop_", orders[0].join("s"),"m",matched,typeSummary(dtypes)].join("")
+  var f = new Function(["function ",loopName,"(", arglist.join(","),"){", code.join("\n"),"} return ", loopName].join(""))
+  return f()
+}
+module.exports = generateCWiseOp
+
+},{"uniq":430}],77:[function(require,module,exports){
+"use strict"
+
+// The function below is called when constructing a cwise function object, and does the following:
+// A function object is constructed which accepts as argument a compilation function and returns another function.
+// It is this other function that is eventually returned by createThunk, and this function is the one that actually
+// checks whether a certain pattern of arguments has already been used before and compiles new loops as needed.
+// The compilation passed to the first function object is used for compiling new functions.
+// Once this function object is created, it is called with compile as argument, where the first argument of compile
+// is bound to "proc" (essentially containing a preprocessed version of the user arguments to cwise).
+// So createThunk roughly works like this:
+// function createThunk(proc) {
+//   var thunk = function(compileBound) {
+//     var CACHED = {}
+//     return function(arrays and scalars) {
+//       if (dtype and order of arrays in CACHED) {
+//         var func = CACHED[dtype and order of arrays]
+//       } else {
+//         var func = CACHED[dtype and order of arrays] = compileBound(dtype and order of arrays)
+//       }
+//       return func(arrays and scalars)
+//     }
+//   }
+//   return thunk(compile.bind1(proc))
+// }
+
+var compile = require("./compile.js")
+
+function createThunk(proc) {
+  var code = ["'use strict'", "var CACHED={}"]
+  var vars = []
+  var thunkName = proc.funcName + "_cwise_thunk"
+  
+  //Build thunk
+  code.push(["return function ", thunkName, "(", proc.shimArgs.join(","), "){"].join(""))
+  var typesig = []
+  var string_typesig = []
+  var proc_args = [["array",proc.arrayArgs[0],".shape.slice(", // Slice shape so that we only retain the shape over which we iterate (which gets passed to the cwise operator as SS).
+                    Math.max(0,proc.arrayBlockIndices[0]),proc.arrayBlockIndices[0]<0?(","+proc.arrayBlockIndices[0]+")"):")"].join("")]
+  var shapeLengthConditions = [], shapeConditions = []
+  // Process array arguments
+  for(var i=0; i<proc.arrayArgs.length; ++i) {
+    var j = proc.arrayArgs[i]
+    vars.push(["t", j, "=array", j, ".dtype,",
+               "r", j, "=array", j, ".order"].join(""))
+    typesig.push("t" + j)
+    typesig.push("r" + j)
+    string_typesig.push("t"+j)
+    string_typesig.push("r"+j+".join()")
+    proc_args.push("array" + j + ".data")
+    proc_args.push("array" + j + ".stride")
+    proc_args.push("array" + j + ".offset|0")
+    if (i>0) { // Gather conditions to check for shape equality (ignoring block indices)
+      shapeLengthConditions.push("array" + proc.arrayArgs[0] + ".shape.length===array" + j + ".shape.length+" + (Math.abs(proc.arrayBlockIndices[0])-Math.abs(proc.arrayBlockIndices[i])))
+      shapeConditions.push("array" + proc.arrayArgs[0] + ".shape[shapeIndex+" + Math.max(0,proc.arrayBlockIndices[0]) + "]===array" + j + ".shape[shapeIndex+" + Math.max(0,proc.arrayBlockIndices[i]) + "]")
+    }
+  }
+  // Check for shape equality
+  if (proc.arrayArgs.length > 1) {
+    code.push("if (!(" + shapeLengthConditions.join(" && ") + ")) throw new Error('cwise: Arrays do not all have the same dimensionality!')")
+    code.push("for(var shapeIndex=array" + proc.arrayArgs[0] + ".shape.length-" + Math.abs(proc.arrayBlockIndices[0]) + "; shapeIndex-->0;) {")
+    code.push("if (!(" + shapeConditions.join(" && ") + ")) throw new Error('cwise: Arrays do not all have the same shape!')")
+    code.push("}")
+  }
+  // Process scalar arguments
+  for(var i=0; i<proc.scalarArgs.length; ++i) {
+    proc_args.push("scalar" + proc.scalarArgs[i])
+  }
+  // Check for cached function (and if not present, generate it)
+  vars.push(["type=[", string_typesig.join(","), "].join()"].join(""))
+  vars.push("proc=CACHED[type]")
+  code.push("var " + vars.join(","))
+  
+  code.push(["if(!proc){",
+             "CACHED[type]=proc=compile([", typesig.join(","), "])}",
+             "return proc(", proc_args.join(","), ")}"].join(""))
+
+  if(proc.debug) {
+    console.log("-----Generated thunk:\n" + code.join("\n") + "\n----------")
+  }
+  
+  //Compile thunk
+  var thunk = new Function("compile", code.join("\n"))
+  return thunk(compile.bind(undefined, proc))
+}
+
+module.exports = createThunk
+
+},{"./compile.js":76}],78:[function(require,module,exports){
+(function (Buffer){
+
+/**
+ * Module exports.
+ */
+
+module.exports = dataUriToBuffer;
+
+/**
+ * Returns a `Buffer` instance from the given data URI `uri`.
+ *
+ * @param {String} uri Data URI to turn into a Buffer instance
+ * @return {Buffer} Buffer instance from Data URI
+ * @api public
+ */
+
+function dataUriToBuffer (uri) {
+  if (!/^data\:/i.test(uri)) {
+    throw new TypeError('`uri` does not appear to be a Data URI (must begin with "data:")');
+  }
+
+  // strip newlines
+  uri = uri.replace(/\r?\n/g, '');
+
+  // split the URI up into the "metadata" and the "data" portions
+  var firstComma = uri.indexOf(',');
+  if (-1 === firstComma || firstComma <= 4) throw new TypeError('malformed data: URI');
+
+  // remove the "data:" scheme and parse the metadata
+  var meta = uri.substring(5, firstComma).split(';');
+
+  var base64 = false;
+  var charset = 'US-ASCII';
+  for (var i = 0; i < meta.length; i++) {
+    if ('base64' == meta[i]) {
+      base64 = true;
+    } else if (0 == meta[i].indexOf('charset=')) {
+      charset = meta[i].substring(8);
+    }
+  }
+
+  // get the encoded data portion and decode URI-encoded chars
+  var data = unescape(uri.substring(firstComma + 1));
+
+  var encoding = base64 ? 'base64' : 'ascii';
+  var buffer = new Buffer(data, encoding);
+
+  // set `.type` property to MIME type
+  buffer.type = meta[0] || 'text/plain';
+
+  // set the `.charset` property
+  buffer.charset = charset;
+
+  return buffer;
+}
+
+}).call(this,require("buffer").Buffer)
+},{"buffer":64}],79:[function(require,module,exports){
 'use strict';
 
 exports.utils = require('./des/utils');
@@ -16170,7 +16783,7 @@ exports.DES = require('./des/des');
 exports.CBC = require('./des/cbc');
 exports.EDE = require('./des/ede');
 
-},{"./des/cbc":76,"./des/cipher":77,"./des/des":78,"./des/ede":79,"./des/utils":80}],76:[function(require,module,exports){
+},{"./des/cbc":80,"./des/cipher":81,"./des/des":82,"./des/ede":83,"./des/utils":84}],80:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -16237,7 +16850,7 @@ proto._update = function _update(inp, inOff, out, outOff) {
   }
 };
 
-},{"inherits":142,"minimalistic-assert":149}],77:[function(require,module,exports){
+},{"inherits":148,"minimalistic-assert":156}],81:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -16380,7 +16993,7 @@ Cipher.prototype._finalDecrypt = function _finalDecrypt() {
   return this._unpad(out);
 };
 
-},{"minimalistic-assert":149}],78:[function(require,module,exports){
+},{"minimalistic-assert":156}],82:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -16525,7 +17138,7 @@ DES.prototype._decrypt = function _decrypt(state, lStart, rStart, out, off) {
   utils.rip(l, r, out, off);
 };
 
-},{"../des":75,"inherits":142,"minimalistic-assert":149}],79:[function(require,module,exports){
+},{"../des":79,"inherits":148,"minimalistic-assert":156}],83:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -16582,7 +17195,7 @@ EDE.prototype._update = function _update(inp, inOff, out, outOff) {
 EDE.prototype._pad = DES.prototype._pad;
 EDE.prototype._unpad = DES.prototype._unpad;
 
-},{"../des":75,"inherits":142,"minimalistic-assert":149}],80:[function(require,module,exports){
+},{"../des":79,"inherits":148,"minimalistic-assert":156}],84:[function(require,module,exports){
 'use strict';
 
 exports.readUInt32BE = function readUInt32BE(bytes, off) {
@@ -16840,7 +17453,7 @@ exports.padSplit = function padSplit(num, size, group) {
   return out.join(' ');
 };
 
-},{}],81:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 (function (Buffer){
 var generatePrime = require('./lib/generatePrime')
 var primes = require('./lib/primes.json')
@@ -16886,7 +17499,7 @@ exports.DiffieHellmanGroup = exports.createDiffieHellmanGroup = exports.getDiffi
 exports.createDiffieHellman = exports.DiffieHellman = createDiffieHellman
 
 }).call(this,require("buffer").Buffer)
-},{"./lib/dh":82,"./lib/generatePrime":83,"./lib/primes.json":84,"buffer":64}],82:[function(require,module,exports){
+},{"./lib/dh":86,"./lib/generatePrime":87,"./lib/primes.json":88,"buffer":64}],86:[function(require,module,exports){
 (function (Buffer){
 var BN = require('bn.js');
 var MillerRabin = require('miller-rabin');
@@ -17054,7 +17667,7 @@ function formatReturnValue(bn, enc) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./generatePrime":83,"bn.js":24,"buffer":64,"miller-rabin":148,"randombytes":216}],83:[function(require,module,exports){
+},{"./generatePrime":87,"bn.js":24,"buffer":64,"miller-rabin":155,"randombytes":227}],87:[function(require,module,exports){
 var randomBytes = require('randombytes');
 module.exports = findPrime;
 findPrime.simpleSieve = simpleSieve;
@@ -17161,7 +17774,7 @@ function findPrime(bits, gen) {
 
 }
 
-},{"bn.js":24,"miller-rabin":148,"randombytes":216}],84:[function(require,module,exports){
+},{"bn.js":24,"miller-rabin":155,"randombytes":227}],88:[function(require,module,exports){
 module.exports={
     "modp1": {
         "gen": "02",
@@ -17196,10 +17809,10 @@ module.exports={
         "prime": "ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aaac42dad33170d04507a33a85521abdf1cba64ecfb850458dbef0a8aea71575d060c7db3970f85a6e1e4c7abf5ae8cdb0933d71e8c94e04a25619dcee3d2261ad2ee6bf12ffa06d98a0864d87602733ec86a64521f2b18177b200cbbe117577a615d6c770988c0bad946e208e24fa074e5ab3143db5bfce0fd108e4b82d120a92108011a723c12a787e6d788719a10bdba5b2699c327186af4e23c1a946834b6150bda2583e9ca2ad44ce8dbbbc2db04de8ef92e8efc141fbecaa6287c59474e6bc05d99b2964fa090c3a2233ba186515be7ed1f612970cee2d7afb81bdd762170481cd0069127d5b05aa993b4ea988d8fddc186ffb7dc90a6c08f4df435c93402849236c3fab4d27c7026c1d4dcb2602646dec9751e763dba37bdf8ff9406ad9e530ee5db382f413001aeb06a53ed9027d831179727b0865a8918da3edbebcf9b14ed44ce6cbaced4bb1bdb7f1447e6cc254b332051512bd7af426fb8f401378cd2bf5983ca01c64b92ecf032ea15d1721d03f482d7ce6e74fef6d55e702f46980c82b5a84031900b1c9e59e7c97fbec7e8f323a97a7e36cc88be0f1d45b7ff585ac54bd407b22b4154aacc8f6d7ebf48e1d814cc5ed20f8037e0a79715eef29be32806a1d58bb7c5da76f550aa3d8a1fbff0eb19ccb1a313d55cda56c9ec2ef29632387fe8d76e3c0468043e8f663f4860ee12bf2d5b0b7474d6e694f91e6dbe115974a3926f12fee5e438777cb6a932df8cd8bec4d073b931ba3bc832b68d9dd300741fa7bf8afc47ed2576f6936ba424663aab639c5ae4f5683423b4742bf1c978238f16cbe39d652de3fdb8befc848ad922222e04a4037c0713eb57a81a23f0c73473fc646cea306b4bcbc8862f8385ddfa9d4b7fa2c087e879683303ed5bdd3a062b3cf5b3a278a66d2a13f83f44f82ddf310ee074ab6a364597e899a0255dc164f31cc50846851df9ab48195ded7ea1b1d510bd7ee74d73faf36bc31ecfa268359046f4eb879f924009438b481c6cd7889a002ed5ee382bc9190da6fc026e479558e4475677e9aa9e3050e2765694dfc81f56e880b96e7160c980dd98edd3dfffffffffffffffff"
     }
 }
-},{}],85:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 module.exports = require('./lib/dom-scroll-into-view');
 
-},{"./lib/dom-scroll-into-view":86}],86:[function(require,module,exports){
+},{"./lib/dom-scroll-into-view":90}],90:[function(require,module,exports){
 var util = require('./util');
 
 function scrollIntoView(elem, container, config) {
@@ -17323,7 +17936,7 @@ function scrollIntoView(elem, container, config) {
 
 module.exports = scrollIntoView;
 
-},{"./util":87}],87:[function(require,module,exports){
+},{"./util":91}],91:[function(require,module,exports){
 var RE_NUM = /[\-+]?(?:\d*\.|)\d+(?:[eE][\-+]?\d+|)/.source;
 
 function getClientPosition(elem) {
@@ -17756,7 +18369,7 @@ var utils = module.exports = {
 
 mix(utils, domUtils);
 
-},{}],88:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -17772,7 +18385,7 @@ elliptic.curves = require('./elliptic/curves');
 elliptic.ec = require('./elliptic/ec');
 elliptic.eddsa = require('./elliptic/eddsa');
 
-},{"../package.json":104,"./elliptic/curve":91,"./elliptic/curves":94,"./elliptic/ec":95,"./elliptic/eddsa":98,"./elliptic/hmac-drbg":101,"./elliptic/utils":103,"brorand":25}],89:[function(require,module,exports){
+},{"../package.json":108,"./elliptic/curve":95,"./elliptic/curves":98,"./elliptic/ec":99,"./elliptic/eddsa":102,"./elliptic/hmac-drbg":105,"./elliptic/utils":107,"brorand":25}],93:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -18149,7 +18762,7 @@ BasePoint.prototype.dblp = function dblp(k) {
   return r;
 };
 
-},{"../../elliptic":88,"bn.js":24}],90:[function(require,module,exports){
+},{"../../elliptic":92,"bn.js":24}],94:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -18584,7 +19197,7 @@ Point.prototype.eqXToP = function eqXToP(x) {
 Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
-},{"../../elliptic":88,"../curve":91,"bn.js":24,"inherits":142}],91:[function(require,module,exports){
+},{"../../elliptic":92,"../curve":95,"bn.js":24,"inherits":148}],95:[function(require,module,exports){
 'use strict';
 
 var curve = exports;
@@ -18594,7 +19207,7 @@ curve.short = require('./short');
 curve.mont = require('./mont');
 curve.edwards = require('./edwards');
 
-},{"./base":89,"./edwards":90,"./mont":92,"./short":93}],92:[function(require,module,exports){
+},{"./base":93,"./edwards":94,"./mont":96,"./short":97}],96:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -18776,7 +19389,7 @@ Point.prototype.getX = function getX() {
   return this.x.fromRed();
 };
 
-},{"../../elliptic":88,"../curve":91,"bn.js":24,"inherits":142}],93:[function(require,module,exports){
+},{"../../elliptic":92,"../curve":95,"bn.js":24,"inherits":148}],97:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -19716,7 +20329,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
   return this.z.cmpn(0) === 0;
 };
 
-},{"../../elliptic":88,"../curve":91,"bn.js":24,"inherits":142}],94:[function(require,module,exports){
+},{"../../elliptic":92,"../curve":95,"bn.js":24,"inherits":148}],98:[function(require,module,exports){
 'use strict';
 
 var curves = exports;
@@ -19923,7 +20536,7 @@ defineCurve('secp256k1', {
   ]
 });
 
-},{"../elliptic":88,"./precomputed/secp256k1":102,"hash.js":133}],95:[function(require,module,exports){
+},{"../elliptic":92,"./precomputed/secp256k1":106,"hash.js":139}],99:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -20162,7 +20775,7 @@ EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
   throw new Error('Unable to find valid recovery factor');
 };
 
-},{"../../elliptic":88,"./key":96,"./signature":97,"bn.js":24}],96:[function(require,module,exports){
+},{"../../elliptic":92,"./key":100,"./signature":101,"bn.js":24}],100:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -20271,7 +20884,7 @@ KeyPair.prototype.inspect = function inspect() {
          ' pub: ' + (this.pub && this.pub.inspect()) + ' >';
 };
 
-},{"bn.js":24}],97:[function(require,module,exports){
+},{"bn.js":24}],101:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -20408,7 +21021,7 @@ Signature.prototype.toDER = function toDER(enc) {
   return utils.encode(res, enc);
 };
 
-},{"../../elliptic":88,"bn.js":24}],98:[function(require,module,exports){
+},{"../../elliptic":92,"bn.js":24}],102:[function(require,module,exports){
 'use strict';
 
 var hash = require('hash.js');
@@ -20528,7 +21141,7 @@ EDDSA.prototype.isPoint = function isPoint(val) {
   return val instanceof this.pointClass;
 };
 
-},{"../../elliptic":88,"./key":99,"./signature":100,"hash.js":133}],99:[function(require,module,exports){
+},{"../../elliptic":92,"./key":103,"./signature":104,"hash.js":139}],103:[function(require,module,exports){
 'use strict';
 
 var elliptic = require('../../elliptic');
@@ -20626,7 +21239,7 @@ KeyPair.prototype.getPublic = function getPublic(enc) {
 
 module.exports = KeyPair;
 
-},{"../../elliptic":88}],100:[function(require,module,exports){
+},{"../../elliptic":92}],104:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -20694,7 +21307,7 @@ Signature.prototype.toHex = function toHex() {
 
 module.exports = Signature;
 
-},{"../../elliptic":88,"bn.js":24}],101:[function(require,module,exports){
+},{"../../elliptic":92,"bn.js":24}],105:[function(require,module,exports){
 'use strict';
 
 var hash = require('hash.js');
@@ -20810,7 +21423,7 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
   return utils.encode(res, enc);
 };
 
-},{"../elliptic":88,"hash.js":133}],102:[function(require,module,exports){
+},{"../elliptic":92,"hash.js":139}],106:[function(require,module,exports){
 module.exports = {
   doubles: {
     step: 4,
@@ -21592,7 +22205,7 @@ module.exports = {
   }
 };
 
-},{}],103:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -21766,7 +22379,7 @@ function intFromLE(bytes) {
 utils.intFromLE = intFromLE;
 
 
-},{"bn.js":24}],104:[function(require,module,exports){
+},{"bn.js":24}],108:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -21886,7 +22499,7 @@ module.exports={
   "version": "6.3.2"
 }
 
-},{}],105:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -22190,7 +22803,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],106:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 (function (Buffer){
 var md5 = require('create-hash/md5')
 module.exports = EVP_BytesToKey
@@ -22262,7 +22875,7 @@ function EVP_BytesToKey (password, salt, keyLen, ivLen) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64,"create-hash/md5":72}],107:[function(require,module,exports){
+},{"buffer":64,"create-hash/md5":72}],111:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -22348,7 +22961,7 @@ var EventListener = {
 
 module.exports = EventListener;
 }).call(this,require('_process'))
-},{"./emptyFunction":114,"_process":205}],108:[function(require,module,exports){
+},{"./emptyFunction":118,"_process":216}],112:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -22384,7 +22997,7 @@ var ExecutionEnvironment = {
 };
 
 module.exports = ExecutionEnvironment;
-},{}],109:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 "use strict";
 
 /**
@@ -22416,7 +23029,7 @@ function camelize(string) {
 }
 
 module.exports = camelize;
-},{}],110:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -22456,7 +23069,7 @@ function camelizeStyleName(string) {
 }
 
 module.exports = camelizeStyleName;
-},{"./camelize":109}],111:[function(require,module,exports){
+},{"./camelize":113}],115:[function(require,module,exports){
 'use strict';
 
 /**
@@ -22496,7 +23109,7 @@ function containsNode(outerNode, innerNode) {
 }
 
 module.exports = containsNode;
-},{"./isTextNode":124}],112:[function(require,module,exports){
+},{"./isTextNode":128}],116:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -22625,7 +23238,7 @@ function createArrayFromMixed(obj) {
 
 module.exports = createArrayFromMixed;
 }).call(this,require('_process'))
-},{"./invariant":122,"_process":205}],113:[function(require,module,exports){
+},{"./invariant":126,"_process":216}],117:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -22711,7 +23324,7 @@ function createNodesFromMarkup(markup, handleScript) {
 
 module.exports = createNodesFromMarkup;
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":108,"./createArrayFromMixed":112,"./getMarkupWrap":118,"./invariant":122,"_process":205}],114:[function(require,module,exports){
+},{"./ExecutionEnvironment":112,"./createArrayFromMixed":116,"./getMarkupWrap":122,"./invariant":126,"_process":216}],118:[function(require,module,exports){
 "use strict";
 
 /**
@@ -22750,7 +23363,7 @@ emptyFunction.thatReturnsArgument = function (arg) {
 };
 
 module.exports = emptyFunction;
-},{}],115:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -22772,7 +23385,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = emptyObject;
 }).call(this,require('_process'))
-},{"_process":205}],116:[function(require,module,exports){
+},{"_process":216}],120:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -22799,7 +23412,7 @@ function focusNode(node) {
 }
 
 module.exports = focusNode;
-},{}],117:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 'use strict';
 
 /**
@@ -22834,7 +23447,7 @@ function getActiveElement() /*?DOMElement*/{
 }
 
 module.exports = getActiveElement;
-},{}],118:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -22931,7 +23544,7 @@ function getMarkupWrap(nodeName) {
 
 module.exports = getMarkupWrap;
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":108,"./invariant":122,"_process":205}],119:[function(require,module,exports){
+},{"./ExecutionEnvironment":112,"./invariant":126,"_process":216}],123:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -22970,7 +23583,7 @@ function getUnboundedScrollPosition(scrollable) {
 }
 
 module.exports = getUnboundedScrollPosition;
-},{}],120:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23003,7 +23616,7 @@ function hyphenate(string) {
 }
 
 module.exports = hyphenate;
-},{}],121:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23042,7 +23655,7 @@ function hyphenateStyleName(string) {
 }
 
 module.exports = hyphenateStyleName;
-},{"./hyphenate":120}],122:[function(require,module,exports){
+},{"./hyphenate":124}],126:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -23094,7 +23707,7 @@ function invariant(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 }).call(this,require('_process'))
-},{"_process":205}],123:[function(require,module,exports){
+},{"_process":216}],127:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23117,7 +23730,7 @@ function isNode(object) {
 }
 
 module.exports = isNode;
-},{}],124:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23142,7 +23755,7 @@ function isTextNode(object) {
 }
 
 module.exports = isTextNode;
-},{"./isNode":123}],125:[function(require,module,exports){
+},{"./isNode":127}],129:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -23192,7 +23805,7 @@ var keyMirror = function keyMirror(obj) {
 
 module.exports = keyMirror;
 }).call(this,require('_process'))
-},{"./invariant":122,"_process":205}],126:[function(require,module,exports){
+},{"./invariant":126,"_process":216}],130:[function(require,module,exports){
 "use strict";
 
 /**
@@ -23227,7 +23840,7 @@ var keyOf = function keyOf(oneKeyObj) {
 };
 
 module.exports = keyOf;
-},{}],127:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23257,7 +23870,7 @@ function memoizeStringOnly(callback) {
 }
 
 module.exports = memoizeStringOnly;
-},{}],128:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23280,7 +23893,7 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 module.exports = performance || {};
-},{"./ExecutionEnvironment":108}],129:[function(require,module,exports){
+},{"./ExecutionEnvironment":112}],133:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23314,7 +23927,7 @@ if (performance.now) {
 }
 
 module.exports = performanceNow;
-},{"./performance":128}],130:[function(require,module,exports){
+},{"./performance":132}],134:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23382,7 +23995,7 @@ function shallowEqual(objA, objB) {
 }
 
 module.exports = shallowEqual;
-},{}],131:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -23451,7 +24064,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = warning;
 }).call(this,require('_process'))
-},{"./emptyFunction":114,"_process":205}],132:[function(require,module,exports){
+},{"./emptyFunction":118,"_process":216}],136:[function(require,module,exports){
 (function (process){
 /**
  * @class
@@ -24020,7 +24633,220 @@ Pool.prototype.getMinPoolSize = function getMinPoolSize () {
 exports.Pool = Pool
 
 }).call(this,require('_process'))
-},{"_process":205}],133:[function(require,module,exports){
+},{"_process":216}],137:[function(require,module,exports){
+(function (Buffer,process){
+'use strict'
+
+var path          = require('path')
+var ndarray       = require('ndarray')
+var GifReader     = require('omggif').GifReader
+var pack          = require('ndarray-pack')
+var through       = require('through')
+var parseDataURI  = require('data-uri-to-buffer')
+
+function defaultImage(url, cb) {
+  var img = new Image()
+  img.crossOrigin = "Anonymous"
+  img.onload = function() {
+    var canvas = document.createElement('canvas')
+    canvas.width = img.width
+    canvas.height = img.height
+    var context = canvas.getContext('2d')
+    context.drawImage(img, 0, 0)
+    var pixels = context.getImageData(0, 0, img.width, img.height)
+    cb(null, ndarray(new Uint8Array(pixels.data), [img.width, img.height, 4], [4, 4*img.width, 1], 0))
+  }
+  img.onerror = function(err) {
+    cb(err)
+  }
+  img.src = url
+}
+
+//Animated gif loading
+function handleGif(data, cb) {
+  var reader
+  try {
+    reader = new GifReader(data)
+  } catch(err) {
+    cb(err)
+    return
+  }
+  if(reader.numFrames() > 0) {
+    var nshape = [reader.numFrames(), reader.height, reader.width, 4]
+    var ndata = new Uint8Array(nshape[0] * nshape[1] * nshape[2] * nshape[3])
+    var result = ndarray(ndata, nshape)
+    try {
+      for(var i=0; i<reader.numFrames(); ++i) {
+        reader.decodeAndBlitFrameRGBA(i, ndata.subarray(
+          result.index(i, 0, 0, 0),
+          result.index(i+1, 0, 0, 0)))
+      }
+    } catch(err) {
+      cb(err)
+      return
+    }
+    cb(null, result.transpose(0,2,1))
+  } else {
+    var nshape = [reader.height, reader.width, 4]
+    var ndata = new Uint8Array(nshape[0] * nshape[1] * nshape[2])
+    var result = ndarray(ndata, nshape)
+    try {
+      reader.decodeAndBlitFrameRGBA(0, ndata)
+    } catch(err) {
+      cb(err)
+      return
+    }
+    cb(null, result.transpose(1,0))
+  }
+}
+
+function httpGif(url, cb) {
+  var xhr          = new XMLHttpRequest()
+  xhr.open('GET', url, true)
+  xhr.responseType = 'arraybuffer'
+  if(xhr.overrideMimeType){
+    xhr.overrideMimeType('application/binary')
+  }
+  xhr.onerror = function(err) {
+    cb(err)
+  }
+  xhr.onload = function() {
+    if(xhr.readyState !== 4) {
+      return
+    }
+    var data = new Uint8Array(xhr.response)
+    handleGif(data, cb)
+    return
+  }
+  xhr.send()
+}
+
+function copyBuffer(buffer) {
+  if(buffer[0] === undefined) {
+    var n = buffer.length
+    var result = new Uint8Array(n)
+    for(var i=0; i<n; ++i) {
+      result[i] = buffer.get(i)
+    }
+    return result
+  } else {
+    return new Uint8Array(buffer)
+  }
+}
+
+function dataGif(url, cb) {
+  process.nextTick(function() {
+    try {
+      var buffer = parseDataURI(url)
+      if(buffer) {
+        handleGif(copyBuffer(buffer), cb)
+      } else {
+        cb(new Error('Error parsing data URI'))
+      }
+    } catch(err) {
+      cb(err)
+    }
+  })
+}
+
+module.exports = function getPixels(url, type, cb) {
+  if(!cb) {
+    cb = type
+    type = ''
+  }
+  var ext = path.extname(url)
+  switch(type || ext.toUpperCase()) {
+    case '.GIF':
+      httpGif(url, cb)
+    break
+    default:
+      if(Buffer.isBuffer(url)) {
+        url = 'data:' + type + ';base64,' + url.toString('base64')
+      }
+      if(url.indexOf('data:image/gif;') === 0) {
+        dataGif(url, cb)
+      } else {
+        defaultImage(url, cb)
+      }
+  }
+}
+}).call(this,{"isBuffer":require("../is-buffer/index.js")},require('_process'))
+},{"../is-buffer/index.js":150,"_process":216,"data-uri-to-buffer":78,"ndarray":159,"ndarray-pack":157,"omggif":161,"path":179,"through":428}],138:[function(require,module,exports){
+'use strict'
+
+function createContext (width, height, options) {
+  width = width | 0
+  height = height | 0
+  if (!(width > 0 && height > 0)) {
+    return null
+  }
+
+  var canvas = document.createElement('canvas')
+  if (!canvas) {
+    return null
+  }
+  var gl
+  canvas.width = width
+  canvas.height = height
+
+  try {
+    gl = canvas.getContext('webgl', options)
+  } catch (e) {
+    try {
+      gl = canvas.getContext('experimental-webgl', options)
+    } catch (e) {
+      return null
+    }
+  }
+
+  var _getExtension = gl.getExtension
+  var extDestroy = {
+    destroy: function () {
+      var loseContext = _getExtension.call(gl, 'WEBGL_lose_context')
+      if (loseContext) {
+        loseContext.loseContext()
+      }
+    }
+  }
+
+  var extResize = {
+    resize: function (w, h) {
+      canvas.width = w
+      canvas.height = h
+    }
+  }
+
+  var _supportedExtensions = gl.getSupportedExtensions().slice()
+  _supportedExtensions.push(
+    'STACKGL_destroy_context',
+    'STACKGL_resize_drawingbuffer')
+  gl.getSupportedExtensions = function () {
+    return _supportedExtensions.slice()
+  }
+
+  gl.getExtension = function (extName) {
+    var name = extName.toLowerCase()
+    if (name === 'stackgl_resize_drawingbuffer') {
+      return extResize
+    }
+    if (name === 'stackgl_destroy_context') {
+      return extDestroy
+    }
+    return _getExtension.call(gl, extName)
+  }
+
+  Object.defineProperty(gl, 'canvas', {
+    get: function () {
+      return null
+    }
+  })
+
+  return gl || null
+}
+
+module.exports = createContext
+
+},{}],139:[function(require,module,exports){
 var hash = exports;
 
 hash.utils = require('./hash/utils');
@@ -24037,7 +24863,7 @@ hash.sha384 = hash.sha.sha384;
 hash.sha512 = hash.sha.sha512;
 hash.ripemd160 = hash.ripemd.ripemd160;
 
-},{"./hash/common":134,"./hash/hmac":135,"./hash/ripemd":136,"./hash/sha":137,"./hash/utils":138}],134:[function(require,module,exports){
+},{"./hash/common":140,"./hash/hmac":141,"./hash/ripemd":142,"./hash/sha":143,"./hash/utils":144}],140:[function(require,module,exports){
 var hash = require('../hash');
 var utils = hash.utils;
 var assert = utils.assert;
@@ -24130,7 +24956,7 @@ BlockHash.prototype._pad = function pad() {
   return res;
 };
 
-},{"../hash":133}],135:[function(require,module,exports){
+},{"../hash":139}],141:[function(require,module,exports){
 var hmac = exports;
 
 var hash = require('../hash');
@@ -24180,7 +25006,7 @@ Hmac.prototype.digest = function digest(enc) {
   return this.outer.digest(enc);
 };
 
-},{"../hash":133}],136:[function(require,module,exports){
+},{"../hash":139}],142:[function(require,module,exports){
 var hash = require('../hash');
 var utils = hash.utils;
 
@@ -24326,7 +25152,7 @@ var sh = [
   8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11
 ];
 
-},{"../hash":133}],137:[function(require,module,exports){
+},{"../hash":139}],143:[function(require,module,exports){
 var hash = require('../hash');
 var utils = hash.utils;
 var assert = utils.assert;
@@ -24892,7 +25718,7 @@ function g1_512_lo(xh, xl) {
   return r;
 }
 
-},{"../hash":133}],138:[function(require,module,exports){
+},{"../hash":139}],144:[function(require,module,exports){
 var utils = exports;
 var inherits = require('inherits');
 
@@ -25151,7 +25977,7 @@ function shr64_lo(ah, al, num) {
 };
 exports.shr64_lo = shr64_lo;
 
-},{"inherits":142}],139:[function(require,module,exports){
+},{"inherits":148}],145:[function(require,module,exports){
 var http = require('http');
 
 var https = module.exports;
@@ -25167,7 +25993,7 @@ https.request = function (params, cb) {
     return http.request.call(this, params, cb);
 }
 
-},{"http":391}],140:[function(require,module,exports){
+},{"http":402}],146:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -25253,7 +26079,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],141:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 
 var indexOf = [].indexOf;
 
@@ -25264,7 +26090,7 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],142:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -25289,7 +26115,19 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],143:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
+"use strict"
+
+function iota(n) {
+  var result = new Array(n)
+  for(var i=0; i<n; ++i) {
+    result[i] = i
+  }
+  return result
+}
+
+module.exports = iota
+},{}],150:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -25312,7 +26150,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],144:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 /**
  * The code was extracted from:
  * https://github.com/davidchambers/Base64.js
@@ -25352,7 +26190,7 @@ function polyfill (input) {
 
 module.exports = typeof window !== 'undefined' && window.atob && window.atob.bind(window) || polyfill;
 
-},{}],145:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 var atob = require('./atob');
 
 function b64DecodeUnicode(str) {
@@ -25387,7 +26225,7 @@ module.exports = function(str) {
   }
 };
 
-},{"./atob":144}],146:[function(require,module,exports){
+},{"./atob":151}],153:[function(require,module,exports){
 'use strict';
 
 var base64_url_decode = require('./base64_url_decode');
@@ -25415,7 +26253,7 @@ module.exports = function (token,options) {
 
 module.exports.InvalidTokenError = InvalidTokenError;
 
-},{"./base64_url_decode":145}],147:[function(require,module,exports){
+},{"./base64_url_decode":152}],154:[function(require,module,exports){
 (function (process,Buffer,__dirname){
 var PQ = module.exports = require('bindings')('addon.node').PQ;
 
@@ -25778,7 +26616,7 @@ PQ.prototype.cancel = function() {
 };
 
 }).call(this,require('_process'),require("buffer").Buffer,"/node_modules/libpq")
-},{"_process":205,"assert":19,"bindings":23,"buffer":64,"events":105,"path":168}],148:[function(require,module,exports){
+},{"_process":216,"assert":19,"bindings":23,"buffer":64,"events":109,"path":179}],155:[function(require,module,exports){
 var bn = require('bn.js');
 var brorand = require('brorand');
 
@@ -25893,7 +26731,7 @@ MillerRabin.prototype.getDivisor = function getDivisor(n, k) {
   return false;
 };
 
-},{"bn.js":24,"brorand":25}],149:[function(require,module,exports){
+},{"bn.js":24,"brorand":25}],156:[function(require,module,exports){
 module.exports = assert;
 
 function assert(val, msg) {
@@ -25906,7 +26744,378 @@ assert.equal = function assertEqual(l, r, msg) {
     throw new Error(msg || ('Assertion failed: ' + l + ' != ' + r));
 };
 
-},{}],150:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
+"use strict"
+
+var ndarray = require("ndarray")
+var do_convert = require("./doConvert.js")
+
+module.exports = function convert(arr, result) {
+  var shape = [], c = arr, sz = 1
+  while(Array.isArray(c)) {
+    shape.push(c.length)
+    sz *= c.length
+    c = c[0]
+  }
+  if(shape.length === 0) {
+    return ndarray()
+  }
+  if(!result) {
+    result = ndarray(new Float64Array(sz), shape)
+  }
+  do_convert(result, arr)
+  return result
+}
+
+},{"./doConvert.js":158,"ndarray":159}],158:[function(require,module,exports){
+module.exports=require('cwise-compiler')({"args":["array","scalar","index"],"pre":{"body":"{}","args":[],"thisVars":[],"localVars":[]},"body":{"body":"{\nvar _inline_1_v=_inline_1_arg1_,_inline_1_i\nfor(_inline_1_i=0;_inline_1_i<_inline_1_arg2_.length-1;++_inline_1_i) {\n_inline_1_v=_inline_1_v[_inline_1_arg2_[_inline_1_i]]\n}\n_inline_1_arg0_=_inline_1_v[_inline_1_arg2_[_inline_1_arg2_.length-1]]\n}","args":[{"name":"_inline_1_arg0_","lvalue":true,"rvalue":false,"count":1},{"name":"_inline_1_arg1_","lvalue":false,"rvalue":true,"count":1},{"name":"_inline_1_arg2_","lvalue":false,"rvalue":true,"count":4}],"thisVars":[],"localVars":["_inline_1_i","_inline_1_v"]},"post":{"body":"{}","args":[],"thisVars":[],"localVars":[]},"funcName":"convert","blockSize":64})
+
+},{"cwise-compiler":75}],159:[function(require,module,exports){
+var iota = require("iota-array")
+var isBuffer = require("is-buffer")
+
+var hasTypedArrays  = ((typeof Float64Array) !== "undefined")
+
+function compare1st(a, b) {
+  return a[0] - b[0]
+}
+
+function order() {
+  var stride = this.stride
+  var terms = new Array(stride.length)
+  var i
+  for(i=0; i<terms.length; ++i) {
+    terms[i] = [Math.abs(stride[i]), i]
+  }
+  terms.sort(compare1st)
+  var result = new Array(terms.length)
+  for(i=0; i<result.length; ++i) {
+    result[i] = terms[i][1]
+  }
+  return result
+}
+
+function compileConstructor(dtype, dimension) {
+  var className = ["View", dimension, "d", dtype].join("")
+  if(dimension < 0) {
+    className = "View_Nil" + dtype
+  }
+  var useGetters = (dtype === "generic")
+
+  if(dimension === -1) {
+    //Special case for trivial arrays
+    var code =
+      "function "+className+"(a){this.data=a;};\
+var proto="+className+".prototype;\
+proto.dtype='"+dtype+"';\
+proto.index=function(){return -1};\
+proto.size=0;\
+proto.dimension=-1;\
+proto.shape=proto.stride=proto.order=[];\
+proto.lo=proto.hi=proto.transpose=proto.step=\
+function(){return new "+className+"(this.data);};\
+proto.get=proto.set=function(){};\
+proto.pick=function(){return null};\
+return function construct_"+className+"(a){return new "+className+"(a);}"
+    var procedure = new Function(code)
+    return procedure()
+  } else if(dimension === 0) {
+    //Special case for 0d arrays
+    var code =
+      "function "+className+"(a,d) {\
+this.data = a;\
+this.offset = d\
+};\
+var proto="+className+".prototype;\
+proto.dtype='"+dtype+"';\
+proto.index=function(){return this.offset};\
+proto.dimension=0;\
+proto.size=1;\
+proto.shape=\
+proto.stride=\
+proto.order=[];\
+proto.lo=\
+proto.hi=\
+proto.transpose=\
+proto.step=function "+className+"_copy() {\
+return new "+className+"(this.data,this.offset)\
+};\
+proto.pick=function "+className+"_pick(){\
+return TrivialArray(this.data);\
+};\
+proto.valueOf=proto.get=function "+className+"_get(){\
+return "+(useGetters ? "this.data.get(this.offset)" : "this.data[this.offset]")+
+"};\
+proto.set=function "+className+"_set(v){\
+return "+(useGetters ? "this.data.set(this.offset,v)" : "this.data[this.offset]=v")+"\
+};\
+return function construct_"+className+"(a,b,c,d){return new "+className+"(a,d)}"
+    var procedure = new Function("TrivialArray", code)
+    return procedure(CACHED_CONSTRUCTORS[dtype][0])
+  }
+
+  var code = ["'use strict'"]
+
+  //Create constructor for view
+  var indices = iota(dimension)
+  var args = indices.map(function(i) { return "i"+i })
+  var index_str = "this.offset+" + indices.map(function(i) {
+        return "this.stride[" + i + "]*i" + i
+      }).join("+")
+  var shapeArg = indices.map(function(i) {
+      return "b"+i
+    }).join(",")
+  var strideArg = indices.map(function(i) {
+      return "c"+i
+    }).join(",")
+  code.push(
+    "function "+className+"(a," + shapeArg + "," + strideArg + ",d){this.data=a",
+      "this.shape=[" + shapeArg + "]",
+      "this.stride=[" + strideArg + "]",
+      "this.offset=d|0}",
+    "var proto="+className+".prototype",
+    "proto.dtype='"+dtype+"'",
+    "proto.dimension="+dimension)
+
+  //view.size:
+  code.push("Object.defineProperty(proto,'size',{get:function "+className+"_size(){\
+return "+indices.map(function(i) { return "this.shape["+i+"]" }).join("*"),
+"}})")
+
+  //view.order:
+  if(dimension === 1) {
+    code.push("proto.order=[0]")
+  } else {
+    code.push("Object.defineProperty(proto,'order',{get:")
+    if(dimension < 4) {
+      code.push("function "+className+"_order(){")
+      if(dimension === 2) {
+        code.push("return (Math.abs(this.stride[0])>Math.abs(this.stride[1]))?[1,0]:[0,1]}})")
+      } else if(dimension === 3) {
+        code.push(
+"var s0=Math.abs(this.stride[0]),s1=Math.abs(this.stride[1]),s2=Math.abs(this.stride[2]);\
+if(s0>s1){\
+if(s1>s2){\
+return [2,1,0];\
+}else if(s0>s2){\
+return [1,2,0];\
+}else{\
+return [1,0,2];\
+}\
+}else if(s0>s2){\
+return [2,0,1];\
+}else if(s2>s1){\
+return [0,1,2];\
+}else{\
+return [0,2,1];\
+}}})")
+      }
+    } else {
+      code.push("ORDER})")
+    }
+  }
+
+  //view.set(i0, ..., v):
+  code.push(
+"proto.set=function "+className+"_set("+args.join(",")+",v){")
+  if(useGetters) {
+    code.push("return this.data.set("+index_str+",v)}")
+  } else {
+    code.push("return this.data["+index_str+"]=v}")
+  }
+
+  //view.get(i0, ...):
+  code.push("proto.get=function "+className+"_get("+args.join(",")+"){")
+  if(useGetters) {
+    code.push("return this.data.get("+index_str+")}")
+  } else {
+    code.push("return this.data["+index_str+"]}")
+  }
+
+  //view.index:
+  code.push(
+    "proto.index=function "+className+"_index(", args.join(), "){return "+index_str+"}")
+
+  //view.hi():
+  code.push("proto.hi=function "+className+"_hi("+args.join(",")+"){return new "+className+"(this.data,"+
+    indices.map(function(i) {
+      return ["(typeof i",i,"!=='number'||i",i,"<0)?this.shape[", i, "]:i", i,"|0"].join("")
+    }).join(",")+","+
+    indices.map(function(i) {
+      return "this.stride["+i + "]"
+    }).join(",")+",this.offset)}")
+
+  //view.lo():
+  var a_vars = indices.map(function(i) { return "a"+i+"=this.shape["+i+"]" })
+  var c_vars = indices.map(function(i) { return "c"+i+"=this.stride["+i+"]" })
+  code.push("proto.lo=function "+className+"_lo("+args.join(",")+"){var b=this.offset,d=0,"+a_vars.join(",")+","+c_vars.join(","))
+  for(var i=0; i<dimension; ++i) {
+    code.push(
+"if(typeof i"+i+"==='number'&&i"+i+">=0){\
+d=i"+i+"|0;\
+b+=c"+i+"*d;\
+a"+i+"-=d}")
+  }
+  code.push("return new "+className+"(this.data,"+
+    indices.map(function(i) {
+      return "a"+i
+    }).join(",")+","+
+    indices.map(function(i) {
+      return "c"+i
+    }).join(",")+",b)}")
+
+  //view.step():
+  code.push("proto.step=function "+className+"_step("+args.join(",")+"){var "+
+    indices.map(function(i) {
+      return "a"+i+"=this.shape["+i+"]"
+    }).join(",")+","+
+    indices.map(function(i) {
+      return "b"+i+"=this.stride["+i+"]"
+    }).join(",")+",c=this.offset,d=0,ceil=Math.ceil")
+  for(var i=0; i<dimension; ++i) {
+    code.push(
+"if(typeof i"+i+"==='number'){\
+d=i"+i+"|0;\
+if(d<0){\
+c+=b"+i+"*(a"+i+"-1);\
+a"+i+"=ceil(-a"+i+"/d)\
+}else{\
+a"+i+"=ceil(a"+i+"/d)\
+}\
+b"+i+"*=d\
+}")
+  }
+  code.push("return new "+className+"(this.data,"+
+    indices.map(function(i) {
+      return "a" + i
+    }).join(",")+","+
+    indices.map(function(i) {
+      return "b" + i
+    }).join(",")+",c)}")
+
+  //view.transpose():
+  var tShape = new Array(dimension)
+  var tStride = new Array(dimension)
+  for(var i=0; i<dimension; ++i) {
+    tShape[i] = "a[i"+i+"]"
+    tStride[i] = "b[i"+i+"]"
+  }
+  code.push("proto.transpose=function "+className+"_transpose("+args+"){"+
+    args.map(function(n,idx) { return n + "=(" + n + "===undefined?" + idx + ":" + n + "|0)"}).join(";"),
+    "var a=this.shape,b=this.stride;return new "+className+"(this.data,"+tShape.join(",")+","+tStride.join(",")+",this.offset)}")
+
+  //view.pick():
+  code.push("proto.pick=function "+className+"_pick("+args+"){var a=[],b=[],c=this.offset")
+  for(var i=0; i<dimension; ++i) {
+    code.push("if(typeof i"+i+"==='number'&&i"+i+">=0){c=(c+this.stride["+i+"]*i"+i+")|0}else{a.push(this.shape["+i+"]);b.push(this.stride["+i+"])}")
+  }
+  code.push("var ctor=CTOR_LIST[a.length+1];return ctor(this.data,a,b,c)}")
+
+  //Add return statement
+  code.push("return function construct_"+className+"(data,shape,stride,offset){return new "+className+"(data,"+
+    indices.map(function(i) {
+      return "shape["+i+"]"
+    }).join(",")+","+
+    indices.map(function(i) {
+      return "stride["+i+"]"
+    }).join(",")+",offset)}")
+
+  //Compile procedure
+  var procedure = new Function("CTOR_LIST", "ORDER", code.join("\n"))
+  return procedure(CACHED_CONSTRUCTORS[dtype], order)
+}
+
+function arrayDType(data) {
+  if(isBuffer(data)) {
+    return "buffer"
+  }
+  if(hasTypedArrays) {
+    switch(Object.prototype.toString.call(data)) {
+      case "[object Float64Array]":
+        return "float64"
+      case "[object Float32Array]":
+        return "float32"
+      case "[object Int8Array]":
+        return "int8"
+      case "[object Int16Array]":
+        return "int16"
+      case "[object Int32Array]":
+        return "int32"
+      case "[object Uint8Array]":
+        return "uint8"
+      case "[object Uint16Array]":
+        return "uint16"
+      case "[object Uint32Array]":
+        return "uint32"
+      case "[object Uint8ClampedArray]":
+        return "uint8_clamped"
+    }
+  }
+  if(Array.isArray(data)) {
+    return "array"
+  }
+  return "generic"
+}
+
+var CACHED_CONSTRUCTORS = {
+  "float32":[],
+  "float64":[],
+  "int8":[],
+  "int16":[],
+  "int32":[],
+  "uint8":[],
+  "uint16":[],
+  "uint32":[],
+  "array":[],
+  "uint8_clamped":[],
+  "buffer":[],
+  "generic":[]
+}
+
+;(function() {
+  for(var id in CACHED_CONSTRUCTORS) {
+    CACHED_CONSTRUCTORS[id].push(compileConstructor(id, -1))
+  }
+});
+
+function wrappedNDArrayCtor(data, shape, stride, offset) {
+  if(data === undefined) {
+    var ctor = CACHED_CONSTRUCTORS.array[0]
+    return ctor([])
+  } else if(typeof data === "number") {
+    data = [data]
+  }
+  if(shape === undefined) {
+    shape = [ data.length ]
+  }
+  var d = shape.length
+  if(stride === undefined) {
+    stride = new Array(d)
+    for(var i=d-1, sz=1; i>=0; --i) {
+      stride[i] = sz
+      sz *= shape[i]
+    }
+  }
+  if(offset === undefined) {
+    offset = 0
+    for(var i=0; i<d; ++i) {
+      if(stride[i] < 0) {
+        offset -= (shape[i]-1)*stride[i]
+      }
+    }
+  }
+  var dtype = arrayDType(data)
+  var ctor_list = CACHED_CONSTRUCTORS[dtype]
+  while(ctor_list.length <= d+1) {
+    ctor_list.push(compileConstructor(dtype, ctor_list.length-1))
+  }
+  var ctor = ctor_list[d+1]
+  return ctor(data, shape, stride, offset)
+}
+
+module.exports = wrappedNDArrayCtor
+
+},{"iota-array":149,"is-buffer":150}],160:[function(require,module,exports){
 'use strict';
 /* eslint-disable no-unused-vars */
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -25991,7 +27200,791 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],151:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
+// (c) Dean McNamee <dean@gmail.com>, 2013.
+//
+// https://github.com/deanm/omggif
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//
+// omggif is a JavaScript implementation of a GIF 89a encoder and decoder,
+// including animation and compression.  It does not rely on any specific
+// underlying system, so should run in the browser, Node, or Plask.
+
+function GifWriter(buf, width, height, gopts) {
+  var p = 0;
+
+  var gopts = gopts === undefined ? { } : gopts;
+  var loop_count = gopts.loop === undefined ? null : gopts.loop;
+  var global_palette = gopts.palette === undefined ? null : gopts.palette;
+
+  if (width <= 0 || height <= 0 || width > 65535 || height > 65535)
+    throw "Width/Height invalid."
+
+  function check_palette_and_num_colors(palette) {
+    var num_colors = palette.length;
+    if (num_colors < 2 || num_colors > 256 ||  num_colors & (num_colors-1))
+      throw "Invalid code/color length, must be power of 2 and 2 .. 256.";
+    return num_colors;
+  }
+
+  // - Header.
+  buf[p++] = 0x47; buf[p++] = 0x49; buf[p++] = 0x46;  // GIF
+  buf[p++] = 0x38; buf[p++] = 0x39; buf[p++] = 0x61;  // 89a
+
+  // Handling of Global Color Table (palette) and background index.
+  var gp_num_colors_pow2 = 0;
+  var background = 0;
+  if (global_palette !== null) {
+    var gp_num_colors = check_palette_and_num_colors(global_palette);
+    while (gp_num_colors >>= 1) ++gp_num_colors_pow2;
+    gp_num_colors = 1 << gp_num_colors_pow2;
+    --gp_num_colors_pow2;
+    if (gopts.background !== undefined) {
+      background = gopts.background;
+      if (background >= gp_num_colors) throw "Background index out of range.";
+      // The GIF spec states that a background index of 0 should be ignored, so
+      // this is probably a mistake and you really want to set it to another
+      // slot in the palette.  But actually in the end most browsers, etc end
+      // up ignoring this almost completely (including for dispose background).
+      if (background === 0)
+        throw "Background index explicitly passed as 0.";
+    }
+  }
+
+  // - Logical Screen Descriptor.
+  // NOTE(deanm): w/h apparently ignored by implementations, but set anyway.
+  buf[p++] = width & 0xff; buf[p++] = width >> 8 & 0xff;
+  buf[p++] = height & 0xff; buf[p++] = height >> 8 & 0xff;
+  // NOTE: Indicates 0-bpp original color resolution (unused?).
+  buf[p++] = (global_palette !== null ? 0x80 : 0) |  // Global Color Table Flag.
+             gp_num_colors_pow2;  // NOTE: No sort flag (unused?).
+  buf[p++] = background;  // Background Color Index.
+  buf[p++] = 0;  // Pixel aspect ratio (unused?).
+
+  // - Global Color Table
+  if (global_palette !== null) {
+    for (var i = 0, il = global_palette.length; i < il; ++i) {
+      var rgb = global_palette[i];
+      buf[p++] = rgb >> 16 & 0xff;
+      buf[p++] = rgb >> 8 & 0xff;
+      buf[p++] = rgb & 0xff;
+    }
+  }
+
+  if (loop_count !== null) {  // Netscape block for looping.
+    if (loop_count < 0 || loop_count > 65535)
+      throw "Loop count invalid."
+    // Extension code, label, and length.
+    buf[p++] = 0x21; buf[p++] = 0xff; buf[p++] = 0x0b;
+    // NETSCAPE2.0
+    buf[p++] = 0x4e; buf[p++] = 0x45; buf[p++] = 0x54; buf[p++] = 0x53;
+    buf[p++] = 0x43; buf[p++] = 0x41; buf[p++] = 0x50; buf[p++] = 0x45;
+    buf[p++] = 0x32; buf[p++] = 0x2e; buf[p++] = 0x30;
+    // Sub-block
+    buf[p++] = 0x03; buf[p++] = 0x01;
+    buf[p++] = loop_count & 0xff; buf[p++] = loop_count >> 8 & 0xff;
+    buf[p++] = 0x00;  // Terminator.
+  }
+
+
+  var ended = false;
+
+  this.addFrame = function(x, y, w, h, indexed_pixels, opts) {
+    if (ended === true) { --p; ended = false; }  // Un-end.
+
+    opts = opts === undefined ? { } : opts;
+
+    // TODO(deanm): Bounds check x, y.  Do they need to be within the virtual
+    // canvas width/height, I imagine?
+    if (x < 0 || y < 0 || x > 65535 || y > 65535)
+      throw "x/y invalid."
+
+    if (w <= 0 || h <= 0 || w > 65535 || h > 65535)
+      throw "Width/Height invalid."
+
+    if (indexed_pixels.length < w * h)
+      throw "Not enough pixels for the frame size.";
+
+    var using_local_palette = true;
+    var palette = opts.palette;
+    if (palette === undefined || palette === null) {
+      using_local_palette = false;
+      palette = global_palette;
+    }
+
+    if (palette === undefined || palette === null)
+      throw "Must supply either a local or global palette.";
+
+    var num_colors = check_palette_and_num_colors(palette);
+
+    // Compute the min_code_size (power of 2), destroying num_colors.
+    var min_code_size = 0;
+    while (num_colors >>= 1) ++min_code_size;
+    num_colors = 1 << min_code_size;  // Now we can easily get it back.
+
+    var delay = opts.delay === undefined ? 0 : opts.delay;
+
+    // From the spec:
+    //     0 -   No disposal specified. The decoder is
+    //           not required to take any action.
+    //     1 -   Do not dispose. The graphic is to be left
+    //           in place.
+    //     2 -   Restore to background color. The area used by the
+    //           graphic must be restored to the background color.
+    //     3 -   Restore to previous. The decoder is required to
+    //           restore the area overwritten by the graphic with
+    //           what was there prior to rendering the graphic.
+    //  4-7 -    To be defined.
+    // NOTE(deanm): Dispose background doesn't really work, apparently most
+    // browsers ignore the background palette index and clear to transparency.
+    var disposal = opts.disposal === undefined ? 0 : opts.disposal;
+    if (disposal < 0 || disposal > 3)  // 4-7 is reserved.
+      throw "Disposal out of range.";
+
+    var use_transparency = false;
+    var transparent_index = 0;
+    if (opts.transparent !== undefined && opts.transparent !== null) {
+      use_transparency = true;
+      transparent_index = opts.transparent;
+      if (transparent_index < 0 || transparent_index >= num_colors)
+        throw "Transparent color index.";
+    }
+
+    if (disposal !== 0 || use_transparency || delay !== 0) {
+      // - Graphics Control Extension
+      buf[p++] = 0x21; buf[p++] = 0xf9;  // Extension / Label.
+      buf[p++] = 4;  // Byte size.
+
+      buf[p++] = disposal << 2 | (use_transparency === true ? 1 : 0);
+      buf[p++] = delay & 0xff; buf[p++] = delay >> 8 & 0xff;
+      buf[p++] = transparent_index;  // Transparent color index.
+      buf[p++] = 0;  // Block Terminator.
+    }
+
+    // - Image Descriptor
+    buf[p++] = 0x2c;  // Image Seperator.
+    buf[p++] = x & 0xff; buf[p++] = x >> 8 & 0xff;  // Left.
+    buf[p++] = y & 0xff; buf[p++] = y >> 8 & 0xff;  // Top.
+    buf[p++] = w & 0xff; buf[p++] = w >> 8 & 0xff;
+    buf[p++] = h & 0xff; buf[p++] = h >> 8 & 0xff;
+    // NOTE: No sort flag (unused?).
+    // TODO(deanm): Support interlace.
+    buf[p++] = using_local_palette === true ? (0x80 | (min_code_size-1)) : 0;
+
+    // - Local Color Table
+    if (using_local_palette === true) {
+      for (var i = 0, il = palette.length; i < il; ++i) {
+        var rgb = palette[i];
+        buf[p++] = rgb >> 16 & 0xff;
+        buf[p++] = rgb >> 8 & 0xff;
+        buf[p++] = rgb & 0xff;
+      }
+    }
+
+    p = GifWriterOutputLZWCodeStream(
+            buf, p, min_code_size < 2 ? 2 : min_code_size, indexed_pixels);
+  };
+
+  this.end = function() {
+    if (ended === false) {
+      buf[p++] = 0x3b;  // Trailer.
+      ended = true;
+    }
+    return p;
+  };
+}
+
+// Main compression routine, palette indexes -> LZW code stream.
+// |index_stream| must have at least one entry.
+function GifWriterOutputLZWCodeStream(buf, p, min_code_size, index_stream) {
+  buf[p++] = min_code_size;
+  var cur_subblock = p++;  // Pointing at the length field.
+
+  var clear_code = 1 << min_code_size;
+  var code_mask = clear_code - 1;
+  var eoi_code = clear_code + 1;
+  var next_code = eoi_code + 1;
+
+  var cur_code_size = min_code_size + 1;  // Number of bits per code.
+  var cur_shift = 0;
+  // We have at most 12-bit codes, so we should have to hold a max of 19
+  // bits here (and then we would write out).
+  var cur = 0;
+
+  function emit_bytes_to_buffer(bit_block_size) {
+    while (cur_shift >= bit_block_size) {
+      buf[p++] = cur & 0xff;
+      cur >>= 8; cur_shift -= 8;
+      if (p === cur_subblock + 256) {  // Finished a subblock.
+        buf[cur_subblock] = 255;
+        cur_subblock = p++;
+      }
+    }
+  }
+
+  function emit_code(c) {
+    cur |= c << cur_shift;
+    cur_shift += cur_code_size;
+    emit_bytes_to_buffer(8);
+  }
+
+  // I am not an expert on the topic, and I don't want to write a thesis.
+  // However, it is good to outline here the basic algorithm and the few data
+  // structures and optimizations here that make this implementation fast.
+  // The basic idea behind LZW is to build a table of previously seen runs
+  // addressed by a short id (herein called output code).  All data is
+  // referenced by a code, which represents one or more values from the
+  // original input stream.  All input bytes can be referenced as the same
+  // value as an output code.  So if you didn't want any compression, you
+  // could more or less just output the original bytes as codes (there are
+  // some details to this, but it is the idea).  In order to achieve
+  // compression, values greater then the input range (codes can be up to
+  // 12-bit while input only 8-bit) represent a sequence of previously seen
+  // inputs.  The decompressor is able to build the same mapping while
+  // decoding, so there is always a shared common knowledge between the
+  // encoding and decoder, which is also important for "timing" aspects like
+  // how to handle variable bit width code encoding.
+  //
+  // One obvious but very important consequence of the table system is there
+  // is always a unique id (at most 12-bits) to map the runs.  'A' might be
+  // 4, then 'AA' might be 10, 'AAA' 11, 'AAAA' 12, etc.  This relationship
+  // can be used for an effecient lookup strategy for the code mapping.  We
+  // need to know if a run has been seen before, and be able to map that run
+  // to the output code.  Since we start with known unique ids (input bytes),
+  // and then from those build more unique ids (table entries), we can
+  // continue this chain (almost like a linked list) to always have small
+  // integer values that represent the current byte chains in the encoder.
+  // This means instead of tracking the input bytes (AAAABCD) to know our
+  // current state, we can track the table entry for AAAABC (it is guaranteed
+  // to exist by the nature of the algorithm) and the next character D.
+  // Therefor the tuple of (table_entry, byte) is guaranteed to also be
+  // unique.  This allows us to create a simple lookup key for mapping input
+  // sequences to codes (table indices) without having to store or search
+  // any of the code sequences.  So if 'AAAA' has a table entry of 12, the
+  // tuple of ('AAAA', K) for any input byte K will be unique, and can be our
+  // key.  This leads to a integer value at most 20-bits, which can always
+  // fit in an SMI value and be used as a fast sparse array / object key.
+
+  // Output code for the current contents of the index buffer.
+  var ib_code = index_stream[0] & code_mask;  // Load first input index.
+  var code_table = { };  // Key'd on our 20-bit "tuple".
+
+  emit_code(clear_code);  // Spec says first code should be a clear code.
+
+  // First index already loaded, process the rest of the stream.
+  for (var i = 1, il = index_stream.length; i < il; ++i) {
+    var k = index_stream[i] & code_mask;
+    var cur_key = ib_code << 8 | k;  // (prev, k) unique tuple.
+    var cur_code = code_table[cur_key];  // buffer + k.
+
+    // Check if we have to create a new code table entry.
+    if (cur_code === undefined) {  // We don't have buffer + k.
+      // Emit index buffer (without k).
+      // This is an inline version of emit_code, because this is the core
+      // writing routine of the compressor (and V8 cannot inline emit_code
+      // because it is a closure here in a different context).  Additionally
+      // we can call emit_byte_to_buffer less often, because we can have
+      // 30-bits (from our 31-bit signed SMI), and we know our codes will only
+      // be 12-bits, so can safely have 18-bits there without overflow.
+      // emit_code(ib_code);
+      cur |= ib_code << cur_shift;
+      cur_shift += cur_code_size;
+      while (cur_shift >= 8) {
+        buf[p++] = cur & 0xff;
+        cur >>= 8; cur_shift -= 8;
+        if (p === cur_subblock + 256) {  // Finished a subblock.
+          buf[cur_subblock] = 255;
+          cur_subblock = p++;
+        }
+      }
+
+      if (next_code === 4096) {  // Table full, need a clear.
+        emit_code(clear_code);
+        next_code = eoi_code + 1;
+        cur_code_size = min_code_size + 1;
+        code_table = { };
+      } else {  // Table not full, insert a new entry.
+        // Increase our variable bit code sizes if necessary.  This is a bit
+        // tricky as it is based on "timing" between the encoding and
+        // decoder.  From the encoders perspective this should happen after
+        // we've already emitted the index buffer and are about to create the
+        // first table entry that would overflow our current code bit size.
+        if (next_code >= (1 << cur_code_size)) ++cur_code_size;
+        code_table[cur_key] = next_code++;  // Insert into code table.
+      }
+
+      ib_code = k;  // Index buffer to single input k.
+    } else {
+      ib_code = cur_code;  // Index buffer to sequence in code table.
+    }
+  }
+
+  emit_code(ib_code);  // There will still be something in the index buffer.
+  emit_code(eoi_code);  // End Of Information.
+
+  // Flush / finalize the sub-blocks stream to the buffer.
+  emit_bytes_to_buffer(1);
+
+  // Finish the sub-blocks, writing out any unfinished lengths and
+  // terminating with a sub-block of length 0.  If we have already started
+  // but not yet used a sub-block it can just become the terminator.
+  if (cur_subblock + 1 === p) {  // Started but unused.
+    buf[cur_subblock] = 0;
+  } else {  // Started and used, write length and additional terminator block.
+    buf[cur_subblock] = p - cur_subblock - 1;
+    buf[p++] = 0;
+  }
+  return p;
+}
+
+function GifReader(buf) {
+  var p = 0;
+
+  // - Header (GIF87a or GIF89a).
+  if (buf[p++] !== 0x47 ||            buf[p++] !== 0x49 || buf[p++] !== 0x46 ||
+      buf[p++] !== 0x38 || (buf[p++]+1 & 0xfd) !== 0x38 || buf[p++] !== 0x61) {
+    throw "Invalid GIF 87a/89a header.";
+  }
+
+  // - Logical Screen Descriptor.
+  var width = buf[p++] | buf[p++] << 8;
+  var height = buf[p++] | buf[p++] << 8;
+  var pf0 = buf[p++];  // <Packed Fields>.
+  var global_palette_flag = pf0 >> 7;
+  var num_global_colors_pow2 = pf0 & 0x7;
+  var num_global_colors = 1 << (num_global_colors_pow2 + 1);
+  var background = buf[p++];
+  buf[p++];  // Pixel aspect ratio (unused?).
+
+  var global_palette_offset = null;
+
+  if (global_palette_flag) {
+    global_palette_offset = p;
+    p += num_global_colors * 3;  // Seek past palette.
+  }
+
+  var no_eof = true;
+
+  var frames = [ ];
+
+  var delay = 0;
+  var transparent_index = null;
+  var disposal = 0;  // 0 - No disposal specified.
+  var loop_count = null;
+
+  this.width = width;
+  this.height = height;
+
+  while (no_eof && p < buf.length) {
+    switch (buf[p++]) {
+      case 0x21:  // Graphics Control Extension Block
+        switch (buf[p++]) {
+          case 0xff:  // Application specific block
+            // Try if it's a Netscape block (with animation loop counter).
+            if (buf[p   ] !== 0x0b ||  // 21 FF already read, check block size.
+                // NETSCAPE2.0
+                buf[p+1 ] == 0x4e && buf[p+2 ] == 0x45 && buf[p+3 ] == 0x54 &&
+                buf[p+4 ] == 0x53 && buf[p+5 ] == 0x43 && buf[p+6 ] == 0x41 &&
+                buf[p+7 ] == 0x50 && buf[p+8 ] == 0x45 && buf[p+9 ] == 0x32 &&
+                buf[p+10] == 0x2e && buf[p+11] == 0x30 &&
+                // Sub-block
+                buf[p+12] == 0x03 && buf[p+13] == 0x01 && buf[p+16] == 0) {
+              p += 14;
+              loop_count = buf[p++] | buf[p++] << 8;
+              p++;  // Skip terminator.
+            } else {  // We don't know what it is, just try to get past it.
+              p += 12;
+              while (true) {  // Seek through subblocks.
+                var block_size = buf[p++];
+                if (block_size === 0) break;
+                p += block_size;
+              }
+            }
+            break;
+
+          case 0xf9:  // Graphics Control Extension
+            if (buf[p++] !== 0x4 || buf[p+4] !== 0)
+              throw "Invalid graphics extension block.";
+            var pf1 = buf[p++];
+            delay = buf[p++] | buf[p++] << 8;
+            transparent_index = buf[p++];
+            if ((pf1 & 1) === 0) transparent_index = null;
+            disposal = pf1 >> 2 & 0x7;
+            p++;  // Skip terminator.
+            break;
+
+          case 0xfe:  // Comment Extension.
+            while (true) {  // Seek through subblocks.
+              var block_size = buf[p++];
+              if (block_size === 0) break;
+              // console.log(buf.slice(p, p+block_size).toString('ascii'));
+              p += block_size;
+            }
+            break;
+
+          default:
+            throw "Unknown graphic control label: 0x" + buf[p-1].toString(16);
+        }
+        break;
+
+      case 0x2c:  // Image Descriptor.
+        var x = buf[p++] | buf[p++] << 8;
+        var y = buf[p++] | buf[p++] << 8;
+        var w = buf[p++] | buf[p++] << 8;
+        var h = buf[p++] | buf[p++] << 8;
+        var pf2 = buf[p++];
+        var local_palette_flag = pf2 >> 7;
+        var interlace_flag = pf2 >> 6 & 1;
+        var num_local_colors_pow2 = pf2 & 0x7;
+        var num_local_colors = 1 << (num_local_colors_pow2 + 1);
+        var palette_offset = global_palette_offset;
+        var has_local_palette = false;
+        if (local_palette_flag) {
+          var has_local_palette = true;
+          palette_offset = p;  // Override with local palette.
+          p += num_local_colors * 3;  // Seek past palette.
+        }
+
+        var data_offset = p;
+
+        p++;  // codesize
+        while (true) {
+          var block_size = buf[p++];
+          if (block_size === 0) break;
+          p += block_size;
+        }
+
+        frames.push({x: x, y: y, width: w, height: h,
+                     has_local_palette: has_local_palette,
+                     palette_offset: palette_offset,
+                     data_offset: data_offset,
+                     data_length: p - data_offset,
+                     transparent_index: transparent_index,
+                     interlaced: !!interlace_flag,
+                     delay: delay,
+                     disposal: disposal});
+        break;
+
+      case 0x3b:  // Trailer Marker (end of file).
+        no_eof = false;
+        break;
+
+      default:
+        throw "Unknown gif block: 0x" + buf[p-1].toString(16);
+        break;
+    }
+  }
+
+  this.numFrames = function() {
+    return frames.length;
+  };
+
+  this.loopCount = function() {
+    return loop_count;
+  };
+
+  this.frameInfo = function(frame_num) {
+    if (frame_num < 0 || frame_num >= frames.length)
+      throw "Frame index out of range.";
+    return frames[frame_num];
+  }
+
+  this.decodeAndBlitFrameBGRA = function(frame_num, pixels) {
+    var frame = this.frameInfo(frame_num);
+    var num_pixels = frame.width * frame.height;
+    var index_stream = new Uint8Array(num_pixels);  // At most 8-bit indices.
+    GifReaderLZWOutputIndexStream(
+        buf, frame.data_offset, index_stream, num_pixels);
+    var palette_offset = frame.palette_offset;
+
+    // NOTE(deanm): It seems to be much faster to compare index to 256 than
+    // to === null.  Not sure why, but CompareStub_EQ_STRICT shows up high in
+    // the profile, not sure if it's related to using a Uint8Array.
+    var trans = frame.transparent_index;
+    if (trans === null) trans = 256;
+
+    // We are possibly just blitting to a portion of the entire frame.
+    // That is a subrect within the framerect, so the additional pixels
+    // must be skipped over after we finished a scanline.
+    var framewidth  = frame.width;
+    var framestride = width - framewidth;
+    var xleft       = framewidth;  // Number of subrect pixels left in scanline.
+
+    // Output indicies of the top left and bottom right corners of the subrect.
+    var opbeg = ((frame.y * width) + frame.x) * 4;
+    var opend = ((frame.y + frame.height) * width + frame.x) * 4;
+    var op    = opbeg;
+
+    var scanstride = framestride * 4;
+
+    // Use scanstride to skip past the rows when interlacing.  This is skipping
+    // 7 rows for the first two passes, then 3 then 1.
+    if (frame.interlaced === true) {
+      scanstride += width * 4 * 7;  // Pass 1.
+    }
+
+    var interlaceskip = 8;  // Tracking the row interval in the current pass.
+
+    for (var i = 0, il = index_stream.length; i < il; ++i) {
+      var index = index_stream[i];
+
+      if (xleft === 0) {  // Beginning of new scan line
+        op += scanstride;
+        xleft = framewidth;
+        if (op >= opend) { // Catch the wrap to switch passes when interlacing.
+          scanstride = framestride * 4 + width * 4 * (interlaceskip-1);
+          // interlaceskip / 2 * 4 is interlaceskip << 1.
+          op = opbeg + (framewidth + framestride) * (interlaceskip << 1);
+          interlaceskip >>= 1;
+        }
+      }
+
+      if (index === trans) {
+        op += 4;
+      } else {
+        var r = buf[palette_offset + index * 3];
+        var g = buf[palette_offset + index * 3 + 1];
+        var b = buf[palette_offset + index * 3 + 2];
+        pixels[op++] = b;
+        pixels[op++] = g;
+        pixels[op++] = r;
+        pixels[op++] = 255;
+      }
+      --xleft;
+    }
+  };
+
+  // I will go to copy and paste hell one day...
+  this.decodeAndBlitFrameRGBA = function(frame_num, pixels) {
+    var frame = this.frameInfo(frame_num);
+    var num_pixels = frame.width * frame.height;
+    var index_stream = new Uint8Array(num_pixels);  // At most 8-bit indices.
+    GifReaderLZWOutputIndexStream(
+        buf, frame.data_offset, index_stream, num_pixels);
+    var palette_offset = frame.palette_offset;
+
+    // NOTE(deanm): It seems to be much faster to compare index to 256 than
+    // to === null.  Not sure why, but CompareStub_EQ_STRICT shows up high in
+    // the profile, not sure if it's related to using a Uint8Array.
+    var trans = frame.transparent_index;
+    if (trans === null) trans = 256;
+
+    // We are possibly just blitting to a portion of the entire frame.
+    // That is a subrect within the framerect, so the additional pixels
+    // must be skipped over after we finished a scanline.
+    var framewidth  = frame.width;
+    var framestride = width - framewidth;
+    var xleft       = framewidth;  // Number of subrect pixels left in scanline.
+
+    // Output indicies of the top left and bottom right corners of the subrect.
+    var opbeg = ((frame.y * width) + frame.x) * 4;
+    var opend = ((frame.y + frame.height) * width + frame.x) * 4;
+    var op    = opbeg;
+
+    var scanstride = framestride * 4;
+
+    // Use scanstride to skip past the rows when interlacing.  This is skipping
+    // 7 rows for the first two passes, then 3 then 1.
+    if (frame.interlaced === true) {
+      scanstride += width * 4 * 7;  // Pass 1.
+    }
+
+    var interlaceskip = 8;  // Tracking the row interval in the current pass.
+
+    for (var i = 0, il = index_stream.length; i < il; ++i) {
+      var index = index_stream[i];
+
+      if (xleft === 0) {  // Beginning of new scan line
+        op += scanstride;
+        xleft = framewidth;
+        if (op >= opend) { // Catch the wrap to switch passes when interlacing.
+          scanstride = framestride * 4 + width * 4 * (interlaceskip-1);
+          // interlaceskip / 2 * 4 is interlaceskip << 1.
+          op = opbeg + (framewidth + framestride) * (interlaceskip << 1);
+          interlaceskip >>= 1;
+        }
+      }
+
+      if (index === trans) {
+        op += 4;
+      } else {
+        var r = buf[palette_offset + index * 3];
+        var g = buf[palette_offset + index * 3 + 1];
+        var b = buf[palette_offset + index * 3 + 2];
+        pixels[op++] = r;
+        pixels[op++] = g;
+        pixels[op++] = b;
+        pixels[op++] = 255;
+      }
+      --xleft;
+    }
+  };
+}
+
+function GifReaderLZWOutputIndexStream(code_stream, p, output, output_length) {
+  var min_code_size = code_stream[p++];
+
+  var clear_code = 1 << min_code_size;
+  var eoi_code = clear_code + 1;
+  var next_code = eoi_code + 1;
+
+  var cur_code_size = min_code_size + 1;  // Number of bits per code.
+  // NOTE: This shares the same name as the encoder, but has a different
+  // meaning here.  Here this masks each code coming from the code stream.
+  var code_mask = (1 << cur_code_size) - 1;
+  var cur_shift = 0;
+  var cur = 0;
+
+  var op = 0;  // Output pointer.
+  
+  var subblock_size = code_stream[p++];
+
+  // TODO(deanm): Would using a TypedArray be any faster?  At least it would
+  // solve the fast mode / backing store uncertainty.
+  // var code_table = Array(4096);
+  var code_table = new Int32Array(4096);  // Can be signed, we only use 20 bits.
+
+  var prev_code = null;  // Track code-1.
+
+  while (true) {
+    // Read up to two bytes, making sure we always 12-bits for max sized code.
+    while (cur_shift < 16) {
+      if (subblock_size === 0) break;  // No more data to be read.
+
+      cur |= code_stream[p++] << cur_shift;
+      cur_shift += 8;
+
+      if (subblock_size === 1) {  // Never let it get to 0 to hold logic above.
+        subblock_size = code_stream[p++];  // Next subblock.
+      } else {
+        --subblock_size;
+      }
+    }
+
+    // TODO(deanm): We should never really get here, we should have received
+    // and EOI.
+    if (cur_shift < cur_code_size)
+      break;
+
+    var code = cur & code_mask;
+    cur >>= cur_code_size;
+    cur_shift -= cur_code_size;
+
+    // TODO(deanm): Maybe should check that the first code was a clear code,
+    // at least this is what you're supposed to do.  But actually our encoder
+    // now doesn't emit a clear code first anyway.
+    if (code === clear_code) {
+      // We don't actually have to clear the table.  This could be a good idea
+      // for greater error checking, but we don't really do any anyway.  We
+      // will just track it with next_code and overwrite old entries.
+
+      next_code = eoi_code + 1;
+      cur_code_size = min_code_size + 1;
+      code_mask = (1 << cur_code_size) - 1;
+
+      // Don't update prev_code ?
+      prev_code = null;
+      continue;
+    } else if (code === eoi_code) {
+      break;
+    }
+
+    // We have a similar situation as the decoder, where we want to store
+    // variable length entries (code table entries), but we want to do in a
+    // faster manner than an array of arrays.  The code below stores sort of a
+    // linked list within the code table, and then "chases" through it to
+    // construct the dictionary entries.  When a new entry is created, just the
+    // last byte is stored, and the rest (prefix) of the entry is only
+    // referenced by its table entry.  Then the code chases through the
+    // prefixes until it reaches a single byte code.  We have to chase twice,
+    // first to compute the length, and then to actually copy the data to the
+    // output (backwards, since we know the length).  The alternative would be
+    // storing something in an intermediate stack, but that doesn't make any
+    // more sense.  I implemented an approach where it also stored the length
+    // in the code table, although it's a bit tricky because you run out of
+    // bits (12 + 12 + 8), but I didn't measure much improvements (the table
+    // entries are generally not the long).  Even when I created benchmarks for
+    // very long table entries the complexity did not seem worth it.
+    // The code table stores the prefix entry in 12 bits and then the suffix
+    // byte in 8 bits, so each entry is 20 bits.
+
+    var chase_code = code < next_code ? code : prev_code;
+
+    // Chase what we will output, either {CODE} or {CODE-1}.
+    var chase_length = 0;
+    var chase = chase_code;
+    while (chase > clear_code) {
+      chase = code_table[chase] >> 8;
+      ++chase_length;
+    }
+
+    var k = chase;
+    
+    var op_end = op + chase_length + (chase_code !== code ? 1 : 0);
+    if (op_end > output_length) {
+      console.log("Warning, gif stream longer than expected.");
+      return;
+    }
+
+    // Already have the first byte from the chase, might as well write it fast.
+    output[op++] = k;
+
+    op += chase_length;
+    var b = op;  // Track pointer, writing backwards.
+
+    if (chase_code !== code)  // The case of emitting {CODE-1} + k.
+      output[op++] = k;
+
+    chase = chase_code;
+    while (chase_length--) {
+      chase = code_table[chase];
+      output[--b] = chase & 0xff;  // Write backwards.
+      chase >>= 8;  // Pull down to the prefix code.
+    }
+
+    if (prev_code !== null && next_code < 4096) {
+      code_table[next_code++] = prev_code << 8 | k;
+      // TODO(deanm): Figure out this clearing vs code growth logic better.  I
+      // have an feeling that it should just happen somewhere else, for now it
+      // is awkward between when we grow past the max and then hit a clear code.
+      // For now just check if we hit the max 12-bits (then a clear code should
+      // follow, also of course encoded in 12-bits).
+      if (next_code >= code_mask+1 && cur_code_size < 12) {
+        ++cur_code_size;
+        code_mask = code_mask << 1 | 1;
+      }
+    }
+
+    prev_code = code;
+  }
+
+  if (op !== output_length) {
+    console.log("Warning, gif stream shorter than expected.");
+  }
+
+  return output;
+}
+
+try { exports.GifWriter = GifWriter; exports.GifReader = GifReader } catch(e) { }  // CommonJS.
+
+},{}],162:[function(require,module,exports){
 exports.endianness = function () { return 'LE' };
 
 exports.hostname = function () {
@@ -26038,7 +28031,7 @@ exports.tmpdir = exports.tmpDir = function () {
 
 exports.EOL = '\n';
 
-},{}],152:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 (function (Buffer){
 var assert = require('assert')
 
@@ -26099,7 +28092,7 @@ Reader.prototype.read = function() {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"assert":19,"buffer":64}],153:[function(require,module,exports){
+},{"assert":19,"buffer":64}],164:[function(require,module,exports){
 'use strict';
 
 
@@ -26203,7 +28196,7 @@ exports.setTyped = function (on) {
 
 exports.setTyped(TYPED_OK);
 
-},{}],154:[function(require,module,exports){
+},{}],165:[function(require,module,exports){
 'use strict';
 
 // Note: adler32 takes 12% for level 0 and 2% for level 6.
@@ -26237,7 +28230,7 @@ function adler32(adler, buf, len, pos) {
 
 module.exports = adler32;
 
-},{}],155:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 'use strict';
 
 
@@ -26289,7 +28282,7 @@ module.exports = {
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
 
-},{}],156:[function(require,module,exports){
+},{}],167:[function(require,module,exports){
 'use strict';
 
 // Note: we can't get significant speed boost here.
@@ -26332,7 +28325,7 @@ function crc32(crc, buf, len, pos) {
 
 module.exports = crc32;
 
-},{}],157:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 'use strict';
 
 var utils   = require('../utils/common');
@@ -28189,7 +30182,7 @@ exports.deflatePrime = deflatePrime;
 exports.deflateTune = deflateTune;
 */
 
-},{"../utils/common":153,"./adler32":154,"./crc32":156,"./messages":161,"./trees":162}],158:[function(require,module,exports){
+},{"../utils/common":164,"./adler32":165,"./crc32":167,"./messages":172,"./trees":173}],169:[function(require,module,exports){
 'use strict';
 
 // See state defs from inflate.js
@@ -28517,7 +30510,7 @@ module.exports = function inflate_fast(strm, start) {
   return;
 };
 
-},{}],159:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 'use strict';
 
 
@@ -30057,7 +32050,7 @@ exports.inflateSyncPoint = inflateSyncPoint;
 exports.inflateUndermine = inflateUndermine;
 */
 
-},{"../utils/common":153,"./adler32":154,"./crc32":156,"./inffast":158,"./inftrees":160}],160:[function(require,module,exports){
+},{"../utils/common":164,"./adler32":165,"./crc32":167,"./inffast":169,"./inftrees":171}],171:[function(require,module,exports){
 'use strict';
 
 
@@ -30386,7 +32379,7 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   return 0;
 };
 
-},{"../utils/common":153}],161:[function(require,module,exports){
+},{"../utils/common":164}],172:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -30401,7 +32394,7 @@ module.exports = {
   '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
 };
 
-},{}],162:[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 'use strict';
 
 
@@ -31605,7 +33598,7 @@ exports._tr_flush_block  = _tr_flush_block;
 exports._tr_tally = _tr_tally;
 exports._tr_align = _tr_align;
 
-},{"../utils/common":153}],163:[function(require,module,exports){
+},{"../utils/common":164}],174:[function(require,module,exports){
 'use strict';
 
 
@@ -31636,7 +33629,7 @@ function ZStream() {
 
 module.exports = ZStream;
 
-},{}],164:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 module.exports={"2.16.840.1.101.3.4.1.1": "aes-128-ecb",
 "2.16.840.1.101.3.4.1.2": "aes-128-cbc",
 "2.16.840.1.101.3.4.1.3": "aes-128-ofb",
@@ -31650,7 +33643,7 @@ module.exports={"2.16.840.1.101.3.4.1.1": "aes-128-ecb",
 "2.16.840.1.101.3.4.1.43": "aes-256-ofb",
 "2.16.840.1.101.3.4.1.44": "aes-256-cfb"
 }
-},{}],165:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 // from https://github.com/indutny/self-signed/blob/gh-pages/lib/asn1.js
 // Fedor, you are amazing.
 
@@ -31769,7 +33762,7 @@ exports.signature = asn1.define('signature', function () {
   )
 })
 
-},{"asn1.js":5}],166:[function(require,module,exports){
+},{"asn1.js":5}],177:[function(require,module,exports){
 (function (Buffer){
 // adapted from https://github.com/apatil/pemstrip
 var findProc = /Proc-Type: 4,ENCRYPTED\r?\nDEK-Info: AES-((?:128)|(?:192)|(?:256))-CBC,([0-9A-H]+)\r?\n\r?\n([0-9A-z\n\r\+\/\=]+)\r?\n/m
@@ -31803,7 +33796,7 @@ module.exports = function (okey, password) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"browserify-aes":29,"buffer":64,"evp_bytestokey":106}],167:[function(require,module,exports){
+},{"browserify-aes":29,"buffer":64,"evp_bytestokey":110}],178:[function(require,module,exports){
 (function (Buffer){
 var asn1 = require('./asn1')
 var aesid = require('./aesid.json')
@@ -31908,7 +33901,7 @@ function decrypt (data, password) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./aesid.json":164,"./asn1":165,"./fixProc":166,"browserify-aes":29,"buffer":64,"pbkdf2":169}],168:[function(require,module,exports){
+},{"./aesid.json":175,"./asn1":176,"./fixProc":177,"browserify-aes":29,"buffer":64,"pbkdf2":180}],179:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -32136,7 +34129,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":205}],169:[function(require,module,exports){
+},{"_process":216}],180:[function(require,module,exports){
 (function (process,Buffer){
 var createHmac = require('create-hmac')
 var checkParameters = require('./precondition')
@@ -32208,7 +34201,7 @@ exports.pbkdf2Sync = function (password, salt, iterations, keylen, digest) {
 }
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"./precondition":170,"_process":205,"buffer":64,"create-hmac":73}],170:[function(require,module,exports){
+},{"./precondition":181,"_process":216,"buffer":64,"create-hmac":73}],181:[function(require,module,exports){
 var MAX_ALLOC = Math.pow(2, 30) - 1 // default in iojs
 module.exports = function (iterations, keylen) {
   if (typeof iterations !== 'number') {
@@ -32228,7 +34221,7 @@ module.exports = function (iterations, keylen) {
   }
 }
 
-},{}],171:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 'use strict';
 
 var url = require('url');
@@ -32292,7 +34285,7 @@ module.exports = {
   parse: parse
 };
 
-},{"url":406}],172:[function(require,module,exports){
+},{"url":431}],183:[function(require,module,exports){
 var Libpq = require('libpq');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
@@ -32585,7 +34578,7 @@ Client.prototype.escapeIdentifier = function(value) {
 //export the version number so we can check it in node-postgres
 module.exports.version = require('./package.json').version
 
-},{"./lib/copy-stream":173,"./package.json":178,"assert":19,"events":105,"libpq":147,"pg-types":174,"util":411}],173:[function(require,module,exports){
+},{"./lib/copy-stream":184,"./package.json":189,"assert":19,"events":109,"libpq":154,"pg-types":185,"util":436}],184:[function(require,module,exports){
 (function (Buffer){
 var Duplex = require('stream').Duplex;
 var Writable = require('stream').Writable;
@@ -32747,7 +34740,7 @@ var consumeResults = function(pq, cb) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64,"stream":378,"util":411}],174:[function(require,module,exports){
+},{"buffer":64,"stream":389,"util":436}],185:[function(require,module,exports){
 var textParsers = require('./lib/textParsers');
 var binaryParsers = require('./lib/binaryParsers');
 var arrayParser = require('./lib/arrayParser');
@@ -32796,7 +34789,7 @@ module.exports = {
   arrayParser: arrayParser
 };
 
-},{"./lib/arrayParser":175,"./lib/binaryParsers":176,"./lib/textParsers":177}],175:[function(require,module,exports){
+},{"./lib/arrayParser":186,"./lib/binaryParsers":187,"./lib/textParsers":188}],186:[function(require,module,exports){
 function ArrayParser(source, converter) {
   this.source = source;
   this.converter = converter;
@@ -32895,7 +34888,7 @@ module.exports = {
   }
 };
 
-},{}],176:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 var parseBits = function(data, bits, offset, invert, callback) {
   offset = offset || 0;
   invert = invert || false;
@@ -33151,7 +35144,7 @@ module.exports = {
   init: init
 };
 
-},{}],177:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 (function (Buffer,__dirname){
 var arrayParser = require(__dirname + "/arrayParser.js");
 
@@ -33427,7 +35420,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer,"/node_modules/pg-native/node_modules/pg-types/lib")
-},{"buffer":64}],178:[function(require,module,exports){
+},{"buffer":64}],189:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -33531,7 +35524,7 @@ module.exports={
   "version": "1.10.0"
 }
 
-},{}],179:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 var genericPool = require('generic-pool')
 var util = require('util')
 var EventEmitter = require('events').EventEmitter
@@ -33663,7 +35656,7 @@ Pool.prototype.end = function (cb) {
   }.bind(this))
 }
 
-},{"events":105,"generic-pool":132,"object-assign":150,"pg":188,"util":411}],180:[function(require,module,exports){
+},{"events":109,"generic-pool":136,"object-assign":160,"pg":199,"util":436}],191:[function(require,module,exports){
 var textParsers = require('./lib/textParsers');
 var binaryParsers = require('./lib/binaryParsers');
 var arrayParser = require('./lib/arrayParser');
@@ -33710,7 +35703,7 @@ binaryParsers.init(function(oid, converter) {
   typeParsers.binary[oid] = converter;
 });
 
-},{"./lib/arrayParser":181,"./lib/binaryParsers":182,"./lib/textParsers":183}],181:[function(require,module,exports){
+},{"./lib/arrayParser":192,"./lib/binaryParsers":193,"./lib/textParsers":194}],192:[function(require,module,exports){
 var array = require('postgres-array');
 
 module.exports = {
@@ -33723,9 +35716,9 @@ module.exports = {
   }
 };
 
-},{"postgres-array":200}],182:[function(require,module,exports){
-arguments[4][176][0].apply(exports,arguments)
-},{"dup":176}],183:[function(require,module,exports){
+},{"postgres-array":211}],193:[function(require,module,exports){
+arguments[4][187][0].apply(exports,arguments)
+},{"dup":187}],194:[function(require,module,exports){
 var array = require('postgres-array')
 var ap = require('ap')
 var arrayParser = require('./arrayParser');
@@ -33908,7 +35901,7 @@ module.exports = {
   init: init
 };
 
-},{"./arrayParser":181,"ap":4,"postgres-array":200,"postgres-bytea":201,"postgres-date":202,"postgres-interval":203}],184:[function(require,module,exports){
+},{"./arrayParser":192,"ap":4,"postgres-array":211,"postgres-bytea":212,"postgres-date":213,"postgres-interval":214}],195:[function(require,module,exports){
 (function (Buffer){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -34265,7 +36258,7 @@ Client.Query = Query;
 module.exports = Client;
 
 }).call(this,require("buffer").Buffer)
-},{"./connection":186,"./connection-parameters":185,"./defaults":187,"./query":193,"./type-overrides":195,"buffer":64,"crypto":74,"events":105,"pgpass":199,"util":411}],185:[function(require,module,exports){
+},{"./connection":197,"./connection-parameters":196,"./defaults":198,"./query":204,"./type-overrides":206,"buffer":64,"crypto":74,"events":109,"pgpass":210,"util":436}],196:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -34370,7 +36363,7 @@ ConnectionParameters.prototype.getLibpqConnectionString = function(cb) {
 module.exports = ConnectionParameters;
 
 }).call(this,require('_process'))
-},{"./defaults":187,"_process":205,"dns":53,"pg-connection-string":171,"url":406}],186:[function(require,module,exports){
+},{"./defaults":198,"_process":216,"dns":53,"pg-connection-string":182,"url":431}],197:[function(require,module,exports){
 (function (Buffer){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -35028,7 +37021,7 @@ Connection.prototype.parseCString = function(buffer) {
 module.exports = Connection;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64,"buffer-writer":62,"events":105,"net":53,"packet-reader":152,"tls":53,"util":411}],187:[function(require,module,exports){
+},{"buffer":64,"buffer-writer":62,"events":109,"net":53,"packet-reader":163,"tls":53,"util":436}],198:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -35100,7 +37093,7 @@ module.exports.__defineSetter__("parseInt8", function(val) {
 });
 
 }).call(this,require('_process'))
-},{"_process":205,"pg-types":180}],188:[function(require,module,exports){
+},{"_process":216,"pg-types":191}],199:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -35218,7 +37211,7 @@ if(typeof process.env.NODE_PG_FORCE_NATIVE != 'undefined') {
 }
 
 }).call(this,require('_process'))
-},{"./client":184,"./connection":186,"./connection-parameters":185,"./defaults":187,"./native":189,"./pool-factory":192,"_process":205,"events":105,"pg-types":180,"util":411}],189:[function(require,module,exports){
+},{"./client":195,"./connection":197,"./connection-parameters":196,"./defaults":198,"./native":200,"./pool-factory":203,"_process":216,"events":109,"pg-types":191,"util":436}],200:[function(require,module,exports){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
  * All rights reserved.
@@ -35421,7 +37414,7 @@ Client.prototype.getTypeParser = function(oid, format) {
   return this._types.getTypeParser(oid, format);
 };
 
-},{"../../package.json":197,"../connection-parameters":185,"../type-overrides":195,"./query":190,"assert":19,"events":105,"pg-native":172,"semver":368,"util":411}],190:[function(require,module,exports){
+},{"../../package.json":208,"../connection-parameters":196,"../type-overrides":206,"./query":201,"assert":19,"events":109,"pg-native":183,"semver":379,"util":436}],201:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -35563,7 +37556,7 @@ NativeQuery.prototype.submit = function(client) {
 };
 
 }).call(this,require('_process'))
-},{"../utils":196,"./result":191,"_process":205,"events":105,"util":411}],191:[function(require,module,exports){
+},{"../utils":207,"./result":202,"_process":216,"events":109,"util":436}],202:[function(require,module,exports){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
  * All rights reserved.
@@ -35601,7 +37594,7 @@ NativeResult.prototype.addRow = function(row) {
   // to pg-native.
 };
 
-},{}],192:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 var Client = require('./client');
 var util = require('util');
 var Pool = require('pg-pool');
@@ -35621,7 +37614,7 @@ module.exports = function(Client) {
   return BoundPool;
 };
 
-},{"./client":184,"pg-pool":179,"util":411}],193:[function(require,module,exports){
+},{"./client":195,"pg-pool":190,"util":436}],204:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -35833,7 +37826,7 @@ Query.prototype.handleCopyData = function (msg, connection) {
 module.exports = Query;
 
 }).call(this,require('_process'))
-},{"./result":194,"./utils":196,"_process":205,"events":105,"util":411}],194:[function(require,module,exports){
+},{"./result":205,"./utils":207,"_process":216,"events":109,"util":436}],205:[function(require,module,exports){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
  * All rights reserved.
@@ -35950,7 +37943,7 @@ Result.prototype._getTypeParser = types.getTypeParser;
 
 module.exports = Result;
 
-},{"pg-types":180}],195:[function(require,module,exports){
+},{"pg-types":191}],206:[function(require,module,exports){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
  * All rights reserved.
@@ -35990,7 +37983,7 @@ TypeOverrides.prototype.getTypeParser = function(oid, format) {
 
 module.exports = TypeOverrides;
 
-},{"pg-types":180}],196:[function(require,module,exports){
+},{"pg-types":191}],207:[function(require,module,exports){
 (function (Buffer){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -36136,7 +38129,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./defaults":187,"buffer":64}],197:[function(require,module,exports){
+},{"./defaults":198,"buffer":64}],208:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -36251,7 +38244,7 @@ module.exports={
   "version": "6.1.0"
 }
 
-},{}],198:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -36488,7 +38481,7 @@ var isValidEntry = module.exports.isValidEntry = function(entry){
 
 
 }).call(this,require('_process'))
-},{"_process":205,"path":168,"split":377,"stream":378,"util":411}],199:[function(require,module,exports){
+},{"_process":216,"path":179,"split":388,"stream":389,"util":436}],210:[function(require,module,exports){
 'use strict';
 
 var path = require('path')
@@ -36513,7 +38506,7 @@ module.exports = function(connInfo, cb) {
 
 module.exports.warnTo = helper.warnTo;
 
-},{"./helper.js":198,"fs":53,"path":168}],200:[function(require,module,exports){
+},{"./helper.js":209,"fs":53,"path":179}],211:[function(require,module,exports){
 'use strict'
 
 exports.parse = function (source, transform) {
@@ -36600,7 +38593,7 @@ function identity (value) {
   return value
 }
 
-},{}],201:[function(require,module,exports){
+},{}],212:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 
@@ -36635,7 +38628,7 @@ module.exports = function parseBytea (input) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64}],202:[function(require,module,exports){
+},{"buffer":64}],213:[function(require,module,exports){
 'use strict'
 
 var DATE_TIME = /(\d{1,})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})(\.\d{1,})?/
@@ -36719,7 +38712,7 @@ function timeZoneOffset (isoDate) {
   return offset * sign * 1000
 }
 
-},{}],203:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 'use strict'
 
 var extend = require('xtend/mutable')
@@ -36787,7 +38780,7 @@ function parse (interval) {
     }, {})
 }
 
-},{"xtend/mutable":414}],204:[function(require,module,exports){
+},{"xtend/mutable":439}],215:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -36834,7 +38827,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":205}],205:[function(require,module,exports){
+},{"_process":216}],216:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -37016,7 +39009,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],206:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 exports.publicEncrypt = require('./publicEncrypt');
 exports.privateDecrypt = require('./privateDecrypt');
 
@@ -37027,7 +39020,7 @@ exports.privateEncrypt = function privateEncrypt(key, buf) {
 exports.publicDecrypt = function publicDecrypt(key, buf) {
   return exports.privateDecrypt(key, buf, true);
 };
-},{"./privateDecrypt":208,"./publicEncrypt":209}],207:[function(require,module,exports){
+},{"./privateDecrypt":219,"./publicEncrypt":220}],218:[function(require,module,exports){
 (function (Buffer){
 var createHash = require('create-hash');
 module.exports = function (seed, len) {
@@ -37046,7 +39039,7 @@ function i2ops(c) {
   return out;
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":64,"create-hash":70}],208:[function(require,module,exports){
+},{"buffer":64,"create-hash":70}],219:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var mgf = require('./mgf');
@@ -37157,7 +39150,7 @@ function compare(a, b){
   return dif;
 }
 }).call(this,require("buffer").Buffer)
-},{"./mgf":207,"./withPublic":210,"./xor":211,"bn.js":24,"browserify-rsa":45,"buffer":64,"create-hash":70,"parse-asn1":167}],209:[function(require,module,exports){
+},{"./mgf":218,"./withPublic":221,"./xor":222,"bn.js":24,"browserify-rsa":45,"buffer":64,"create-hash":70,"parse-asn1":178}],220:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var randomBytes = require('randombytes');
@@ -37255,7 +39248,7 @@ function nonZero(len, crypto) {
   return out;
 }
 }).call(this,require("buffer").Buffer)
-},{"./mgf":207,"./withPublic":210,"./xor":211,"bn.js":24,"browserify-rsa":45,"buffer":64,"create-hash":70,"parse-asn1":167,"randombytes":216}],210:[function(require,module,exports){
+},{"./mgf":218,"./withPublic":221,"./xor":222,"bn.js":24,"browserify-rsa":45,"buffer":64,"create-hash":70,"parse-asn1":178,"randombytes":227}],221:[function(require,module,exports){
 (function (Buffer){
 var bn = require('bn.js');
 function withPublic(paddedMsg, key) {
@@ -37268,7 +39261,7 @@ function withPublic(paddedMsg, key) {
 
 module.exports = withPublic;
 }).call(this,require("buffer").Buffer)
-},{"bn.js":24,"buffer":64}],211:[function(require,module,exports){
+},{"bn.js":24,"buffer":64}],222:[function(require,module,exports){
 module.exports = function xor(a, b) {
   var len = a.length;
   var i = -1;
@@ -37277,7 +39270,7 @@ module.exports = function xor(a, b) {
   }
   return a
 };
-},{}],212:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -37814,7 +39807,7 @@ module.exports = function xor(a, b) {
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],213:[function(require,module,exports){
+},{}],224:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -37900,7 +39893,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],214:[function(require,module,exports){
+},{}],225:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -37987,13 +39980,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],215:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":213,"./encode":214}],216:[function(require,module,exports){
+},{"./decode":224,"./encode":225}],227:[function(require,module,exports){
 (function (process,global,Buffer){
 'use strict'
 
@@ -38033,7 +40026,7 @@ function randomBytes (size, cb) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"_process":205,"buffer":64}],217:[function(require,module,exports){
+},{"_process":216,"buffer":64}],228:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -38472,17 +40465,17 @@ var Autocomplete = React.createClass({
 
 module.exports = Autocomplete;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"dom-scroll-into-view":85,"react":366,"react-dom":218}],218:[function(require,module,exports){
+},{"dom-scroll-into-view":89,"react":377,"react-dom":229}],229:[function(require,module,exports){
 'use strict';
 
 module.exports = require('react/lib/ReactDOM');
 
-},{"react/lib/ReactDOM":258}],219:[function(require,module,exports){
+},{"react/lib/ReactDOM":269}],230:[function(require,module,exports){
 'use strict';
 
 module.exports = require('react/lib/ReactDOMServer');
 
-},{"react/lib/ReactDOMServer":273}],220:[function(require,module,exports){
+},{"react/lib/ReactDOMServer":284}],231:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -38711,7 +40704,7 @@ var Swipeable = React.createClass({
 
 module.exports = Swipeable;
 
-},{"react":366}],221:[function(require,module,exports){
+},{"react":377}],232:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -38736,7 +40729,7 @@ var AutoFocusUtils = {
 };
 
 module.exports = AutoFocusUtils;
-},{"./ReactDOMComponentTree":262,"fbjs/lib/focusNode":116}],222:[function(require,module,exports){
+},{"./ReactDOMComponentTree":273,"fbjs/lib/focusNode":120}],233:[function(require,module,exports){
 /**
  * Copyright 2013-present Facebook, Inc.
  * All rights reserved.
@@ -39127,7 +41120,7 @@ var BeforeInputEventPlugin = {
 };
 
 module.exports = BeforeInputEventPlugin;
-},{"./EventConstants":236,"./EventPropagators":240,"./FallbackCompositionState":241,"./SyntheticCompositionEvent":322,"./SyntheticInputEvent":326,"fbjs/lib/ExecutionEnvironment":108,"fbjs/lib/keyOf":126}],223:[function(require,module,exports){
+},{"./EventConstants":247,"./EventPropagators":251,"./FallbackCompositionState":252,"./SyntheticCompositionEvent":333,"./SyntheticInputEvent":337,"fbjs/lib/ExecutionEnvironment":112,"fbjs/lib/keyOf":130}],234:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -39276,7 +41269,7 @@ var CSSProperty = {
 };
 
 module.exports = CSSProperty;
-},{}],224:[function(require,module,exports){
+},{}],235:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -39484,7 +41477,7 @@ var CSSPropertyOperations = {
 
 module.exports = CSSPropertyOperations;
 }).call(this,require('_process'))
-},{"./CSSProperty":223,"./ReactInstrumentation":293,"./dangerousStyleValue":340,"_process":205,"fbjs/lib/ExecutionEnvironment":108,"fbjs/lib/camelizeStyleName":110,"fbjs/lib/hyphenateStyleName":121,"fbjs/lib/memoizeStringOnly":127,"fbjs/lib/warning":131}],225:[function(require,module,exports){
+},{"./CSSProperty":234,"./ReactInstrumentation":304,"./dangerousStyleValue":351,"_process":216,"fbjs/lib/ExecutionEnvironment":112,"fbjs/lib/camelizeStyleName":114,"fbjs/lib/hyphenateStyleName":125,"fbjs/lib/memoizeStringOnly":131,"fbjs/lib/warning":135}],236:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -39593,7 +41586,7 @@ PooledClass.addPoolingTo(CallbackQueue);
 
 module.exports = CallbackQueue;
 }).call(this,require('_process'))
-},{"./PooledClass":245,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"object-assign":150}],226:[function(require,module,exports){
+},{"./PooledClass":256,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"object-assign":160}],237:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -39919,7 +41912,7 @@ var ChangeEventPlugin = {
 };
 
 module.exports = ChangeEventPlugin;
-},{"./EventConstants":236,"./EventPluginHub":237,"./EventPropagators":240,"./ReactDOMComponentTree":262,"./ReactUpdates":315,"./SyntheticEvent":324,"./getEventTarget":348,"./isEventSupported":355,"./isTextInputElement":356,"fbjs/lib/ExecutionEnvironment":108,"fbjs/lib/keyOf":126}],227:[function(require,module,exports){
+},{"./EventConstants":247,"./EventPluginHub":248,"./EventPropagators":251,"./ReactDOMComponentTree":273,"./ReactUpdates":326,"./SyntheticEvent":335,"./getEventTarget":359,"./isEventSupported":366,"./isTextInputElement":367,"fbjs/lib/ExecutionEnvironment":112,"fbjs/lib/keyOf":130}],238:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -40116,7 +42109,7 @@ var DOMChildrenOperations = {
 
 module.exports = DOMChildrenOperations;
 }).call(this,require('_process'))
-},{"./DOMLazyTree":228,"./Danger":232,"./ReactDOMComponentTree":262,"./ReactInstrumentation":293,"./ReactMultiChildUpdateTypes":298,"./createMicrosoftUnsafeLocalFunction":339,"./setInnerHTML":361,"./setTextContent":362,"_process":205}],228:[function(require,module,exports){
+},{"./DOMLazyTree":239,"./Danger":243,"./ReactDOMComponentTree":273,"./ReactInstrumentation":304,"./ReactMultiChildUpdateTypes":309,"./createMicrosoftUnsafeLocalFunction":350,"./setInnerHTML":372,"./setTextContent":373,"_process":216}],239:[function(require,module,exports){
 /**
  * Copyright 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -40235,7 +42228,7 @@ DOMLazyTree.queueHTML = queueHTML;
 DOMLazyTree.queueText = queueText;
 
 module.exports = DOMLazyTree;
-},{"./DOMNamespaces":229,"./createMicrosoftUnsafeLocalFunction":339,"./setInnerHTML":361,"./setTextContent":362}],229:[function(require,module,exports){
+},{"./DOMNamespaces":240,"./createMicrosoftUnsafeLocalFunction":350,"./setInnerHTML":372,"./setTextContent":373}],240:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -40256,7 +42249,7 @@ var DOMNamespaces = {
 };
 
 module.exports = DOMNamespaces;
-},{}],230:[function(require,module,exports){
+},{}],241:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -40465,7 +42458,7 @@ var DOMProperty = {
 
 module.exports = DOMProperty;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],231:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],242:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -40689,7 +42682,7 @@ var DOMPropertyOperations = {
 
 module.exports = DOMPropertyOperations;
 }).call(this,require('_process'))
-},{"./DOMProperty":230,"./ReactDOMComponentTree":262,"./ReactInstrumentation":293,"./quoteAttributeValueForBrowser":358,"_process":205,"fbjs/lib/warning":131}],232:[function(require,module,exports){
+},{"./DOMProperty":241,"./ReactDOMComponentTree":273,"./ReactInstrumentation":304,"./quoteAttributeValueForBrowser":369,"_process":216,"fbjs/lib/warning":135}],243:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -40740,7 +42733,7 @@ var Danger = {
 
 module.exports = Danger;
 }).call(this,require('_process'))
-},{"./DOMLazyTree":228,"./reactProdInvariant":359,"_process":205,"fbjs/lib/ExecutionEnvironment":108,"fbjs/lib/createNodesFromMarkup":113,"fbjs/lib/emptyFunction":114,"fbjs/lib/invariant":122}],233:[function(require,module,exports){
+},{"./DOMLazyTree":239,"./reactProdInvariant":370,"_process":216,"fbjs/lib/ExecutionEnvironment":112,"fbjs/lib/createNodesFromMarkup":117,"fbjs/lib/emptyFunction":118,"fbjs/lib/invariant":126}],244:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -40768,7 +42761,7 @@ var keyOf = require('fbjs/lib/keyOf');
 var DefaultEventPluginOrder = [keyOf({ ResponderEventPlugin: null }), keyOf({ SimpleEventPlugin: null }), keyOf({ TapEventPlugin: null }), keyOf({ EnterLeaveEventPlugin: null }), keyOf({ ChangeEventPlugin: null }), keyOf({ SelectEventPlugin: null }), keyOf({ BeforeInputEventPlugin: null })];
 
 module.exports = DefaultEventPluginOrder;
-},{"fbjs/lib/keyOf":126}],234:[function(require,module,exports){
+},{"fbjs/lib/keyOf":130}],245:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -40819,7 +42812,7 @@ var DisabledInputUtils = {
 };
 
 module.exports = DisabledInputUtils;
-},{}],235:[function(require,module,exports){
+},{}],246:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -40925,7 +42918,7 @@ var EnterLeaveEventPlugin = {
 };
 
 module.exports = EnterLeaveEventPlugin;
-},{"./EventConstants":236,"./EventPropagators":240,"./ReactDOMComponentTree":262,"./SyntheticMouseEvent":328,"fbjs/lib/keyOf":126}],236:[function(require,module,exports){
+},{"./EventConstants":247,"./EventPropagators":251,"./ReactDOMComponentTree":273,"./SyntheticMouseEvent":339,"fbjs/lib/keyOf":130}],247:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -41023,7 +43016,7 @@ var EventConstants = {
 };
 
 module.exports = EventConstants;
-},{"fbjs/lib/keyMirror":125}],237:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":129}],248:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -41277,7 +43270,7 @@ var EventPluginHub = {
 
 module.exports = EventPluginHub;
 }).call(this,require('_process'))
-},{"./EventPluginRegistry":238,"./EventPluginUtils":239,"./ReactErrorUtils":284,"./accumulateInto":335,"./forEachAccumulated":344,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],238:[function(require,module,exports){
+},{"./EventPluginRegistry":249,"./EventPluginUtils":250,"./ReactErrorUtils":295,"./accumulateInto":346,"./forEachAccumulated":355,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],249:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -41527,7 +43520,7 @@ var EventPluginRegistry = {
 
 module.exports = EventPluginRegistry;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],239:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],250:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -41759,7 +43752,7 @@ var EventPluginUtils = {
 
 module.exports = EventPluginUtils;
 }).call(this,require('_process'))
-},{"./EventConstants":236,"./ReactErrorUtils":284,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],240:[function(require,module,exports){
+},{"./EventConstants":247,"./ReactErrorUtils":295,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],251:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -41899,7 +43892,7 @@ var EventPropagators = {
 
 module.exports = EventPropagators;
 }).call(this,require('_process'))
-},{"./EventConstants":236,"./EventPluginHub":237,"./EventPluginUtils":239,"./accumulateInto":335,"./forEachAccumulated":344,"_process":205,"fbjs/lib/warning":131}],241:[function(require,module,exports){
+},{"./EventConstants":247,"./EventPluginHub":248,"./EventPluginUtils":250,"./accumulateInto":346,"./forEachAccumulated":355,"_process":216,"fbjs/lib/warning":135}],252:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -41995,7 +43988,7 @@ _assign(FallbackCompositionState.prototype, {
 PooledClass.addPoolingTo(FallbackCompositionState);
 
 module.exports = FallbackCompositionState;
-},{"./PooledClass":245,"./getTextContentAccessor":352,"object-assign":150}],242:[function(require,module,exports){
+},{"./PooledClass":256,"./getTextContentAccessor":363,"object-assign":160}],253:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -42208,7 +44201,7 @@ var HTMLDOMPropertyConfig = {
 };
 
 module.exports = HTMLDOMPropertyConfig;
-},{"./DOMProperty":230}],243:[function(require,module,exports){
+},{"./DOMProperty":241}],254:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -42268,7 +44261,7 @@ var KeyEscapeUtils = {
 };
 
 module.exports = KeyEscapeUtils;
-},{}],244:[function(require,module,exports){
+},{}],255:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -42407,7 +44400,7 @@ var LinkedValueUtils = {
 
 module.exports = LinkedValueUtils;
 }).call(this,require('_process'))
-},{"./ReactPropTypeLocations":303,"./ReactPropTypes":304,"./ReactPropTypesSecret":305,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],245:[function(require,module,exports){
+},{"./ReactPropTypeLocations":314,"./ReactPropTypes":315,"./ReactPropTypesSecret":316,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],256:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -42531,7 +44524,7 @@ var PooledClass = {
 
 module.exports = PooledClass;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],246:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],257:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -42623,7 +44616,7 @@ var React = {
 
 module.exports = React;
 }).call(this,require('_process'))
-},{"./ReactChildren":249,"./ReactClass":251,"./ReactComponent":252,"./ReactDOMFactories":265,"./ReactElement":281,"./ReactElementValidator":282,"./ReactPropTypes":304,"./ReactPureComponent":306,"./ReactVersion":316,"./onlyChild":357,"_process":205,"fbjs/lib/warning":131,"object-assign":150}],247:[function(require,module,exports){
+},{"./ReactChildren":260,"./ReactClass":262,"./ReactComponent":263,"./ReactDOMFactories":276,"./ReactElement":292,"./ReactElementValidator":293,"./ReactPropTypes":315,"./ReactPureComponent":317,"./ReactVersion":327,"./onlyChild":368,"_process":216,"fbjs/lib/warning":135,"object-assign":160}],258:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -42954,7 +44947,7 @@ var ReactBrowserEventEmitter = _assign({}, ReactEventEmitterMixin, {
 });
 
 module.exports = ReactBrowserEventEmitter;
-},{"./EventConstants":236,"./EventPluginRegistry":238,"./ReactEventEmitterMixin":285,"./ViewportMetrics":334,"./getVendorPrefixedEventName":353,"./isEventSupported":355,"object-assign":150}],248:[function(require,module,exports){
+},{"./EventConstants":247,"./EventPluginRegistry":249,"./ReactEventEmitterMixin":296,"./ViewportMetrics":345,"./getVendorPrefixedEventName":364,"./isEventSupported":366,"object-assign":160}],259:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -43111,7 +45104,7 @@ var ReactChildReconciler = {
 
 module.exports = ReactChildReconciler;
 }).call(this,require('_process'))
-},{"./KeyEscapeUtils":243,"./ReactComponentTreeHook":255,"./ReactReconciler":308,"./instantiateReactComponent":354,"./shouldUpdateReactComponent":363,"./traverseAllChildren":364,"_process":205,"fbjs/lib/warning":131}],249:[function(require,module,exports){
+},{"./KeyEscapeUtils":254,"./ReactComponentTreeHook":266,"./ReactReconciler":319,"./instantiateReactComponent":365,"./shouldUpdateReactComponent":374,"./traverseAllChildren":375,"_process":216,"fbjs/lib/warning":135}],260:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -43303,7 +45296,7 @@ var ReactChildren = {
 };
 
 module.exports = ReactChildren;
-},{"./PooledClass":245,"./ReactElement":281,"./traverseAllChildren":364,"fbjs/lib/emptyFunction":114}],250:[function(require,module,exports){
+},{"./PooledClass":256,"./ReactElement":292,"./traverseAllChildren":375,"fbjs/lib/emptyFunction":118}],261:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -43360,7 +45353,7 @@ var ReactChildrenMutationWarningHook = {
 
 module.exports = ReactChildrenMutationWarningHook;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":255,"_process":205,"fbjs/lib/warning":131}],251:[function(require,module,exports){
+},{"./ReactComponentTreeHook":266,"_process":216,"fbjs/lib/warning":135}],262:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -44095,7 +46088,7 @@ var ReactClass = {
 
 module.exports = ReactClass;
 }).call(this,require('_process'))
-},{"./ReactComponent":252,"./ReactElement":281,"./ReactNoopUpdateQueue":300,"./ReactPropTypeLocationNames":302,"./ReactPropTypeLocations":303,"./reactProdInvariant":359,"_process":205,"fbjs/lib/emptyObject":115,"fbjs/lib/invariant":122,"fbjs/lib/keyMirror":125,"fbjs/lib/keyOf":126,"fbjs/lib/warning":131,"object-assign":150}],252:[function(require,module,exports){
+},{"./ReactComponent":263,"./ReactElement":292,"./ReactNoopUpdateQueue":311,"./ReactPropTypeLocationNames":313,"./ReactPropTypeLocations":314,"./reactProdInvariant":370,"_process":216,"fbjs/lib/emptyObject":119,"fbjs/lib/invariant":126,"fbjs/lib/keyMirror":129,"fbjs/lib/keyOf":130,"fbjs/lib/warning":135,"object-assign":160}],263:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -44216,7 +46209,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactComponent;
 }).call(this,require('_process'))
-},{"./ReactNoopUpdateQueue":300,"./canDefineProperty":337,"./reactProdInvariant":359,"_process":205,"fbjs/lib/emptyObject":115,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],253:[function(require,module,exports){
+},{"./ReactNoopUpdateQueue":311,"./canDefineProperty":348,"./reactProdInvariant":370,"_process":216,"fbjs/lib/emptyObject":119,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],264:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -44247,7 +46240,7 @@ var ReactComponentBrowserEnvironment = {
 };
 
 module.exports = ReactComponentBrowserEnvironment;
-},{"./DOMChildrenOperations":227,"./ReactDOMIDOperations":267}],254:[function(require,module,exports){
+},{"./DOMChildrenOperations":238,"./ReactDOMIDOperations":278}],265:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -44295,7 +46288,7 @@ var ReactComponentEnvironment = {
 
 module.exports = ReactComponentEnvironment;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],255:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],266:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2016-present, Facebook, Inc.
@@ -44640,7 +46633,7 @@ var ReactComponentTreeHook = {
 
 module.exports = ReactComponentTreeHook;
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":257,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],256:[function(require,module,exports){
+},{"./ReactCurrentOwner":268,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],267:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -45547,7 +47540,7 @@ var ReactCompositeComponent = {
 
 module.exports = ReactCompositeComponent;
 }).call(this,require('_process'))
-},{"./ReactComponentEnvironment":254,"./ReactCurrentOwner":257,"./ReactElement":281,"./ReactErrorUtils":284,"./ReactInstanceMap":292,"./ReactInstrumentation":293,"./ReactNodeTypes":299,"./ReactPropTypeLocations":303,"./ReactReconciler":308,"./checkReactTypeSpec":338,"./reactProdInvariant":359,"./shouldUpdateReactComponent":363,"_process":205,"fbjs/lib/emptyObject":115,"fbjs/lib/invariant":122,"fbjs/lib/shallowEqual":130,"fbjs/lib/warning":131,"object-assign":150}],257:[function(require,module,exports){
+},{"./ReactComponentEnvironment":265,"./ReactCurrentOwner":268,"./ReactElement":292,"./ReactErrorUtils":295,"./ReactInstanceMap":303,"./ReactInstrumentation":304,"./ReactNodeTypes":310,"./ReactPropTypeLocations":314,"./ReactReconciler":319,"./checkReactTypeSpec":349,"./reactProdInvariant":370,"./shouldUpdateReactComponent":374,"_process":216,"fbjs/lib/emptyObject":119,"fbjs/lib/invariant":126,"fbjs/lib/shallowEqual":134,"fbjs/lib/warning":135,"object-assign":160}],268:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -45579,7 +47572,7 @@ var ReactCurrentOwner = {
 };
 
 module.exports = ReactCurrentOwner;
-},{}],258:[function(require,module,exports){
+},{}],269:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -45692,7 +47685,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactDOM;
 }).call(this,require('_process'))
-},{"./ReactDOMComponentTree":262,"./ReactDOMNullInputValuePropHook":269,"./ReactDOMUnknownPropertyHook":277,"./ReactDefaultInjection":280,"./ReactInstrumentation":293,"./ReactMount":296,"./ReactReconciler":308,"./ReactUpdates":315,"./ReactVersion":316,"./findDOMNode":342,"./getHostComponentFromComposite":349,"./renderSubtreeIntoContainer":360,"_process":205,"fbjs/lib/ExecutionEnvironment":108,"fbjs/lib/warning":131}],259:[function(require,module,exports){
+},{"./ReactDOMComponentTree":273,"./ReactDOMNullInputValuePropHook":280,"./ReactDOMUnknownPropertyHook":288,"./ReactDefaultInjection":291,"./ReactInstrumentation":304,"./ReactMount":307,"./ReactReconciler":319,"./ReactUpdates":326,"./ReactVersion":327,"./findDOMNode":353,"./getHostComponentFromComposite":360,"./renderSubtreeIntoContainer":371,"_process":216,"fbjs/lib/ExecutionEnvironment":112,"fbjs/lib/warning":135}],270:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -45717,7 +47710,7 @@ var ReactDOMButton = {
 };
 
 module.exports = ReactDOMButton;
-},{"./DisabledInputUtils":234}],260:[function(require,module,exports){
+},{"./DisabledInputUtils":245}],271:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -46726,7 +48719,7 @@ _assign(ReactDOMComponent.prototype, ReactDOMComponent.Mixin, ReactMultiChild.Mi
 
 module.exports = ReactDOMComponent;
 }).call(this,require('_process'))
-},{"./AutoFocusUtils":221,"./CSSPropertyOperations":224,"./DOMLazyTree":228,"./DOMNamespaces":229,"./DOMProperty":230,"./DOMPropertyOperations":231,"./EventConstants":236,"./EventPluginHub":237,"./EventPluginRegistry":238,"./ReactBrowserEventEmitter":247,"./ReactDOMButton":259,"./ReactDOMComponentFlags":261,"./ReactDOMComponentTree":262,"./ReactDOMInput":268,"./ReactDOMOption":270,"./ReactDOMSelect":271,"./ReactDOMTextarea":275,"./ReactInstrumentation":293,"./ReactMultiChild":297,"./ReactServerRenderingTransaction":312,"./escapeTextContentForBrowser":341,"./isEventSupported":355,"./reactProdInvariant":359,"./validateDOMNesting":365,"_process":205,"fbjs/lib/emptyFunction":114,"fbjs/lib/invariant":122,"fbjs/lib/keyOf":126,"fbjs/lib/shallowEqual":130,"fbjs/lib/warning":131,"object-assign":150}],261:[function(require,module,exports){
+},{"./AutoFocusUtils":232,"./CSSPropertyOperations":235,"./DOMLazyTree":239,"./DOMNamespaces":240,"./DOMProperty":241,"./DOMPropertyOperations":242,"./EventConstants":247,"./EventPluginHub":248,"./EventPluginRegistry":249,"./ReactBrowserEventEmitter":258,"./ReactDOMButton":270,"./ReactDOMComponentFlags":272,"./ReactDOMComponentTree":273,"./ReactDOMInput":279,"./ReactDOMOption":281,"./ReactDOMSelect":282,"./ReactDOMTextarea":286,"./ReactInstrumentation":304,"./ReactMultiChild":308,"./ReactServerRenderingTransaction":323,"./escapeTextContentForBrowser":352,"./isEventSupported":366,"./reactProdInvariant":370,"./validateDOMNesting":376,"_process":216,"fbjs/lib/emptyFunction":118,"fbjs/lib/invariant":126,"fbjs/lib/keyOf":130,"fbjs/lib/shallowEqual":134,"fbjs/lib/warning":135,"object-assign":160}],272:[function(require,module,exports){
 /**
  * Copyright 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -46745,7 +48738,7 @@ var ReactDOMComponentFlags = {
 };
 
 module.exports = ReactDOMComponentFlags;
-},{}],262:[function(require,module,exports){
+},{}],273:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -46936,7 +48929,7 @@ var ReactDOMComponentTree = {
 
 module.exports = ReactDOMComponentTree;
 }).call(this,require('_process'))
-},{"./DOMProperty":230,"./ReactDOMComponentFlags":261,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],263:[function(require,module,exports){
+},{"./DOMProperty":241,"./ReactDOMComponentFlags":272,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],274:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -46972,7 +48965,7 @@ function ReactDOMContainerInfo(topLevelWrapper, node) {
 
 module.exports = ReactDOMContainerInfo;
 }).call(this,require('_process'))
-},{"./validateDOMNesting":365,"_process":205}],264:[function(require,module,exports){
+},{"./validateDOMNesting":376,"_process":216}],275:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -47033,7 +49026,7 @@ _assign(ReactDOMEmptyComponent.prototype, {
 });
 
 module.exports = ReactDOMEmptyComponent;
-},{"./DOMLazyTree":228,"./ReactDOMComponentTree":262,"object-assign":150}],265:[function(require,module,exports){
+},{"./DOMLazyTree":239,"./ReactDOMComponentTree":273,"object-assign":160}],276:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -47206,7 +49199,7 @@ var ReactDOMFactories = {
 
 module.exports = ReactDOMFactories;
 }).call(this,require('_process'))
-},{"./ReactElement":281,"./ReactElementValidator":282,"_process":205}],266:[function(require,module,exports){
+},{"./ReactElement":292,"./ReactElementValidator":293,"_process":216}],277:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -47225,7 +49218,7 @@ var ReactDOMFeatureFlags = {
 };
 
 module.exports = ReactDOMFeatureFlags;
-},{}],267:[function(require,module,exports){
+},{}],278:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -47260,7 +49253,7 @@ var ReactDOMIDOperations = {
 };
 
 module.exports = ReactDOMIDOperations;
-},{"./DOMChildrenOperations":227,"./ReactDOMComponentTree":262}],268:[function(require,module,exports){
+},{"./DOMChildrenOperations":238,"./ReactDOMComponentTree":273}],279:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -47532,7 +49525,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMInput;
 }).call(this,require('_process'))
-},{"./DOMPropertyOperations":231,"./DisabledInputUtils":234,"./LinkedValueUtils":244,"./ReactDOMComponentTree":262,"./ReactUpdates":315,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131,"object-assign":150}],269:[function(require,module,exports){
+},{"./DOMPropertyOperations":242,"./DisabledInputUtils":245,"./LinkedValueUtils":255,"./ReactDOMComponentTree":273,"./ReactUpdates":326,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135,"object-assign":160}],280:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -47578,7 +49571,7 @@ var ReactDOMNullInputValuePropHook = {
 
 module.exports = ReactDOMNullInputValuePropHook;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":255,"_process":205,"fbjs/lib/warning":131}],270:[function(require,module,exports){
+},{"./ReactComponentTreeHook":266,"_process":216,"fbjs/lib/warning":135}],281:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -47704,7 +49697,7 @@ var ReactDOMOption = {
 
 module.exports = ReactDOMOption;
 }).call(this,require('_process'))
-},{"./ReactChildren":249,"./ReactDOMComponentTree":262,"./ReactDOMSelect":271,"_process":205,"fbjs/lib/warning":131,"object-assign":150}],271:[function(require,module,exports){
+},{"./ReactChildren":260,"./ReactDOMComponentTree":273,"./ReactDOMSelect":282,"_process":216,"fbjs/lib/warning":135,"object-assign":160}],282:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -47908,7 +49901,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMSelect;
 }).call(this,require('_process'))
-},{"./DisabledInputUtils":234,"./LinkedValueUtils":244,"./ReactDOMComponentTree":262,"./ReactUpdates":315,"_process":205,"fbjs/lib/warning":131,"object-assign":150}],272:[function(require,module,exports){
+},{"./DisabledInputUtils":245,"./LinkedValueUtils":255,"./ReactDOMComponentTree":273,"./ReactUpdates":326,"_process":216,"fbjs/lib/warning":135,"object-assign":160}],283:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -48121,7 +50114,7 @@ var ReactDOMSelection = {
 };
 
 module.exports = ReactDOMSelection;
-},{"./getNodeForCharacterOffset":351,"./getTextContentAccessor":352,"fbjs/lib/ExecutionEnvironment":108}],273:[function(require,module,exports){
+},{"./getNodeForCharacterOffset":362,"./getTextContentAccessor":363,"fbjs/lib/ExecutionEnvironment":112}],284:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -48148,7 +50141,7 @@ var ReactDOMServer = {
 };
 
 module.exports = ReactDOMServer;
-},{"./ReactDefaultInjection":280,"./ReactServerRendering":311,"./ReactVersion":316}],274:[function(require,module,exports){
+},{"./ReactDefaultInjection":291,"./ReactServerRendering":322,"./ReactVersion":327}],285:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -48315,7 +50308,7 @@ _assign(ReactDOMTextComponent.prototype, {
 
 module.exports = ReactDOMTextComponent;
 }).call(this,require('_process'))
-},{"./DOMChildrenOperations":227,"./DOMLazyTree":228,"./ReactDOMComponentTree":262,"./escapeTextContentForBrowser":341,"./reactProdInvariant":359,"./validateDOMNesting":365,"_process":205,"fbjs/lib/invariant":122,"object-assign":150}],275:[function(require,module,exports){
+},{"./DOMChildrenOperations":238,"./DOMLazyTree":239,"./ReactDOMComponentTree":273,"./escapeTextContentForBrowser":352,"./reactProdInvariant":370,"./validateDOMNesting":376,"_process":216,"fbjs/lib/invariant":126,"object-assign":160}],286:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -48473,7 +50466,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMTextarea;
 }).call(this,require('_process'))
-},{"./DisabledInputUtils":234,"./LinkedValueUtils":244,"./ReactDOMComponentTree":262,"./ReactUpdates":315,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131,"object-assign":150}],276:[function(require,module,exports){
+},{"./DisabledInputUtils":245,"./LinkedValueUtils":255,"./ReactDOMComponentTree":273,"./ReactUpdates":326,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135,"object-assign":160}],287:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -48612,7 +50605,7 @@ module.exports = {
   traverseEnterLeave: traverseEnterLeave
 };
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],277:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],288:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -48727,7 +50720,7 @@ var ReactDOMUnknownPropertyHook = {
 
 module.exports = ReactDOMUnknownPropertyHook;
 }).call(this,require('_process'))
-},{"./DOMProperty":230,"./EventPluginRegistry":238,"./ReactComponentTreeHook":255,"_process":205,"fbjs/lib/warning":131}],278:[function(require,module,exports){
+},{"./DOMProperty":241,"./EventPluginRegistry":249,"./ReactComponentTreeHook":266,"_process":216,"fbjs/lib/warning":135}],289:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2016-present, Facebook, Inc.
@@ -49031,7 +51024,7 @@ if (/[?&]react_perf\b/.test(url)) {
 
 module.exports = ReactDebugTool;
 }).call(this,require('_process'))
-},{"./ReactChildrenMutationWarningHook":250,"./ReactComponentTreeHook":255,"./ReactHostOperationHistoryHook":289,"./ReactInvalidSetStateWarningHook":294,"_process":205,"fbjs/lib/ExecutionEnvironment":108,"fbjs/lib/performanceNow":129,"fbjs/lib/warning":131}],279:[function(require,module,exports){
+},{"./ReactChildrenMutationWarningHook":261,"./ReactComponentTreeHook":266,"./ReactHostOperationHistoryHook":300,"./ReactInvalidSetStateWarningHook":305,"_process":216,"fbjs/lib/ExecutionEnvironment":112,"fbjs/lib/performanceNow":133,"fbjs/lib/warning":135}],290:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -49100,7 +51093,7 @@ var ReactDefaultBatchingStrategy = {
 };
 
 module.exports = ReactDefaultBatchingStrategy;
-},{"./ReactUpdates":315,"./Transaction":333,"fbjs/lib/emptyFunction":114,"object-assign":150}],280:[function(require,module,exports){
+},{"./ReactUpdates":326,"./Transaction":344,"fbjs/lib/emptyFunction":118,"object-assign":160}],291:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -49185,7 +51178,7 @@ function inject() {
 module.exports = {
   inject: inject
 };
-},{"./BeforeInputEventPlugin":222,"./ChangeEventPlugin":226,"./DefaultEventPluginOrder":233,"./EnterLeaveEventPlugin":235,"./HTMLDOMPropertyConfig":242,"./ReactComponentBrowserEnvironment":253,"./ReactDOMComponent":260,"./ReactDOMComponentTree":262,"./ReactDOMEmptyComponent":264,"./ReactDOMTextComponent":274,"./ReactDOMTreeTraversal":276,"./ReactDefaultBatchingStrategy":279,"./ReactEventListener":286,"./ReactInjection":290,"./ReactReconcileTransaction":307,"./SVGDOMPropertyConfig":317,"./SelectEventPlugin":318,"./SimpleEventPlugin":319}],281:[function(require,module,exports){
+},{"./BeforeInputEventPlugin":233,"./ChangeEventPlugin":237,"./DefaultEventPluginOrder":244,"./EnterLeaveEventPlugin":246,"./HTMLDOMPropertyConfig":253,"./ReactComponentBrowserEnvironment":264,"./ReactDOMComponent":271,"./ReactDOMComponentTree":273,"./ReactDOMEmptyComponent":275,"./ReactDOMTextComponent":285,"./ReactDOMTreeTraversal":287,"./ReactDefaultBatchingStrategy":290,"./ReactEventListener":297,"./ReactInjection":301,"./ReactReconcileTransaction":318,"./SVGDOMPropertyConfig":328,"./SelectEventPlugin":329,"./SimpleEventPlugin":330}],292:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -49536,7 +51529,7 @@ ReactElement.REACT_ELEMENT_TYPE = REACT_ELEMENT_TYPE;
 
 module.exports = ReactElement;
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":257,"./canDefineProperty":337,"_process":205,"fbjs/lib/warning":131,"object-assign":150}],282:[function(require,module,exports){
+},{"./ReactCurrentOwner":268,"./canDefineProperty":348,"_process":216,"fbjs/lib/warning":135,"object-assign":160}],293:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -49767,7 +51760,7 @@ var ReactElementValidator = {
 
 module.exports = ReactElementValidator;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":255,"./ReactCurrentOwner":257,"./ReactElement":281,"./ReactPropTypeLocations":303,"./canDefineProperty":337,"./checkReactTypeSpec":338,"./getIteratorFn":350,"_process":205,"fbjs/lib/warning":131}],283:[function(require,module,exports){
+},{"./ReactComponentTreeHook":266,"./ReactCurrentOwner":268,"./ReactElement":292,"./ReactPropTypeLocations":314,"./canDefineProperty":348,"./checkReactTypeSpec":349,"./getIteratorFn":361,"_process":216,"fbjs/lib/warning":135}],294:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -49798,7 +51791,7 @@ var ReactEmptyComponent = {
 ReactEmptyComponent.injection = ReactEmptyComponentInjection;
 
 module.exports = ReactEmptyComponent;
-},{}],284:[function(require,module,exports){
+},{}],295:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -49877,7 +51870,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactErrorUtils;
 }).call(this,require('_process'))
-},{"_process":205}],285:[function(require,module,exports){
+},{"_process":216}],296:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -49911,7 +51904,7 @@ var ReactEventEmitterMixin = {
 };
 
 module.exports = ReactEventEmitterMixin;
-},{"./EventPluginHub":237}],286:[function(require,module,exports){
+},{"./EventPluginHub":248}],297:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -50069,7 +52062,7 @@ var ReactEventListener = {
 };
 
 module.exports = ReactEventListener;
-},{"./PooledClass":245,"./ReactDOMComponentTree":262,"./ReactUpdates":315,"./getEventTarget":348,"fbjs/lib/EventListener":107,"fbjs/lib/ExecutionEnvironment":108,"fbjs/lib/getUnboundedScrollPosition":119,"object-assign":150}],287:[function(require,module,exports){
+},{"./PooledClass":256,"./ReactDOMComponentTree":273,"./ReactUpdates":326,"./getEventTarget":359,"fbjs/lib/EventListener":111,"fbjs/lib/ExecutionEnvironment":112,"fbjs/lib/getUnboundedScrollPosition":123,"object-assign":160}],298:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -50092,7 +52085,7 @@ var ReactFeatureFlags = {
 };
 
 module.exports = ReactFeatureFlags;
-},{}],288:[function(require,module,exports){
+},{}],299:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -50171,7 +52164,7 @@ var ReactHostComponent = {
 
 module.exports = ReactHostComponent;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"object-assign":150}],289:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"object-assign":160}],300:[function(require,module,exports){
 /**
  * Copyright 2016-present, Facebook, Inc.
  * All rights reserved.
@@ -50209,7 +52202,7 @@ var ReactHostOperationHistoryHook = {
 };
 
 module.exports = ReactHostOperationHistoryHook;
-},{}],290:[function(require,module,exports){
+},{}],301:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -50246,7 +52239,7 @@ var ReactInjection = {
 };
 
 module.exports = ReactInjection;
-},{"./DOMProperty":230,"./EventPluginHub":237,"./EventPluginUtils":239,"./ReactBrowserEventEmitter":247,"./ReactClass":251,"./ReactComponentEnvironment":254,"./ReactEmptyComponent":283,"./ReactHostComponent":288,"./ReactUpdates":315}],291:[function(require,module,exports){
+},{"./DOMProperty":241,"./EventPluginHub":248,"./EventPluginUtils":250,"./ReactBrowserEventEmitter":258,"./ReactClass":262,"./ReactComponentEnvironment":265,"./ReactEmptyComponent":294,"./ReactHostComponent":299,"./ReactUpdates":326}],302:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -50371,7 +52364,7 @@ var ReactInputSelection = {
 };
 
 module.exports = ReactInputSelection;
-},{"./ReactDOMSelection":272,"fbjs/lib/containsNode":111,"fbjs/lib/focusNode":116,"fbjs/lib/getActiveElement":117}],292:[function(require,module,exports){
+},{"./ReactDOMSelection":283,"fbjs/lib/containsNode":115,"fbjs/lib/focusNode":120,"fbjs/lib/getActiveElement":121}],303:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -50420,7 +52413,7 @@ var ReactInstanceMap = {
 };
 
 module.exports = ReactInstanceMap;
-},{}],293:[function(require,module,exports){
+},{}],304:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2016-present, Facebook, Inc.
@@ -50444,7 +52437,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = { debugTool: debugTool };
 }).call(this,require('_process'))
-},{"./ReactDebugTool":278,"_process":205}],294:[function(require,module,exports){
+},{"./ReactDebugTool":289,"_process":216}],305:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2016-present, Facebook, Inc.
@@ -50483,7 +52476,7 @@ var ReactInvalidSetStateWarningHook = {
 
 module.exports = ReactInvalidSetStateWarningHook;
 }).call(this,require('_process'))
-},{"_process":205,"fbjs/lib/warning":131}],295:[function(require,module,exports){
+},{"_process":216,"fbjs/lib/warning":135}],306:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -50534,7 +52527,7 @@ var ReactMarkupChecksum = {
 };
 
 module.exports = ReactMarkupChecksum;
-},{"./adler32":336}],296:[function(require,module,exports){
+},{"./adler32":347}],307:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -51071,7 +53064,7 @@ var ReactMount = {
 
 module.exports = ReactMount;
 }).call(this,require('_process'))
-},{"./DOMLazyTree":228,"./DOMProperty":230,"./ReactBrowserEventEmitter":247,"./ReactCurrentOwner":257,"./ReactDOMComponentTree":262,"./ReactDOMContainerInfo":263,"./ReactDOMFeatureFlags":266,"./ReactElement":281,"./ReactFeatureFlags":287,"./ReactInstanceMap":292,"./ReactInstrumentation":293,"./ReactMarkupChecksum":295,"./ReactReconciler":308,"./ReactUpdateQueue":314,"./ReactUpdates":315,"./instantiateReactComponent":354,"./reactProdInvariant":359,"./setInnerHTML":361,"./shouldUpdateReactComponent":363,"_process":205,"fbjs/lib/emptyObject":115,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],297:[function(require,module,exports){
+},{"./DOMLazyTree":239,"./DOMProperty":241,"./ReactBrowserEventEmitter":258,"./ReactCurrentOwner":268,"./ReactDOMComponentTree":273,"./ReactDOMContainerInfo":274,"./ReactDOMFeatureFlags":277,"./ReactElement":292,"./ReactFeatureFlags":298,"./ReactInstanceMap":303,"./ReactInstrumentation":304,"./ReactMarkupChecksum":306,"./ReactReconciler":319,"./ReactUpdateQueue":325,"./ReactUpdates":326,"./instantiateReactComponent":365,"./reactProdInvariant":370,"./setInnerHTML":372,"./shouldUpdateReactComponent":374,"_process":216,"fbjs/lib/emptyObject":119,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],308:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -51525,7 +53518,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 }).call(this,require('_process'))
-},{"./ReactChildReconciler":248,"./ReactComponentEnvironment":254,"./ReactCurrentOwner":257,"./ReactInstanceMap":292,"./ReactInstrumentation":293,"./ReactMultiChildUpdateTypes":298,"./ReactReconciler":308,"./flattenChildren":343,"./reactProdInvariant":359,"_process":205,"fbjs/lib/emptyFunction":114,"fbjs/lib/invariant":122}],298:[function(require,module,exports){
+},{"./ReactChildReconciler":259,"./ReactComponentEnvironment":265,"./ReactCurrentOwner":268,"./ReactInstanceMap":303,"./ReactInstrumentation":304,"./ReactMultiChildUpdateTypes":309,"./ReactReconciler":319,"./flattenChildren":354,"./reactProdInvariant":370,"_process":216,"fbjs/lib/emptyFunction":118,"fbjs/lib/invariant":126}],309:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -51558,7 +53551,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 });
 
 module.exports = ReactMultiChildUpdateTypes;
-},{"fbjs/lib/keyMirror":125}],299:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":129}],310:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -51601,7 +53594,7 @@ var ReactNodeTypes = {
 
 module.exports = ReactNodeTypes;
 }).call(this,require('_process'))
-},{"./ReactElement":281,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],300:[function(require,module,exports){
+},{"./ReactElement":292,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],311:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -51700,7 +53693,7 @@ var ReactNoopUpdateQueue = {
 
 module.exports = ReactNoopUpdateQueue;
 }).call(this,require('_process'))
-},{"_process":205,"fbjs/lib/warning":131}],301:[function(require,module,exports){
+},{"_process":216,"fbjs/lib/warning":135}],312:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -51797,7 +53790,7 @@ var ReactOwner = {
 
 module.exports = ReactOwner;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],302:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],313:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -51824,7 +53817,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactPropTypeLocationNames;
 }).call(this,require('_process'))
-},{"_process":205}],303:[function(require,module,exports){
+},{"_process":216}],314:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -51847,7 +53840,7 @@ var ReactPropTypeLocations = keyMirror({
 });
 
 module.exports = ReactPropTypeLocations;
-},{"fbjs/lib/keyMirror":125}],304:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":129}],315:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -52281,7 +54274,7 @@ function getClassName(propValue) {
 
 module.exports = ReactPropTypes;
 }).call(this,require('_process'))
-},{"./ReactElement":281,"./ReactPropTypeLocationNames":302,"./ReactPropTypesSecret":305,"./getIteratorFn":350,"_process":205,"fbjs/lib/emptyFunction":114,"fbjs/lib/warning":131}],305:[function(require,module,exports){
+},{"./ReactElement":292,"./ReactPropTypeLocationNames":313,"./ReactPropTypesSecret":316,"./getIteratorFn":361,"_process":216,"fbjs/lib/emptyFunction":118,"fbjs/lib/warning":135}],316:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -52298,7 +54291,7 @@ module.exports = ReactPropTypes;
 var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 
 module.exports = ReactPropTypesSecret;
-},{}],306:[function(require,module,exports){
+},{}],317:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -52341,7 +54334,7 @@ _assign(ReactPureComponent.prototype, ReactComponent.prototype);
 ReactPureComponent.prototype.isPureReactComponent = true;
 
 module.exports = ReactPureComponent;
-},{"./ReactComponent":252,"./ReactNoopUpdateQueue":300,"fbjs/lib/emptyObject":115,"object-assign":150}],307:[function(require,module,exports){
+},{"./ReactComponent":263,"./ReactNoopUpdateQueue":311,"fbjs/lib/emptyObject":119,"object-assign":160}],318:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -52522,7 +54515,7 @@ PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
 }).call(this,require('_process'))
-},{"./CallbackQueue":225,"./PooledClass":245,"./ReactBrowserEventEmitter":247,"./ReactInputSelection":291,"./ReactInstrumentation":293,"./ReactUpdateQueue":314,"./Transaction":333,"_process":205,"object-assign":150}],308:[function(require,module,exports){
+},{"./CallbackQueue":236,"./PooledClass":256,"./ReactBrowserEventEmitter":258,"./ReactInputSelection":302,"./ReactInstrumentation":304,"./ReactUpdateQueue":325,"./Transaction":344,"_process":216,"object-assign":160}],319:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -52693,7 +54686,7 @@ var ReactReconciler = {
 
 module.exports = ReactReconciler;
 }).call(this,require('_process'))
-},{"./ReactInstrumentation":293,"./ReactRef":309,"_process":205,"fbjs/lib/warning":131}],309:[function(require,module,exports){
+},{"./ReactInstrumentation":304,"./ReactRef":320,"_process":216,"fbjs/lib/warning":135}],320:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -52774,7 +54767,7 @@ ReactRef.detachRefs = function (instance, element) {
 };
 
 module.exports = ReactRef;
-},{"./ReactOwner":301}],310:[function(require,module,exports){
+},{"./ReactOwner":312}],321:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -52797,7 +54790,7 @@ var ReactServerBatchingStrategy = {
 };
 
 module.exports = ReactServerBatchingStrategy;
-},{}],311:[function(require,module,exports){
+},{}],322:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -52890,7 +54883,7 @@ module.exports = {
   renderToStaticMarkup: renderToStaticMarkup
 };
 }).call(this,require('_process'))
-},{"./ReactDOMContainerInfo":263,"./ReactDefaultBatchingStrategy":279,"./ReactElement":281,"./ReactInstrumentation":293,"./ReactMarkupChecksum":295,"./ReactReconciler":308,"./ReactServerBatchingStrategy":310,"./ReactServerRenderingTransaction":312,"./ReactUpdates":315,"./instantiateReactComponent":354,"./reactProdInvariant":359,"_process":205,"fbjs/lib/emptyObject":115,"fbjs/lib/invariant":122}],312:[function(require,module,exports){
+},{"./ReactDOMContainerInfo":274,"./ReactDefaultBatchingStrategy":290,"./ReactElement":292,"./ReactInstrumentation":304,"./ReactMarkupChecksum":306,"./ReactReconciler":319,"./ReactServerBatchingStrategy":321,"./ReactServerRenderingTransaction":323,"./ReactUpdates":326,"./instantiateReactComponent":365,"./reactProdInvariant":370,"_process":216,"fbjs/lib/emptyObject":119,"fbjs/lib/invariant":126}],323:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -52983,7 +54976,7 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 }).call(this,require('_process'))
-},{"./PooledClass":245,"./ReactInstrumentation":293,"./ReactServerUpdateQueue":313,"./Transaction":333,"_process":205,"object-assign":150}],313:[function(require,module,exports){
+},{"./PooledClass":256,"./ReactInstrumentation":304,"./ReactServerUpdateQueue":324,"./Transaction":344,"_process":216,"object-assign":160}],324:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -53127,7 +55120,7 @@ var ReactServerUpdateQueue = function () {
 
 module.exports = ReactServerUpdateQueue;
 }).call(this,require('_process'))
-},{"./ReactUpdateQueue":314,"./Transaction":333,"_process":205,"fbjs/lib/warning":131}],314:[function(require,module,exports){
+},{"./ReactUpdateQueue":325,"./Transaction":344,"_process":216,"fbjs/lib/warning":135}],325:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -53356,7 +55349,7 @@ var ReactUpdateQueue = {
 
 module.exports = ReactUpdateQueue;
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":257,"./ReactInstanceMap":292,"./ReactInstrumentation":293,"./ReactUpdates":315,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],315:[function(require,module,exports){
+},{"./ReactCurrentOwner":268,"./ReactInstanceMap":303,"./ReactInstrumentation":304,"./ReactUpdates":326,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],326:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -53610,7 +55603,7 @@ var ReactUpdates = {
 
 module.exports = ReactUpdates;
 }).call(this,require('_process'))
-},{"./CallbackQueue":225,"./PooledClass":245,"./ReactFeatureFlags":287,"./ReactReconciler":308,"./Transaction":333,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"object-assign":150}],316:[function(require,module,exports){
+},{"./CallbackQueue":236,"./PooledClass":256,"./ReactFeatureFlags":298,"./ReactReconciler":319,"./Transaction":344,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"object-assign":160}],327:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -53625,7 +55618,7 @@ module.exports = ReactUpdates;
 'use strict';
 
 module.exports = '15.3.2';
-},{}],317:[function(require,module,exports){
+},{}],328:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -53928,7 +55921,7 @@ Object.keys(ATTRS).forEach(function (key) {
 });
 
 module.exports = SVGDOMPropertyConfig;
-},{}],318:[function(require,module,exports){
+},{}],329:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -54125,7 +56118,7 @@ var SelectEventPlugin = {
 };
 
 module.exports = SelectEventPlugin;
-},{"./EventConstants":236,"./EventPropagators":240,"./ReactDOMComponentTree":262,"./ReactInputSelection":291,"./SyntheticEvent":324,"./isTextInputElement":356,"fbjs/lib/ExecutionEnvironment":108,"fbjs/lib/getActiveElement":117,"fbjs/lib/keyOf":126,"fbjs/lib/shallowEqual":130}],319:[function(require,module,exports){
+},{"./EventConstants":247,"./EventPropagators":251,"./ReactDOMComponentTree":273,"./ReactInputSelection":302,"./SyntheticEvent":335,"./isTextInputElement":367,"fbjs/lib/ExecutionEnvironment":112,"fbjs/lib/getActiveElement":121,"fbjs/lib/keyOf":130,"fbjs/lib/shallowEqual":134}],330:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -54763,7 +56756,7 @@ var SimpleEventPlugin = {
 
 module.exports = SimpleEventPlugin;
 }).call(this,require('_process'))
-},{"./EventConstants":236,"./EventPropagators":240,"./ReactDOMComponentTree":262,"./SyntheticAnimationEvent":320,"./SyntheticClipboardEvent":321,"./SyntheticDragEvent":323,"./SyntheticEvent":324,"./SyntheticFocusEvent":325,"./SyntheticKeyboardEvent":327,"./SyntheticMouseEvent":328,"./SyntheticTouchEvent":329,"./SyntheticTransitionEvent":330,"./SyntheticUIEvent":331,"./SyntheticWheelEvent":332,"./getEventCharCode":345,"./reactProdInvariant":359,"_process":205,"fbjs/lib/EventListener":107,"fbjs/lib/emptyFunction":114,"fbjs/lib/invariant":122,"fbjs/lib/keyOf":126}],320:[function(require,module,exports){
+},{"./EventConstants":247,"./EventPropagators":251,"./ReactDOMComponentTree":273,"./SyntheticAnimationEvent":331,"./SyntheticClipboardEvent":332,"./SyntheticDragEvent":334,"./SyntheticEvent":335,"./SyntheticFocusEvent":336,"./SyntheticKeyboardEvent":338,"./SyntheticMouseEvent":339,"./SyntheticTouchEvent":340,"./SyntheticTransitionEvent":341,"./SyntheticUIEvent":342,"./SyntheticWheelEvent":343,"./getEventCharCode":356,"./reactProdInvariant":370,"_process":216,"fbjs/lib/EventListener":111,"fbjs/lib/emptyFunction":118,"fbjs/lib/invariant":126,"fbjs/lib/keyOf":130}],331:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -54803,7 +56796,7 @@ function SyntheticAnimationEvent(dispatchConfig, dispatchMarker, nativeEvent, na
 SyntheticEvent.augmentClass(SyntheticAnimationEvent, AnimationEventInterface);
 
 module.exports = SyntheticAnimationEvent;
-},{"./SyntheticEvent":324}],321:[function(require,module,exports){
+},{"./SyntheticEvent":335}],332:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -54842,7 +56835,7 @@ function SyntheticClipboardEvent(dispatchConfig, dispatchMarker, nativeEvent, na
 SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 
 module.exports = SyntheticClipboardEvent;
-},{"./SyntheticEvent":324}],322:[function(require,module,exports){
+},{"./SyntheticEvent":335}],333:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -54879,7 +56872,7 @@ function SyntheticCompositionEvent(dispatchConfig, dispatchMarker, nativeEvent, 
 SyntheticEvent.augmentClass(SyntheticCompositionEvent, CompositionEventInterface);
 
 module.exports = SyntheticCompositionEvent;
-},{"./SyntheticEvent":324}],323:[function(require,module,exports){
+},{"./SyntheticEvent":335}],334:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -54916,7 +56909,7 @@ function SyntheticDragEvent(dispatchConfig, dispatchMarker, nativeEvent, nativeE
 SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
-},{"./SyntheticMouseEvent":328}],324:[function(require,module,exports){
+},{"./SyntheticMouseEvent":339}],335:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -55187,7 +57180,7 @@ function getPooledWarningPropertyDefinition(propName, getVal) {
   }
 }
 }).call(this,require('_process'))
-},{"./PooledClass":245,"_process":205,"fbjs/lib/emptyFunction":114,"fbjs/lib/warning":131,"object-assign":150}],325:[function(require,module,exports){
+},{"./PooledClass":256,"_process":216,"fbjs/lib/emptyFunction":118,"fbjs/lib/warning":135,"object-assign":160}],336:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55224,7 +57217,7 @@ function SyntheticFocusEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
-},{"./SyntheticUIEvent":331}],326:[function(require,module,exports){
+},{"./SyntheticUIEvent":342}],337:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55262,7 +57255,7 @@ function SyntheticInputEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticEvent.augmentClass(SyntheticInputEvent, InputEventInterface);
 
 module.exports = SyntheticInputEvent;
-},{"./SyntheticEvent":324}],327:[function(require,module,exports){
+},{"./SyntheticEvent":335}],338:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55347,7 +57340,7 @@ function SyntheticKeyboardEvent(dispatchConfig, dispatchMarker, nativeEvent, nat
 SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
-},{"./SyntheticUIEvent":331,"./getEventCharCode":345,"./getEventKey":346,"./getEventModifierState":347}],328:[function(require,module,exports){
+},{"./SyntheticUIEvent":342,"./getEventCharCode":356,"./getEventKey":357,"./getEventModifierState":358}],339:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55420,7 +57413,7 @@ function SyntheticMouseEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
-},{"./SyntheticUIEvent":331,"./ViewportMetrics":334,"./getEventModifierState":347}],329:[function(require,module,exports){
+},{"./SyntheticUIEvent":342,"./ViewportMetrics":345,"./getEventModifierState":358}],340:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55466,7 +57459,7 @@ function SyntheticTouchEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
-},{"./SyntheticUIEvent":331,"./getEventModifierState":347}],330:[function(require,module,exports){
+},{"./SyntheticUIEvent":342,"./getEventModifierState":358}],341:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55506,7 +57499,7 @@ function SyntheticTransitionEvent(dispatchConfig, dispatchMarker, nativeEvent, n
 SyntheticEvent.augmentClass(SyntheticTransitionEvent, TransitionEventInterface);
 
 module.exports = SyntheticTransitionEvent;
-},{"./SyntheticEvent":324}],331:[function(require,module,exports){
+},{"./SyntheticEvent":335}],342:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55566,7 +57559,7 @@ function SyntheticUIEvent(dispatchConfig, dispatchMarker, nativeEvent, nativeEve
 SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
-},{"./SyntheticEvent":324,"./getEventTarget":348}],332:[function(require,module,exports){
+},{"./SyntheticEvent":335,"./getEventTarget":359}],343:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55621,7 +57614,7 @@ function SyntheticWheelEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
-},{"./SyntheticMouseEvent":328}],333:[function(require,module,exports){
+},{"./SyntheticMouseEvent":339}],344:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -55857,7 +57850,7 @@ var Transaction = {
 
 module.exports = Transaction;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],334:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],345:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55885,7 +57878,7 @@ var ViewportMetrics = {
 };
 
 module.exports = ViewportMetrics;
-},{}],335:[function(require,module,exports){
+},{}],346:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -55946,7 +57939,7 @@ function accumulateInto(current, next) {
 
 module.exports = accumulateInto;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],336:[function(require,module,exports){
+},{"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],347:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55991,7 +57984,7 @@ function adler32(data) {
 }
 
 module.exports = adler32;
-},{}],337:[function(require,module,exports){
+},{}],348:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -56018,7 +58011,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = canDefineProperty;
 }).call(this,require('_process'))
-},{"_process":205}],338:[function(require,module,exports){
+},{"_process":216}],349:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -56108,7 +58101,7 @@ function checkReactTypeSpec(typeSpecs, values, location, componentName, element,
 
 module.exports = checkReactTypeSpec;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":255,"./ReactPropTypeLocationNames":302,"./ReactPropTypesSecret":305,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],339:[function(require,module,exports){
+},{"./ReactComponentTreeHook":266,"./ReactPropTypeLocationNames":313,"./ReactPropTypesSecret":316,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],350:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56141,7 +58134,7 @@ var createMicrosoftUnsafeLocalFunction = function (func) {
 };
 
 module.exports = createMicrosoftUnsafeLocalFunction;
-},{}],340:[function(require,module,exports){
+},{}],351:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -56223,7 +58216,7 @@ function dangerousStyleValue(name, value, component) {
 
 module.exports = dangerousStyleValue;
 }).call(this,require('_process'))
-},{"./CSSProperty":223,"_process":205,"fbjs/lib/warning":131}],341:[function(require,module,exports){
+},{"./CSSProperty":234,"_process":216,"fbjs/lib/warning":135}],352:[function(require,module,exports){
 /**
  * Copyright 2016-present, Facebook, Inc.
  * All rights reserved.
@@ -56347,7 +58340,7 @@ function escapeTextContentForBrowser(text) {
 }
 
 module.exports = escapeTextContentForBrowser;
-},{}],342:[function(require,module,exports){
+},{}],353:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -56410,7 +58403,7 @@ function findDOMNode(componentOrElement) {
 
 module.exports = findDOMNode;
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":257,"./ReactDOMComponentTree":262,"./ReactInstanceMap":292,"./getHostComponentFromComposite":349,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],343:[function(require,module,exports){
+},{"./ReactCurrentOwner":268,"./ReactDOMComponentTree":273,"./ReactInstanceMap":303,"./getHostComponentFromComposite":360,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],354:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -56489,7 +58482,7 @@ function flattenChildren(children, selfDebugID) {
 
 module.exports = flattenChildren;
 }).call(this,require('_process'))
-},{"./KeyEscapeUtils":243,"./ReactComponentTreeHook":255,"./traverseAllChildren":364,"_process":205,"fbjs/lib/warning":131}],344:[function(require,module,exports){
+},{"./KeyEscapeUtils":254,"./ReactComponentTreeHook":266,"./traverseAllChildren":375,"_process":216,"fbjs/lib/warning":135}],355:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56521,7 +58514,7 @@ function forEachAccumulated(arr, cb, scope) {
 }
 
 module.exports = forEachAccumulated;
-},{}],345:[function(require,module,exports){
+},{}],356:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56572,7 +58565,7 @@ function getEventCharCode(nativeEvent) {
 }
 
 module.exports = getEventCharCode;
-},{}],346:[function(require,module,exports){
+},{}],357:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56675,7 +58668,7 @@ function getEventKey(nativeEvent) {
 }
 
 module.exports = getEventKey;
-},{"./getEventCharCode":345}],347:[function(require,module,exports){
+},{"./getEventCharCode":356}],358:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56719,7 +58712,7 @@ function getEventModifierState(nativeEvent) {
 }
 
 module.exports = getEventModifierState;
-},{}],348:[function(require,module,exports){
+},{}],359:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56755,7 +58748,7 @@ function getEventTarget(nativeEvent) {
 }
 
 module.exports = getEventTarget;
-},{}],349:[function(require,module,exports){
+},{}],360:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56786,7 +58779,7 @@ function getHostComponentFromComposite(inst) {
 }
 
 module.exports = getHostComponentFromComposite;
-},{"./ReactNodeTypes":299}],350:[function(require,module,exports){
+},{"./ReactNodeTypes":310}],361:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56828,7 +58821,7 @@ function getIteratorFn(maybeIterable) {
 }
 
 module.exports = getIteratorFn;
-},{}],351:[function(require,module,exports){
+},{}],362:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56903,7 +58896,7 @@ function getNodeForCharacterOffset(root, offset) {
 }
 
 module.exports = getNodeForCharacterOffset;
-},{}],352:[function(require,module,exports){
+},{}],363:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56937,7 +58930,7 @@ function getTextContentAccessor() {
 }
 
 module.exports = getTextContentAccessor;
-},{"fbjs/lib/ExecutionEnvironment":108}],353:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":112}],364:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57039,7 +59032,7 @@ function getVendorPrefixedEventName(eventName) {
 }
 
 module.exports = getVendorPrefixedEventName;
-},{"fbjs/lib/ExecutionEnvironment":108}],354:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":112}],365:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -57161,7 +59154,7 @@ function instantiateReactComponent(node, shouldHaveDebugID) {
 
 module.exports = instantiateReactComponent;
 }).call(this,require('_process'))
-},{"./ReactCompositeComponent":256,"./ReactEmptyComponent":283,"./ReactHostComponent":288,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131,"object-assign":150}],355:[function(require,module,exports){
+},{"./ReactCompositeComponent":267,"./ReactEmptyComponent":294,"./ReactHostComponent":299,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135,"object-assign":160}],366:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57222,7 +59215,7 @@ function isEventSupported(eventNameSuffix, capture) {
 }
 
 module.exports = isEventSupported;
-},{"fbjs/lib/ExecutionEnvironment":108}],356:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":112}],367:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57274,7 +59267,7 @@ function isTextInputElement(elem) {
 }
 
 module.exports = isTextInputElement;
-},{}],357:[function(require,module,exports){
+},{}],368:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -57315,7 +59308,7 @@ function onlyChild(children) {
 
 module.exports = onlyChild;
 }).call(this,require('_process'))
-},{"./ReactElement":281,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122}],358:[function(require,module,exports){
+},{"./ReactElement":292,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126}],369:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57342,7 +59335,7 @@ function quoteAttributeValueForBrowser(value) {
 }
 
 module.exports = quoteAttributeValueForBrowser;
-},{"./escapeTextContentForBrowser":341}],359:[function(require,module,exports){
+},{"./escapeTextContentForBrowser":352}],370:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57382,7 +59375,7 @@ function reactProdInvariant(code) {
 }
 
 module.exports = reactProdInvariant;
-},{}],360:[function(require,module,exports){
+},{}],371:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57399,7 +59392,7 @@ module.exports = reactProdInvariant;
 var ReactMount = require('./ReactMount');
 
 module.exports = ReactMount.renderSubtreeIntoContainer;
-},{"./ReactMount":296}],361:[function(require,module,exports){
+},{"./ReactMount":307}],372:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57498,7 +59491,7 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 module.exports = setInnerHTML;
-},{"./DOMNamespaces":229,"./createMicrosoftUnsafeLocalFunction":339,"fbjs/lib/ExecutionEnvironment":108}],362:[function(require,module,exports){
+},{"./DOMNamespaces":240,"./createMicrosoftUnsafeLocalFunction":350,"fbjs/lib/ExecutionEnvironment":112}],373:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57547,7 +59540,7 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 module.exports = setTextContent;
-},{"./escapeTextContentForBrowser":341,"./setInnerHTML":361,"fbjs/lib/ExecutionEnvironment":108}],363:[function(require,module,exports){
+},{"./escapeTextContentForBrowser":352,"./setInnerHTML":372,"fbjs/lib/ExecutionEnvironment":112}],374:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57590,7 +59583,7 @@ function shouldUpdateReactComponent(prevElement, nextElement) {
 }
 
 module.exports = shouldUpdateReactComponent;
-},{}],364:[function(require,module,exports){
+},{}],375:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -57760,7 +59753,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 
 module.exports = traverseAllChildren;
 }).call(this,require('_process'))
-},{"./KeyEscapeUtils":243,"./ReactCurrentOwner":257,"./ReactElement":281,"./getIteratorFn":350,"./reactProdInvariant":359,"_process":205,"fbjs/lib/invariant":122,"fbjs/lib/warning":131}],365:[function(require,module,exports){
+},{"./KeyEscapeUtils":254,"./ReactCurrentOwner":268,"./ReactElement":292,"./getIteratorFn":361,"./reactProdInvariant":370,"_process":216,"fbjs/lib/invariant":126,"fbjs/lib/warning":135}],376:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -58145,12 +60138,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = validateDOMNesting;
 }).call(this,require('_process'))
-},{"_process":205,"fbjs/lib/emptyFunction":114,"fbjs/lib/warning":131,"object-assign":150}],366:[function(require,module,exports){
+},{"_process":216,"fbjs/lib/emptyFunction":118,"fbjs/lib/warning":135,"object-assign":160}],377:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/React');
 
-},{"./lib/React":246}],367:[function(require,module,exports){
+},{"./lib/React":257}],378:[function(require,module,exports){
 (function (Buffer){
 /*
 CryptoJS v3.1.2
@@ -58364,7 +60357,7 @@ function ripemd160 (message) {
 module.exports = ripemd160
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64}],368:[function(require,module,exports){
+},{"buffer":64}],379:[function(require,module,exports){
 ;(function(exports) {
 
 // export the class if we are in a Node-like system.
@@ -59553,7 +61546,7 @@ if (typeof define === 'function' && define.amd)
   semver = {}
 );
 
-},{}],369:[function(require,module,exports){
+},{}],380:[function(require,module,exports){
 (function (Buffer){
 // prototype class for hash functions
 function Hash (blockSize, finalSize) {
@@ -59626,7 +61619,7 @@ Hash.prototype._update = function () {
 module.exports = Hash
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64}],370:[function(require,module,exports){
+},{"buffer":64}],381:[function(require,module,exports){
 var exports = module.exports = function SHA (algorithm) {
   algorithm = algorithm.toLowerCase()
 
@@ -59643,7 +61636,7 @@ exports.sha256 = require('./sha256')
 exports.sha384 = require('./sha384')
 exports.sha512 = require('./sha512')
 
-},{"./sha":371,"./sha1":372,"./sha224":373,"./sha256":374,"./sha384":375,"./sha512":376}],371:[function(require,module,exports){
+},{"./sha":382,"./sha1":383,"./sha224":384,"./sha256":385,"./sha384":386,"./sha512":387}],382:[function(require,module,exports){
 (function (Buffer){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-0, as defined
@@ -59740,7 +61733,7 @@ Sha.prototype._hash = function () {
 module.exports = Sha
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":369,"buffer":64,"inherits":142}],372:[function(require,module,exports){
+},{"./hash":380,"buffer":64,"inherits":148}],383:[function(require,module,exports){
 (function (Buffer){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
@@ -59842,7 +61835,7 @@ Sha1.prototype._hash = function () {
 module.exports = Sha1
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":369,"buffer":64,"inherits":142}],373:[function(require,module,exports){
+},{"./hash":380,"buffer":64,"inherits":148}],384:[function(require,module,exports){
 (function (Buffer){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
@@ -59898,7 +61891,7 @@ Sha224.prototype._hash = function () {
 module.exports = Sha224
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":369,"./sha256":374,"buffer":64,"inherits":142}],374:[function(require,module,exports){
+},{"./hash":380,"./sha256":385,"buffer":64,"inherits":148}],385:[function(require,module,exports){
 (function (Buffer){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
@@ -60036,7 +62029,7 @@ Sha256.prototype._hash = function () {
 module.exports = Sha256
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":369,"buffer":64,"inherits":142}],375:[function(require,module,exports){
+},{"./hash":380,"buffer":64,"inherits":148}],386:[function(require,module,exports){
 (function (Buffer){
 var inherits = require('inherits')
 var SHA512 = require('./sha512')
@@ -60096,7 +62089,7 @@ Sha384.prototype._hash = function () {
 module.exports = Sha384
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":369,"./sha512":376,"buffer":64,"inherits":142}],376:[function(require,module,exports){
+},{"./hash":380,"./sha512":387,"buffer":64,"inherits":148}],387:[function(require,module,exports){
 (function (Buffer){
 var inherits = require('inherits')
 var Hash = require('./hash')
@@ -60359,7 +62352,7 @@ Sha512.prototype._hash = function () {
 module.exports = Sha512
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":369,"buffer":64,"inherits":142}],377:[function(require,module,exports){
+},{"./hash":380,"buffer":64,"inherits":148}],388:[function(require,module,exports){
 //filter will reemit the data if cb(err,pass) pass is truthy
 
 // reduce is more tricky
@@ -60424,7 +62417,7 @@ function split (matcher, mapper, options) {
   })
 }
 
-},{"string_decoder":403,"through":404}],378:[function(require,module,exports){
+},{"string_decoder":414,"through":428}],389:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -60553,14 +62546,14 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":105,"inherits":142,"readable-stream/duplex.js":380,"readable-stream/passthrough.js":387,"readable-stream/readable.js":388,"readable-stream/transform.js":389,"readable-stream/writable.js":390}],379:[function(require,module,exports){
+},{"events":109,"inherits":148,"readable-stream/duplex.js":391,"readable-stream/passthrough.js":398,"readable-stream/readable.js":399,"readable-stream/transform.js":400,"readable-stream/writable.js":401}],390:[function(require,module,exports){
 arguments[4][54][0].apply(exports,arguments)
-},{"dup":54}],380:[function(require,module,exports){
+},{"dup":54}],391:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":381}],381:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":392}],392:[function(require,module,exports){
 arguments[4][55][0].apply(exports,arguments)
-},{"./_stream_readable":383,"./_stream_writable":385,"core-util-is":68,"dup":55,"inherits":142,"process-nextick-args":204}],382:[function(require,module,exports){
+},{"./_stream_readable":394,"./_stream_writable":396,"core-util-is":68,"dup":55,"inherits":148,"process-nextick-args":215}],393:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -60587,18 +62580,18 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":384,"core-util-is":68,"inherits":142}],383:[function(require,module,exports){
+},{"./_stream_transform":395,"core-util-is":68,"inherits":148}],394:[function(require,module,exports){
 arguments[4][56][0].apply(exports,arguments)
-},{"./_stream_duplex":381,"./internal/streams/BufferList":386,"_process":205,"buffer":64,"buffer-shims":61,"core-util-is":68,"dup":56,"events":105,"inherits":142,"isarray":379,"process-nextick-args":204,"string_decoder/":403,"util":26}],384:[function(require,module,exports){
+},{"./_stream_duplex":392,"./internal/streams/BufferList":397,"_process":216,"buffer":64,"buffer-shims":61,"core-util-is":68,"dup":56,"events":109,"inherits":148,"isarray":390,"process-nextick-args":215,"string_decoder/":414,"util":26}],395:[function(require,module,exports){
 arguments[4][57][0].apply(exports,arguments)
-},{"./_stream_duplex":381,"core-util-is":68,"dup":57,"inherits":142}],385:[function(require,module,exports){
+},{"./_stream_duplex":392,"core-util-is":68,"dup":57,"inherits":148}],396:[function(require,module,exports){
 arguments[4][58][0].apply(exports,arguments)
-},{"./_stream_duplex":381,"_process":205,"buffer":64,"buffer-shims":61,"core-util-is":68,"dup":58,"events":105,"inherits":142,"process-nextick-args":204,"util-deprecate":408}],386:[function(require,module,exports){
+},{"./_stream_duplex":392,"_process":216,"buffer":64,"buffer-shims":61,"core-util-is":68,"dup":58,"events":109,"inherits":148,"process-nextick-args":215,"util-deprecate":433}],397:[function(require,module,exports){
 arguments[4][59][0].apply(exports,arguments)
-},{"buffer":64,"buffer-shims":61,"dup":59}],387:[function(require,module,exports){
+},{"buffer":64,"buffer-shims":61,"dup":59}],398:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":382}],388:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":393}],399:[function(require,module,exports){
 (function (process){
 var Stream = (function (){
   try {
@@ -60618,12 +62611,12 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
 }
 
 }).call(this,require('_process'))
-},{"./lib/_stream_duplex.js":381,"./lib/_stream_passthrough.js":382,"./lib/_stream_readable.js":383,"./lib/_stream_transform.js":384,"./lib/_stream_writable.js":385,"_process":205}],389:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":392,"./lib/_stream_passthrough.js":393,"./lib/_stream_readable.js":394,"./lib/_stream_transform.js":395,"./lib/_stream_writable.js":396,"_process":216}],400:[function(require,module,exports){
 arguments[4][60][0].apply(exports,arguments)
-},{"./lib/_stream_transform.js":384,"dup":60}],390:[function(require,module,exports){
+},{"./lib/_stream_transform.js":395,"dup":60}],401:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":385}],391:[function(require,module,exports){
+},{"./lib/_stream_writable.js":396}],402:[function(require,module,exports){
 (function (global){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
@@ -60705,7 +62698,7 @@ http.METHODS = [
 	'UNSUBSCRIBE'
 ]
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./lib/request":393,"builtin-status-codes":66,"url":406,"xtend":413}],392:[function(require,module,exports){
+},{"./lib/request":404,"builtin-status-codes":66,"url":431,"xtend":438}],403:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableStream)
 
@@ -60749,7 +62742,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],393:[function(require,module,exports){
+},{}],404:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -61035,7 +63028,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":392,"./response":394,"_process":205,"buffer":64,"inherits":142,"readable-stream":402,"to-arraybuffer":405}],394:[function(require,module,exports){
+},{"./capability":403,"./response":405,"_process":216,"buffer":64,"inherits":148,"readable-stream":413,"to-arraybuffer":429}],405:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -61219,23 +63212,23 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":392,"_process":205,"buffer":64,"inherits":142,"readable-stream":402}],395:[function(require,module,exports){
+},{"./capability":403,"_process":216,"buffer":64,"inherits":148,"readable-stream":413}],406:[function(require,module,exports){
 arguments[4][54][0].apply(exports,arguments)
-},{"dup":54}],396:[function(require,module,exports){
+},{"dup":54}],407:[function(require,module,exports){
 arguments[4][55][0].apply(exports,arguments)
-},{"./_stream_readable":398,"./_stream_writable":400,"core-util-is":68,"dup":55,"inherits":142,"process-nextick-args":204}],397:[function(require,module,exports){
-arguments[4][382][0].apply(exports,arguments)
-},{"./_stream_transform":399,"core-util-is":68,"dup":382,"inherits":142}],398:[function(require,module,exports){
+},{"./_stream_readable":409,"./_stream_writable":411,"core-util-is":68,"dup":55,"inherits":148,"process-nextick-args":215}],408:[function(require,module,exports){
+arguments[4][393][0].apply(exports,arguments)
+},{"./_stream_transform":410,"core-util-is":68,"dup":393,"inherits":148}],409:[function(require,module,exports){
 arguments[4][56][0].apply(exports,arguments)
-},{"./_stream_duplex":396,"./internal/streams/BufferList":401,"_process":205,"buffer":64,"buffer-shims":61,"core-util-is":68,"dup":56,"events":105,"inherits":142,"isarray":395,"process-nextick-args":204,"string_decoder/":403,"util":26}],399:[function(require,module,exports){
+},{"./_stream_duplex":407,"./internal/streams/BufferList":412,"_process":216,"buffer":64,"buffer-shims":61,"core-util-is":68,"dup":56,"events":109,"inherits":148,"isarray":406,"process-nextick-args":215,"string_decoder/":414,"util":26}],410:[function(require,module,exports){
 arguments[4][57][0].apply(exports,arguments)
-},{"./_stream_duplex":396,"core-util-is":68,"dup":57,"inherits":142}],400:[function(require,module,exports){
+},{"./_stream_duplex":407,"core-util-is":68,"dup":57,"inherits":148}],411:[function(require,module,exports){
 arguments[4][58][0].apply(exports,arguments)
-},{"./_stream_duplex":396,"_process":205,"buffer":64,"buffer-shims":61,"core-util-is":68,"dup":58,"events":105,"inherits":142,"process-nextick-args":204,"util-deprecate":408}],401:[function(require,module,exports){
+},{"./_stream_duplex":407,"_process":216,"buffer":64,"buffer-shims":61,"core-util-is":68,"dup":58,"events":109,"inherits":148,"process-nextick-args":215,"util-deprecate":433}],412:[function(require,module,exports){
 arguments[4][59][0].apply(exports,arguments)
-},{"buffer":64,"buffer-shims":61,"dup":59}],402:[function(require,module,exports){
-arguments[4][388][0].apply(exports,arguments)
-},{"./lib/_stream_duplex.js":396,"./lib/_stream_passthrough.js":397,"./lib/_stream_readable.js":398,"./lib/_stream_transform.js":399,"./lib/_stream_writable.js":400,"_process":205,"dup":388}],403:[function(require,module,exports){
+},{"buffer":64,"buffer-shims":61,"dup":59}],413:[function(require,module,exports){
+arguments[4][399][0].apply(exports,arguments)
+},{"./lib/_stream_duplex.js":407,"./lib/_stream_passthrough.js":408,"./lib/_stream_readable.js":409,"./lib/_stream_transform.js":410,"./lib/_stream_writable.js":411,"_process":216,"dup":399}],414:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -61458,7 +63451,2933 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":64}],404:[function(require,module,exports){
+},{"buffer":64}],415:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.CircularLinkedList = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _LinkedList2 = require("./LinkedList");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var CircularLinkedList = exports.CircularLinkedList = function (_LinkedList) {
+    _inherits(CircularLinkedList, _LinkedList);
+
+    function CircularLinkedList() {
+        _classCallCheck(this, CircularLinkedList);
+
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(CircularLinkedList).apply(this, arguments));
+    }
+
+    _createClass(CircularLinkedList, [{
+        key: "append",
+        value: function append(node) {
+            if (this.first === null) {
+                node.prev = node;
+                node.next = node;
+                this.first = node;
+                this.last = node;
+            } else {
+                node.prev = this.last;
+                node.next = this.first;
+                this.first.prev = node;
+                this.last.next = node;
+                this.last = node;
+            }
+            this.length++;
+        }
+    }, {
+        key: "prepend",
+        value: function prepend(node) {
+            if (this.first === null) {
+                this.append(node);
+                return;
+            } else {
+                node.prev = this.last;
+                node.next = this.first;
+                this.first.prev = node;
+                this.last.next = node;
+                this.first = node;
+            }
+            this.length++;
+        }
+    }, {
+        key: "insertAfter",
+        value: function insertAfter(node, newNode) {
+            newNode.prev = node;
+            newNode.next = node.next;
+            node.next.prev = newNode;
+            node.next = newNode;
+            if (newNode.prev === this.last) {
+                this.last = newNode;
+            }
+            this.length++;
+        }
+    }, {
+        key: "insertBefore",
+        value: function insertBefore(node, newNode) {
+            newNode.prev = node.prev;
+            newNode.next = node;
+            node.prev.next = newNode;
+            node.prev = newNode;
+            if (newNode.next === this.first) {
+                this.first = newNode;
+            }
+            this.length++;
+        }
+    }, {
+        key: "remove",
+        value: function remove(node) {
+            if (this.length > 1) {
+                node.prev.next = node.next;
+                node.next.prev = node.prev;
+                if (node === this.first) {
+                    this.first = node.next;
+                }
+                if (node === this.last) {
+                    this.last = node.prev;
+                }
+            } else {
+                this.first = null;
+                this.last = null;
+            }
+            node.prev = null;
+            node.next = null;
+            this.length--;
+        }
+    }, {
+        key: "withData",
+        value: function withData(data) {
+            var nodeFromStart = this.first,
+                nodeFromEnd = this.last,
+                n = Math.ceil(this.length / 2);
+            while (n--) {
+                if (nodeFromStart.data === data) {
+                    return nodeFromStart;
+                }
+                if (nodeFromEnd.data === data) {
+                    return nodeFromEnd;
+                }
+                nodeFromStart = nodeFromStart.next;
+                nodeFromEnd = nodeFromEnd.prev;
+            }
+            return null;
+        }
+    }]);
+
+    return CircularLinkedList;
+}(_LinkedList2.LinkedList);
+
+;
+
+CircularLinkedList.fromArray = function (list, useNodes) {
+    var linked = new CircularLinkedList();
+    var n = list.length;
+    while (n--) {
+        linked.prepend(useNodes ? new _LinkedList2.LinkedList.Node(list[n]) : list[n]);
+    }
+    return linked;
+};
+
+
+},{"./LinkedList":418}],416:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Line = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _PRECISION = require("./PRECISION");
+
+var _Vector = require("./Vector");
+
+var _Matrix = require("./Matrix");
+
+var _Plane = require("./Plane");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Line = exports.Line = function () {
+    function Line(anchor, direction) {
+        _classCallCheck(this, Line);
+
+        this.setVectors(anchor, direction);
+    }
+
+    _createClass(Line, [{
+        key: "eql",
+        value: function eql(line) {
+            return this.isParallelTo(line) && this.contains(line.anchor);
+        }
+    }, {
+        key: "dup",
+        value: function dup() {
+            return new Line(this.anchor, this.direction);
+        }
+    }, {
+        key: "translate",
+        value: function translate(vector) {
+            var V = vector.elements || vector;
+            return new Line([this.anchor.elements[0] + V[0], this.anchor.elements[1] + V[1], this.anchor.elements[2] + (V[2] || 0)], this.direction);
+        }
+    }, {
+        key: "isParallelTo",
+        value: function isParallelTo(obj) {
+            if (obj.normal || obj.start && obj.end) {
+                return obj.isParallelTo(this);
+            }
+            var theta = this.direction.angleFrom(obj.direction);
+            return Math.abs(theta) <= _PRECISION.PRECISION || Math.abs(theta - Math.PI) <= _PRECISION.PRECISION;
+        }
+    }, {
+        key: "distanceFrom",
+        value: function distanceFrom(obj) {
+            if (obj.normal || obj.start && obj.end) {
+                return obj.distanceFrom(this);
+            }
+            if (obj.direction) {
+                // obj is a line
+                if (this.isParallelTo(obj)) {
+                    return this.distanceFrom(obj.anchor);
+                }
+                var N = this.direction.cross(obj.direction).toUnitVector().elements;
+                var A = this.anchor.elements,
+                    B = obj.anchor.elements;
+                return Math.abs((A[0] - B[0]) * N[0] + (A[1] - B[1]) * N[1] + (A[2] - B[2]) * N[2]);
+            } else {
+                // obj is a point
+                var P = obj.elements || obj;
+                var A = this.anchor.elements,
+                    D = this.direction.elements;
+                var PA1 = P[0] - A[0],
+                    PA2 = P[1] - A[1],
+                    PA3 = (P[2] || 0) - A[2];
+                var modPA = Math.sqrt(PA1 * PA1 + PA2 * PA2 + PA3 * PA3);
+                if (modPA === 0) {
+                    return 0;
+                }
+                // Assumes direction vector is normalized
+                var cosTheta = (PA1 * D[0] + PA2 * D[1] + PA3 * D[2]) / modPA;
+                var sin2 = 1 - cosTheta * cosTheta;
+                return Math.abs(modPA * Math.sqrt(sin2 < 0 ? 0 : sin2));
+            }
+        }
+    }, {
+        key: "contains",
+        value: function contains(obj) {
+            if (obj.start && obj.end) {
+                return this.contains(obj.start) && this.contains(obj.end);
+            }
+            var dist = this.distanceFrom(obj);
+            return dist !== null && dist <= _PRECISION.PRECISION;
+        }
+    }, {
+        key: "positionOf",
+        value: function positionOf(point) {
+            if (!this.contains(point)) {
+                return null;
+            }
+            var P = point.elements || point;
+            var A = this.anchor.elements,
+                D = this.direction.elements;
+            return (P[0] - A[0]) * D[0] + (P[1] - A[1]) * D[1] + ((P[2] || 0) - A[2]) * D[2];
+        }
+    }, {
+        key: "liesIn",
+        value: function liesIn(plane) {
+            return plane.contains(this);
+        }
+    }, {
+        key: "intersects",
+        value: function intersects(obj) {
+            if (obj.normal) {
+                return obj.intersects(this);
+            }
+            return !this.isParallelTo(obj) && this.distanceFrom(obj) <= _PRECISION.PRECISION;
+        }
+    }, {
+        key: "intersectionWith",
+        value: function intersectionWith(obj) {
+            if (obj.normal || obj.start && obj.end) {
+                return obj.intersectionWith(this);
+            }
+            if (!this.intersects(obj)) {
+                return null;
+            }
+            var P = this.anchor.elements,
+                X = this.direction.elements,
+                Q = obj.anchor.elements,
+                Y = obj.direction.elements;
+            var X1 = X[0],
+                X2 = X[1],
+                X3 = X[2],
+                Y1 = Y[0],
+                Y2 = Y[1],
+                Y3 = Y[2];
+            var PsubQ1 = P[0] - Q[0],
+                PsubQ2 = P[1] - Q[1],
+                PsubQ3 = P[2] - Q[2];
+            var XdotQsubP = -X1 * PsubQ1 - X2 * PsubQ2 - X3 * PsubQ3;
+            var YdotPsubQ = Y1 * PsubQ1 + Y2 * PsubQ2 + Y3 * PsubQ3;
+            var XdotX = X1 * X1 + X2 * X2 + X3 * X3;
+            var YdotY = Y1 * Y1 + Y2 * Y2 + Y3 * Y3;
+            var XdotY = X1 * Y1 + X2 * Y2 + X3 * Y3;
+            var k = (XdotQsubP * YdotY / XdotX + XdotY * YdotPsubQ) / (YdotY - XdotY * XdotY);
+            return new _Vector.Vector([P[0] + k * X1, P[1] + k * X2, P[2] + k * X3]);
+        }
+    }, {
+        key: "pointClosestTo",
+        value: function pointClosestTo(obj) {
+            if (obj.start && obj.end) {
+                // obj is a line segment
+                var P = obj.pointClosestTo(this);
+                return P === null ? null : this.pointClosestTo(P);
+            } else if (obj.direction) {
+                // obj is a line
+                if (this.intersects(obj)) {
+                    return this.intersectionWith(obj);
+                }
+                if (this.isParallelTo(obj)) {
+                    return null;
+                }
+                var D = this.direction.elements,
+                    E = obj.direction.elements;
+                var D1 = D[0],
+                    D2 = D[1],
+                    D3 = D[2],
+                    E1 = E[0],
+                    E2 = E[1],
+                    E3 = E[2];
+                // Create plane containing obj and the shared normal and intersect this
+                // with it Thank you:
+                // http://www.cgafaq.info/wiki/Line-line_distance
+                var x = D3 * E1 - D1 * E3,
+                    y = D1 * E2 - D2 * E1,
+                    z = D2 * E3 - D3 * E2;
+                var N = [x * E3 - y * E2, y * E1 - z * E3, z * E2 - x * E1];
+                var P = new _Plane.Plane(obj.anchor, N);
+                return P.intersectionWith(this);
+            } else {
+                // obj is a point
+                var P = obj.elements || obj;
+                if (this.contains(P)) {
+                    return new _Vector.Vector(P);
+                }
+                var A = this.anchor.elements,
+                    D = this.direction.elements;
+                var D1 = D[0],
+                    D2 = D[1],
+                    D3 = D[2],
+                    A1 = A[0],
+                    A2 = A[1],
+                    A3 = A[2];
+                var x = D1 * (P[1] - A2) - D2 * (P[0] - A1),
+                    y = D2 * ((P[2] || 0) - A3) - D3 * (P[1] - A2),
+                    z = D3 * (P[0] - A1) - D1 * ((P[2] || 0) - A3);
+                var V = new _Vector.Vector([D2 * x - D3 * z, D3 * y - D1 * x, D1 * z - D2 * y]);
+                var k = this.distanceFrom(P) / V.modulus();
+                return new _Vector.Vector([P[0] + V.elements[0] * k, P[1] + V.elements[1] * k, (P[2] || 0) + V.elements[2] * k]);
+            }
+        }
+
+        // Returns a copy of the line rotated by t radians about the given line. Works
+        // by finding the argument's closest point to this line's anchor point (call
+        // this C) and rotating the anchor about C. Also rotates the line's direction
+        // about the argument's. Be careful with this - the rotation axis' direction
+        // affects the outcome!
+
+    }, {
+        key: "rotate",
+        value: function rotate(t, line) {
+            // If we're working in 2D
+            if (typeof line.direction === 'undefined') {
+                line = new Line(line.to3D(), _Vector.Vector.k);
+            }
+            var R = _Matrix.Matrix.Rotation(t, line.direction).elements;
+            var C = line.pointClosestTo(this.anchor).elements;
+            var A = this.anchor.elements,
+                D = this.direction.elements;
+            var C1 = C[0],
+                C2 = C[1],
+                C3 = C[2],
+                A1 = A[0],
+                A2 = A[1],
+                A3 = A[2];
+            var x = A1 - C1,
+                y = A2 - C2,
+                z = A3 - C3;
+            return new Line([C1 + R[0][0] * x + R[0][1] * y + R[0][2] * z, C2 + R[1][0] * x + R[1][1] * y + R[1][2] * z, C3 + R[2][0] * x + R[2][1] * y + R[2][2] * z], [R[0][0] * D[0] + R[0][1] * D[1] + R[0][2] * D[2], R[1][0] * D[0] + R[1][1] * D[1] + R[1][2] * D[2], R[2][0] * D[0] + R[2][1] * D[1] + R[2][2] * D[2]]);
+        }
+    }, {
+        key: "reverse",
+        value: function reverse() {
+            return new Line(this.anchor, this.direction.x(-1));
+        }
+    }, {
+        key: "reflectionIn",
+        value: function reflectionIn(obj) {
+            if (obj.normal) {
+                // obj is a plane
+                var A = this.anchor.elements,
+                    D = this.direction.elements;
+                var A1 = A[0],
+                    A2 = A[1],
+                    A3 = A[2],
+                    D1 = D[0],
+                    D2 = D[1],
+                    D3 = D[2];
+                var newA = this.anchor.reflectionIn(obj).elements;
+                // Add the line's direction vector to its anchor, then mirror that in the plane
+                var AD1 = A1 + D1,
+                    AD2 = A2 + D2,
+                    AD3 = A3 + D3;
+                var Q = obj.pointClosestTo([AD1, AD2, AD3]).elements;
+                var newD = [Q[0] + (Q[0] - AD1) - newA[0], Q[1] + (Q[1] - AD2) - newA[1], Q[2] + (Q[2] - AD3) - newA[2]];
+                return new Line(newA, newD);
+            } else if (obj.direction) {
+                // obj is a line - reflection obtained by rotating PI radians about obj
+                return this.rotate(Math.PI, obj);
+            } else {
+                // obj is a point - just reflect the line's anchor in it
+                var P = obj.elements || obj;
+                return new Line(this.anchor.reflectionIn([P[0], P[1], P[2] || 0]), this.direction);
+            }
+        }
+    }, {
+        key: "setVectors",
+        value: function setVectors(anchor, direction) {
+            // Need to do this so that line's properties are not references to the
+            // arguments passed in
+            anchor = new _Vector.Vector(anchor);
+            direction = new _Vector.Vector(direction);
+            if (anchor.elements.length === 2) {
+                anchor.elements.push(0);
+            }
+            if (direction.elements.length === 2) {
+                direction.elements.push(0);
+            }
+            if (anchor.elements.length > 3 || direction.elements.length > 3) {
+                return null;
+            }
+            var mod = direction.modulus();
+            if (mod === 0) {
+                return null;
+            }
+            this.anchor = anchor;
+            this.direction = new _Vector.Vector([direction.elements[0] / mod, direction.elements[1] / mod, direction.elements[2] / mod]);
+            return this;
+        }
+    }]);
+
+    return Line;
+}();
+
+Line.X = new Line(_Vector.Vector.Zero(3), _Vector.Vector.i);
+Line.Y = new Line(_Vector.Vector.Zero(3), _Vector.Vector.j);
+Line.Z = new Line(_Vector.Vector.Zero(3), _Vector.Vector.k);
+
+
+},{"./Matrix":420,"./PRECISION":421,"./Plane":422,"./Vector":426}],417:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.LineSegment = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Vector = require("./Vector");
+
+var _Plane = require("./Plane");
+
+var _Line = require("./Line");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var LineSegment = exports.LineSegment = function () {
+    function LineSegment(v1, v2) {
+        _classCallCheck(this, LineSegment);
+
+        this.setPoints(v1, v2);
+    }
+
+    _createClass(LineSegment, [{
+        key: "eql",
+        value: function eql(segment) {
+            return this.start.eql(segment.start) && this.end.eql(segment.end) || this.start.eql(segment.end) && this.end.eql(segment.start);
+        }
+    }, {
+        key: "dup",
+        value: function dup() {
+            return new LineSegment(this.start, this.end);
+        }
+    }, {
+        key: "length",
+        value: function length() {
+            var A = this.start.elements,
+                B = this.end.elements;
+            var C1 = B[0] - A[0],
+                C2 = B[1] - A[1],
+                C3 = B[2] - A[2];
+            return Math.sqrt(C1 * C1 + C2 * C2 + C3 * C3);
+        }
+    }, {
+        key: "toVector",
+        value: function toVector() {
+            var A = this.start.elements,
+                B = this.end.elements;
+            return new _Vector.Vector([B[0] - A[0], B[1] - A[1], B[2] - A[2]]);
+        }
+    }, {
+        key: "midpoint",
+        value: function midpoint() {
+            var A = this.start.elements,
+                B = this.end.elements;
+            return new _Vector.Vector([(B[0] + A[0]) / 2, (B[1] + A[1]) / 2, (B[2] + A[2]) / 2]);
+        }
+    }, {
+        key: "bisectingPlane",
+        value: function bisectingPlane() {
+            return new _Plane.Plane(this.midpoint(), this.toVector());
+        }
+    }, {
+        key: "translate",
+        value: function translate(vector) {
+            var V = vector.elements || vector;
+            var S = this.start.elements,
+                E = this.end.elements;
+            return new LineSegment([S[0] + V[0], S[1] + V[1], S[2] + (V[2] || 0)], [E[0] + V[0], E[1] + V[1], E[2] + (V[2] || 0)]);
+        }
+    }, {
+        key: "isParallelTo",
+        value: function isParallelTo(obj) {
+            return this.line.isParallelTo(obj);
+        }
+    }, {
+        key: "distanceFrom",
+        value: function distanceFrom(obj) {
+            var P = this.pointClosestTo(obj);
+            return P === null ? null : P.distanceFrom(obj);
+        }
+    }, {
+        key: "contains",
+        value: function contains(obj) {
+            if (obj.start && obj.end) {
+                return this.contains(obj.start) && this.contains(obj.end);
+            }
+            var P = (obj.elements || obj).slice();
+            if (P.length === 2) {
+                P.push(0);
+            }
+            if (this.start.eql(P)) {
+                return true;
+            }
+            var S = this.start.elements;
+            var V = new _Vector.Vector([S[0] - P[0], S[1] - P[1], S[2] - (P[2] || 0)]);
+            var vect = this.toVector();
+            return V.isAntiparallelTo(vect) && V.modulus() <= vect.modulus();
+        }
+    }, {
+        key: "intersects",
+        value: function intersects(obj) {
+            return this.intersectionWith(obj) !== null;
+        }
+    }, {
+        key: "intersectionWith",
+        value: function intersectionWith(obj) {
+            if (!this.line.intersects(obj)) {
+                return null;
+            }
+            var P = this.line.intersectionWith(obj);
+            return this.contains(P) ? P : null;
+        }
+    }, {
+        key: "pointClosestTo",
+        value: function pointClosestTo(obj) {
+            if (obj.normal) {
+                // obj is a plane
+                var V = this.line.intersectionWith(obj);
+                if (V === null) {
+                    return null;
+                }
+                return this.pointClosestTo(V);
+            } else {
+                // obj is a line (segment) or point
+                var P = this.line.pointClosestTo(obj);
+                if (P === null) {
+                    return null;
+                }
+                if (this.contains(P)) {
+                    return P;
+                }
+                return (this.line.positionOf(P) < 0 ? this.start : this.end).dup();
+            }
+        }
+    }, {
+        key: "setPoints",
+        value: function setPoints(startPoint, endPoint) {
+            startPoint = new _Vector.Vector(startPoint).to3D();
+            endPoint = new _Vector.Vector(endPoint).to3D();
+            if (startPoint === null || endPoint === null) {
+                return null;
+            }
+            this.line = new _Line.Line(startPoint, endPoint.subtract(startPoint));
+            this.start = startPoint;
+            this.end = endPoint;
+            return this;
+        }
+    }]);
+
+    return LineSegment;
+}();
+
+
+},{"./Line":416,"./Plane":422,"./Vector":426}],418:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var LinkedList = exports.LinkedList = function () {
+    function LinkedList() {
+        _classCallCheck(this, LinkedList);
+
+        this.length = 0;
+        this.first = null;
+        this.last = null;
+    }
+
+    _createClass(LinkedList, [{
+        key: "forEach",
+        value: function forEach(fn, context) {
+            var node = this.first,
+                n = this.length;
+            for (var i = 0; i < n; i++) {
+                fn.call(context, node, i);
+                node = node.next;
+            }
+        }
+    }, {
+        key: "at",
+        value: function at(i) {
+            if (!(i >= 0 && i < this.length)) {
+                return null;
+            }
+            var node = this.first;
+            while (i--) {
+                node = node.next;
+            }
+            return node;
+        }
+    }, {
+        key: "randomNode",
+        value: function randomNode() {
+            var n = Math.floor(Math.random() * this.length);
+            return this.at(n);
+        }
+    }, {
+        key: "toArray",
+        value: function toArray() {
+            var arr = [],
+                node = this.first,
+                n = this.length;
+            while (n--) {
+                arr.push(node.data || node);
+                node = node.next;
+            }
+            return arr;
+        }
+    }]);
+
+    return LinkedList;
+}();
+
+LinkedList.prototype.each = LinkedList.prototype.forEach;
+
+
+},{}],419:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var LinkedListNode = exports.LinkedListNode = function LinkedListNode(data) {
+    _classCallCheck(this, LinkedListNode);
+
+    this.prev = null;
+    this.next = null;
+    this.data = data;
+};
+
+
+},{}],420:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Matrix = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _PRECISION = require("./PRECISION");
+
+var _Vector = require("./Vector");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Matrix = exports.Matrix = function () {
+    function Matrix(elements) {
+        _classCallCheck(this, Matrix);
+
+        this.setElements(elements);
+    }
+
+    _createClass(Matrix, [{
+        key: "e",
+        value: function e(i, j) {
+            if (i < 1 || i > this.elements.length || j < 1 || j > this.elements[0].length) {
+                return null;
+            }
+            return this.elements[i - 1][j - 1];
+        }
+    }, {
+        key: "row",
+        value: function row(i) {
+            if (i > this.elements.length) {
+                return null;
+            }
+            return new _Vector.Vector(this.elements[i - 1]);
+        }
+    }, {
+        key: "col",
+        value: function col(j) {
+            if (this.elements.length === 0) {
+                return null;
+            }
+            if (j > this.elements[0].length) {
+                return null;
+            }
+            var col = [],
+                n = this.elements.length;
+            for (var i = 0; i < n; i++) {
+                col.push(this.elements[i][j - 1]);
+            }
+            return new _Vector.Vector(col);
+        }
+    }, {
+        key: "dimensions",
+        value: function dimensions() {
+            var cols = this.elements.length === 0 ? 0 : this.elements[0].length;
+            return { rows: this.elements.length, cols: cols };
+        }
+    }, {
+        key: "rows",
+        value: function rows() {
+            return this.elements.length;
+        }
+    }, {
+        key: "cols",
+        value: function cols() {
+            if (this.elements.length === 0) {
+                return 0;
+            }
+            return this.elements[0].length;
+        }
+    }, {
+        key: "eql",
+        value: function eql(matrix) {
+            var M = matrix.elements || matrix;
+            if (!M[0] || typeof M[0][0] === 'undefined') {
+                M = new Matrix(M).elements;
+            }
+            if (this.elements.length === 0 || M.length === 0) {
+                return this.elements.length === M.length;
+            }
+            if (this.elements.length !== M.length) {
+                return false;
+            }
+            if (this.elements[0].length !== M[0].length) {
+                return false;
+            }
+            var i = this.elements.length,
+                nj = this.elements[0].length,
+                j;
+            while (i--) {
+                j = nj;
+                while (j--) {
+                    if (Math.abs(this.elements[i][j] - M[i][j]) > _PRECISION.PRECISION) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+    }, {
+        key: "dup",
+        value: function dup() {
+            return new Matrix(this.elements);
+        }
+    }, {
+        key: "map",
+        value: function map(fn, context) {
+            if (this.elements.length === 0) {
+                return new Matrix([]);
+            }
+            var els = [],
+                i = this.elements.length,
+                nj = this.elements[0].length,
+                j;
+            while (i--) {
+                j = nj;
+                els[i] = [];
+                while (j--) {
+                    els[i][j] = fn.call(context, this.elements[i][j], i + 1, j + 1);
+                }
+            }
+            return new Matrix(els);
+        }
+    }, {
+        key: "isSameSizeAs",
+        value: function isSameSizeAs(matrix) {
+            var M = matrix.elements || matrix;
+            if (typeof M[0][0] === 'undefined') {
+                M = new Matrix(M).elements;
+            }
+            if (this.elements.length === 0) {
+                return M.length === 0;
+            }
+            return this.elements.length === M.length && this.elements[0].length === M[0].length;
+        }
+    }, {
+        key: "add",
+        value: function add(matrix) {
+            if (this.elements.length === 0) {
+                return this.map(function (x) {
+                    return x;
+                });
+            }
+            var M = matrix.elements || matrix;
+            if (typeof M[0][0] === 'undefined') {
+                M = new Matrix(M).elements;
+            }
+            if (!this.isSameSizeAs(M)) {
+                return null;
+            }
+            return this.map(function (x, i, j) {
+                return x + M[i - 1][j - 1];
+            });
+        }
+    }, {
+        key: "subtract",
+        value: function subtract(matrix) {
+            if (this.elements.length === 0) {
+                return this.map(function (x) {
+                    return x;
+                });
+            }
+            var M = matrix.elements || matrix;
+            if (typeof M[0][0] === 'undefined') {
+                M = new Matrix(M).elements;
+            }
+            if (!this.isSameSizeAs(M)) {
+                return null;
+            }
+            return this.map(function (x, i, j) {
+                return x - M[i - 1][j - 1];
+            });
+        }
+    }, {
+        key: "canMultiplyFromLeft",
+        value: function canMultiplyFromLeft(matrix) {
+            if (this.elements.length === 0) {
+                return false;
+            }
+            var M = matrix.elements || matrix;
+            if (typeof M[0][0] === 'undefined') {
+                M = new Matrix(M).elements;
+            }
+            // this.columns should equal matrix.rows
+            return this.elements[0].length === M.length;
+        }
+    }, {
+        key: "multiply",
+        value: function multiply(matrix) {
+            if (this.elements.length === 0) {
+                return null;
+            }
+            if (!matrix.elements) {
+                return this.map(function (x) {
+                    return x * matrix;
+                });
+            }
+            var returnVector = matrix.modulus ? true : false;
+            var M = matrix.elements || matrix;
+            if (typeof M[0][0] === 'undefined') {
+                M = new Matrix(M).elements;
+            }
+            if (!this.canMultiplyFromLeft(M)) {
+                return null;
+            }
+            var i = this.elements.length,
+                nj = M[0].length,
+                j;
+            var cols = this.elements[0].length,
+                c,
+                elements = [],
+                sum;
+            while (i--) {
+                j = nj;
+                elements[i] = [];
+                while (j--) {
+                    c = cols;
+                    sum = 0;
+                    while (c--) {
+                        sum += this.elements[i][c] * M[c][j];
+                    }
+                    elements[i][j] = sum;
+                }
+            }
+            var M = new Matrix(elements);
+            return returnVector ? M.col(1) : M;
+        }
+    }, {
+        key: "minor",
+        value: function minor(a, b, c, d) {
+            if (this.elements.length === 0) {
+                return null;
+            }
+            var elements = [],
+                ni = c,
+                i,
+                nj,
+                j;
+            var rows = this.elements.length,
+                cols = this.elements[0].length;
+            while (ni--) {
+                i = c - ni - 1;
+                elements[i] = [];
+                nj = d;
+                while (nj--) {
+                    j = d - nj - 1;
+                    elements[i][j] = this.elements[(a + i - 1) % rows][(b + j - 1) % cols];
+                }
+            }
+            return new Matrix(elements);
+        }
+    }, {
+        key: "transpose",
+        value: function transpose() {
+            if (this.elements.length === 0) {
+                return new Matrix([]);
+            }
+            var rows = this.elements.length,
+                i,
+                cols = this.elements[0].length,
+                j;
+            var elements = [],
+                i = cols;
+            while (i--) {
+                j = rows;
+                elements[i] = [];
+                while (j--) {
+                    elements[i][j] = this.elements[j][i];
+                }
+            }
+            return new Matrix(elements);
+        }
+    }, {
+        key: "isSquare",
+        value: function isSquare() {
+            var cols = this.elements.length === 0 ? 0 : this.elements[0].length;
+            return this.elements.length === cols;
+        }
+    }, {
+        key: "max",
+        value: function max() {
+            if (this.elements.length === 0) {
+                return null;
+            }
+            var m = 0,
+                i = this.elements.length,
+                nj = this.elements[0].length,
+                j;
+            while (i--) {
+                j = nj;
+                while (j--) {
+                    if (Math.abs(this.elements[i][j]) > Math.abs(m)) {
+                        m = this.elements[i][j];
+                    }
+                }
+            }
+            return m;
+        }
+    }, {
+        key: "indexOf",
+        value: function indexOf(x) {
+            if (this.elements.length === 0) {
+                return null;
+            }
+            var index = null,
+                ni = this.elements.length,
+                i,
+                nj = this.elements[0].length,
+                j;
+            for (i = 0; i < ni; i++) {
+                for (j = 0; j < nj; j++) {
+                    if (this.elements[i][j] === x) {
+                        return {
+                            i: i + 1,
+                            j: j + 1
+                        };
+                    }
+                }
+            }
+            return null;
+        }
+    }, {
+        key: "diagonal",
+        value: function diagonal() {
+            if (!this.isSquare) {
+                return null;
+            }
+            var els = [],
+                n = this.elements.length;
+            for (var i = 0; i < n; i++) {
+                els.push(this.elements[i][i]);
+            }
+            return new _Vector.Vector(els);
+        }
+    }, {
+        key: "toRightTriangular",
+        value: function toRightTriangular() {
+            if (this.elements.length === 0) {
+                return new Matrix([]);
+            }
+            var M = this.dup(),
+                els;
+            var n = this.elements.length,
+                i,
+                j,
+                np = this.elements[0].length,
+                p;
+            for (i = 0; i < n; i++) {
+                if (M.elements[i][i] === 0) {
+                    for (j = i + 1; j < n; j++) {
+                        if (M.elements[j][i] !== 0) {
+                            els = [];
+                            for (p = 0; p < np; p++) {
+                                els.push(M.elements[i][p] + M.elements[j][p]);
+                            }
+                            M.elements[i] = els;
+                            break;
+                        }
+                    }
+                }
+                if (M.elements[i][i] !== 0) {
+                    for (j = i + 1; j < n; j++) {
+                        var multiplier = M.elements[j][i] / M.elements[i][i];
+                        els = [];
+                        for (p = 0; p < np; p++) {
+                            // Elements with column numbers up to an including the number of the
+                            // row that we're subtracting can safely be set straight to zero,
+                            // since that's the point of this routine and it avoids having to
+                            // loop over and correct rounding errors later
+                            els.push(p <= i ? 0 : M.elements[j][p] - M.elements[i][p] * multiplier);
+                        }
+                        M.elements[j] = els;
+                    }
+                }
+            }
+            return M;
+        }
+    }, {
+        key: "determinant",
+        value: function determinant() {
+            if (this.elements.length === 0) {
+                return 1;
+            }
+            if (!this.isSquare()) {
+                return null;
+            }
+            var M = this.toRightTriangular();
+            var det = M.elements[0][0],
+                n = M.elements.length;
+            for (var i = 1; i < n; i++) {
+                det = det * M.elements[i][i];
+            }
+            return det;
+        }
+    }, {
+        key: "isSingular",
+        value: function isSingular() {
+            return this.isSquare() && this.determinant() === 0;
+        }
+    }, {
+        key: "trace",
+        value: function trace() {
+            if (this.elements.length === 0) {
+                return 0;
+            }
+            if (!this.isSquare()) {
+                return null;
+            }
+            var tr = this.elements[0][0],
+                n = this.elements.length;
+            for (var i = 1; i < n; i++) {
+                tr += this.elements[i][i];
+            }
+            return tr;
+        }
+    }, {
+        key: "rank",
+        value: function rank() {
+            if (this.elements.length === 0) {
+                return 0;
+            }
+            var M = this.toRightTriangular(),
+                rank = 0;
+            var i = this.elements.length,
+                nj = this.elements[0].length,
+                j;
+            while (i--) {
+                j = nj;
+                while (j--) {
+                    if (Math.abs(M.elements[i][j]) > _PRECISION.PRECISION) {
+                        rank++;
+                        break;
+                    }
+                }
+            }
+            return rank;
+        }
+    }, {
+        key: "augment",
+        value: function augment(matrix) {
+            if (this.elements.length === 0) {
+                return this.dup();
+            }
+            var M = matrix.elements || matrix;
+            if (typeof M[0][0] === 'undefined') {
+                M = new Matrix(M).elements;
+            }
+            var T = this.dup(),
+                cols = T.elements[0].length;
+            var i = T.elements.length,
+                nj = M[0].length,
+                j;
+            if (i !== M.length) {
+                return null;
+            }
+            while (i--) {
+                j = nj;
+                while (j--) {
+                    T.elements[i][cols + j] = M[i][j];
+                }
+            }
+            return T;
+        }
+    }, {
+        key: "inverse",
+        value: function inverse() {
+            if (this.elements.length === 0) {
+                return null;
+            }
+            if (!this.isSquare() || this.isSingular()) {
+                return null;
+            }
+            var n = this.elements.length,
+                i = n,
+                j;
+            var M = this.augment(Matrix.I(n)).toRightTriangular();
+            var np = M.elements[0].length,
+                p,
+                els,
+                divisor;
+            var inverse_elements = [],
+                new_element;
+            // Matrix is non-singular so there will be no zeros on the
+            // diagonal. Cycle through rows from last to first.
+            while (i--) {
+                // First, normalise diagonal elements to 1
+                els = [];
+                inverse_elements[i] = [];
+                divisor = M.elements[i][i];
+                for (p = 0; p < np; p++) {
+                    new_element = M.elements[i][p] / divisor;
+                    els.push(new_element);
+                    // Shuffle off the current row of the right hand side into the results
+                    // array as it will not be modified by later runs through this loop
+                    if (p >= n) {
+                        inverse_elements[i].push(new_element);
+                    }
+                }
+                M.elements[i] = els;
+                // Then, subtract this row from those above it to give the identity matrix
+                // on the left hand side
+                j = i;
+                while (j--) {
+                    els = [];
+                    for (p = 0; p < np; p++) {
+                        els.push(M.elements[j][p] - M.elements[i][p] * M.elements[j][i]);
+                    }
+                    M.elements[j] = els;
+                }
+            }
+            return new Matrix(inverse_elements);
+        }
+    }, {
+        key: "round",
+        value: function round() {
+            return this.map(function (x) {
+                return Math.round(x);
+            });
+        }
+    }, {
+        key: "snapTo",
+        value: function snapTo(x) {
+            return this.map(function (p) {
+                return Math.abs(p - x) <= _PRECISION.PRECISION ? x : p;
+            });
+        }
+    }, {
+        key: "inspect",
+        value: function inspect() {
+            var matrix_rows = [];
+            var n = this.elements.length;
+            if (n === 0) return '[]';
+            for (var i = 0; i < n; i++) {
+                matrix_rows.push(new _Vector.Vector(this.elements[i]).inspect());
+            }
+            return matrix_rows.join('\n');
+        }
+    }, {
+        key: "setElements",
+        value: function setElements(els) {
+            var i,
+                j,
+                elements = els.elements || els;
+            if (elements[0] && typeof elements[0][0] !== 'undefined') {
+                i = elements.length;
+                this.elements = [];
+                while (i--) {
+                    j = elements[i].length;
+                    this.elements[i] = [];
+                    while (j--) {
+                        this.elements[i][j] = elements[i][j];
+                    }
+                }
+                return this;
+            }
+            var n = elements.length;
+            this.elements = [];
+            for (i = 0; i < n; i++) {
+                this.elements.push([elements[i]]);
+            }
+            return this;
+        }
+
+        //From glUtils.js
+
+    }, {
+        key: "flatten",
+        value: function flatten() {
+            var result = [];
+            if (this.elements.length == 0) {
+                return [];
+            }
+
+            for (var j = 0; j < this.elements[0].length; j++) {
+                for (var i = 0; i < this.elements.length; i++) {
+                    result.push(this.elements[i][j]);
+                }
+            }
+            return result;
+        }
+
+        //From glUtils.js
+
+    }, {
+        key: "ensure4x4",
+        value: function ensure4x4() {
+            if (this.elements.length == 4 && this.elements[0].length == 4) {
+                return this;
+            }
+
+            if (this.elements.length > 4 || this.elements[0].length > 4) {
+                return null;
+            }
+
+            for (var i = 0; i < this.elements.length; i++) {
+                for (var j = this.elements[i].length; j < 4; j++) {
+                    if (i == j) {
+                        this.elements[i].push(1);
+                    } else {
+                        this.elements[i].push(0);
+                    }
+                }
+            }
+
+            for (var i = this.elements.length; i < 4; i++) {
+                if (i == 0) {
+                    this.elements.push([1, 0, 0, 0]);
+                } else if (i == 1) {
+                    this.elements.push([0, 1, 0, 0]);
+                } else if (i == 2) {
+                    this.elements.push([0, 0, 1, 0]);
+                } else if (i == 3) {
+                    this.elements.push([0, 0, 0, 1]);
+                }
+            }
+
+            return this;
+        }
+
+        //From glUtils.js
+
+    }, {
+        key: "make3x3",
+        value: function make3x3() {
+            if (this.elements.length != 4 || this.elements[0].length != 4) {
+                return null;
+            }
+
+            return new Matrix([[this.elements[0][0], this.elements[0][1], this.elements[0][2]], [this.elements[1][0], this.elements[1][1], this.elements[1][2]], [this.elements[2][0], this.elements[2][1], this.elements[2][2]]]);
+        }
+    }]);
+
+    return Matrix;
+}();
+
+Matrix.I = function (n) {
+    var els = [],
+        i = n,
+        j;
+    while (i--) {
+        j = n;
+        els[i] = [];
+        while (j--) {
+            els[i][j] = i === j ? 1 : 0;
+        }
+    }
+    return new Matrix(els);
+};
+
+Matrix.Diagonal = function (elements) {
+    var i = elements.length;
+    var M = Matrix.I(i);
+    while (i--) {
+        M.elements[i][i] = elements[i];
+    }
+    return M;
+};
+
+Matrix.Rotation = function (theta, a) {
+    if (!a) {
+        return new Matrix([[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]]);
+    }
+    var axis = a.dup();
+    if (axis.elements.length !== 3) {
+        return null;
+    }
+    var mod = axis.modulus();
+    var x = axis.elements[0] / mod,
+        y = axis.elements[1] / mod,
+        z = axis.elements[2] / mod;
+    var s = Math.sin(theta),
+        c = Math.cos(theta),
+        t = 1 - c;
+    // Formula derived here: http://www.gamedev.net/reference/articles/article1199.asp
+    // That proof rotates the co-ordinate system so theta becomes -theta and sin
+    // becomes -sin here.
+    return new Matrix([[t * x * x + c, t * x * y - s * z, t * x * z + s * y], [t * x * y + s * z, t * y * y + c, t * y * z - s * x], [t * x * z - s * y, t * y * z + s * x, t * z * z + c]]);
+};
+
+Matrix.RotationX = function (t) {
+    var c = Math.cos(t),
+        s = Math.sin(t);
+    return new Matrix([[1, 0, 0], [0, c, -s], [0, s, c]]);
+};
+Matrix.RotationY = function (t) {
+    var c = Math.cos(t),
+        s = Math.sin(t);
+    return new Matrix([[c, 0, s], [0, 1, 0], [-s, 0, c]]);
+};
+Matrix.RotationZ = function (t) {
+    var c = Math.cos(t),
+        s = Math.sin(t);
+    return new Matrix([[c, -s, 0], [s, c, 0], [0, 0, 1]]);
+};
+
+Matrix.Random = function (n, m) {
+    return Matrix.Zero(n, m).map(function () {
+        return Math.random();
+    });
+};
+
+//From glUtils.js
+Matrix.Translation = function (v) {
+    if (v.elements.length == 2) {
+        var r = Matrix.I(3);
+        r.elements[2][0] = v.elements[0];
+        r.elements[2][1] = v.elements[1];
+        return r;
+    }
+
+    if (v.elements.length == 3) {
+        var r = Matrix.I(4);
+        r.elements[0][3] = v.elements[0];
+        r.elements[1][3] = v.elements[1];
+        r.elements[2][3] = v.elements[2];
+        return r;
+    }
+
+    throw "Invalid length for Translation";
+};
+
+Matrix.Zero = function (n, m) {
+    var els = [],
+        i = n,
+        j;
+    while (i--) {
+        j = m;
+        els[i] = [];
+        while (j--) {
+            els[i][j] = 0;
+        }
+    }
+    return new Matrix(els);
+};
+
+Matrix.prototype.toUpperTriangular = Matrix.prototype.toRightTriangular;
+Matrix.prototype.det = Matrix.prototype.determinant;
+Matrix.prototype.tr = Matrix.prototype.trace;
+Matrix.prototype.rk = Matrix.prototype.rank;
+Matrix.prototype.inv = Matrix.prototype.inverse;
+Matrix.prototype.x = Matrix.prototype.multiply;
+
+
+},{"./PRECISION":421,"./Vector":426}],421:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var PRECISION = exports.PRECISION = 1e-6;
+
+
+},{}],422:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Plane = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _PRECISION = require("./PRECISION");
+
+var _Matrix = require("./Matrix");
+
+var _Vector = require("./Vector");
+
+var _Line = require("./Line");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Plane = exports.Plane = function () {
+    function Plane(anchor, v1, v2) {
+        _classCallCheck(this, Plane);
+
+        this.setVectors(anchor, v1, v2);
+    }
+
+    _createClass(Plane, [{
+        key: "eql",
+        value: function eql(plane) {
+            return this.contains(plane.anchor) && this.isParallelTo(plane);
+        }
+    }, {
+        key: "dup",
+        value: function dup() {
+            return new Plane(this.anchor, this.normal);
+        }
+    }, {
+        key: "translate",
+        value: function translate(vector) {
+            var V = vector.elements || vector;
+            return new Plane([this.anchor.elements[0] + V[0], this.anchor.elements[1] + V[1], this.anchor.elements[2] + (V[2] || 0)], this.normal);
+        }
+    }, {
+        key: "isParallelTo",
+        value: function isParallelTo(obj) {
+            var theta;
+            if (obj.normal) {
+                // obj is a plane
+                theta = this.normal.angleFrom(obj.normal);
+                return Math.abs(theta) <= _PRECISION.PRECISION || Math.abs(Math.PI - theta) <= _PRECISION.PRECISION;
+            } else if (obj.direction) {
+                // obj is a line
+                return this.normal.isPerpendicularTo(obj.direction);
+            }
+            return null;
+        }
+    }, {
+        key: "isPerpendicularTo",
+        value: function isPerpendicularTo(plane) {
+            var theta = this.normal.angleFrom(plane.normal);
+            return Math.abs(Math.PI / 2 - theta) <= _PRECISION.PRECISION;
+        }
+    }, {
+        key: "distanceFrom",
+        value: function distanceFrom(obj) {
+            if (this.intersects(obj) || this.contains(obj)) {
+                return 0;
+            }
+            if (obj.anchor) {
+                // obj is a plane or line
+                var A = this.anchor.elements,
+                    B = obj.anchor.elements,
+                    N = this.normal.elements;
+                return Math.abs((A[0] - B[0]) * N[0] + (A[1] - B[1]) * N[1] + (A[2] - B[2]) * N[2]);
+            } else {
+                // obj is a point
+                var P = obj.elements || obj;
+                var A = this.anchor.elements,
+                    N = this.normal.elements;
+                return Math.abs((A[0] - P[0]) * N[0] + (A[1] - P[1]) * N[1] + (A[2] - (P[2] || 0)) * N[2]);
+            }
+        }
+    }, {
+        key: "contains",
+        value: function contains(obj) {
+            if (obj.normal) {
+                return null;
+            }
+            if (obj.direction) {
+                return this.contains(obj.anchor) && this.contains(obj.anchor.add(obj.direction));
+            } else {
+                var P = obj.elements || obj;
+                var A = this.anchor.elements,
+                    N = this.normal.elements;
+                var diff = Math.abs(N[0] * (A[0] - P[0]) + N[1] * (A[1] - P[1]) + N[2] * (A[2] - (P[2] || 0)));
+                return diff <= _PRECISION.PRECISION;
+            }
+        }
+    }, {
+        key: "intersects",
+        value: function intersects(obj) {
+            if (typeof obj.direction === 'undefined' && typeof obj.normal === 'undefined') {
+                return null;
+            }
+            return !this.isParallelTo(obj);
+        }
+    }, {
+        key: "intersectionWith",
+        value: function intersectionWith(obj) {
+            if (!this.intersects(obj)) {
+                return null;
+            }
+            if (obj.direction) {
+                // obj is a line
+                var A = obj.anchor.elements,
+                    D = obj.direction.elements,
+                    P = this.anchor.elements,
+                    N = this.normal.elements;
+                var multiplier = (N[0] * (P[0] - A[0]) + N[1] * (P[1] - A[1]) + N[2] * (P[2] - A[2])) / (N[0] * D[0] + N[1] * D[1] + N[2] * D[2]);
+                return new _Vector.Vector([A[0] + D[0] * multiplier, A[1] + D[1] * multiplier, A[2] + D[2] * multiplier]);
+            } else if (obj.normal) {
+                // obj is a plane
+                var direction = this.normal.cross(obj.normal).toUnitVector();
+                // To find an anchor point, we find one co-ordinate that has a value of
+                // zero somewhere on the intersection, and remember which one we picked
+                var N = this.normal.elements,
+                    A = this.anchor.elements,
+                    O = obj.normal.elements,
+                    B = obj.anchor.elements;
+                var solver = _Matrix.Matrix.Zero(2, 2),
+                    i = 0;
+                while (solver.isSingular()) {
+                    i++;
+                    solver = new _Matrix.Matrix([[N[i % 3], N[(i + 1) % 3]], [O[i % 3], O[(i + 1) % 3]]]);
+                }
+                // Then we solve the simultaneous equations in the remaining dimensions
+                var inverse = solver.inverse().elements;
+                var x = N[0] * A[0] + N[1] * A[1] + N[2] * A[2];
+                var y = O[0] * B[0] + O[1] * B[1] + O[2] * B[2];
+                var intersection = [inverse[0][0] * x + inverse[0][1] * y, inverse[1][0] * x + inverse[1][1] * y];
+                var anchor = [];
+                for (var j = 1; j <= 3; j++) {
+                    // This formula picks the right element from intersection by cycling
+                    // depending on which element we set to zero above
+                    anchor.push(i === j ? 0 : intersection[(j + (5 - i) % 3) % 3]);
+                }
+                return new _Line.Line(anchor, direction);
+            }
+        }
+    }, {
+        key: "pointClosestTo",
+        value: function pointClosestTo(point) {
+            var P = point.elements || point;
+            var A = this.anchor.elements,
+                N = this.normal.elements;
+            var dot = (A[0] - P[0]) * N[0] + (A[1] - P[1]) * N[1] + (A[2] - (P[2] || 0)) * N[2];
+            return new _Vector.Vector([P[0] + N[0] * dot, P[1] + N[1] * dot, (P[2] || 0) + N[2] * dot]);
+        }
+    }, {
+        key: "rotate",
+        value: function rotate(t, line) {
+            var R = t.determinant ? t.elements : _Matrix.Matrix.Rotation(t, line.direction).elements;
+            var C = line.pointClosestTo(this.anchor).elements;
+            var A = this.anchor.elements,
+                N = this.normal.elements;
+            var C1 = C[0],
+                C2 = C[1],
+                C3 = C[2],
+                A1 = A[0],
+                A2 = A[1],
+                A3 = A[2];
+            var x = A1 - C1,
+                y = A2 - C2,
+                z = A3 - C3;
+            return new Plane([C1 + R[0][0] * x + R[0][1] * y + R[0][2] * z, C2 + R[1][0] * x + R[1][1] * y + R[1][2] * z, C3 + R[2][0] * x + R[2][1] * y + R[2][2] * z], [R[0][0] * N[0] + R[0][1] * N[1] + R[0][2] * N[2], R[1][0] * N[0] + R[1][1] * N[1] + R[1][2] * N[2], R[2][0] * N[0] + R[2][1] * N[1] + R[2][2] * N[2]]);
+        }
+    }, {
+        key: "reflectionIn",
+        value: function reflectionIn(obj) {
+            if (obj.normal) {
+                // obj is a plane
+                var A = this.anchor.elements,
+                    N = this.normal.elements;
+                var A1 = A[0],
+                    A2 = A[1],
+                    A3 = A[2],
+                    N1 = N[0],
+                    N2 = N[1],
+                    N3 = N[2];
+                var newA = this.anchor.reflectionIn(obj).elements;
+                // Add the plane's normal to its anchor, then mirror that in the other plane
+                var AN1 = A1 + N1,
+                    AN2 = A2 + N2,
+                    AN3 = A3 + N3;
+                var Q = obj.pointClosestTo([AN1, AN2, AN3]).elements;
+                var newN = [Q[0] + (Q[0] - AN1) - newA[0], Q[1] + (Q[1] - AN2) - newA[1], Q[2] + (Q[2] - AN3) - newA[2]];
+                return new Plane(newA, newN);
+            } else if (obj.direction) {
+                // obj is a line
+                return this.rotate(Math.PI, obj);
+            } else {
+                // obj is a point
+                var P = obj.elements || obj;
+                return new Plane(this.anchor.reflectionIn([P[0], P[1], P[2] || 0]), this.normal);
+            }
+        }
+    }, {
+        key: "setVectors",
+        value: function setVectors(anchor, v1, v2) {
+            anchor = new _Vector.Vector(anchor);
+            anchor = anchor.to3D();if (anchor === null) {
+                return null;
+            }
+            v1 = new _Vector.Vector(v1);
+            v1 = v1.to3D();if (v1 === null) {
+                return null;
+            }
+            if (typeof v2 === 'undefined') {
+                v2 = null;
+            } else {
+                v2 = new _Vector.Vector(v2);
+                v2 = v2.to3D();
+                if (v2 === null) {
+                    return null;
+                }
+            }
+            var A1 = anchor.elements[0],
+                A2 = anchor.elements[1],
+                A3 = anchor.elements[2];
+            var v11 = v1.elements[0],
+                v12 = v1.elements[1],
+                v13 = v1.elements[2];
+            var normal, mod;
+            if (v2 !== null) {
+                var v21 = v2.elements[0],
+                    v22 = v2.elements[1],
+                    v23 = v2.elements[2];
+                normal = new _Vector.Vector([(v12 - A2) * (v23 - A3) - (v13 - A3) * (v22 - A2), (v13 - A3) * (v21 - A1) - (v11 - A1) * (v23 - A3), (v11 - A1) * (v22 - A2) - (v12 - A2) * (v21 - A1)]);
+                mod = normal.modulus();
+                if (mod === 0) {
+                    return null;
+                }
+                normal = new _Vector.Vector([normal.elements[0] / mod, normal.elements[1] / mod, normal.elements[2] / mod]);
+            } else {
+                mod = Math.sqrt(v11 * v11 + v12 * v12 + v13 * v13);
+                if (mod === 0) {
+                    return null;
+                }
+                normal = new _Vector.Vector([v1.elements[0] / mod, v1.elements[1] / mod, v1.elements[2] / mod]);
+            }
+            this.anchor = anchor;
+            this.normal = normal;
+            return this;
+        }
+    }]);
+
+    return Plane;
+}();
+
+Plane.XY = new Plane(_Vector.Vector.Zero(3), _Vector.Vector.k);
+Plane.YZ = new Plane(_Vector.Vector.Zero(3), _Vector.Vector.i);
+Plane.ZX = new Plane(_Vector.Vector.Zero(3), _Vector.Vector.j);
+Plane.YX = Plane.XY;Plane.ZY = Plane.YZ;Plane.XZ = Plane.ZX;
+
+Plane.fromPoints = function (points) {
+    var np = points.length,
+        list = [],
+        i,
+        P,
+        n,
+        N,
+        A,
+        B,
+        C,
+        D,
+        theta,
+        prevN,
+        totalN = _Vector.Vector.Zero(3);
+    for (i = 0; i < np; i++) {
+        P = new _Vector.Vector(points[i]).to3D();
+        if (P === null) {
+            return null;
+        }
+        list.push(P);
+        n = list.length;
+        if (n > 2) {
+            // Compute plane normal for the latest three points
+            A = list[n - 1].elements;B = list[n - 2].elements;C = list[n - 3].elements;
+            N = new _Vector.Vector([(A[1] - B[1]) * (C[2] - B[2]) - (A[2] - B[2]) * (C[1] - B[1]), (A[2] - B[2]) * (C[0] - B[0]) - (A[0] - B[0]) * (C[2] - B[2]), (A[0] - B[0]) * (C[1] - B[1]) - (A[1] - B[1]) * (C[0] - B[0])]).toUnitVector();
+            if (n > 3) {
+                // If the latest normal is not (anti)parallel to the previous one, we've
+                // strayed off the plane. This might be a slightly long-winded way of
+                // doing things, but we need the sum of all the normals to find which
+                // way the plane normal should point so that the points form an
+                // anticlockwise list.
+                theta = N.angleFrom(prevN);
+                if (theta !== null) {
+                    if (!(Math.abs(theta) <= _PRECISION.PRECISION || Math.abs(theta - Math.PI) <= _PRECISION.PRECISION)) {
+                        return null;
+                    }
+                }
+            }
+            totalN = totalN.add(N);
+            prevN = N;
+        }
+    }
+    // We need to add in the normals at the start and end points, which the above
+    // misses out
+    A = list[1].elements;B = list[0].elements;C = list[n - 1].elements;D = list[n - 2].elements;
+    totalN = totalN.add(new _Vector.Vector([(A[1] - B[1]) * (C[2] - B[2]) - (A[2] - B[2]) * (C[1] - B[1]), (A[2] - B[2]) * (C[0] - B[0]) - (A[0] - B[0]) * (C[2] - B[2]), (A[0] - B[0]) * (C[1] - B[1]) - (A[1] - B[1]) * (C[0] - B[0])]).toUnitVector()).add(new _Vector.Vector([(B[1] - C[1]) * (D[2] - C[2]) - (B[2] - C[2]) * (D[1] - C[1]), (B[2] - C[2]) * (D[0] - C[0]) - (B[0] - C[0]) * (D[2] - C[2]), (B[0] - C[0]) * (D[1] - C[1]) - (B[1] - C[1]) * (D[0] - C[0])]).toUnitVector());
+    return new Plane(list[0], totalN);
+};
+
+
+},{"./Line":416,"./Matrix":420,"./PRECISION":421,"./Vector":426}],423:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Polygon = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _LinkedList = require("./LinkedList");
+
+var _PRECISION = require("./PRECISION");
+
+var _Matrix = require("./Matrix");
+
+var _Vector = require("./Vector");
+
+var _Plane = require("./Plane");
+
+var _Line = require("./Line");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Polygon = exports.Polygon = function () {
+    function Polygon(points, plane) {
+        _classCallCheck(this, Polygon);
+
+        this.setVertices(points, plane);
+    }
+
+    _createClass(Polygon, [{
+        key: "v",
+        value: function v(i) {
+            return this.vertices.at(i - 1).data;
+        }
+    }, {
+        key: "nodeFor",
+        value: function nodeFor(vertex) {
+            return this.vertices.withData(vertex);
+        }
+    }, {
+        key: "dup",
+        value: function dup() {
+            return new Polygon(this.vertices, this.plane);
+        }
+    }, {
+        key: "translate",
+        value: function translate(vector) {
+            var P = vector.elements || vector;
+            this.vertices.each(function (node) {
+                var E = node.data.elements;
+                node.data.setElements([E[0] + P[0], E[1] + P[1], E[2] + (P[2] || 0)]);
+            });
+            this.plane = this.plane.translate(vector);
+            this.updateTrianglePlanes(function (plane) {
+                return plane.translate(vector);
+            });
+            return this;
+        }
+    }, {
+        key: "rotate",
+        value: function rotate(t, line) {
+            var R = _Matrix.Matrix.Rotation(t, line.direction);
+            this.vertices.each(function (node) {
+                node.data.setElements(node.data.rotate(R, line).elements);
+            });
+            this.plane = this.plane.rotate(R, line);
+            this.updateTrianglePlanes(function (plane) {
+                return plane.rotate(R, line);
+            });
+            return this;
+        }
+    }, {
+        key: "scale",
+        value: function scale(k, point) {
+            var P = point.elements || point;
+            this.vertices.each(function (node) {
+                var E = node.data.elements;
+                node.data.setElements([P[0] + k * (E[0] - P[0]), P[1] + k * (E[1] - P[1]), (P[2] || 0) + k * (E[2] - (P[2] || 0))]);
+            });
+            var anchor = this.vertices.first.data;
+            this.plane.anchor.setElements(anchor);
+            this.updateTrianglePlanes(function (plane) {
+                return new _Plane.Plane(anchor, plane.normal);
+            });
+            return this;
+        }
+
+        // Updates the plane properties of all the cached triangles belonging to the
+        // polygon according to the given function. For example, suppose you just
+        // rotated the polygon, you should call:
+        //
+        //   poly.updateTrianglePlanes(function(plane) { return plane.rotate(t, line); });
+        //
+        // This method is called automatically by Polygon.translate,
+        // Polygon.rotate and Polygon.scale transformation methods.
+
+    }, {
+        key: "updateTrianglePlanes",
+        value: function updateTrianglePlanes(fn) {
+            var i;
+            if (this.cached.triangles !== null) {
+                i = this.cached.triangles.length;
+                while (i--) {
+                    this.cached.triangles[i].plane = fn(this.cached.triangles[i].plane);
+                }
+            }
+            if (this.cached.surfaceIntegralElements !== null) {
+                i = this.cached.surfaceIntegralElements.length;
+                while (i--) {
+                    this.cached.surfaceIntegralElements[i].plane = fn(this.cached.surfaceIntegralElements[i].plane);
+                }
+            }
+        }
+    }, {
+        key: "isTriangle",
+        value: function isTriangle() {
+            return this.vertices.length === 3;
+        }
+
+        // Returns a collection of triangles used for calculating area and center of
+        // mass. Some of the triangles will not lie inside the polygon - this
+        // collection is essentially a series of itervals in a surface integral, so
+        // some are 'negative'. If you want the polygon broken into constituent
+        // triangles, use toTriangles(). This method is used because it's much faster
+        // than toTriangles().
+        //
+        // The triangles generated share vertices with the original polygon, so they
+        // transform with the polygon. They are cached after first calculation and
+        // should remain in sync with changes to the parent polygon.
+
+    }, {
+        key: "trianglesForSurfaceIntegral",
+        value: function trianglesForSurfaceIntegral() {
+            if (this.cached.surfaceIntegralElements !== null) {
+                return this.cached.surfaceIntegralElements;
+            }
+            var triangles = [];
+            var firstVertex = this.vertices.first.data;
+            var plane = this.plane;
+            this.vertices.each(function (node, i) {
+                if (i < 2) {
+                    return;
+                }
+                var points = [firstVertex, node.prev.data, node.data];
+                // If the vertices lie on a straigh line, give the polygon's own plane. If
+                // the element has no area, it doesn't matter which way its normal faces.
+                triangles.push(new Polygon(points, _Plane.Plane.fromPoints(points) || plane));
+            });
+            return this.setCache('surfaceIntegralElements', triangles);
+        }
+    }, {
+        key: "area",
+        value: function area() {
+            if (this.isTriangle()) {
+                // Area is half the modulus of the cross product of two sides
+                var A = this.vertices.first,
+                    B = A.next,
+                    C = B.next;
+                A = A.data.elements;B = B.data.elements;C = C.data.elements;
+                return 0.5 * new _Vector.Vector([(A[1] - B[1]) * (C[2] - B[2]) - (A[2] - B[2]) * (C[1] - B[1]), (A[2] - B[2]) * (C[0] - B[0]) - (A[0] - B[0]) * (C[2] - B[2]), (A[0] - B[0]) * (C[1] - B[1]) - (A[1] - B[1]) * (C[0] - B[0])]).modulus();
+            } else {
+                var trigs = this.trianglesForSurfaceIntegral(),
+                    area = 0;
+                var i = trigs.length;
+                while (i--) {
+                    area += trigs[i].area() * trigs[i].plane.normal.dot(this.plane.normal);
+                }
+                return area;
+            }
+        }
+    }, {
+        key: "centroid",
+        value: function centroid() {
+            if (this.isTriangle()) {
+                var A = this.v(1).elements,
+                    B = this.v(2).elements,
+                    C = this.v(3).elements;
+                return new _Vector.Vector([(A[0] + B[0] + C[0]) / 3, (A[1] + B[1] + C[1]) / 3, (A[2] + B[2] + C[2]) / 3]);
+            } else {
+                var A,
+                    M = 0,
+                    V = _Vector.Vector.Zero(3),
+                    P,
+                    C,
+                    trigs = this.trianglesForSurfaceIntegral();
+                var i = trigs.length;
+                while (i--) {
+                    A = trigs[i].area() * trigs[i].plane.normal.dot(this.plane.normal);
+                    M += A;
+                    P = V.elements;
+                    C = trigs[i].centroid().elements;
+                    V.setElements([P[0] + C[0] * A, P[1] + C[1] * A, P[2] + C[2] * A]);
+                }
+                return V.x(1 / M);
+            }
+        }
+    }, {
+        key: "projectionOn",
+        value: function projectionOn(plane) {
+            var points = [];
+            this.vertices.each(function (node) {
+                points.push(plane.pointClosestTo(node.data));
+            });
+            return new Polygon(points);
+        }
+    }, {
+        key: "removeVertex",
+        value: function removeVertex(vertex) {
+            if (this.isTriangle()) {
+                return;
+            }
+            var node = this.nodeFor(vertex);
+            if (node === null) {
+                return null;
+            }
+            this.clearCache();
+            // Previous and next entries in the main vertex list
+            var prev = node.prev,
+                next = node.next;
+            var prevWasConvex = prev.data.isConvex(this);
+            var nextWasConvex = next.data.isConvex(this);
+            if (node.data.isConvex(this)) {
+                this.convexVertices.remove(this.convexVertices.withData(node.data));
+            } else {
+                this.reflexVertices.remove(this.reflexVertices.withData(node.data));
+            }
+            this.vertices.remove(node);
+            // Deal with previous vertex's change of class
+            if (prevWasConvex !== prev.data.isConvex(this)) {
+                if (prevWasConvex) {
+                    this.convexVertices.remove(this.convexVertices.withData(prev.data));
+                    this.reflexVertices.append(new _LinkedList.LinkedList.Node(prev.data));
+                } else {
+                    this.reflexVertices.remove(this.reflexVertices.withData(prev.data));
+                    this.convexVertices.append(new _LinkedList.LinkedList.Node(prev.data));
+                }
+            }
+            // Deal with next vertex's change of class
+            if (nextWasConvex !== next.data.isConvex(this)) {
+                if (nextWasConvex) {
+                    this.convexVertices.remove(this.convexVertices.withData(next.data));
+                    this.reflexVertices.append(new _LinkedList.LinkedList.Node(next.data));
+                } else {
+                    this.reflexVertices.remove(this.reflexVertices.withData(next.data));
+                    this.convexVertices.append(new _LinkedList.LinkedList.Node(next.data));
+                }
+            }
+            return this;
+        }
+    }, {
+        key: "contains",
+        value: function contains(point) {
+            return this.containsByWindingNumber(point);
+        }
+    }, {
+        key: "containsByWindingNumber",
+        value: function containsByWindingNumber(point) {
+            var P = point.elements || point;
+            if (!this.plane.contains(P)) {
+                return false;
+            }
+            if (this.hasEdgeContaining(P)) {
+                return false;
+            }
+            var V,
+                W,
+                A,
+                B,
+                theta = 0,
+                dt,
+                loops = 0,
+                self = this;
+            this.vertices.each(function (node) {
+                V = node.data.elements;
+                W = node.next.data.elements;
+                A = new _Vector.Vector([V[0] - P[0], V[1] - P[1], V[2] - (P[2] || 0)]);
+                B = new _Vector.Vector([W[0] - P[0], W[1] - P[1], W[2] - (P[2] || 0)]);
+                dt = A.angleFrom(B);
+                if (dt === null || dt === 0) {
+                    return;
+                }
+                theta += (A.cross(B).isParallelTo(self.plane.normal) ? 1 : -1) * dt;
+                if (theta >= 2 * Math.PI - _PRECISION.PRECISION) {
+                    loops++;theta -= 2 * Math.PI;
+                }
+                if (theta <= -2 * Math.PI + _PRECISION.PRECISION) {
+                    loops--;theta += 2 * Math.PI;
+                }
+            });
+            return loops !== 0;
+        }
+    }, {
+        key: "hasEdgeContaining",
+        value: function hasEdgeContaining(point) {
+            var P = point.elements || point;
+            var success = false;
+            this.vertices.each(function (node) {
+                if (_Line.Line.Segment.create(node.data, node.next.data).contains(P)) {
+                    success = true;
+                }
+            });
+            return success;
+        }
+    }, {
+        key: "toTriangles",
+        value: function toTriangles() {
+            if (this.cached.triangles !== null) {
+                return this.cached.triangles;
+            }
+            return this.setCache('triangles', this.triangulateByEarClipping());
+        }
+
+        // Implementation of ear clipping algorithm
+        // Found in 'Triangulation by ear clipping', by David Eberly
+        // at http://www.geometrictools.com
+        // This will not deal with overlapping sections - contruct your polygons
+        // sensibly
+
+    }, {
+        key: "triangulateByEarClipping",
+        value: function triangulateByEarClipping() {
+            var poly = this.dup(),
+                triangles = [],
+                success,
+                convexNode,
+                mainNode,
+                trig;
+            while (!poly.isTriangle()) {
+                success = false;
+                while (!success) {
+                    success = true;
+                    // Ear tips must be convex vertices - let's pick one at random
+                    convexNode = poly.convexVertices.randomNode();
+                    mainNode = poly.vertices.withData(convexNode.data);
+                    // For convex vertices, this order will always be anticlockwise
+                    trig = new Polygon([mainNode.data, mainNode.next.data, mainNode.prev.data], this.plane);
+                    // Now test whether any reflex vertices lie within the ear
+                    poly.reflexVertices.each(function (node) {
+                        // Don't test points belonging to this triangle. node won't be equal
+                        // to convexNode as node is reflex and vertex is convex.
+                        if (node.data !== mainNode.prev.data && node.data !== mainNode.next.data) {
+                            if (trig.contains(node.data) || trig.hasEdgeContaining(node.data)) {
+                                success = false;
+                            }
+                        }
+                    });
+                }
+                triangles.push(trig);
+                poly.removeVertex(mainNode.data);
+            }
+            // Need to do this to renumber the remaining vertices
+            triangles.push(new Polygon(poly.vertices, this.plane));
+            return triangles;
+        }
+    }, {
+        key: "setVertices",
+        value: function setVertices(points, plane) {
+            var pointSet = points.toArray ? points.toArray() : points;
+            this.plane = plane && plane.normal ? plane.dup() : _Plane.Plane.fromPoints(pointSet);
+            if (this.plane === null) {
+                return null;
+            }
+            this.vertices = new _LinkedList.LinkedList.Circular();
+            // Construct linked list of vertices. If each point is already a polygon
+            // vertex, we reference it rather than creating a new vertex.
+            var i = pointSet.length,
+                newVertex;
+            while (i--) {
+                newVertex = pointSet[i].isConvex ? pointSet[i] : new Polygon.Vertex(pointSet[i]);
+                this.vertices.prepend(new _LinkedList.LinkedList.Node(newVertex));
+            }
+            this.clearCache();
+            this.populateVertexTypeLists();
+            return this;
+        }
+    }, {
+        key: "populateVertexTypeLists",
+        value: function populateVertexTypeLists() {
+            this.convexVertices = new _LinkedList.LinkedList.Circular();
+            this.reflexVertices = new _LinkedList.LinkedList.Circular();
+            var self = this;
+            this.vertices.each(function (node) {
+                // Split vertices into convex / reflex groups. The
+                // LinkedList.Node class wraps each vertex so it can belong to
+                // many linked lists.
+                self[node.data.type(self) + 'Vertices'].append(new _LinkedList.LinkedList.Node(node.data));
+            });
+        }
+    }, {
+        key: "copyVertices",
+        value: function copyVertices() {
+            this.clearCache();
+            this.vertices.each(function (node) {
+                node.data = new Polygon.Vertex(node.data);
+            });
+            this.populateVertexTypeLists();
+        }
+    }, {
+        key: "clearCache",
+        value: function clearCache() {
+            this.cached = {
+                triangles: null,
+                surfaceIntegralElements: null
+            };
+        }
+    }, {
+        key: "setCache",
+        value: function setCache(key, value) {
+            this.cached[key] = value;
+            return value;
+        }
+    }, {
+        key: "inspect",
+        value: function inspect() {
+            var points = [];
+            this.vertices.each(function (node) {
+                points.push(node.data.inspect());
+            });
+            return points.join(' -> ');
+        }
+    }]);
+
+    return Polygon;
+}();
+
+
+},{"./Line":416,"./LinkedList":418,"./Matrix":420,"./PRECISION":421,"./Plane":422,"./Vector":426}],424:[function(require,module,exports){
+"use strict";
+
+//Classes
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _CircularLinkedList = require("./CircularLinkedList");
+
+Object.defineProperty(exports, "CircularLinkedList", {
+	enumerable: true,
+	get: function get() {
+		return _CircularLinkedList.CircularLinkedList;
+	}
+});
+
+var _Line = require("./Line");
+
+Object.defineProperty(exports, "Line", {
+	enumerable: true,
+	get: function get() {
+		return _Line.Line;
+	}
+});
+
+var _LineSegment = require("./LineSegment");
+
+Object.defineProperty(exports, "LineSegment", {
+	enumerable: true,
+	get: function get() {
+		return _LineSegment.LineSegment;
+	}
+});
+
+var _LinkedList = require("./LinkedList");
+
+Object.defineProperty(exports, "LinkedList", {
+	enumerable: true,
+	get: function get() {
+		return _LinkedList.LinkedList;
+	}
+});
+
+var _LinkedListNode = require("./LinkedListNode");
+
+Object.defineProperty(exports, "LinkedListNode", {
+	enumerable: true,
+	get: function get() {
+		return _LinkedListNode.LinkedListNode;
+	}
+});
+
+var _Matrix = require("./Matrix");
+
+Object.defineProperty(exports, "Matrix", {
+	enumerable: true,
+	get: function get() {
+		return _Matrix.Matrix;
+	}
+});
+
+var _Plane = require("./Plane");
+
+Object.defineProperty(exports, "Plane", {
+	enumerable: true,
+	get: function get() {
+		return _Plane.Plane;
+	}
+});
+
+var _Polygon = require("./Polygon");
+
+Object.defineProperty(exports, "Polygon", {
+	enumerable: true,
+	get: function get() {
+		return _Polygon.Polygon;
+	}
+});
+
+var _Vector = require("./Vector");
+
+Object.defineProperty(exports, "Vector", {
+	enumerable: true,
+	get: function get() {
+		return _Vector.Vector;
+	}
+});
+
+var _Vertex = require("./Vertex");
+
+Object.defineProperty(exports, "Vertex", {
+	enumerable: true,
+	get: function get() {
+		return _Vertex.Vertex;
+	}
+});
+
+var _Utils = require("./Utils");
+
+Object.defineProperty(exports, "mht", {
+	enumerable: true,
+	get: function get() {
+		return _Utils.mht;
+	}
+});
+Object.defineProperty(exports, "makeLookAt", {
+	enumerable: true,
+	get: function get() {
+		return _Utils.makeLookAt;
+	}
+});
+Object.defineProperty(exports, "makePerspective", {
+	enumerable: true,
+	get: function get() {
+		return _Utils.makePerspective;
+	}
+});
+Object.defineProperty(exports, "makeFrustum", {
+	enumerable: true,
+	get: function get() {
+		return _Utils.makeFrustum;
+	}
+});
+Object.defineProperty(exports, "makeOrtho", {
+	enumerable: true,
+	get: function get() {
+		return _Utils.makeOrtho;
+	}
+});
+
+var _PRECISION = require("./PRECISION");
+
+Object.defineProperty(exports, "PRECISION", {
+	enumerable: true,
+	get: function get() {
+		return _PRECISION.PRECISION;
+	}
+});
+
+
+},{"./CircularLinkedList":415,"./Line":416,"./LineSegment":417,"./LinkedList":418,"./LinkedListNode":419,"./Matrix":420,"./PRECISION":421,"./Plane":422,"./Polygon":423,"./Utils":425,"./Vector":426,"./Vertex":427}],425:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.mht = mht;
+exports.makeLookAt = makeLookAt;
+exports.makeOrtho = makeOrtho;
+exports.makePerspective = makePerspective;
+exports.makeFrustum = makeFrustum;
+exports.makeOrtho = makeOrtho;
+
+var _Vector = require("./Vector");
+
+var _Matrix = require("./Matrix");
+
+//From glUtils.js
+function mht(m) {
+    var s = "";
+    if (m.length == 16) {
+        for (var i = 0; i < 4; i++) {
+            s += "<span style='font-family: monospace'>[" + m[i * 4 + 0].toFixed(4) + "," + m[i * 4 + 1].toFixed(4) + "," + m[i * 4 + 2].toFixed(4) + "," + m[i * 4 + 3].toFixed(4) + "]</span><br>";
+        }
+    } else if (m.length == 9) {
+        for (var i = 0; i < 3; i++) {
+            s += "<span style='font-family: monospace'>[" + m[i * 3 + 0].toFixed(4) + "," + m[i * 3 + 1].toFixed(4) + "," + m[i * 3 + 2].toFixed(4) + "]</font><br>";
+        }
+    } else {
+        return m.toString();
+    }
+    return s;
+}
+
+//From glUtils.js
+//
+// gluLookAt
+//
+function makeLookAt(ex, ey, ez, cx, cy, cz, ux, uy, uz) {
+    var eye = new _Vector.Vector([ex, ey, ez]);
+    var center = new _Vector.Vector([cx, cy, cz]);
+    var up = new _Vector.Vector([ux, uy, uz]);
+
+    var mag;
+
+    var z = eye.subtract(center).toUnitVector();
+    var x = up.cross(z).toUnitVector();
+    var y = z.cross(x).toUnitVector();
+
+    var m = new _Matrix.Matrix([[x.e(1), x.e(2), x.e(3), 0], [y.e(1), y.e(2), y.e(3), 0], [z.e(1), z.e(2), z.e(3), 0], [0, 0, 0, 1]]);
+
+    var t = new _Matrix.Matrix([[1, 0, 0, -ex], [0, 1, 0, -ey], [0, 0, 1, -ez], [0, 0, 0, 1]]);
+    return m.x(t);
+}
+
+//From glUtils.js
+//
+// glOrtho
+//
+function makeOrtho(left, right, bottom, top, znear, zfar) {
+    var tx = -(right + left) / (right - left);
+    var ty = -(top + bottom) / (top - bottom);
+    var tz = -(zfar + znear) / (zfar - znear);
+
+    return new _Matrix.Matrix([[2 / (right - left), 0, 0, tx], [0, 2 / (top - bottom), 0, ty], [0, 0, -2 / (zfar - znear), tz], [0, 0, 0, 1]]);
+}
+
+//From glUtils.js
+//
+// gluPerspective
+//
+function makePerspective(fovy, aspect, znear, zfar) {
+    var ymax = znear * Math.tan(fovy * Math.PI / 360.0);
+    var ymin = -ymax;
+    var xmin = ymin * aspect;
+    var xmax = ymax * aspect;
+
+    return makeFrustum(xmin, xmax, ymin, ymax, znear, zfar);
+}
+
+//From glUtils.js
+//
+// glFrustum
+//
+function makeFrustum(left, right, bottom, top, znear, zfar) {
+    var X = 2 * znear / (right - left);
+    var Y = 2 * znear / (top - bottom);
+    var A = (right + left) / (right - left);
+    var B = (top + bottom) / (top - bottom);
+    var C = -(zfar + znear) / (zfar - znear);
+    var D = -2 * zfar * znear / (zfar - znear);
+
+    return new _Matrix.Matrix([[X, 0, A, 0], [0, Y, B, 0], [0, 0, C, D], [0, 0, -1, 0]]);
+}
+
+//From glUtils.js
+//
+// glOrtho
+//
+function makeOrtho(left, right, bottom, top, znear, zfar) {
+    var tx = -(right + left) / (right - left);
+    var ty = -(top + bottom) / (top - bottom);
+    var tz = -(zfar + znear) / (zfar - znear);
+
+    return new _Matrix.Matrix([[2 / (right - left), 0, 0, tx], [0, 2 / (top - bottom), 0, ty], [0, 0, -2 / (zfar - znear), tz], [0, 0, 0, 1]]);
+}
+
+
+},{"./Matrix":420,"./Vector":426}],426:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Vector = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Matrix = require("./Matrix");
+
+var _PRECISION = require("./PRECISION");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Vector = exports.Vector = function () {
+    function Vector(elements) {
+        _classCallCheck(this, Vector);
+
+        this.setElements(elements);
+    }
+
+    _createClass(Vector, [{
+        key: "e",
+        value: function e(i) {
+            return i < 1 || i > this.elements.length ? null : this.elements[i - 1];
+        }
+    }, {
+        key: "dimensions",
+        value: function dimensions() {
+            return this.elements.length;
+        }
+    }, {
+        key: "modulus",
+        value: function modulus() {
+            return Math.sqrt(this.dot(this));
+        }
+    }, {
+        key: "eql",
+        value: function eql(vector) {
+            var n = this.elements.length;
+            var V = vector.elements || vector;
+            if (n !== V.length) {
+                return false;
+            }
+            while (n--) {
+                if (Math.abs(this.elements[n] - V[n]) > _PRECISION.PRECISION) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }, {
+        key: "dup",
+        value: function dup() {
+            return new Vector(this.elements);
+        }
+    }, {
+        key: "map",
+        value: function map(fn, context) {
+            var elements = [];
+            this.each(function (x, i) {
+                elements.push(fn.call(context, x, i));
+            });
+            return new Vector(elements);
+        }
+    }, {
+        key: "forEach",
+        value: function forEach(fn, context) {
+            var n = this.elements.length;
+            for (var i = 0; i < n; i++) {
+                fn.call(context, this.elements[i], i + 1);
+            }
+        }
+    }, {
+        key: "toUnitVector",
+        value: function toUnitVector() {
+            var r = this.modulus();
+            if (r === 0) {
+                return this.dup();
+            }
+            return this.map(function (x) {
+                return x / r;
+            });
+        }
+    }, {
+        key: "angleFrom",
+        value: function angleFrom(vector) {
+            var V = vector.elements || vector;
+            var n = this.elements.length,
+                k = n,
+                i;
+            if (n !== V.length) {
+                return null;
+            }
+            var dot = 0,
+                mod1 = 0,
+                mod2 = 0;
+            // Work things out in parallel to save time
+            this.each(function (x, i) {
+                dot += x * V[i - 1];
+                mod1 += x * x;
+                mod2 += V[i - 1] * V[i - 1];
+            });
+            mod1 = Math.sqrt(mod1);mod2 = Math.sqrt(mod2);
+            if (mod1 * mod2 === 0) {
+                return null;
+            }
+            var theta = dot / (mod1 * mod2);
+            if (theta < -1) {
+                theta = -1;
+            }
+            if (theta > 1) {
+                theta = 1;
+            }
+            return Math.acos(theta);
+        }
+    }, {
+        key: "isParallelTo",
+        value: function isParallelTo(vector) {
+            var angle = this.angleFrom(vector);
+            return angle === null ? null : angle <= _PRECISION.PRECISION;
+        }
+    }, {
+        key: "isAntiparallelTo",
+        value: function isAntiparallelTo(vector) {
+            var angle = this.angleFrom(vector);
+            return angle === null ? null : Math.abs(angle - Math.PI) <= _PRECISION.PRECISION;
+        }
+    }, {
+        key: "isPerpendicularTo",
+        value: function isPerpendicularTo(vector) {
+            var dot = this.dot(vector);
+            return dot === null ? null : Math.abs(dot) <= _PRECISION.PRECISION;
+        }
+    }, {
+        key: "add",
+        value: function add(vector) {
+            var V = vector.elements || vector;
+            if (this.elements.length !== V.length) {
+                return null;
+            }
+            return this.map(function (x, i) {
+                return x + V[i - 1];
+            });
+        }
+    }, {
+        key: "subtract",
+        value: function subtract(vector) {
+            var V = vector.elements || vector;
+            if (this.elements.length !== V.length) {
+                return null;
+            }
+            return this.map(function (x, i) {
+                return x - V[i - 1];
+            });
+        }
+    }, {
+        key: "multiply",
+        value: function multiply(k) {
+            return this.map(function (x) {
+                return x * k;
+            });
+        }
+    }, {
+        key: "dot",
+        value: function dot(vector) {
+            var V = vector.elements || vector;
+            var i,
+                product = 0,
+                n = this.elements.length;
+            if (n !== V.length) {
+                return null;
+            }
+            while (n--) {
+                product += this.elements[n] * V[n];
+            }
+            return product;
+        }
+    }, {
+        key: "cross",
+        value: function cross(vector) {
+            var B = vector.elements || vector;
+            if (this.elements.length !== 3 || B.length !== 3) {
+                return null;
+            }
+            var A = this.elements;
+            return new Vector([A[1] * B[2] - A[2] * B[1], A[2] * B[0] - A[0] * B[2], A[0] * B[1] - A[1] * B[0]]);
+        }
+    }, {
+        key: "max",
+        value: function max() {
+            var m = 0,
+                i = this.elements.length;
+            while (i--) {
+                if (Math.abs(this.elements[i]) > Math.abs(m)) {
+                    m = this.elements[i];
+                }
+            }
+            return m;
+        }
+    }, {
+        key: "indexOf",
+        value: function indexOf(x) {
+            var index = null,
+                n = this.elements.length;
+            for (var i = 0; i < n; i++) {
+                if (index === null && this.elements[i] === x) {
+                    index = i + 1;
+                }
+            }
+            return index;
+        }
+    }, {
+        key: "toDiagonalMatrix",
+        value: function toDiagonalMatrix() {
+            return _Matrix.Matrix.Diagonal(this.elements);
+        }
+    }, {
+        key: "round",
+        value: function round() {
+            return this.map(function (x) {
+                return Math.round(x);
+            });
+        }
+    }, {
+        key: "snapTo",
+        value: function snapTo(x) {
+            return this.map(function (y) {
+                return Math.abs(y - x) <= _PRECISION.PRECISION ? x : y;
+            });
+        }
+    }, {
+        key: "distanceFrom",
+        value: function distanceFrom(obj) {
+            if (obj.anchor || obj.start && obj.end) {
+                return obj.distanceFrom(this);
+            }
+            var V = obj.elements || obj;
+            if (V.length !== this.elements.length) {
+                return null;
+            }
+            var sum = 0,
+                part;
+            this.each(function (x, i) {
+                part = x - V[i - 1];
+                sum += part * part;
+            });
+            return Math.sqrt(sum);
+        }
+    }, {
+        key: "liesOn",
+        value: function liesOn(line) {
+            return line.contains(this);
+        }
+    }, {
+        key: "liesIn",
+        value: function liesIn(plane) {
+            return plane.contains(this);
+        }
+    }, {
+        key: "rotate",
+        value: function rotate(t, obj) {
+            var V,
+                R = null,
+                x,
+                y,
+                z;
+            if (t.determinant) {
+                R = t.elements;
+            }
+            switch (this.elements.length) {
+                case 2:
+                    {
+                        V = obj.elements || obj;
+                        if (V.length !== 2) {
+                            return null;
+                        }
+                        if (!R) {
+                            R = _Matrix.Matrix.Rotation(t).elements;
+                        }
+                        x = this.elements[0] - V[0];
+                        y = this.elements[1] - V[1];
+                        return new Vector([V[0] + R[0][0] * x + R[0][1] * y, V[1] + R[1][0] * x + R[1][1] * y]);
+                        break;
+                    }
+                case 3:
+                    {
+                        if (!obj.direction) {
+                            return null;
+                        }
+                        var C = obj.pointClosestTo(this).elements;
+                        if (!R) {
+                            R = _Matrix.Matrix.Rotation(t, obj.direction).elements;
+                        }
+                        x = this.elements[0] - C[0];
+                        y = this.elements[1] - C[1];
+                        z = this.elements[2] - C[2];
+                        return new Vector([C[0] + R[0][0] * x + R[0][1] * y + R[0][2] * z, C[1] + R[1][0] * x + R[1][1] * y + R[1][2] * z, C[2] + R[2][0] * x + R[2][1] * y + R[2][2] * z]);
+                        break;
+                    }
+                default:
+                    {
+                        return null;
+                    }
+            }
+        }
+    }, {
+        key: "reflectionIn",
+        value: function reflectionIn(obj) {
+            if (obj.anchor) {
+                // obj is a plane or line
+                var P = this.elements.slice();
+                var C = obj.pointClosestTo(P).elements;
+                return new Vector([C[0] + (C[0] - P[0]), C[1] + (C[1] - P[1]), C[2] + (C[2] - (P[2] || 0))]);
+            } else {
+                // obj is a point
+                var Q = obj.elements || obj;
+                if (this.elements.length !== Q.length) {
+                    return null;
+                }
+                return this.map(function (x, i) {
+                    return Q[i - 1] + (Q[i - 1] - x);
+                });
+            }
+        }
+    }, {
+        key: "to3D",
+        value: function to3D() {
+            var V = this.dup();
+            switch (V.elements.length) {
+                case 3:
+                    {
+                        break;
+                    }
+                case 2:
+                    {
+                        V.elements.push(0);
+                        break;
+                    }
+                default:
+                    {
+                        return null;
+                    }
+            }
+            return V;
+        }
+    }, {
+        key: "inspect",
+        value: function inspect() {
+            return '[' + this.elements.join(', ') + ']';
+        }
+    }, {
+        key: "setElements",
+        value: function setElements(els) {
+            this.elements = (els.elements || els).slice();
+            return this;
+        }
+
+        //From glUtils.js
+
+    }, {
+        key: "flatten",
+        value: function flatten() {
+            return this.elements;
+        }
+    }]);
+
+    return Vector;
+}();
+
+Vector.Random = function (n) {
+    var elements = [];
+    while (n--) {
+        elements.push(Math.random());
+    }
+    return new Vector(elements);
+};
+
+Vector.Zero = function (n) {
+    var elements = [];
+    while (n--) {
+        elements.push(0);
+    }
+    return new Vector(elements);
+};
+
+Vector.prototype.x = Vector.prototype.multiply;
+Vector.prototype.each = Vector.prototype.forEach;
+
+Vector.i = new Vector([1, 0, 0]);
+Vector.j = new Vector([0, 1, 0]);
+Vector.k = new Vector([0, 0, 1]);
+
+
+},{"./Matrix":420,"./PRECISION":421}],427:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Vertex = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Vector2 = require("./Vector");
+
+var _PRECISION = require("./PRECISION");
+
+var _Polygon = require("./Polygon");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Vertex = exports.Vertex = function (_Vector) {
+    _inherits(Vertex, _Vector);
+
+    function Vertex(point) {
+        _classCallCheck(this, Vertex);
+
+        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Vertex).call(this, point));
+
+        _this.setElements(point);
+        if (_this.elements.length === 2) {
+            _this.elements.push(0);
+        }
+        if (_this.elements.length !== 3) {
+            var _ret;
+
+            return _ret = null, _possibleConstructorReturn(_this, _ret);
+        }
+        return _this;
+    }
+
+    // Returns true iff the vertex's internal angle is 0 <= x < 180
+    // in the context of the given polygon object. Returns null if the
+    // vertex does not exist in the polygon.
+
+
+    _createClass(Vertex, [{
+        key: "isConvex",
+        value: function isConvex(polygon) {
+            var node = polygon.nodeFor(this);
+            if (node === null) {
+                return null;
+            }
+            var prev = node.prev.data,
+                next = node.next.data;
+            var A = next.subtract(this);
+            var B = prev.subtract(this);
+            var theta = A.angleFrom(B);
+            if (theta <= _PRECISION.PRECISION) {
+                return true;
+            }
+            if (Math.abs(theta - Math.PI) <= _PRECISION.PRECISION) {
+                return false;
+            }
+            return A.cross(B).dot(polygon.plane.normal) > 0;
+        }
+
+        // Returns true iff the vertex's internal angle is 180 <= x < 360
+
+    }, {
+        key: "isReflex",
+        value: function isReflex(polygon) {
+            var result = this.isConvex(polygon);
+            return result === null ? null : !result;
+        }
+    }, {
+        key: "type",
+        value: function type(polygon) {
+            var result = this.isConvex(polygon);
+            return result === null ? null : result ? 'convex' : 'reflex';
+        }
+    }]);
+
+    return Vertex;
+}(_Vector2.Vector);
+
+// Method for converting a set of arrays/vectors/whatever to a set of Vertex objects
+
+
+Vertex.convert = function (points) {
+    var pointSet = points.toArray ? points.toArray() : points;
+    var list = [],
+        n = pointSet.length;
+    for (var i = 0; i < n; i++) {
+        list.push(new Vertex(pointSet[i]));
+    }
+    return list;
+};
+
+
+},{"./PRECISION":421,"./Polygon":423,"./Vector":426}],428:[function(require,module,exports){
 (function (process){
 var Stream = require('stream')
 
@@ -61570,7 +66489,7 @@ function through (write, end, opts) {
 
 
 }).call(this,require('_process'))
-},{"_process":205,"stream":378}],405:[function(require,module,exports){
+},{"_process":216,"stream":389}],429:[function(require,module,exports){
 var Buffer = require('buffer').Buffer
 
 module.exports = function (buf) {
@@ -61599,7 +66518,66 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":64}],406:[function(require,module,exports){
+},{"buffer":64}],430:[function(require,module,exports){
+"use strict"
+
+function unique_pred(list, compare) {
+  var ptr = 1
+    , len = list.length
+    , a=list[0], b=list[0]
+  for(var i=1; i<len; ++i) {
+    b = a
+    a = list[i]
+    if(compare(a, b)) {
+      if(i === ptr) {
+        ptr++
+        continue
+      }
+      list[ptr++] = a
+    }
+  }
+  list.length = ptr
+  return list
+}
+
+function unique_eq(list) {
+  var ptr = 1
+    , len = list.length
+    , a=list[0], b = list[0]
+  for(var i=1; i<len; ++i, b=a) {
+    b = a
+    a = list[i]
+    if(a !== b) {
+      if(i === ptr) {
+        ptr++
+        continue
+      }
+      list[ptr++] = a
+    }
+  }
+  list.length = ptr
+  return list
+}
+
+function unique(list, compare, sorted) {
+  if(list.length === 0) {
+    return list
+  }
+  if(compare) {
+    if(!sorted) {
+      list.sort(compare)
+    }
+    return unique_pred(list, compare)
+  }
+  if(!sorted) {
+    list.sort()
+  }
+  return unique_eq(list)
+}
+
+module.exports = unique
+
+},{}],431:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -62333,7 +67311,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":407,"punycode":212,"querystring":215}],407:[function(require,module,exports){
+},{"./util":432,"punycode":223,"querystring":226}],432:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -62351,7 +67329,7 @@ module.exports = {
   }
 };
 
-},{}],408:[function(require,module,exports){
+},{}],433:[function(require,module,exports){
 (function (global){
 
 /**
@@ -62422,16 +67400,16 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],409:[function(require,module,exports){
-arguments[4][142][0].apply(exports,arguments)
-},{"dup":142}],410:[function(require,module,exports){
+},{}],434:[function(require,module,exports){
+arguments[4][148][0].apply(exports,arguments)
+},{"dup":148}],435:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],411:[function(require,module,exports){
+},{}],436:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -63021,7 +67999,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":410,"_process":205,"inherits":409}],412:[function(require,module,exports){
+},{"./support/isBuffer":435,"_process":216,"inherits":434}],437:[function(require,module,exports){
 var indexOf = require('indexof');
 
 var Object_keys = function (obj) {
@@ -63161,7 +68139,7 @@ exports.createContext = Script.createContext = function (context) {
     return copy;
 };
 
-},{"indexof":141}],413:[function(require,module,exports){
+},{"indexof":147}],438:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -63182,7 +68160,7 @@ function extend() {
     return target
 }
 
-},{}],414:[function(require,module,exports){
+},{}],439:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -63201,7 +68179,7 @@ function extend(target) {
     return target
 }
 
-},{}],415:[function(require,module,exports){
+},{}],440:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -63274,7 +68252,7 @@ var Address = function (_React$Component) {
 
 module.exports = Address;
 
-},{"react":366}],416:[function(require,module,exports){
+},{"react":377}],441:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -63379,12 +68357,16 @@ var Cart = function (_React$Component) {
 
 module.exports = Cart;
 
-},{"react":366}],417:[function(require,module,exports){
+},{"react":377}],442:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SylvestorGlUtils = require('sylvester-es6');
+var Matrix = SylvestorGlUtils.Matrix;
+var Vector = SylvestorGlUtils.Vector;
 
 var Component = function () {
   function Component() {
@@ -63406,65 +68388,32 @@ var Component = function () {
   }
 
   _createClass(Component, [{
+    key: "imageLoadedCallback",
+    value: function imageLoadedCallback(gl, loaded_image) {
+      if (!this.texture) ;
+      this.texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, this.texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      // mipmapping the sequins looks bad?
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+  }, {
     key: "set",
-    value: function set(gl, state) {
+    value: function set(gl, state, callback) {
       var _this = this;
 
-      // handle image
-      if (state.props && state.props.image && state.props.image != this.props.image) {
-        (function () {
-          var image_load = new Image();
-          image_load.crossOrigin = "";
-          image_load.onload = function () {
-            if (_this.texture) {
-              gl.deleteTexture(_this.texture);
-            }
-            _this.texture = gl.createTexture();
-
-            // special handling if image is not power of 2
-            var isPowerOfTwo = function isPowerOfTwo(x) {
-              return (x & x - 1) == 0;
-            };
-            var nextHighestPowerOfTwo = function nextHighestPowerOfTwo(x) {
-              --x;
-              for (var i = 1; i < 32; i <<= 1) {
-                x = x | x >> i;
-              }
-              return x + 1;
-            };
-            if (!isPowerOfTwo(image_load.width) || !isPowerOfTwo(image_load.height)) {
-              // Scale up the texture to the next highest power of two dimensions.
-              var canvas = document.createElement("canvas");
-              canvas.width = nextHighestPowerOfTwo(image_load.width);
-              canvas.height = nextHighestPowerOfTwo(image_load.height);
-              _this.texture_scale = [canvas.width / image_load.width, canvas.height / image_load.height];
-              var ctx = canvas.getContext("2d");
-              ctx.drawImage(image_load, (canvas.width - image_load.width) / 2, (canvas.height - image_load.height) / 2, image_load.width, image_load.height);
-              image_load = canvas;
-            }
-
-            gl.bindTexture(gl.TEXTURE_2D, _this.texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image_load);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            // mipmapping the sequins looks bad?
-            //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.generateMipmap(gl.TEXTURE_2D);
-            gl.bindTexture(gl.TEXTURE_2D, null);
-          };
-          // mobile needs cachebust or it won't load it?
-          image_load.src = state.props.image + "?cachebust=" + new Date();
-        })();
-      }
       this.scale[0] = parseFloat(state.props.imagewidth) || 1;
       this.scale[1] = parseFloat(state.props.imageheight) || 1;
       if (state.props.position) {
         this.position[0] = parseFloat(state.props.position[0]) || 0;
         this.position[1] = parseFloat(state.props.position[1]) || 0;
       }
-      this.props = state.props || {};
       // fill out if we got an internal assembly
       state.assembly = state.assembly || [];
       if (state.assembly) {
@@ -63479,6 +68428,57 @@ var Component = function () {
       } else {
         this.assembly = [];
       }
+      // handle image
+      if (state.props && state.props.image && state.props.image != this.props.image) {
+        if (typeof Image != "undefined") {
+          (function () {
+            // client side image load
+            var loaded_image = new Image();
+            loaded_image.crossOrigin = "";
+            loaded_image.onload = function () {
+              if (_this.texture) {
+                gl.deleteTexture(_this.texture);
+              }
+
+              // special handling if image is not power of 2
+              var isPowerOfTwo = function isPowerOfTwo(x) {
+                return (x & x - 1) == 0;
+              };
+              var nextHighestPowerOfTwo = function nextHighestPowerOfTwo(x) {
+                --x;
+                for (var i = 1; i < 32; i <<= 1) {
+                  x = x | x >> i;
+                }
+                return x + 1;
+              };
+              if (!isPowerOfTwo(loaded_image.width) || !isPowerOfTwo(loaded_image.height)) {
+                // Scale up the texture to the next highest power of two dimensions.
+                var canvas = document.createElement("canvas");
+                canvas.width = nextHighestPowerOfTwo(loaded_image.width);
+                canvas.height = nextHighestPowerOfTwo(loaded_image.height);
+                _this.texture_scale = [canvas.width / loaded_image.width, canvas.height / loaded_image.height];
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(loaded_image, (canvas.width - loaded_image.width) / 2, (canvas.height - loaded_image.height) / 2, loaded_image.width, loaded_image.height);
+                loaded_image = canvas;
+              }
+              _this.imageLoadedCallback(gl, loaded_image);
+              if (callback) callback(null);
+            };
+            // mobile needs cachebust or it won't load it?
+            loaded_image.src = state.props.image + "?cachebust=" + new Date();
+          })();
+        } else {
+          var getPixels = require("get-pixels");
+          getPixels(state.props.image, function (err, loaded_image) {
+            if (typeof ImageData != "undefined") _this.imageLoadedCallback(gl, new ImageData(new Uint8ClampedArray(loaded_image.data), loaded_image.shape[0], loaded_image.shape[1]));else _this.imageLoadedCallback(gl, { data: new Uint8ClampedArray(loaded_image.data), width: loaded_image.shape[0], height: loaded_image.shape[1] });
+            if (callback) callback(null);
+          });
+          // server side image load
+        }
+      } else {
+        if (callback) callback(null);
+      } // handle image
+      this.props = state.props || {};
     }
   }, {
     key: "render",
@@ -63486,9 +68486,9 @@ var Component = function () {
 
       // TODO pre-multiply these into a single transform matrix
       var modelview = void 0;
-      modelview = mvMatrix.x(Matrix.Translation($V([this.position[0], this.position[1], this.position[2]])).ensure4x4());
+      modelview = mvMatrix.x(Matrix.Translation(new Vector([this.position[0], this.position[1], this.position[2]])).ensure4x4());
 
-      modelview = modelview.x(Matrix.Rotation(this.rotation, $V([this.rotation_axis[0], this.rotation_axis[1], this.rotation_axis[2]])).ensure4x4());
+      modelview = modelview.x(Matrix.Rotation(this.rotation, new Vector([this.rotation_axis[0], this.rotation_axis[1], this.rotation_axis[2]])).ensure4x4());
       modelview = modelview.x(Matrix.Diagonal([this.scale[0] * this.texture_scale[0], this.scale[1] * this.texture_scale[1], this.scale[2], 1]));
       var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
       gl.uniformMatrix4fv(mvUniform, false, new Float32Array(modelview.flatten()));
@@ -63501,11 +68501,11 @@ var Component = function () {
       }
 
       var width = this.getWorldDims()[0];
-      modelview = Matrix.Translation($V([-width / 2, 0, 0])).ensure4x4().x(modelview);
+      modelview = Matrix.Translation(new Vector([-width / 2, 0, 0])).ensure4x4().x(modelview);
       for (var i = 0; i < this.assembly.length; i++) {
-        modelview = Matrix.Translation($V([this.assembly[i].scale[0] / 2, 0, 0])).ensure4x4().x(modelview);
+        modelview = Matrix.Translation(new Vector([this.assembly[i].scale[0] / 2, 0, 0])).ensure4x4().x(modelview);
         this.assembly[i].render(gl, modelview, shaderProgram);
-        modelview = Matrix.Translation($V([this.assembly[i].scale[0] / 2, 0, 0])).ensure4x4().x(modelview);
+        modelview = Matrix.Translation(new Vector([this.assembly[i].scale[0] / 2, 0, 0])).ensure4x4().x(modelview);
       }
     }
   }, {
@@ -63571,7 +68571,7 @@ var Component = function () {
 
 module.exports = Component;
 
-},{}],418:[function(require,module,exports){
+},{"get-pixels":137,"sylvester-es6":424}],443:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -63725,7 +68725,7 @@ var ComponentEdit = function (_React$Component) {
 
 module.exports = ComponentEdit;
 
-},{"react":366}],419:[function(require,module,exports){
+},{"react":377}],444:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -63740,13 +68740,14 @@ var ComponentSerializer = function () {
     _classCallCheck(this, ComponentSerializer);
   }
 
+  // I made this sync as it's currently called in a react ComponentWillMount
+
+
   _createClass(ComponentSerializer, null, [{
     key: 'parse',
     value: function parse(component_string) {
-      console.log("parse", component_string);
       var buffer = Buffer.from(component_string, 'base64');
       var customization = zlib.unzipSync(buffer).toString();
-      console.log("parse", customization);
       return JSON.parse(customization);
     }
   }, {
@@ -63786,7 +68787,7 @@ var ComponentSerializer = function () {
 module.exports = ComponentSerializer;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":64,"zlib":52}],420:[function(require,module,exports){
+},{"buffer":64,"zlib":52}],445:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -63854,14 +68855,19 @@ var ComponentsEdit = function (_React$Component) {
 
 module.exports = ComponentsEdit;
 
-},{"./ComponentEdit.jsx":418,"react":366}],421:[function(require,module,exports){
-"use strict";
+},{"./ComponentEdit.jsx":443,"react":377}],446:[function(require,module,exports){
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var async = require('async');
+
 var Component = require('./Component.js');
+var SylvestorGlUtils = require('sylvester-es6');
+var Matrix = SylvestorGlUtils.Matrix;
+var Vector = SylvestorGlUtils.Vector;
 
 var Customizer = function () {
   function Customizer(options) {
@@ -63899,11 +68905,13 @@ var Customizer = function () {
   }
 
   _createClass(Customizer, [{
-    key: "set",
-    value: function set(product, construction) {
+    key: 'set',
+    value: function set(product, construction, callback) {
+      var set_tasks = [];
+
       var components = [];
       // set product
-      this.product.set(this.gl, { props: product.props });
+      set_tasks.push(this.product.set.bind(this.product, this.gl, { props: product.props }));
       // TODO recurse assemblies
       construction.assembly.forEach(function (component) {
         components.push(component);
@@ -63915,29 +68923,30 @@ var Customizer = function () {
       // TODO unbind textures here so we don't leak
       this.components.length = components.length;
       for (var i = 0; i < components.length; i++) {
-        this.components[i].set(this.gl, components[i]);
+        set_tasks.push(this.components[i].set.bind(this.components[i], this.gl, components[i]));
       }
+      async.parallel(set_tasks, function (err) {
+        if (callback) callback();
+      });
     }
   }, {
-    key: "resizeViewport",
+    key: 'resizeViewport',
     value: function resizeViewport() {
       // set canvas space to be 1-to-1 with browser space
-      this.options.canvas.width = this.options.canvas.offsetWidth;
-      this.options.canvas.height = this.options.canvas.offsetHeight;
-      this.gl.viewport(0, 0, this.options.canvas.width, this.options.canvas.height);
+      this.gl.viewport(0, 0, this.options.width, this.options.height);
 
       // init pMatrix with view frustrum
-      this.pMatrix = makePerspective(this.options.vfov, this.options.canvas.width / this.options.canvas.height, 0.1, 100.0);
+      this.pMatrix = SylvestorGlUtils.makePerspective(this.options.vfov, this.options.width / this.options.height, 0.1, 100.0);
       // move camera upwards by elevation
       this.pMatrix = this.translate(this.pMatrix, [-0.0, 0.0, -this.camera_elevation]);
       // TODO if camera_elevation is negative, then rotate Y 180
 
-      this.focal_length_pixels = this.options.canvas.offsetHeight / 2 / Math.tan(this.options.vfov * Math.PI / 360);
+      this.focal_length_pixels = this.options.height / 2 / Math.tan(this.options.vfov * Math.PI / 360);
 
       this.updateCanvasScreenPosition();
     }
   }, {
-    key: "updateCanvasScreenPosition",
+    key: 'updateCanvasScreenPosition',
     value: function updateCanvasScreenPosition() {
       var position = [0, 0];
       var element = this.options.canvas;
@@ -63956,7 +68965,7 @@ var Customizer = function () {
       this.canvas_offset = position;
     }
   }, {
-    key: "init",
+    key: 'init',
     value: function init() {
       this.gl = this.initWebGL();
       var gl = this.gl;
@@ -63975,18 +68984,15 @@ var Customizer = function () {
 
       // init mvMatrix
       this.mvMatrix = Matrix.I(4);
-
-      // Set up to draw the scene periodically.
-      window.requestAnimationFrame(this.render.bind(this));
     }
   }, {
-    key: "browserToWorld",
+    key: 'browserToWorld',
     value: function browserToWorld(browser) {
       //    let scroll = document.body.scrollTop || document.documentElement.scrollTop;
       return this.screenToWorld([browser[0] - this.canvas_offset[0], browser[1] - this.canvas_offset[1]]);
     }
   }, {
-    key: "screenToWorld",
+    key: 'screenToWorld',
     value: function screenToWorld(screen) {
       var ret = [screen[0] - this.options.canvas.offsetWidth / 2, this.options.canvas.offsetHeight / 2 - screen[1], 0, 1];
       ret[0] = ret[0] * this.camera_elevation / this.focal_length_pixels;
@@ -63994,13 +69000,13 @@ var Customizer = function () {
       return ret;
     }
   }, {
-    key: "worldToScreen",
+    key: 'worldToScreen',
     value: function worldToScreen(world) {
       var ret = [world[0] * this.focal_length_pixels / this.camera_elevation + this.options.canvas.offsetWidth / 2, this.options.canvas.offsetHeight / 2 - world[1] * this.focal_length_pixels / this.camera_elevation, 0, 1];
       return ret;
     }
   }, {
-    key: "getScreenDims",
+    key: 'getScreenDims',
     value: function getScreenDims(component) {
       var world_dims = component.getWorldDims();
       var top_left = this.worldToScreen([component.position[0] - world_dims[0] / 2, component.position[1] - world_dims[1] / 2]);
@@ -64008,19 +69014,29 @@ var Customizer = function () {
       return [Math.abs(bottom_right[0] - top_left[0]), Math.abs(bottom_right[1] - top_left[1])];
     }
   }, {
-    key: "initWebGL",
+    key: 'initWebGL',
     value: function initWebGL() {
       var gl = null;
       try {
-        gl = this.options.canvas.getContext("webgl");
+        if (this.options.canvas) {
+          gl = this.options.canvas.getContext("webgl");
+          this.options.canvas.width = this.options.canvas.offsetWidth;
+          this.options.canvas.height = this.options.canvas.offsetHeight;
+          this.options.width = this.options.canvas.width;
+          this.options.height = this.options.canvas.height;
+        } else {
+          // if we didn't get passed a canvas, we're doing a server side render
+          gl = require('gl')(this.options.width, this.options.height);
+        }
       } catch (e) {}
+
       if (!gl) {
         alert("Unable to initialize WebGL. Your browser may not support it.");
       }
       return gl;
     }
   }, {
-    key: "initBuffers",
+    key: 'initBuffers',
     value: function initBuffers() {
       var gl = this.gl;
 
@@ -64046,23 +69062,34 @@ var Customizer = function () {
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(particleVertexIndices), gl.STATIC_DRAW);
     }
   }, {
-    key: "initTextures",
+    key: 'initTextures',
     value: function initTextures() {
+      var _this = this;
+
       var gl = this.gl;
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
       this.particleTexture = gl.createTexture();
-      var particleImage = new Image();
-      var self = this;
-      particleImage.onload = function () {
-        self.handleTextureLoaded(particleImage, self.particleTexture);
-        for (var i = 0; i < self.particles.length; i++) {
-          self.particles[i].texture = self.particleTexture;
-        }
-      };
-      particleImage.src = "/petal.png";
+      if (typeof Image != "undefined") {
+        (function () {
+          var particleImage = new Image();
+          var self = _this;
+          particleImage.onload = function () {
+            self.handleTextureLoaded(particleImage, self.particleTexture);
+            for (var i = 0; i < self.particles.length; i++) {
+              self.particles[i].texture = self.particleTexture;
+            }
+          };
+          particleImage.src = "/petal.png";
+        })();
+      } else {
+        var getPixels = require("get-pixels");
+        getPixels("http://localhost/petal.png", function (err, pixels) {
+          _this.handleTextureLoaded(pixels, _this.particleTexture);
+        });
+      }
     }
   }, {
-    key: "handleTextureLoaded",
+    key: 'handleTextureLoaded',
     value: function handleTextureLoaded(image, texture) {
       var gl = this.gl;
       gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -64073,7 +69100,7 @@ var Customizer = function () {
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render() {
       var gl = this.gl;
 
@@ -64112,25 +69139,29 @@ var Customizer = function () {
         this.particles[_i].render(gl, this.mvMatrix, this.shaderProgram);
         this.particles[_i].updatePosition(this.time_delta);
       }
-
-      window.requestAnimationFrame(this.render.bind(this));
     }
   }, {
-    key: "initShaders",
+    key: 'animate',
+    value: function animate() {
+      this.render();
+      window.requestAnimationFrame(this.animate.bind(this));
+    }
+  }, {
+    key: 'initShaders',
     value: function initShaders() {
       var gl = this.gl;
       var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-      gl.shaderSource(fragmentShader, "\n        varying highp vec2 vTextureCoord;\n        uniform sampler2D uSampler;\n        void main(void) {\n          gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n        }\n    ");
+      gl.shaderSource(fragmentShader, '\n        varying highp vec2 vTextureCoord;\n        uniform sampler2D uSampler;\n        void main(void) {\n          gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n        }\n    ');
       gl.compileShader(fragmentShader);
       if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-        alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(fragmentShader));
+        console.log("An error occurred compiling the shaders: " + gl.getShaderInfoLog(fragmentShader));
       }
 
       var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-      gl.shaderSource(vertexShader, "\n        attribute vec3 aVertexPosition;\n        attribute vec2 aTextureCoord;\n        uniform mat4 uMVMatrix;\n        uniform mat4 uPMatrix;\n        varying highp vec2 vTextureCoord;\n        void main(void) {\n          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n          vTextureCoord = aTextureCoord;\n        }\n    ");
+      gl.shaderSource(vertexShader, '\n        attribute vec3 aVertexPosition;\n        attribute vec2 aTextureCoord;\n        uniform mat4 uMVMatrix;\n        uniform mat4 uPMatrix;\n        varying highp vec2 vTextureCoord;\n        void main(void) {\n          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n          vTextureCoord = aTextureCoord;\n        }\n    ');
       gl.compileShader(vertexShader);
       if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-        alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(vertexShader));
+        console.log("An error occurred compiling the shaders: " + gl.getShaderInfoLog(vertexShader));
       }
 
       // Create the shader program
@@ -64141,7 +69172,7 @@ var Customizer = function () {
 
       // If creating the shader program failed, alert
       if (!gl.getProgramParameter(this.shaderProgram, gl.LINK_STATUS)) {
-        alert("Unable to initialize the shader program: " + gl.getProgramInfoLog(shader));
+        console.log("Unable to initialize the shader program: " + gl.getProgramInfoLog(shader));
       }
 
       gl.useProgram(this.shaderProgram);
@@ -64153,14 +69184,14 @@ var Customizer = function () {
       gl.enableVertexAttribArray(this.textureCoordAttribute);
     }
   }, {
-    key: "setMatrixUniforms",
+    key: 'setMatrixUniforms',
     value: function setMatrixUniforms() {
       var gl = this.gl;
       var mvUniform = gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
       gl.uniformMatrix4fv(mvUniform, false, new Float32Array(this.mvMatrix.flatten()));
     }
   }, {
-    key: "mvPushMatrix",
+    key: 'mvPushMatrix',
     value: function mvPushMatrix(m) {
       if (m) {
         this.mvMatrixStack.push(m.dup());
@@ -64170,7 +69201,7 @@ var Customizer = function () {
       }
     }
   }, {
-    key: "mvPopMatrix",
+    key: 'mvPopMatrix',
     value: function mvPopMatrix() {
       if (!this.mvMatrixStack.length) {
         throw "Can't pop from an empty matrix stack.";
@@ -64180,18 +69211,18 @@ var Customizer = function () {
       return this.mvMatrix;
     }
   }, {
-    key: "rotate",
+    key: 'rotate',
     value: function rotate(m, angle, v) {
-      var r = Matrix.Rotation(angle, $V([v[0], v[1], v[2]])).ensure4x4();
+      var r = Matrix.Rotation(angle, new Vector([v[0], v[1], v[2]])).ensure4x4();
       return m.x(r);
     }
   }, {
-    key: "translate",
+    key: 'translate',
     value: function translate(m, v) {
-      return m.x(Matrix.Translation($V([v[0], v[1], v[2]])).ensure4x4());
+      return m.x(Matrix.Translation(new Vector([v[0], v[1], v[2]])).ensure4x4());
     }
   }, {
-    key: "scale",
+    key: 'scale',
     value: function scale(m, v) {
       return m.x(Matrix.Diagonal([v[0], v[1], v[2], 1]));
     }
@@ -64202,7 +69233,7 @@ var Customizer = function () {
 
 module.exports = Customizer;
 
-},{"./Component.js":417}],422:[function(require,module,exports){
+},{"./Component.js":442,"async":20,"get-pixels":137,"gl":138,"sylvester-es6":424}],447:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -64304,7 +69335,7 @@ var FacebookLogin = function (_React$Component) {
 
 module.exports = FacebookLogin;
 
-},{"./UserProfile.jsx":442,"https":139,"react":366}],423:[function(require,module,exports){
+},{"./UserProfile.jsx":467,"https":145,"react":377}],448:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -64425,7 +69456,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./Scrollable.jsx":435,"./Shipment.jsx":436,"./Tabs.jsx":437,"react":366}],424:[function(require,module,exports){
+},{"./Scrollable.jsx":460,"./Shipment.jsx":461,"./Tabs.jsx":462,"react":377}],449:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -64611,7 +69642,7 @@ var InputAddress = function (_React$Component) {
 
 module.exports = InputAddress;
 
-},{"react":366}],425:[function(require,module,exports){
+},{"react":377}],450:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -64715,7 +69746,7 @@ var Item = function (_React$Component) {
 
 module.exports = Item;
 
-},{"react":366}],426:[function(require,module,exports){
+},{"react":377}],451:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -64790,7 +69821,7 @@ var Items = function (_React$Component) {
 
 module.exports = Items;
 
-},{"./Item.jsx":425,"react":366}],427:[function(require,module,exports){
+},{"./Item.jsx":450,"react":377}],452:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -64846,7 +69877,7 @@ var LayoutBasic = function (_React$Component) {
 
 module.exports = LayoutBasic;
 
-},{"react":366}],428:[function(require,module,exports){
+},{"react":377}],453:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -64974,8 +70005,6 @@ var LayoutMain = function (_React$Component) {
           React.createElement(UserMenu, _extends({ handleToggleMenu: this.handleToggleMenuState.bind(this) }, this.state))
         ),
         React.createElement('script', { src: '/BowAndDrape.js' }),
-        React.createElement('script', { src: '/sylvester.js', type: 'text/javascript' }),
-        React.createElement('script', { src: '/glUtils.js', type: 'text/javascript' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n            content_string: `' + escape(this.props.content_string) + '`,\n            content_name: `' + this.props.content_name + '`,\n            content_props: `' + this.props.content_props + '`}\n          );\n          ReactDOM.render(\n            layout,\n            document.body\n          );\n\n        ' } })
       );
     }
@@ -64986,7 +70015,7 @@ var LayoutMain = function (_React$Component) {
 
 module.exports = LayoutMain;
 
-},{"./UserMenu.jsx":440,"react":366,"react-dom/server":219,"react-swipeable":220}],429:[function(require,module,exports){
+},{"./UserMenu.jsx":465,"react":377,"react-dom/server":230,"react-swipeable":231}],454:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -65123,7 +70152,7 @@ var PageEdit = function (_React$Component) {
 
 module.exports = PageEdit;
 
-},{"react":366}],430:[function(require,module,exports){
+},{"react":377}],455:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -65187,7 +70216,7 @@ var PageList = function (_React$Component) {
 
 module.exports = PageList;
 
-},{"./PageEdit.jsx":429,"./Scrollable.jsx":435,"react":366}],431:[function(require,module,exports){
+},{"./PageEdit.jsx":454,"./Scrollable.jsx":460,"react":377}],456:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -65481,7 +70510,7 @@ var PayStripe = function (_React$Component) {
 module.exports = PayStripe;
 
 }).call(this,require('_process'))
-},{"./InputAddress.jsx":424,"./Items.jsx":426,"./ThanksPurchaseComplete.jsx":438,"_process":205,"react":366}],432:[function(require,module,exports){
+},{"./InputAddress.jsx":449,"./Items.jsx":451,"./ThanksPurchaseComplete.jsx":463,"_process":216,"react":377}],457:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -65519,6 +70548,7 @@ var ProductCanvas = function (_React$Component) {
       this.customizer = new BowAndDrape.Customizer({ canvas: this.canvas });
       this.customizer.init();
       this.forceUpdate();
+      this.customizer.animate();
     }
   }, {
     key: 'handleAddComponent',
@@ -65653,7 +70683,7 @@ var ProductCanvas = function (_React$Component) {
 
 module.exports = ProductCanvas;
 
-},{"react":366,"react-swipeable":220}],433:[function(require,module,exports){
+},{"react":377,"react-swipeable":231}],458:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -65709,10 +70739,8 @@ var ProductList = function (_React$Component) {
           _this2.setState({ selected_product: customization.selected_product });
 
           var product = _this2.state.product_map[customization.selected_product[0]];
-          console.log("Mount", product.options);
           for (var i = 1; product && i < customization.selected_product.length; i++) {
             product = product.options[customization.selected_product[i]];
-            console.log("Mount", product);
           }
           // fill in our customization
           var initial_assembly = customization.assembly;
@@ -65746,6 +70774,7 @@ var ProductList = function (_React$Component) {
               component.props = JSON.parse(JSON.stringify(components[component.sku].props));
             }
           });
+          _this2.initial_product = product;
           _this2.initial_assembly = initial_assembly;
         })();
       } // this.props.c
@@ -65768,6 +70797,7 @@ var ProductList = function (_React$Component) {
       return React.createElement(
         'customize',
         null,
+        this.props.c ? React.createElement('meta', { property: 'og:image', content: '/store/' + this.props.store.id + '/preview?c=' + this.props.c }) : null,
         this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : React.createElement(
           'button',
           { onClick: this.handleAddToCart.bind(this, product), style: { position: "fixed", top: "0px", right: "0px", zIndex: "1", maxWidth: "none", margin: "0px" } },
@@ -66002,11 +71032,11 @@ var ProductList = function (_React$Component) {
     key: 'handleUpdateProduct',
     value: function handleUpdateProduct() {
       // call this whenever there was an update to base_product or assembly
+      // TODO only do the following when done with a component drag!
       var item = {
         selected_product: this.state.selected_product,
         assembly: this.refs.ProductCanvas.state.assembly
       };
-      // TODO only do the following when done with a component drag!
       ComponentSerializer.stringify(item, function (err, serialized) {
         var toks = location.href.split('?');
         var url = toks[0];
@@ -66166,7 +71196,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ComponentEdit.jsx":418,"./ComponentSerializer.js":419,"./ProductCanvas.jsx":432,"./ProductListEdit.jsx":434,"./Tabs.jsx":437,"async":20,"querystring":215,"react":366}],434:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ComponentEdit.jsx":443,"./ComponentSerializer.js":444,"./ProductCanvas.jsx":457,"./ProductListEdit.jsx":459,"./Tabs.jsx":462,"async":20,"querystring":226,"react":377}],459:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66292,7 +71322,7 @@ var ProductListEdit = function (_React$Component) {
 
 module.exports = ProductListEdit;
 
-},{"async":20,"react":366,"react-autocomplete":217}],435:[function(require,module,exports){
+},{"async":20,"react":377,"react-autocomplete":228}],460:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66380,7 +71410,7 @@ var Scrollable = function (_React$Component) {
 
 module.exports = Scrollable;
 
-},{"react":366}],436:[function(require,module,exports){
+},{"react":377}],461:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -66627,7 +71657,7 @@ var Shipment = function (_React$Component) {
 
 module.exports = Shipment;
 
-},{"./Address.jsx":415,"./Item.jsx":425,"./Timestamp.jsx":439,"react":366}],437:[function(require,module,exports){
+},{"./Address.jsx":440,"./Item.jsx":450,"./Timestamp.jsx":464,"react":377}],462:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66752,7 +71782,7 @@ var Tabs = function (_React$Component) {
 
 module.exports = Tabs;
 
-},{"fs":53,"react":366}],438:[function(require,module,exports){
+},{"fs":53,"react":377}],463:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66794,7 +71824,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"react":366}],439:[function(require,module,exports){
+},{"react":377}],464:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66833,7 +71863,7 @@ var Timestamp = function (_React$Component) {
 
 module.exports = Timestamp;
 
-},{"react":366}],440:[function(require,module,exports){
+},{"react":377}],465:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -66925,7 +71955,7 @@ var UserMenu = function (_React$Component) {
 
 module.exports = UserMenu;
 
-},{"./Cart.jsx":416,"./FacebookLogin.jsx":422,"./UserProfile.jsx":442,"react":366}],441:[function(require,module,exports){
+},{"./Cart.jsx":441,"./FacebookLogin.jsx":447,"./UserProfile.jsx":467,"react":377}],466:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -67023,7 +72053,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserProfile.jsx":442,"jwt-decode":146,"react":366}],442:[function(require,module,exports){
+},{"./UserProfile.jsx":467,"jwt-decode":153,"react":377}],467:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -67145,7 +72175,7 @@ var UserProfile = function (_React$Component) {
 
 module.exports = UserProfile;
 
-},{"bcryptjs":22,"react":366}],"BowAndDrape":[function(require,module,exports){
+},{"bcryptjs":22,"react":377}],"BowAndDrape":[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -67276,4 +72306,4 @@ module.exports = {
   Customizer: Customizer
 };
 
-},{"./ComponentsEdit.jsx":420,"./Customizer.js":421,"./FulfillShipments.jsx":423,"./Items.jsx":426,"./LayoutBasic.jsx":427,"./LayoutMain.jsx":428,"./PageList.jsx":430,"./PayStripe.jsx":431,"./ProductList.jsx":433,"./UserPasswordReset.jsx":441,"events":105,"jwt-decode":146,"react":366,"react-dom":218}]},{},[]);
+},{"./ComponentsEdit.jsx":445,"./Customizer.js":446,"./FulfillShipments.jsx":448,"./Items.jsx":451,"./LayoutBasic.jsx":452,"./LayoutMain.jsx":453,"./PageList.jsx":455,"./PayStripe.jsx":456,"./ProductList.jsx":458,"./UserPasswordReset.jsx":466,"events":109,"jwt-decode":153,"react":377,"react-dom":229}]},{},[]);

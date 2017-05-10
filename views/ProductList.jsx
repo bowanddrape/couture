@@ -107,6 +107,7 @@ class ProductList extends React.Component {
           component.props = JSON.parse(JSON.stringify(components[component.sku].props));
         }
       });
+      this.initial_product = product;
       this.initial_assembly = initial_assembly;
     } // this.props.c
   }
@@ -123,6 +124,7 @@ class ProductList extends React.Component {
 
     return (
       <customize>
+        {this.props.c ? <meta property="og:image" content={`/store/${this.props.store.id}/preview?c=${this.props.c}`} /> :null}
         {this.props.edit ?
           <ComponentEdit {...product_raw} inherits={product} /> :
           <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1",maxWidth:"none",margin:"0px"}}>Add To Cart</button>
@@ -307,11 +309,11 @@ class ProductList extends React.Component {
   }
   handleUpdateProduct() {
     // call this whenever there was an update to base_product or assembly
+    // TODO only do the following when done with a component drag!
     let item = {
       selected_product: this.state.selected_product,
       assembly: this.refs.ProductCanvas.state.assembly,
     };
-    // TODO only do the following when done with a component drag!
     ComponentSerializer.stringify(item, (err, serialized) => {
       let toks = location.href.split('?');
       let url = toks[0];
