@@ -68358,12 +68358,13 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 },{"react":377}],442:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var async = require('async');
 var SylvestorGlUtils = require('sylvester-es6');
 var Matrix = SylvestorGlUtils.Matrix;
 var Vector = SylvestorGlUtils.Vector;
@@ -68388,26 +68389,81 @@ var Component = function () {
   }
 
   _createClass(Component, [{
-    key: "imageLoadedCallback",
-    value: function imageLoadedCallback(gl, loaded_image) {
-      if (!this.texture) ;
-      this.texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, this.texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      // mipmapping the sequins looks bad?
-      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.generateMipmap(gl.TEXTURE_2D);
-      gl.bindTexture(gl.TEXTURE_2D, null);
-    }
-  }, {
-    key: "set",
-    value: function set(gl, state, callback) {
+    key: 'loadImage',
+    value: function loadImage(gl, state, callback) {
       var _this = this;
 
+      var imageLoadedCallback = function imageLoadedCallback(gl, loaded_image) {
+        if (!_this.texture) ;
+        _this.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, _this.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        // mipmapping the sequins looks bad?
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+      };
+
+      if (!state.props || !state.props.image || state.props.image == this.props.image) {
+        if (callback) callback();
+        return;
+      }
+      if (typeof Image != "undefined") {
+        (function () {
+          // client side image load
+          var loaded_image = new Image();
+          loaded_image.crossOrigin = "";
+          loaded_image.onload = function () {
+            if (_this.texture) {
+              gl.deleteTexture(_this.texture);
+            }
+
+            // special handling if image is not power of 2
+            var isPowerOfTwo = function isPowerOfTwo(x) {
+              return (x & x - 1) == 0;
+            };
+            var nextHighestPowerOfTwo = function nextHighestPowerOfTwo(x) {
+              --x;
+              for (var i = 1; i < 32; i <<= 1) {
+                x = x | x >> i;
+              }
+              return x + 1;
+            };
+            if (!isPowerOfTwo(loaded_image.width) || !isPowerOfTwo(loaded_image.height)) {
+              // Scale up the texture to the next highest power of two dimensions.
+              var canvas = document.createElement("canvas");
+              canvas.width = nextHighestPowerOfTwo(loaded_image.width);
+              canvas.height = nextHighestPowerOfTwo(loaded_image.height);
+              _this.texture_scale = [canvas.width / loaded_image.width, canvas.height / loaded_image.height];
+              var ctx = canvas.getContext("2d");
+              ctx.drawImage(loaded_image, (canvas.width - loaded_image.width) / 2, (canvas.height - loaded_image.height) / 2, loaded_image.width, loaded_image.height);
+              loaded_image = canvas;
+            }
+            imageLoadedCallback(gl, loaded_image);
+            if (callback) callback(null);
+          };
+          // mobile needs cachebust or it won't load it?
+          loaded_image.src = state.props.image + "?cachebust=" + new Date();
+        })();
+      } else {
+        // server side image load
+        var getPixels = require("get-pixels");
+        getPixels(state.props.image, function (err, loaded_image) {
+          if (typeof ImageData != "undefined") imageLoadedCallback(gl, new ImageData(new Uint8ClampedArray(loaded_image.data), loaded_image.shape[0], loaded_image.shape[1]));else imageLoadedCallback(gl, { data: new Uint8ClampedArray(loaded_image.data), width: loaded_image.shape[0], height: loaded_image.shape[1] });
+          if (callback) callback(null);
+        });
+      }
+    }
+  }, {
+    key: 'set',
+    value: function set(gl, state, callback) {
+      var _this2 = this;
+
+      var sub_tasks = [];
       this.scale[0] = parseFloat(state.props.imagewidth) || 1;
       this.scale[1] = parseFloat(state.props.imageheight) || 1;
       if (state.props.position) {
@@ -68423,65 +68479,20 @@ var Component = function () {
         // TODO unbind textures here so we don't leak
         this.assembly.length = state.assembly.length;
         for (var i = 0; i < this.assembly.length; i++) {
-          this.assembly[i].set(gl, state.assembly[i]);
+          sub_tasks.push(this.assembly[i].set.bind(this.assembly[i], gl, state.assembly[i]));
         }
       } else {
         this.assembly = [];
       }
       // handle image
-      if (state.props && state.props.image && state.props.image != this.props.image) {
-        if (typeof Image != "undefined") {
-          (function () {
-            // client side image load
-            var loaded_image = new Image();
-            loaded_image.crossOrigin = "";
-            loaded_image.onload = function () {
-              if (_this.texture) {
-                gl.deleteTexture(_this.texture);
-              }
-
-              // special handling if image is not power of 2
-              var isPowerOfTwo = function isPowerOfTwo(x) {
-                return (x & x - 1) == 0;
-              };
-              var nextHighestPowerOfTwo = function nextHighestPowerOfTwo(x) {
-                --x;
-                for (var i = 1; i < 32; i <<= 1) {
-                  x = x | x >> i;
-                }
-                return x + 1;
-              };
-              if (!isPowerOfTwo(loaded_image.width) || !isPowerOfTwo(loaded_image.height)) {
-                // Scale up the texture to the next highest power of two dimensions.
-                var canvas = document.createElement("canvas");
-                canvas.width = nextHighestPowerOfTwo(loaded_image.width);
-                canvas.height = nextHighestPowerOfTwo(loaded_image.height);
-                _this.texture_scale = [canvas.width / loaded_image.width, canvas.height / loaded_image.height];
-                var ctx = canvas.getContext("2d");
-                ctx.drawImage(loaded_image, (canvas.width - loaded_image.width) / 2, (canvas.height - loaded_image.height) / 2, loaded_image.width, loaded_image.height);
-                loaded_image = canvas;
-              }
-              _this.imageLoadedCallback(gl, loaded_image);
-              if (callback) callback(null);
-            };
-            // mobile needs cachebust or it won't load it?
-            loaded_image.src = state.props.image + "?cachebust=" + new Date();
-          })();
-        } else {
-          var getPixels = require("get-pixels");
-          getPixels(state.props.image, function (err, loaded_image) {
-            if (typeof ImageData != "undefined") _this.imageLoadedCallback(gl, new ImageData(new Uint8ClampedArray(loaded_image.data), loaded_image.shape[0], loaded_image.shape[1]));else _this.imageLoadedCallback(gl, { data: new Uint8ClampedArray(loaded_image.data), width: loaded_image.shape[0], height: loaded_image.shape[1] });
-            if (callback) callback(null);
-          });
-          // server side image load
-        }
-      } else {
-        if (callback) callback(null);
-      } // handle image
-      this.props = state.props || {};
+      sub_tasks.push(this.loadImage.bind(this, gl, state));
+      async.parallel(sub_tasks, function () {
+        _this2.props = state.props || {};
+        if (callback) callback();
+      });
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render(gl, mvMatrix, shaderProgram) {
 
       // TODO pre-multiply these into a single transform matrix
@@ -68509,7 +68520,7 @@ var Component = function () {
       }
     }
   }, {
-    key: "getWorldDims",
+    key: 'getWorldDims',
     value: function getWorldDims() {
       if (!this.assembly || !this.assembly.length) return [this.scale[0] * this.texture_scale[0], this.scale[1] * this.texture_scale[1]];
       var width = 0;
@@ -68524,18 +68535,18 @@ var Component = function () {
       return [width, height];
     }
   }, {
-    key: "randomizePosition",
+    key: 'randomizePosition',
     value: function randomizePosition() {
       this.position = [Math.random() * (this.bounds.max[0] - this.bounds.min[0]) + this.bounds.min[0], this.bounds.max[1], Math.random() * (this.bounds.max[2] - this.bounds.min[2]) + this.bounds.min[2]];
       this.velocity = [0, 0, 0];
     }
   }, {
-    key: "isOutOfBounds",
+    key: 'isOutOfBounds',
     value: function isOutOfBounds() {
       return this.position[0] < this.bounds.min[0] || this.position[0] > this.bounds.max[0] || this.position[1] < this.bounds.min[1] || this.position[1] > this.bounds.max[1] || this.position[2] < this.bounds.min[2] || this.position[2] > this.bounds.max[2];
     }
   }, {
-    key: "updatePosition",
+    key: 'updatePosition',
     value: function updatePosition(time) {
       // rotate
       this.rotation += 30 * time / 100000.0;
@@ -68571,7 +68582,7 @@ var Component = function () {
 
 module.exports = Component;
 
-},{"get-pixels":137,"sylvester-es6":424}],443:[function(require,module,exports){
+},{"async":20,"get-pixels":137,"sylvester-es6":424}],443:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -68746,8 +68757,14 @@ var ComponentSerializer = function () {
   _createClass(ComponentSerializer, null, [{
     key: 'parse',
     value: function parse(component_string) {
+      if (!component_string) return null;
       var buffer = Buffer.from(component_string, 'base64');
-      var customization = zlib.unzipSync(buffer).toString();
+      var customization = void 0;
+      try {
+        customization = zlib.unzipSync(buffer).toString();
+      } catch (err) {
+        return null;
+      }
       return JSON.parse(customization);
     }
   }, {
@@ -68911,9 +68928,9 @@ var Customizer = function () {
 
       var components = [];
       // set product
-      set_tasks.push(this.product.set.bind(this.product, this.gl, { props: product.props }));
+      if (product) set_tasks.push(this.product.set.bind(this.product, this.gl, { props: product.props }));
       // TODO recurse assemblies
-      construction.assembly.forEach(function (component) {
+      if (construction) construction.assembly.forEach(function (component) {
         components.push(component);
       });
       // sync component list the same
@@ -69031,7 +69048,7 @@ var Customizer = function () {
       } catch (e) {}
 
       if (!gl) {
-        alert("Unable to initialize WebGL. Your browser may not support it.");
+        console.log("Unable to initialize WebGL. Your browser may not support it.");
       }
       return gl;
     }
@@ -69084,6 +69101,7 @@ var Customizer = function () {
       } else {
         var getPixels = require("get-pixels");
         getPixels("http://localhost/petal.png", function (err, pixels) {
+          if (err) return;
           _this.handleTextureLoaded(pixels, _this.particleTexture);
         });
       }
@@ -69994,8 +70012,6 @@ var LayoutMain = function (_React$Component) {
           style: { width: "100%", height: "100%", marginLeft: this.state.menu.offset + "px", transition: "margin-left 0.1s" },
           trackMouse: true
         },
-        React.createElement('meta', { httpEquiv: 'content-type', content: 'text/html; charset=utf-8' }),
-        React.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }),
         React.createElement('link', { href: 'https://fonts.googleapis.com/css?family=Open+Sans', rel: 'stylesheet' }),
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         content,
@@ -70733,9 +70749,9 @@ var ProductList = function (_React$Component) {
     value: function componentWillMount() {
       var _this2 = this;
 
-      if (this.props.c) {
+      var customization = ComponentSerializer.parse(this.props.c);
+      if (customization) {
         (function () {
-          var customization = ComponentSerializer.parse(_this2.props.c);
           _this2.setState({ selected_product: customization.selected_product });
 
           var product = _this2.state.product_map[customization.selected_product[0]];
@@ -70797,7 +70813,6 @@ var ProductList = function (_React$Component) {
       return React.createElement(
         'customize',
         null,
-        this.props.c ? React.createElement('meta', { property: 'og:image', content: '/store/' + this.props.store.id + '/preview?c=' + this.props.c }) : null,
         this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : React.createElement(
           'button',
           { onClick: this.handleAddToCart.bind(this, product), style: { position: "fixed", top: "0px", right: "0px", zIndex: "1", maxWidth: "none", margin: "0px" } },

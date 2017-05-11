@@ -1,6 +1,7 @@
 
 const zeros = require('zeros');
 const sharp = require('sharp');
+const savePixels = require("save-pixels");
 
 const SQLTable = require('./SQLTable');
 const Item = require('./Item.js');
@@ -130,13 +131,13 @@ class Store extends SQLTable {
         product_list = new ProductList(product_list);
         product_list.componentWillMount();
 
-let width = 700;
-let height = 200;
+        let width = req.query['w'] || 200;
+        let height = req.query['h'] || 200;
         let customizer = new Customizer({width:width, height:height});
         customizer.init();
         customizer.set(product_list.initial_product, {assembly:product_list.initial_assembly}, () => {
 
-          var pixel_buffer = new Uint8Array(width * height * 4);
+          let pixel_buffer = new Uint8Array(width * height * 4);
           let gl = customizer.gl;
           gl.clearColor(1, 1, 1, 0);
           customizer.render();
@@ -145,8 +146,10 @@ let height = 200;
           let pixels = zeros([height, width, 4]);
           pixels.data = pixel_buffer;
 
-          var savePixels = require("save-pixels");
-          savePixels(pixels, "png").pipe(sharp().rotate(270)).pipe(res);
+          savePixels(pixels, "png").pipe(sharp().rotate(270)).pipe(res).on("finish", () => {
+            // tell headless-gl to garbage collect
+            gl.getExtension('STACKGL_destroy_context').destroy();
+          });
         }); // customizer.set()
       }); // ProductList.preprocessProps()
     }); // Store.get()

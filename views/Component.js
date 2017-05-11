@@ -1,4 +1,5 @@
 
+const async = require('async');
 const SylvestorGlUtils = require('sylvester-es6');
 const Matrix = SylvestorGlUtils.Matrix;
 const Vector = SylvestorGlUtils.Vector;
@@ -24,22 +25,71 @@ class Component {
     this.assembly = [];
   }
 
+  loadImage(gl, state, callback) {
+    let imageLoadedCallback = (gl, loaded_image) => {
+      if (!this.texture);
+        this.texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, this.texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      // mipmapping the sequins looks bad?
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    };
 
-  imageLoadedCallback(gl, loaded_image) {
-    if (!this.texture);
-      this.texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    // mipmapping the sequins looks bad?
-    //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-  };
+    if (!state.props || !state.props.image || state.props.image==this.props.image) {
+      if (callback) callback();
+      return;
+    }
+    if (typeof(Image)!="undefined") {
+      // client side image load
+      let loaded_image = new Image();
+      loaded_image.crossOrigin = "";
+      loaded_image.onload = () => {
+        if (this.texture) {
+          gl.deleteTexture(this.texture)
+        }
+
+        // special handling if image is not power of 2
+        let isPowerOfTwo = (x) => {return (x & (x - 1)) == 0;}
+        let nextHighestPowerOfTwo = (x) => {
+          --x;
+          for (var i = 1; i < 32; i <<= 1) { x = x | x >> i; }
+          return x + 1;
+        }
+        if (!isPowerOfTwo(loaded_image.width) || !isPowerOfTwo(loaded_image.height)) {
+            // Scale up the texture to the next highest power of two dimensions.
+            let canvas = document.createElement("canvas");
+            canvas.width = nextHighestPowerOfTwo(loaded_image.width);
+            canvas.height = nextHighestPowerOfTwo(loaded_image.height);
+            this.texture_scale = [canvas.width/loaded_image.width, canvas.height/loaded_image.height];
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(loaded_image, (canvas.width-loaded_image.width)/2, (canvas.height-loaded_image.height)/2, loaded_image.width, loaded_image.height);
+            loaded_image = canvas;
+        }
+        imageLoadedCallback(gl, loaded_image);
+        if (callback) callback(null);
+      }
+      // mobile needs cachebust or it won't load it?
+      loaded_image.src = state.props.image+"?cachebust="+(new Date());
+    } else {
+      // server side image load
+      const getPixels = require("get-pixels")
+      getPixels(state.props.image, (err, loaded_image) => {
+        if (typeof(ImageData)!="undefined")
+          imageLoadedCallback(gl, new ImageData(new Uint8ClampedArray(loaded_image.data), loaded_image.shape[0], loaded_image.shape[1]));
+        else
+          imageLoadedCallback(gl, {data:new Uint8ClampedArray(loaded_image.data), width:loaded_image.shape[0], height:loaded_image.shape[1]});
+        if (callback) callback(null);
+      });
+    }
+  }
   set(gl, state, callback) {
+    let sub_tasks = [];
     this.scale[0] = parseFloat(state.props.imagewidth) || 1;
     this.scale[1] = parseFloat(state.props.imageheight) || 1;
     if (state.props.position) {
@@ -55,59 +105,17 @@ class Component {
       // TODO unbind textures here so we don't leak
       this.assembly.length = state.assembly.length;
       for (let i=0; i<this.assembly.length; i++) {
-        this.assembly[i].set(gl, state.assembly[i]);
+        sub_tasks.push(this.assembly[i].set.bind(this.assembly[i], gl, state.assembly[i]));
       }
     } else {
       this.assembly = [];
     }
     // handle image
-    if (state.props && state.props.image && state.props.image!=this.props.image) {
-      if (typeof(Image)!="undefined") {
-        // client side image load
-        let loaded_image = new Image();
-        loaded_image.crossOrigin = "";
-        loaded_image.onload = () => {
-          if (this.texture) {
-            gl.deleteTexture(this.texture)
-          }
-
-          // special handling if image is not power of 2
-          let isPowerOfTwo = (x) => {return (x & (x - 1)) == 0;}
-          let nextHighestPowerOfTwo = (x) => {
-            --x;
-            for (var i = 1; i < 32; i <<= 1) { x = x | x >> i; }
-            return x + 1;
-          }
-          if (!isPowerOfTwo(loaded_image.width) || !isPowerOfTwo(loaded_image.height)) {
-              // Scale up the texture to the next highest power of two dimensions.
-              let canvas = document.createElement("canvas");
-              canvas.width = nextHighestPowerOfTwo(loaded_image.width);
-              canvas.height = nextHighestPowerOfTwo(loaded_image.height);
-              this.texture_scale = [canvas.width/loaded_image.width, canvas.height/loaded_image.height];
-              let ctx = canvas.getContext("2d");
-              ctx.drawImage(loaded_image, (canvas.width-loaded_image.width)/2, (canvas.height-loaded_image.height)/2, loaded_image.width, loaded_image.height);
-              loaded_image = canvas;
-          }
-          this.imageLoadedCallback(gl, loaded_image);
-          if (callback) callback(null);
-        }
-        // mobile needs cachebust or it won't load it?
-        loaded_image.src = state.props.image+"?cachebust="+(new Date());
-      } else {
-        const getPixels = require("get-pixels")
-        getPixels(state.props.image, (err, loaded_image) => {
-          if (typeof(ImageData)!="undefined")
-            this.imageLoadedCallback(gl, new ImageData(new Uint8ClampedArray(loaded_image.data), loaded_image.shape[0], loaded_image.shape[1]));
-          else
-            this.imageLoadedCallback(gl, {data:new Uint8ClampedArray(loaded_image.data), width:loaded_image.shape[0], height:loaded_image.shape[1]});
-          if (callback) callback(null);
-        });
-        // server side image load
-      }
-    } else {
-      if (callback) callback(null);
-    } // handle image
-    this.props = state.props || {};
+    sub_tasks.push(this.loadImage.bind(this, gl, state));
+    async.parallel(sub_tasks, () => {
+      this.props = state.props || {};
+      if (callback) callback();
+    });
   }
 
   render(gl, mvMatrix, shaderProgram) {

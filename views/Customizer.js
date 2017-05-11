@@ -43,11 +43,13 @@ class Customizer {
 
     let components = [];
     // set product
-    set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props}));
+    if (product)
+      set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props}));
     // TODO recurse assemblies
-    construction.assembly.forEach((component) => {
-      components.push(component);
-    });
+    if (construction)
+      construction.assembly.forEach((component) => {
+        components.push(component);
+      });
     // sync component list the same
     while (this.components.length < components.length) {
       this.components.push(new Component());
@@ -175,9 +177,8 @@ class Customizer {
     }
     catch(e) {}
 
-
     if (!gl) {
-      alert("Unable to initialize WebGL. Your browser may not support it.");
+      console.log("Unable to initialize WebGL. Your browser may not support it.");
     }
     return gl;
   }
@@ -236,6 +237,7 @@ class Customizer {
     } else {
       const getPixels = require("get-pixels")
       getPixels("http://localhost/petal.png", (err, pixels) => {
+        if (err) return;
         this.handleTextureLoaded(pixels, this.particleTexture);
       });
     }

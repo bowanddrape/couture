@@ -7,8 +7,14 @@ class ComponentSerializer {
 
   // I made this sync as it's currently called in a react ComponentWillMount
   static parse(component_string) {
+    if (!component_string) return null;
     const buffer = Buffer.from(component_string, 'base64');
-    let customization = zlib.unzipSync(buffer).toString();
+    let customization;
+    try {
+      customization = zlib.unzipSync(buffer).toString();
+    } catch(err) {
+      return null;
+    }
     return JSON.parse(customization);
   }
 

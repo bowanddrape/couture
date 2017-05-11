@@ -139,12 +139,31 @@ class Page extends JSONAPI {
     return res.status(404).end(ReactDOMServer.renderToString(page));
   }
 
+  static getHTMLHead(req, res, props) {
+    let image_header = "";
+    if (props.c && props.store) {
+      let width = 256;
+      let height = 256;
+      image_header = `<meta property="og:image:width" content="${width}"/><meta property="og:image:height" content="${height}"/><meta property="og:image" content="https://${req.headers.host}/store/${props.store.id}/preview?w=${width}&h=${height}&c=${encodeURIComponent(props.c)}"/>`
+    }
+    return `
+      <meta httpEquiv="content-type" content="text/html; charset=utf-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <meta property="og:title" content="Bow & Drape"/>
+      <meta property="og:type" content="website"/>
+      ${image_header}
+    `;
+  }
+
   static render(req, res, component, props, layout=LayoutMain) {
     // if json was requested, just return the props object
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.json(props).end();
-    return res.end(Page.renderString(component, props, layout));
+    let head = Page.getHTMLHead(req, res, props);
+    let body = Page.renderString(component, props, layout);
+    return res.end(`<head>${head}</head><body>${body}</body>`);
   }
+
 }
 
 module.exports = Page;

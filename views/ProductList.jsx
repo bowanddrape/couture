@@ -66,8 +66,8 @@ class ProductList extends React.Component {
   };
 
   componentWillMount() {
-    if (this.props.c) {
-      let customization = ComponentSerializer.parse(this.props.c);
+    let customization = ComponentSerializer.parse(this.props.c);
+    if (customization) {
       this.setState({selected_product: customization.selected_product});
 
       let product = this.state.product_map[customization.selected_product[0]];
@@ -124,7 +124,6 @@ class ProductList extends React.Component {
 
     return (
       <customize>
-        {this.props.c ? <meta property="og:image" content={`/store/${this.props.store.id}/preview?c=${this.props.c}`} /> :null}
         {this.props.edit ?
           <ComponentEdit {...product_raw} inherits={product} /> :
           <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1",maxWidth:"none",margin:"0px"}}>Add To Cart</button>
