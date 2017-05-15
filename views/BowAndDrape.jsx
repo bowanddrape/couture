@@ -99,7 +99,7 @@ module.exports = {
     UserPasswordReset: require('./UserPasswordReset.jsx'),
     FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),
-    PayStripe: require('./PayStripe.jsx'),
+    Cart: require('./Cart.jsx'),
     PageList: require('./PageList.jsx'),
     Items: require('./Items.jsx'),
     ComponentsEdit: require('./ComponentsEdit.jsx'),

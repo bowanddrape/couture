@@ -14,8 +14,8 @@ class Items extends React.Component {
 
   componentDidMount() {
     if (this.props.is_cart) {
-      if (BowAndDrape.cart) {
-        this.updateContents(BowAndDrape.cart.state.contents);
+      if (BowAndDrape.cart_menu) {
+        this.updateContents(BowAndDrape.cart_menu.state.contents);
       }
       BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
@@ -29,9 +29,9 @@ class Items extends React.Component {
 
   render() {
     let items = [];
-    if (this.props.is_cart=="editable") {
+    if (this.props.is_cart) {
       for (let i=0; i<this.state.contents.length; i++) {
-        items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={BowAndDrape.cart.remove.bind(BowAndDrape.cart, items.length)}/>);
+        items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length)}/>);
       }
     } else {
       for (let i=0; i<this.state.contents.length; i++) {

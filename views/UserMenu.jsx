@@ -3,7 +3,7 @@ const React = require('react');
 
 const FacebookLogin = require('./FacebookLogin.jsx');
 const UserProfile = require('./UserProfile.jsx');
-const Cart = require('./Cart.jsx');
+const CartMenu = require('./CartMenu.jsx');
 
 class UserMenu extends React.Component {
   constructor(props) {
@@ -19,7 +19,7 @@ class UserMenu extends React.Component {
 
     menu_items.push(<UserProfile key={key++} {...this.props}/>);
     menu_items.push(<FacebookLogin key={key++} {...this.props}/>);
-    menu_items.push(<Cart key={key++} />);
+    menu_items.push(<CartMenu key={key++} />);
     menu_items.push(<a key={key++} href="/customize-your-own" disabled>Customize</a>);
     // links to admin pages
     if (this.props.user&&this.props.user.roles&&this.props.user.roles.length) {
