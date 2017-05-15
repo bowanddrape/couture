@@ -21,7 +21,7 @@ class InputAddress extends React.Component {
         (document.getElementById("address_autocomplete"+this.props.section_title.substring(0,4))),
         {types: ['geocode']});
     this.autocomplete.addListener('place_changed', () => {
-      let place = autocomplete.getPlace();
+      let place = this.autocomplete.getPlace();
       let parse_place = document.createElement("div");
       parse_place.innerHTML = place.adr_address;
       let place_fields = ["street-address", "locality", "region", "postal-code", "country-name"];

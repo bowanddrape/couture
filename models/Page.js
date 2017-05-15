@@ -20,7 +20,7 @@ const whitelisted_components = [
   "ProductList",
   "ItemProductionChecklist",
   "ItemProductionChecklistLegacy",
-  "PayStripe",
+  "Cart",
 ]
 
 class Page extends JSONAPI {

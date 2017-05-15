@@ -203,9 +203,18 @@ class ProductList extends React.Component {
       sku: product.sku,
       quantity: 1,
       assembly: this.refs.ProductCanvas.state.assembly,
-      props: product.props
+      props: product.props,
     };
-    BowAndDrape.cart.add(item);
+
+    // get image preview url
+    let toks = location.href.split('?');
+    let query_params = {}
+    if (toks.length>1) {
+      query_params = querystring.parse(toks.slice(1).join('?'));
+    }
+    item.props.image = `/store/${this.props.store.id}/preview?w=256&h=256&c=${encodeURIComponent(query_params.c)}`;
+
+    BowAndDrape.cart_menu.add(item);
     location.href = "/cart";
   }
 
