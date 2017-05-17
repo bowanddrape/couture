@@ -16,24 +16,26 @@ const ReactDOMServer = require('react-dom/server');
 const multer = require('multer');
 const compression = require('compression');
 const Log = require('./models/Log.js');
-// override console.log and console.error
-["log", "error"].forEach(function(level) {
-  let oldMethod = console[level].bind(console);
-  console[level] = function() {
-    let message = "";
-    for (let key in arguments) {
-      if (message) message += ", ";
-      if (Buffer.isBuffer(arguments[key]))
-        message += arguments[key].inspect()
-      else if (typeof arguments[key] === 'object')
-        message += JSON.stringify(arguments[key]);
-      else
-        message += arguments[key];
-    }
-    oldMethod.apply(console, arguments);
-    Log.message(message);
-  };
-});
+if (["stag", "prod"].indexOf(process.env.ENV)!=-1) {
+  // override console.log and console.error
+  ["log", "error"].forEach(function(level) {
+    let oldMethod = console[level].bind(console);
+    console[level] = function() {
+      let message = "";
+      for (let key in arguments) {
+        if (message) message += ", ";
+        if (Buffer.isBuffer(arguments[key]))
+          message += arguments[key].inspect()
+        else if (typeof arguments[key] === 'object')
+          message += JSON.stringify(arguments[key]);
+        else
+          message += arguments[key];
+      }
+      oldMethod.apply(console, arguments);
+      Log.message(message);
+    };
+  });
+}
 
 var aws = require('aws-sdk');
 const multerS3 = require('multer-s3');
@@ -161,6 +163,7 @@ app.use(function(req, res, next) {
 
 server.on('request', app);
 server.listen(80, function () {
+  console.log("restarted webserver");
 });
 
 

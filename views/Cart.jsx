@@ -53,12 +53,10 @@ class Cart extends React.Component {
 
   componentDidMount() {
     // TODO fill in shipping info if we know it
-    if (this.props.is_cart) {
-      if (BowAndDrape.cart_menu) {
-        this.updateContents(BowAndDrape.cart_menu.state.contents);
-      }
-      BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
+    if (BowAndDrape.cart_menu) {
+      this.updateContents(BowAndDrape.cart_menu.state.contents);
     }
+    BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
   }
   updateContents(items) {
     items = items || [];
@@ -172,7 +170,7 @@ class Cart extends React.Component {
 
     return (
       <div>
-        <Items ref="Items" contents={this.state.items} is_cart={this.props.is_cart}/>
+        <Items ref="Items" contents={this.state.items} is_cart="true"/>
         {this.state.errors.length?<errors>{this.state.errors}</errors>:null}
         <InputAddress section_title="Shipping Address" handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
         same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} />

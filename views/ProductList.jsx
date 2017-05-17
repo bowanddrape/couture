@@ -227,7 +227,10 @@ class ProductList extends React.Component {
   renderProductList() {
     let products = [];
     this.props.store.products.forEach((product) => {
-      products.push(<a className="card" onClick={(event)=>{this.handleOptionChange(product.sku, 0)}} key={products.length} style={{backgroundImage:`url(${product.props.image})`}}><label>{product.props.name}</label></a>);
+      products.push(<a className="card" onClick={(event)=>{this.handleOptionChange(product.sku, 0)}} key={products.length} style={{backgroundImage:`url(${product.props.image})`}}>
+        <label>{product.props.name}</label>
+        <price>${product.props.price}</price>
+      </a>);
     });
     if (this.props.edit) {
       products.push(<ProductListEdit key={products.length} store={this.props.store}/>);

@@ -66,15 +66,27 @@ input[type="text"], input[type="password"] {
   background-position: center;
   background-repeat: no-repeat;
   label, .label {
+    position: absolute;
     opacity: 0.5;
     cursor: inherit;
     text-align: center;
     height: @card_height;
     width: @card_width;
     border: solid 3px #000;
-    position: absolute;
     transform: rotate(-30deg);
     left: -30px;
+    z-index: -1;
+  }
+  price, .price {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    display: inline-block;
+    padding: 7px;
+    width: auto;
+    border: 1px solid @color_secondary;
+    background-color: @color_primary;
+    font-size: 12px;
   }
   .autocomplete {
     position: relative;

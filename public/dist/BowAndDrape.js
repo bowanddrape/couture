@@ -68245,12 +68245,10 @@ var Cart = function (_React$Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       // TODO fill in shipping info if we know it
-      if (this.props.is_cart) {
-        if (BowAndDrape.cart_menu) {
-          this.updateContents(BowAndDrape.cart_menu.state.contents);
-        }
-        BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
+      if (BowAndDrape.cart_menu) {
+        this.updateContents(BowAndDrape.cart_menu.state.contents);
       }
+      BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
   }, {
     key: 'updateContents',
@@ -68419,7 +68417,7 @@ var Cart = function (_React$Component) {
       return React.createElement(
         'div',
         null,
-        React.createElement(Items, { ref: 'Items', contents: this.state.items, is_cart: this.props.is_cart }),
+        React.createElement(Items, { ref: 'Items', contents: this.state.items, is_cart: 'true' }),
         this.state.errors.length ? React.createElement(
           'errors',
           null,
@@ -70879,6 +70877,12 @@ var ProductList = function (_React$Component) {
             'label',
             null,
             product.props.name
+          ),
+          React.createElement(
+            'price',
+            null,
+            '$',
+            product.props.price
           )
         ));
       });
