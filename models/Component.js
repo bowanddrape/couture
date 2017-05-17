@@ -47,6 +47,12 @@ class Component extends JSONAPI {
         this.options[option] = new Component(this.options[option]);
       }
     }
+    // assemblies are how to build a product, also convert these to Components
+    if (this.assembly) {
+      this.assembly = this.assembly.map((assembly) => {
+        return new Component(assembly);
+      });
+    }
   }
 
   // needed by SQLTable

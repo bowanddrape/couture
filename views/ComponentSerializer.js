@@ -7,6 +7,8 @@ class ComponentSerializer {
 
   // I made this sync as it's currently called in a react ComponentWillMount
   static parse(component_string) {
+    // uri encoding and decoding means that '+' may be read as ' '
+    component_string = component_string.replace(/ /g, "+");
     if (!component_string) return null;
     const buffer = Buffer.from(component_string, 'base64');
     let customization;

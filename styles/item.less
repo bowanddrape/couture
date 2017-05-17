@@ -2,50 +2,64 @@
 @import "./colors.less";
 @item_preview_width: 200px;
 @item_preview_height: 200px;
+@item_width: 700px;
 
 item {
   display: block;
   position: relative;
-  max-width: 700px;
+  max-width: @item_width;
   margin: auto;
   border: solid 1px #000000;
   border-bottom: none;
   &:last-of-type {
     border-bottom: solid 1px @color_secondary;
   }
-  deets {
-    display: flex;
-    position: relative;
-    justify-content: space-between;
-    padding-right: 50px;
+  preview {
+    display: none;
+    position: absolute;
+    width: @item_preview_width;
+    height: @item_preview_height;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  &.has_image {
+    height: @item_preview_height;
     preview {
       display: block;
-      width: @item_preview_width;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      &:not(.disabled) {
-        height: @item_preview_height;
-      }
-    }
-    .sku {
-      font-style: italic;
-      font-size: 13px;
-      opacity: 0.8;
-    }
-    .name {
-      font-weight: bold;
-    }
-    props {
-      justify-content: space-between;
     }
   }
-  remove {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    background-color: @color_support_0;
-    padding: 5px;
+  deets {
+    display: block;
+    margin-left: @item_preview_width + 10px;
+    margin-right: 10px;
+    * {
+      color: @color_secondary;
+      float: left;
+      display: inline-block;
+    }
+    .name, .price {
+      font-weight: bold;
+    }
+    .price {
+      float: right;
+    }
+    .remove {
+      clear: both;
+      background-color: #eaeaea;
+      padding: 5px 10px;
+      cursor: pointer;
+      border: none;
+      width: auto;
+      font-weight: normal;
+      font-size: 15px;
+      &:hover {
+        color: @color_secondary;
+      }
+      &.confirm {
+        background-color: @color_support_2;
+      }
+    }
   }
 }
 

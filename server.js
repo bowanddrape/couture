@@ -15,10 +15,30 @@ const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const multer = require('multer');
 const compression = require('compression');
+const Log = require('./models/Log.js');
+// override console.log and console.error
+["log", "error"].forEach(function(level) {
+  let oldMethod = console[level].bind(console);
+  console[level] = function() {
+    let message = "";
+    for (let key in arguments) {
+      if (message) message += ", ";
+      if (Buffer.isBuffer(arguments[key]))
+        message += arguments[key].inspect()
+      else if (typeof arguments[key] === 'object')
+        message += JSON.stringify(arguments[key]);
+      else
+        message += arguments[key];
+    }
+    oldMethod.apply(console, arguments);
+    Log.message(message);
+  };
+});
+
 var aws = require('aws-sdk');
 const multerS3 = require('multer-s3');
 var s3 = new aws.S3({ accessKeyId: process.env.AWS_ACCESS_KEY, secretAccessKey: process.env.AWS_SECRET_KEY, region: process.env.AWS_REGION })
-var upload = multer({
+let upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: 'www.bowanddrape.com',

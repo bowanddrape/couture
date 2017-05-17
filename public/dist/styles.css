@@ -174,39 +174,53 @@ item {
 item:last-of-type {
   border-bottom: solid 1px #000;
 }
-item deets {
-  display: flex;
-  position: relative;
-  justify-content: space-between;
-  padding-right: 50px;
-}
-item deets preview {
-  display: block;
+item preview {
+  display: none;
+  position: absolute;
   width: 200px;
+  height: 200px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
-item deets preview:not(.disabled) {
+item.has_image {
   height: 200px;
 }
-item deets .sku {
-  font-style: italic;
-  font-size: 13px;
-  opacity: 0.8;
+item.has_image preview {
+  display: block;
 }
-item deets .name {
+item deets {
+  display: block;
+  margin-left: 210px;
+  margin-right: 10px;
+}
+item deets * {
+  color: #000;
+  float: left;
+  display: inline-block;
+}
+item deets .name,
+item deets .price {
   font-weight: bold;
 }
-item deets props {
-  justify-content: space-between;
+item deets .price {
+  float: right;
 }
-item remove {
-  position: absolute;
-  top: 0px;
-  right: 0px;
+item deets .remove {
+  clear: both;
   background-color: #eaeaea;
-  padding: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border: none;
+  width: auto;
+  font-weight: normal;
+  font-size: 15px;
+}
+item deets .remove:hover {
+  color: #000;
+}
+item deets .remove.confirm {
+  background-color: #ff5c5c;
 }
 customize product_options {
   display: flex;

@@ -46,7 +46,7 @@ class Customizer {
     if (product)
       set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props}));
     // TODO recurse assemblies
-    if (construction)
+    if (construction && construction.assembly)
       construction.assembly.forEach((component) => {
         components.push(component);
       });

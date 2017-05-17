@@ -1,7 +1,6 @@
 
 const pg = require('pg').native;
 const async = require('async');
-const Log = require('./Log.js');
 
 let pg_read_pool = new pg.Pool({
   user: process.env.PG_USER,
@@ -248,7 +247,10 @@ class SQLTable {
       );
     });
     async.parallel(db_tasks, (err, ret) => {
-      if (err) console.log(err);
+      if (err) {
+        console.log(err);
+        return callback(err);
+      }
       let ids = {};
       ret.forEach((name_val) => {
         ids[name_val[0]] = name_val[1];

@@ -48,7 +48,6 @@ class Fulfillment {
       if (err) return res.status(500).end(err.toString());
       if (!store) return Page.renderNotFound(req, res);
       // check permissions
-console.log(store);
       let authorized = store.props.admins.filter(function(role) {
         return req.user.roles.indexOf(role) != -1;
       });
