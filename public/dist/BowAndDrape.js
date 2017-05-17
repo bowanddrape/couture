@@ -68492,9 +68492,7 @@ var CartMenu = function (_React$Component) {
       if (contents) {
         try {
           contents = JSON.parse(contents);
-        } catch (err) {
-          console.log("unset cart", err);
-        }
+        } catch (err) {}
       }
       contents = contents || [];
       this.setState({ contents: contents });
@@ -68504,7 +68502,6 @@ var CartMenu = function (_React$Component) {
     key: "updateCookie",
     value: function updateCookie(contents) {
       window.localStorage.setItem("cart", JSON.stringify(contents));
-      console.log("updateCookie", contents);
       BowAndDrape.dispatcher.emit("update_cart", contents);
     }
   }, {
@@ -68949,9 +68946,9 @@ var ComponentSerializer = function () {
   _createClass(ComponentSerializer, null, [{
     key: 'parse',
     value: function parse(component_string) {
+      if (!component_string) return null;
       // uri encoding and decoding means that '+' may be read as ' '
       component_string = component_string.replace(/ /g, "+");
-      if (!component_string) return null;
       var buffer = Buffer.from(component_string, 'base64');
       var customization = void 0;
       try {
