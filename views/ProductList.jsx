@@ -68,7 +68,11 @@ class ProductList extends React.Component {
   componentWillMount() {
     let customization = ComponentSerializer.parse(this.props.c);
     if (customization) {
-      this.setState({selected_product: customization.selected_product});
+      // disable logging for this statement as it whines and I can't shut it up
+      let log = console.error;
+      console.error = ()=>{};
+        this.setState({selected_product: customization.selected_product});
+      console.error = log;
 
       let product = this.state.product_map[customization.selected_product[0]];
       for (let i=1; product && i<customization.selected_product.length; i++) {
@@ -206,6 +210,8 @@ class ProductList extends React.Component {
       props: product.props,
     };
 
+    // set item url
+    item.props.url = location.href;
     // get image preview url
     let toks = location.href.split('?');
     let query_params = {}

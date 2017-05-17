@@ -26,18 +26,18 @@ class Items extends React.Component {
     this.setState({contents});
   }
 
-
   render() {
     let items = [];
-    if (this.props.is_cart) {
-      for (let i=0; i<this.state.contents.length; i++) {
-        items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length)}/>);
-      }
-    } else {
-      for (let i=0; i<this.state.contents.length; i++) {
-        items.push(<Item key={items.length} {...this.state.contents[i]} />);
-      }
+    for (let i=0; i<this.state.contents.length; i++) {
+      items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length)}/>);
     }
+    if (this.props.is_cart) {
+    }
+
+    if (typeof(window)!="undefined" && !items.length)
+      return (
+        <errors><div>{this.props.is_cart?"Cart is empty":"No items"}</div></errors>
+      );
 
     return (
       <cart>

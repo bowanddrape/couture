@@ -24,17 +24,14 @@ class CartMenu extends React.Component {
     if (contents) {
       try {
         contents = JSON.parse(contents);
-        this.setState({contents: contents});
-        this.updateCookie(contents);
-      } catch (err) {
-        // expire if borked
-        window.localStorage.setItem("cart", null);
-      }
+      } catch (err) {}
     }
+    contents = contents || [];
+    this.setState({contents: contents});
+    this.updateCookie(contents);
   }
 
   updateCookie(contents) {
-console.log("updateCookie", contents);
     window.localStorage.setItem("cart", JSON.stringify(contents));
     BowAndDrape.dispatcher.emit("update_cart", contents);
   }

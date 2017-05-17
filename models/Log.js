@@ -4,6 +4,7 @@ const https = require('https');
 
 class Log {
   static message(msg) {
+    // TODO we NEED ratelimiting here or we risk disabling the slack webhook
     let slack_notify = https.request({
         protocol: 'https:',
         method: 'POST',
@@ -11,7 +12,7 @@ class Log {
         path: `/services/T0928RSGP/B2TUE537X/mko0Fs5coag6qzjCtc0T28VW`
       }, (result) => {}
     );
-    slack_notify.on('error', function(err) {console.log(err);});
+    slack_notify.on('error', function(err) {console.info(err);});
     slack_notify.end(JSON.stringify({
       as_user: false,
       username: "couture "+os.hostname(),

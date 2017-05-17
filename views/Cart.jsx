@@ -46,7 +46,6 @@ class Cart extends React.Component {
       done: false,
     };
 
-console.log(this.props);
     if (!this.props.store[0].id) {
       this.state.errors.push(<div>Config Error: Store not set</div>);
     }
@@ -63,7 +62,8 @@ console.log(this.props);
   }
   updateContents(items) {
     items = items || [];
-    this.setState({items});
+    this.refs.Items.updateContents(items);
+    this.forceUpdate();
   }
 
   handleSameBillingToggle(e) {
@@ -151,7 +151,7 @@ console.log(this.props);
       let payload = {
         store_id: this.props.store[0].id,
         email: this.state.shipping.email,
-        contents: this.props.items,
+        contents: this.refs.Items.state.contents,
         stripe_token: response.id,
         address: this.state.shipping,
       }
@@ -172,9 +172,8 @@ console.log(this.props);
 
     return (
       <div>
-        <Items contents={this.state.items} is_cart={this.props.is_cart}/>
+        <Items ref="Items" contents={this.state.items} is_cart={this.props.is_cart}/>
         {this.state.errors.length?<errors>{this.state.errors}</errors>:null}
-        {(!this.state.items.length)?<errors><div>Cart is empty</div></errors>:null}
         <InputAddress section_title="Shipping Address" handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
         same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} />
         {this.state.same_billing?null:<InputAddress section_title="Billing Address" handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}

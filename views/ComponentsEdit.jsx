@@ -18,7 +18,6 @@ class ComponentsEdit extends React.Component {
 
     let query = event.target.value;
     BowAndDrape.api('GET', `/component?search=${query}&page={"limit":20}`, null, (err, components) => {
-console.log(components);
       this.setState({components});
       this.querying = false;
     });

@@ -19,30 +19,39 @@ class Item extends React.Component {
       }
     }
 
-    let other_properties = [];
-    for (let prop in this.props.props) {
-      if (prop=="image" || prop=="name") continue;
-      other_properties.push(<div key={other_properties.length}><label>{prop}:</label> <value>{this.props.props[prop]}</value></div>);
-    }
-
     return (
-      <item>
+      <item className={this.props.props.image?"has_image":""}>
+        <a href={this.props.props.url}>
+          <preview style={{backgroundImage: "url("+this.props.props.image+")"}}/>
+        </a>
         <deets>
-          {this.props.props.image ?
-            <preview style={{backgroundImage: "url("+this.props.props.image+")"}}/>
-            : <preview className="disabled" />
-          }
           {/*<div className="sku">{this.props.sku}</div>*/}
-          <div className="name">{this.props.props.name}</div>
-          <props>{other_properties}</props>
+          <a href={this.props.props.url}>
+            <div className="name">{this.props.props.name}</div>
+          </a>
+          <div className="price">{this.props.props.price}$</div>
+          {this.props.onRemove?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
         </deets>
-        {this.props.onRemove?<remove onClick={this.props.onRemove}>X</remove>:null}
         <assembly>
           {assembly}
         </assembly>
         {/*JSON.stringify(this.props.assembly)*/}
       </item>
     )
+  }
+
+  handleRemovePromptConfirm(event) {
+    event.stopPropagation();
+    if (event.target.innerHTML=="Are you sure?") {
+      this.handleRemoveBlur(event);
+      return this.props.onRemove();
+    }
+    event.target.classList.add("confirm");
+    event.target.innerHTML = "Are you sure?";
+  }
+  handleRemoveBlur(event) {
+    event.target.classList.remove("confirm");
+    event.target.innerHTML = "Remove";
   }
 }
 
