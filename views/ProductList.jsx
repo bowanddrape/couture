@@ -265,6 +265,8 @@ class ProductList extends React.Component {
     
     // recurse to fill out option menus
     let traverse_options = (option_product, depth=1) => {
+      // TODO FIXME when not in edit mode, we need to set state.selected_product to the default selected options here
+
       // if we're not editing, select whatever product we end up on
       if (!this.props.edit)
         product = option_product;

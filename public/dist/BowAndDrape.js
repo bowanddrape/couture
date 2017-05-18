@@ -43,7 +43,66 @@ var Inventory = function (_SQLTable) {
 
 module.exports = Inventory;
 
-},{"./SQLTable":2}],2:[function(require,module,exports){
+},{"./SQLTable":3}],2:[function(require,module,exports){
+(function (process){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var braintree_server = require('braintree');
+var braintree = braintree_server.connect({
+  environment: braintree_server.Environment[process.env.BRAINTREE_ENV],
+  merchantId: process.env.BRAINTREE_MERCHANTID,
+  publicKey: process.env.BRAINTREE_PUBLICKEY,
+  privateKey: process.env.BRAINTREE_PRIVATEKEY
+});
+
+var Braintree = function () {
+  function Braintree() {
+    _classCallCheck(this, Braintree);
+  }
+
+  _createClass(Braintree, null, [{
+    key: 'getClientAuthorization',
+    value: function getClientAuthorization(callback) {
+      braintree.clientToken.generate({}, function (err, response) {
+        callback(err, response.clientToken);
+      });
+    }
+  }, {
+    key: 'charge',
+    value: function charge(nonce, amount, callback) {
+      braintree.transaction.sale({
+        amount: amount,
+        paymentMethodNonce: nonce,
+        options: {
+          submitForSettlement: true
+        }
+      }, function (err, result) {
+        if (err) {
+          return callback(err);
+        }
+        if (!result.success) {
+          return callback(result.message);
+        }
+
+        callback(null, {
+          type: 'braintree_' + result.transaction.paymentInstrumentType,
+          amount: result.transaction.amount
+        });
+      });
+    }
+  }]);
+
+  return Braintree;
+}();
+
+module.exports = Braintree;
+
+}).call(this,require('_process'))
+},{"_process":443,"braintree":130}],3:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -326,7 +385,7 @@ var SQLTable = function () {
 module.exports = SQLTable;
 
 }).call(this,require('_process'))
-},{"_process":214,"async":19,"pg":197}],3:[function(require,module,exports){
+},{"_process":443,"async":20,"pg":426}],4:[function(require,module,exports){
 exports = module.exports = ap;
 function ap (args, fn) {
     return function () {
@@ -376,7 +435,7 @@ exports.curryRight = function curryRight (fn) {
     return partial(partialRight, fn);
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var asn1 = exports;
 
 asn1.bignum = require('bn.js');
@@ -387,7 +446,7 @@ asn1.constants = require('./asn1/constants');
 asn1.decoders = require('./asn1/decoders');
 asn1.encoders = require('./asn1/encoders');
 
-},{"./asn1/api":5,"./asn1/base":7,"./asn1/constants":11,"./asn1/decoders":13,"./asn1/encoders":16,"bn.js":23}],5:[function(require,module,exports){
+},{"./asn1/api":6,"./asn1/base":8,"./asn1/constants":12,"./asn1/decoders":14,"./asn1/encoders":17,"bn.js":24}],6:[function(require,module,exports){
 var asn1 = require('../asn1');
 var inherits = require('inherits');
 
@@ -450,7 +509,7 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
   return this._getEncoder(enc).encode(data, reporter);
 };
 
-},{"../asn1":4,"inherits":147,"vm":435}],6:[function(require,module,exports){
+},{"../asn1":5,"inherits":376,"vm":668}],7:[function(require,module,exports){
 var inherits = require('inherits');
 var Reporter = require('../base').Reporter;
 var Buffer = require('buffer').Buffer;
@@ -568,7 +627,7 @@ EncoderBuffer.prototype.join = function join(out, offset) {
   return out;
 };
 
-},{"../base":7,"buffer":63,"inherits":147}],7:[function(require,module,exports){
+},{"../base":8,"buffer":284,"inherits":376}],8:[function(require,module,exports){
 var base = exports;
 
 base.Reporter = require('./reporter').Reporter;
@@ -576,7 +635,7 @@ base.DecoderBuffer = require('./buffer').DecoderBuffer;
 base.EncoderBuffer = require('./buffer').EncoderBuffer;
 base.Node = require('./node');
 
-},{"./buffer":6,"./node":8,"./reporter":9}],8:[function(require,module,exports){
+},{"./buffer":7,"./node":9,"./reporter":10}],9:[function(require,module,exports){
 var Reporter = require('../base').Reporter;
 var EncoderBuffer = require('../base').EncoderBuffer;
 var DecoderBuffer = require('../base').DecoderBuffer;
@@ -1207,7 +1266,7 @@ Node.prototype._isPrintstr = function isPrintstr(str) {
   return /^[A-Za-z0-9 '\(\)\+,\-\.\/:=\?]*$/.test(str);
 };
 
-},{"../base":7,"minimalistic-assert":155}],9:[function(require,module,exports){
+},{"../base":8,"minimalistic-assert":384}],10:[function(require,module,exports){
 var inherits = require('inherits');
 
 function Reporter(options) {
@@ -1330,7 +1389,7 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
   return this;
 };
 
-},{"inherits":147}],10:[function(require,module,exports){
+},{"inherits":376}],11:[function(require,module,exports){
 var constants = require('../constants');
 
 exports.tagClass = {
@@ -1374,7 +1433,7 @@ exports.tag = {
 };
 exports.tagByName = constants._reverse(exports.tag);
 
-},{"../constants":11}],11:[function(require,module,exports){
+},{"../constants":12}],12:[function(require,module,exports){
 var constants = exports;
 
 // Helper
@@ -1395,7 +1454,7 @@ constants._reverse = function reverse(map) {
 
 constants.der = require('./der');
 
-},{"./der":10}],12:[function(require,module,exports){
+},{"./der":11}],13:[function(require,module,exports){
 var inherits = require('inherits');
 
 var asn1 = require('../../asn1');
@@ -1719,13 +1778,13 @@ function derDecodeLen(buf, primitive, fail) {
   return len;
 }
 
-},{"../../asn1":4,"inherits":147}],13:[function(require,module,exports){
+},{"../../asn1":5,"inherits":376}],14:[function(require,module,exports){
 var decoders = exports;
 
 decoders.der = require('./der');
 decoders.pem = require('./pem');
 
-},{"./der":12,"./pem":14}],14:[function(require,module,exports){
+},{"./der":13,"./pem":15}],15:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -1776,7 +1835,7 @@ PEMDecoder.prototype.decode = function decode(data, options) {
   return DERDecoder.prototype.decode.call(this, input, options);
 };
 
-},{"./der":12,"buffer":63,"inherits":147}],15:[function(require,module,exports){
+},{"./der":13,"buffer":284,"inherits":376}],16:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -2071,13 +2130,13 @@ function encodeTag(tag, primitive, cls, reporter) {
   return res;
 }
 
-},{"../../asn1":4,"buffer":63,"inherits":147}],16:[function(require,module,exports){
+},{"../../asn1":5,"buffer":284,"inherits":376}],17:[function(require,module,exports){
 var encoders = exports;
 
 encoders.der = require('./der');
 encoders.pem = require('./pem');
 
-},{"./der":15,"./pem":17}],17:[function(require,module,exports){
+},{"./der":16,"./pem":18}],18:[function(require,module,exports){
 var inherits = require('inherits');
 
 var DEREncoder = require('./der');
@@ -2100,7 +2159,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
   return out.join('\n');
 };
 
-},{"./der":15,"inherits":147}],18:[function(require,module,exports){
+},{"./der":16,"inherits":376}],19:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -2461,7 +2520,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":434}],19:[function(require,module,exports){
+},{"util/":667}],20:[function(require,module,exports){
 (function (process,global){
 /*!
  * async
@@ -3730,7 +3789,7 @@ var objectKeys = Object.keys || function (obj) {
 }());
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":214}],20:[function(require,module,exports){
+},{"_process":443}],21:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -3846,7 +3905,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function (process){
 /*
  Copyright (c) 2012 Nevins Bartolomeo <nevins.bartolomeo@gmail.com>
@@ -5229,7 +5288,7 @@ function fromByteArray (uint8) {
 }));
 
 }).call(this,require('_process'))
-},{"_process":214,"crypto":73}],22:[function(require,module,exports){
+},{"_process":443,"crypto":295}],23:[function(require,module,exports){
 (function (process,__filename){
 
 /**
@@ -5399,7 +5458,7 @@ exports.getRoot = function getRoot (file) {
 }
 
 }).call(this,require('_process'),"/node_modules/bindings/bindings.js")
-},{"_process":214,"fs":52,"path":177}],23:[function(require,module,exports){
+},{"_process":443,"fs":273,"path":406}],24:[function(require,module,exports){
 (function (module, exports) {
   'use strict';
 
@@ -8828,7 +8887,19417 @@ exports.getRoot = function getRoot (file) {
   };
 })(typeof module === 'undefined' || module, this);
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+var errors = require('./errors');
+var assign = require('../lib/assign').assign;
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @class
+ * @param {object} options Options
+ * @description <strong>You cannot use this constructor directly. Use {@link module:braintree-web/american-express.create|braintree.american-express.create} instead.</strong>
+ * @classdesc This class allows you use a nonce to interact with American Express Checkout. To accept American Express cards, use Hosted Fields.
+ */
+function AmericanExpress(options) {
+  this._client = options.client;
+}
+
+/**
+ * Gets the rewards balance associated with a Braintree nonce.
+ * @public
+ * @param {object} options Request options
+ * @param {string} options.nonce An existing Braintree nonce.
+ * @param {callback} [callback] The second argument, <code>data</code>, is the returned server data. If no callback is provided, `getRewardsBalance` returns a promise that resolves with the server data.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * var americanExpress = require('braintree-web/american-express');
+ *
+ * americanExpress.create({client: clientInstance}, function (createErr, americanExpressInstance) {
+ *   var options = {nonce: existingBraintreeNonce};
+ *   americanExpressInstance.getRewardsBalance(options, function (getErr, payload) {
+ *     if (getErr || payload.error) {
+ *       // Handle error
+ *       return;
+ *     }
+ *
+ *     console.log('Rewards amount: ' + payload.rewardsAmount);
+ *   });
+ * });
+ */
+AmericanExpress.prototype.getRewardsBalance = function (options) {
+  var nonce = options.nonce;
+  var data;
+
+  if (!nonce) {
+    return Promise.reject(new BraintreeError({
+      type: errors.AMEX_NONCE_REQUIRED.type,
+      code: errors.AMEX_NONCE_REQUIRED.code,
+      message: 'getRewardsBalance must be called with a nonce.'
+    }));
+  }
+
+  data = assign({
+    _meta: {source: 'american-express'},
+    paymentMethodNonce: nonce
+  }, options);
+
+  delete data.nonce;
+
+  return this._client.request({
+    method: 'get',
+    endpoint: 'payment_methods/amex_rewards_balance',
+    data: data
+  }).catch(function (err) {
+    return Promise.reject(new BraintreeError({
+      type: errors.AMEX_NETWORK_ERROR.type,
+      code: errors.AMEX_NETWORK_ERROR.code,
+      message: 'A network error occurred when getting the American Express rewards balance.',
+      details: {
+        originalError: err
+      }
+    }));
+  });
+};
+
+/**
+ * Gets the Express Checkout nonce profile given a nonce from American Express.
+ * @public
+ * @param {object} options Request options
+ * @param {string} options.nonce An existing nonce from American Express (note that this is <em>not</em> a nonce from Braintree).
+ * @param {callback} [callback] The second argument, <code>data</code>, is the returned server data. If no callback is provided, `getExpressCheckoutProfile` returns a promise that resolves with the server data.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * var americanExpress = require('braintree-web/american-express');
+ *
+ * americanExpress.create({client: clientInstance}, function (createErr, americanExpressInstance) {
+ *   var options = {nonce: existingAmericanExpressNonce};
+ *   americanExpressInstance.getExpressCheckoutProfile(options, function (getErr, payload) {
+ *     if (getErr) {
+ *       // Handle error
+ *       return;
+ *     }
+ *
+ *     console.log('Number of cards: ' + payload.amexExpressCheckoutCards.length);
+ *   });
+ * });
+ */
+AmericanExpress.prototype.getExpressCheckoutProfile = function (options) {
+  if (!options.nonce) {
+    return Promise.reject(new BraintreeError({
+      type: errors.AMEX_NONCE_REQUIRED.type,
+      code: errors.AMEX_NONCE_REQUIRED.code,
+      message: 'getExpressCheckoutProfile must be called with a nonce.'
+    }));
+  }
+
+  return this._client.request({
+    method: 'get',
+    endpoint: 'payment_methods/amex_express_checkout_cards/' + options.nonce,
+    data: {
+      _meta: {source: 'american-express'},
+      paymentMethodNonce: options.nonce
+    }
+  }).catch(function (err) {
+    return Promise.reject(new BraintreeError({
+      type: errors.AMEX_NETWORK_ERROR.type,
+      code: errors.AMEX_NETWORK_ERROR.code,
+      message: 'A network error occurred when getting the American Express Checkout nonce profile.',
+      details: {
+        originalError: err
+      }
+    }));
+  });
+};
+
+module.exports = wrapPromise.wrapPrototype(AmericanExpress);
+
+},{"../lib/assign":64,"../lib/braintree-error":66,"../lib/promise":97,"./errors":26,"wrap-promise":672}],26:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+
+module.exports = {
+  AMEX_NONCE_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'AMEX_NONCE_REQUIRED'
+  },
+  AMEX_NETWORK_ERROR: {
+    type: BraintreeError.types.NETWORK,
+    code: 'AMEX_NETWORK_ERROR'
+  }
+};
+
+},{"../lib/braintree-error":66}],27:[function(require,module,exports){
+'use strict';
+/**
+ * @module braintree-web/american-express
+ * @description This module is for use with Amex Express Checkout. To accept American Express cards, use Hosted Fields.
+ */
+
+var BraintreeError = require('../lib/braintree-error');
+var AmericanExpress = require('./american-express');
+var sharedErrors = require('../lib/errors');
+var VERSION = "3.15.0";
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} [callback] The second argument, `data`, is the {@link AmericanExpress} instance. If no callback is provided, `create` returns a promise that resolves with the {@link AmericanExpress} instance.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+function create(options) {
+  var clientVersion;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating American Express.'
+    }));
+  }
+
+  clientVersion = options.client.getConfiguration().analyticsMetadata.sdkVersion;
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and American Express (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  return Promise.resolve(new AmericanExpress(options));
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./american-express":25,"wrap-promise":672}],28:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+var analytics = require('../lib/analytics');
+var errors = require('./errors');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @typedef {object} ApplePay~tokenizePayload
+ * @property {string} nonce The payment method nonce.
+ * @property {object} details Additional details.
+ * @property {string} details.cardType Type of card, ex: Visa, MasterCard.
+ * @property {string} details.cardHolderName The name of the card holder.
+ * @property {string} details.dpanLastTwo Last two digits of card number.
+ * @property {string} description A human-readable description.
+ * @property {string} type The payment method type, always `ApplePayCard`.
+ */
+
+/**
+ * An Apple Pay Payment Authorization Event object.
+ * @typedef {object} ApplePayPaymentAuthorizedEvent
+ * @external ApplePayPaymentAuthorizedEvent
+ * @see {@link https://developer.apple.com/reference/applepayjs/applepaypaymentauthorizedevent ApplePayPaymentAuthorizedEvent}
+ */
+
+/**
+ * An Apple Pay Payment Request object.
+ * @typedef {object} ApplePayPaymentRequest
+ * @external ApplePayPaymentRequest
+ * @see {@link https://developer.apple.com/reference/applepayjs/1916082-applepay_js_data_types/paymentrequest PaymentRequest}
+ */
+
+/**
+ * @class
+ * @param {object} options Options
+ * @description <strong>You cannot use this constructor directly. Use {@link module:braintree-web/apple-pay.create|braintree.applePay.create} instead.</strong>
+ * @classdesc This class represents an Apple Pay component. Instances of this class have methods for validating the merchant server and tokenizing payments.
+ */
+function ApplePay(options) {
+  this._client = options.client;
+  /**
+   * @name ApplePay#merchantIdentifier
+   * @description A special merchant ID which represents the merchant association with Braintree. Required when using `ApplePaySession.canMakePaymentsWithActiveCard`.
+   * @example
+   * var promise = ApplePaySession.canMakePaymentsWithActiveCard(applePayInstance.merchantIdentifier);
+   * promise.then(function (canMakePaymentsWithActiveCard) {
+   *   if (canMakePaymentsWithActiveCard) {
+   *     // Set up Apple Pay buttons
+   *   }
+   * });
+   */
+  Object.defineProperty(this, 'merchantIdentifier', {
+    value: this._client.getConfiguration().gatewayConfiguration.applePayWeb.merchantIdentifier,
+    configurable: false,
+    writable: false
+  });
+}
+
+/**
+ * Merges a payment request with Braintree defaults to return an {external:ApplePayPaymentRequest}.
+ *
+ * The following properties are assigned to `paymentRequest` if not already defined. Their default values come from the Braintree gateway.
+ * - `countryCode`
+ * - `currencyCode`
+ * - `merchantCapabilities`
+ * - `supportedNetworks`
+ * @public
+ * @param {external:ApplePayPaymentRequest} paymentRequest The payment request details to apply on top of those from Braintree.
+ * @returns {external:ApplePayPaymentRequest} The decorated `paymentRequest` object.
+ * @example
+ * var applePay = require('braintree-web/apple-pay');
+ *
+ * applePay.create({client: clientInstance}, function (applePayErr, applePayInstance) {
+ *   if (applePayErr) {
+ *     // Handle error here
+ *     return;
+ *   }
+ *
+ *   var paymentRequest = applePayInstance.createPaymentRequest({
+ *     total: {
+ *       label: 'My Company',
+ *       amount: '19.99'
+ *     }
+ *   });
+ *
+ *   var session = new ApplePaySession(1, paymentRequest);
+ *
+ *   // ...
+ */
+ApplePay.prototype.createPaymentRequest = function (paymentRequest) {
+  var applePay = this._client.getConfiguration().gatewayConfiguration.applePayWeb;
+  var defaults = {
+    countryCode: applePay.countryCode,
+    currencyCode: applePay.currencyCode,
+    merchantCapabilities: applePay.merchantCapabilities || ['supports3DS'],
+    supportedNetworks: applePay.supportedNetworks.map(function (network) {
+      return network === 'mastercard' ? 'masterCard' : network;
+    })
+  };
+
+  return Object.assign({}, defaults, paymentRequest);
+};
+
+/**
+ * Validates your merchant website, as required by `ApplePaySession` before payment can be authorized.
+ * @public
+ * @param {object} options Options
+ * @param {string} options.validationURL The validationURL fram an `ApplePayValidateMerchantEvent`.
+ * @param {string} options.displayName The canonical name for your store. Use a non-localized name. This parameter should be a UTF-8 string that is a maximum of 128 characters. The system may display this name to the user.
+ * @param {callback} [callback] The second argument, <code>data</code>, is the Apple Pay merchant session object. If no callback is provided, `performValidation` returns a promise.
+ * Pass the merchant session to your Apple Pay session's `completeMerchantValidation` method.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * var applePay = require('braintree-web/apple-pay');
+ *
+ * applePay.create({client: clientInstance}, function (applePayErr, applePayInstance) {
+ *   if (applePayErr) {
+ *     // Handle error here
+ *     return;
+ *   }
+ *
+ *   var paymentRequest = applePayInstance.createPaymentRequest({
+ *     total: {
+ *       label: 'My Company',
+ *       amount: '19.99'
+ *     }
+ *   });
+ *   var session = new ApplePaySession(1, paymentRequest);
+ *
+ *   session.onvalidatemerchant = function (event) {
+ *     applePayInstance.performValidation({
+ *       validationURL: event.validationURL,
+ *       displayName: 'My Great Store'
+ *     }, function (validationErr, validationData) {
+ *       if (validationErr) {
+ *         console.error(validationErr);
+ *         session.abort();
+ *         return;
+ *       }
+ *
+ *       session.completeMerchantValidation(validationData);
+ *     });
+ *   };
+ * });
+ */
+ApplePay.prototype.performValidation = function (options) {
+  var applePayWebSession;
+  var self = this;
+
+  if (!options || !options.validationURL) {
+    return Promise.reject(new BraintreeError(errors.APPLE_PAY_VALIDATION_URL_REQUIRED));
+  }
+
+  applePayWebSession = {
+    validationUrl: options.validationURL,
+    domainName: options.domainName || global.location.hostname,
+    merchantIdentifier: options.merchantIdentifier || this.merchantIdentifier
+  };
+
+  if (options.displayName != null) {
+    applePayWebSession.displayName = options.displayName;
+  }
+
+  return this._client.request({
+    method: 'post',
+    endpoint: 'apple_pay_web/sessions',
+    data: {
+      _meta: {source: 'apple-pay'},
+      applePayWebSession: applePayWebSession
+    }
+  }).then(function (response) {
+    analytics.sendEvent(self._client, 'applepay.performValidation.succeeded');
+    return Promise.resolve(response);
+  }).catch(function (err) {
+    analytics.sendEvent(self._client, 'applepay.performValidation.failed');
+
+    if (err.code === 'CLIENT_REQUEST_ERROR') {
+      return Promise.reject(new BraintreeError({
+        type: errors.APPLE_PAY_MERCHANT_VALIDATION_FAILED.type,
+        code: errors.APPLE_PAY_MERCHANT_VALIDATION_FAILED.code,
+        message: errors.APPLE_PAY_MERCHANT_VALIDATION_FAILED.message,
+        details: {
+          originalError: err.details.originalError
+        }
+      }));
+    }
+
+    return Promise.reject(new BraintreeError({
+      type: errors.APPLE_PAY_MERCHANT_VALIDATION_NETWORK.type,
+      code: errors.APPLE_PAY_MERCHANT_VALIDATION_NETWORK.code,
+      message: errors.APPLE_PAY_MERCHANT_VALIDATION_NETWORK.message,
+      details: {
+        originalError: err
+      }
+    }));
+  });
+};
+
+/**
+ * Tokenizes an Apple Pay payment. This will likely be called in your `ApplePaySession`'s `onpaymentauthorized` callback.
+ * @public
+ * @param {object} options Options
+ * @param {object} options.token The `payment.token` property of an {@link external:ApplePayPaymentAuthorizedEvent}.
+ * @param {callback} [callback] The second argument, <code>data</code>, is a {@link ApplePay~tokenizePayload|tokenizePayload}. If no callback is provided, `tokenize` returns a promise that resolves with a {@link ApplePay~tokenizePayload|tokenizePayload}.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * var applePay = require('braintree-web/apple-pay');
+ *
+ * applePay.create({client: clientInstance}, function (applePayErr, applePayInstance) {
+ *   if (applePayErr) {
+ *     // Handle error here
+ *     return;
+ *   }
+ *
+ *   var paymentRequest = applePayInstance.createPaymentRequest({
+ *     total: {
+ *       label: 'My Company',
+ *       amount: '19.99'
+ *     }
+ *   });
+ *   var session = new ApplePaySession(1, paymentRequest);
+ *
+ *   session.onpaymentauthorized = function (event) {
+ *     applePayInstance.tokenize({
+ *       token: event.payment.token
+ *     }, function (tokenizeErr, tokenizedPayload) {
+ *       if (tokenizeErr) {
+ *         session.completePayment(ApplePaySession.STATUS_FAILURE);
+ *         return;
+ *       }
+ *       session.completePayment(ApplePaySession.STATUS_SUCCESS);
+ *
+ *       // Send the tokenizedPayload to your server here!
+ *     });
+ *   };
+ *
+ *   // ...
+ * });
+ */
+ApplePay.prototype.tokenize = function (options) {
+  var self = this;
+
+  if (!options.token) {
+    return Promise.reject(new BraintreeError(errors.APPLE_PAY_PAYMENT_TOKEN_REQUIRED));
+  }
+
+  return this._client.request({
+    method: 'post',
+    endpoint: 'payment_methods/apple_payment_tokens',
+    data: {
+      _meta: {
+        source: 'apple-pay'
+      },
+      applePaymentToken: Object.assign({}, options.token, {
+        // The gateway requires this key to be base64-encoded.
+        paymentData: btoa(JSON.stringify(options.token.paymentData))
+      })
+    }
+  }).then(function (response) {
+    analytics.sendEvent(self._client, 'applepay.tokenize.succeeded');
+    return Promise.resolve(response.applePayCards[0]);
+  }).catch(function (err) {
+    analytics.sendEvent(self._client, 'applepay.tokenize.failed');
+
+    return Promise.reject(new BraintreeError({
+      type: errors.APPLE_PAY_TOKENIZATION.type,
+      code: errors.APPLE_PAY_TOKENIZATION.code,
+      message: errors.APPLE_PAY_TOKENIZATION.message,
+      details: {
+        originalError: err
+      }
+    }));
+  });
+};
+
+module.exports = wrapPromise.wrapPrototype(ApplePay);
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/promise":97,"./errors":29,"wrap-promise":672}],29:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+
+module.exports = {
+  APPLE_PAY_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'APPLE_PAY_NOT_ENABLED',
+    message: 'Apple Pay is not enabled for this merchant.'
+  },
+  APPLE_PAY_VALIDATION_URL_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'APPLE_PAY_VALIDATION_URL_REQUIRED',
+    message: 'performValidation must be called with a validationURL.'
+  },
+  APPLE_PAY_MERCHANT_VALIDATION_NETWORK: {
+    type: BraintreeError.types.NETWORK,
+    code: 'APPLE_PAY_MERCHANT_VALIDATION_NETWORK',
+    message: 'A network error occurred when validating the Apple Pay merchant.'
+  },
+  APPLE_PAY_MERCHANT_VALIDATION_FAILED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'APPLE_PAY_MERCHANT_VALIDATION_FAILED',
+    message: 'Make sure you have registered your domain name in the Braintree Control Panel.'
+  },
+  APPLE_PAY_PAYMENT_TOKEN_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'APPLE_PAY_PAYMENT_TOKEN_REQUIRED',
+    message: 'tokenize must be called with a payment token.'
+  },
+  APPLE_PAY_TOKENIZATION: {
+    type: BraintreeError.types.NETWORK,
+    code: 'APPLE_PAY_TOKENIZATION',
+    message: 'A network error occurred when processing the Apple Pay payment.'
+  }
+};
+
+},{"../lib/braintree-error":66}],30:[function(require,module,exports){
+'use strict';
+
+/**
+ * @module braintree-web/apple-pay
+ * @description Accept Apple Pay on the Web. *This component is currently in beta and is subject to change.*
+ */
+
+var BraintreeError = require('../lib/braintree-error');
+var ApplePay = require('./apple-pay');
+var analytics = require('../lib/analytics');
+var sharedErrors = require('../lib/errors');
+var errors = require('./errors');
+var VERSION = "3.15.0";
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} [callback] The second argument, `data`, is the {@link ApplePay} instance. If no callback is provided, `create` returns a promise that resolves with the {@link ApplePay} instance.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+function create(options) {
+  var clientVersion;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating Apple Pay.'
+    }));
+  }
+
+  clientVersion = options.client.getConfiguration().analyticsMetadata.sdkVersion;
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and Apple Pay (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  if (!options.client.getConfiguration().gatewayConfiguration.applePayWeb) {
+    return Promise.reject(new BraintreeError(errors.APPLE_PAY_NOT_ENABLED));
+  }
+
+  analytics.sendEvent(options.client, 'applepay.initialized');
+
+  return Promise.resolve(new ApplePay(options));
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./apple-pay":28,"./errors":29,"wrap-promise":672}],31:[function(require,module,exports){
+'use strict';
+
+var request = require('./request');
+var isWhitelistedDomain = require('../lib/is-whitelisted-domain');
+var BraintreeError = require('../lib/braintree-error');
+var convertToBraintreeError = require('../lib/convert-to-braintree-error');
+var addMetadata = require('../lib/add-metadata');
+var Promise = require('../lib/promise');
+var once = require('../lib/once');
+var deferred = require('../lib/deferred');
+var assign = require('../lib/assign').assign;
+var constants = require('./constants');
+var errors = require('./errors');
+var sharedErrors = require('../lib/errors');
+
+/**
+ * This object is returned by {@link Client#getConfiguration|getConfiguration}. This information is used extensively by other Braintree modules to properly configure themselves.
+ * @typedef {object} Client~configuration
+ * @property {object} client The braintree-web/client parameters.
+ * @property {string} client.authorization A tokenizationKey or clientToken.
+ * @property {object} gatewayConfiguration Gateway-supplied configuration.
+ * @property {object} analyticsMetadata Analytics-specific data.
+ * @property {string} analyticsMetadata.sessionId Uniquely identifies a browsing session.
+ * @property {string} analyticsMetadata.sdkVersion The braintree.js version.
+ * @property {string} analyticsMetadata.merchantAppId Identifies the merchant's web app.
+ */
+
+/**
+ * @class
+ * @param {Client~configuration} configuration Options
+ * @description <strong>Do not use this constructor directly. Use {@link module:braintree-web/client.create|braintree.client.create} instead.</strong>
+ * @classdesc This class is required by many other Braintree components. It serves as the base API layer that communicates with our servers. It is also capable of being used to formulate direct calls to our servers, such as direct credit card tokenization. See {@link Client#request}.
+ */
+function Client(configuration) {
+  var configurationJSON, gatewayConfiguration, braintreeApiConfiguration;
+
+  configuration = configuration || {};
+
+  configurationJSON = JSON.stringify(configuration);
+  gatewayConfiguration = configuration.gatewayConfiguration;
+
+  if (!gatewayConfiguration) {
+    throw new BraintreeError(errors.CLIENT_MISSING_GATEWAY_CONFIGURATION);
+  }
+
+  [
+    'assetsUrl',
+    'clientApiUrl',
+    'configUrl'
+  ].forEach(function (property) {
+    if (property in gatewayConfiguration && !isWhitelistedDomain(gatewayConfiguration[property])) {
+      throw new BraintreeError({
+        type: errors.CLIENT_GATEWAY_CONFIGURATION_INVALID_DOMAIN.type,
+        code: errors.CLIENT_GATEWAY_CONFIGURATION_INVALID_DOMAIN.code,
+        message: property + ' property is on an invalid domain.'
+      });
+    }
+  });
+
+  /**
+   * Returns a copy of the configuration values.
+   * @public
+   * @returns {Client~configuration} configuration
+   */
+  this.getConfiguration = function () {
+    return JSON.parse(configurationJSON);
+  };
+
+  this._request = request;
+  this._configuration = this.getConfiguration();
+
+  this._clientApiBaseUrl = gatewayConfiguration.clientApiUrl + '/v1/';
+
+  braintreeApiConfiguration = gatewayConfiguration.braintreeApi;
+  if (braintreeApiConfiguration) {
+    this._braintreeApi = {
+      baseUrl: braintreeApiConfiguration.url + '/',
+      accessToken: braintreeApiConfiguration.accessToken
+    };
+
+    if (!isWhitelistedDomain(this._braintreeApi.baseUrl)) {
+      throw new BraintreeError({
+        type: errors.CLIENT_GATEWAY_CONFIGURATION_INVALID_DOMAIN.type,
+        code: errors.CLIENT_GATEWAY_CONFIGURATION_INVALID_DOMAIN.code,
+        message: 'braintreeApi URL is on an invalid domain.'
+      });
+    }
+  }
+}
+
+/**
+ * Used by other modules to formulate all network requests to the Braintree gateway. It is also capable of being used directly from your own form to tokenize credit card information. However, be sure to satisfy PCI compliance if you use direct card tokenization.
+ * @public
+ * @param {object} options Request options:
+ * @param {string} options.method HTTP method, e.g. "get" or "post".
+ * @param {string} options.endpoint Endpoint path, e.g. "payment_methods".
+ * @param {object} options.data Data to send with the request.
+ * @param {number} [options.timeout=60000] Set a timeout (in milliseconds) for the request.
+ * @param {callback} [callback] The second argument, <code>data</code>, is the returned server data.
+ * @example
+ * <caption>Direct Credit Card Tokenization</caption>
+ * var createClient = require('braintree-web/client').create;
+ *
+ * createClient({
+ *   authorization: CLIENT_AUTHORIZATION
+ * }, function (createErr, clientInstance) {
+ *   var form = document.getElementById('my-form-id');
+ *   var data = {
+ *     creditCard: {
+ *       number: form['cc-number'].value,
+ *       cvv: form['cc-cvv'].value,
+ *       expirationDate: form['cc-date'].value,
+ *       billingAddress: {
+ *         postalCode: form['cc-postal'].value
+ *       },
+ *       options: {
+ *         validate: false
+ *       }
+ *     }
+ *   };
+ *
+ *   // Warning: For a merchant to be eligible for the easiest level of PCI compliance (SAQ A),
+ *   // payment fields cannot be hosted on your checkout page.
+ *   // For an alternative to the following, use Hosted Fields.
+ *   clientInstance.request({
+ *     endpoint: 'payment_methods/credit_cards',
+ *     method: 'post',
+ *     data: data
+ *   }, function (requestErr, response) {
+ *     // More detailed example of handling API errors: https://codepen.io/braintree/pen/MbwjdM
+ *     if (requestErr) { throw new Error(requestErr); }
+ *
+ *     console.log('Got nonce:', response.creditCards[0].nonce);
+ *   });
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+Client.prototype.request = function (options, callback) {
+  var self = this; // eslint-disable-line no-invalid-this
+  var requestPromise = new Promise(function (resolve, reject) {
+    var optionName, api, baseUrl, requestOptions;
+
+    if (!options.method) {
+      optionName = 'options.method';
+    } else if (!options.endpoint) {
+      optionName = 'options.endpoint';
+    }
+
+    if (optionName) {
+      throw new BraintreeError({
+        type: errors.CLIENT_OPTION_REQUIRED.type,
+        code: errors.CLIENT_OPTION_REQUIRED.code,
+        message: optionName + ' is required when making a request.'
+      });
+    }
+
+    if ('api' in options) {
+      api = options.api;
+    } else {
+      api = 'clientApi';
+    }
+
+    requestOptions = {
+      method: options.method,
+      timeout: options.timeout
+    };
+
+    if (api === 'clientApi') {
+      baseUrl = self._clientApiBaseUrl;
+
+      requestOptions.data = addMetadata(self._configuration, options.data);
+    } else if (api === 'braintreeApi') {
+      if (!self._braintreeApi) {
+        throw new BraintreeError(sharedErrors.BRAINTREE_API_ACCESS_RESTRICTED);
+      }
+
+      baseUrl = self._braintreeApi.baseUrl;
+
+      requestOptions.data = options.data;
+
+      requestOptions.headers = {
+        'Braintree-Version': constants.BRAINTREE_API_VERSION_HEADER,
+        Authorization: 'Bearer ' + self._braintreeApi.accessToken
+      };
+    } else {
+      throw new BraintreeError({
+        type: errors.CLIENT_OPTION_INVALID.type,
+        code: errors.CLIENT_OPTION_INVALID.code,
+        message: 'options.api is invalid.'
+      });
+    }
+
+    requestOptions.url = baseUrl + options.endpoint;
+
+    self._request(requestOptions, function (err, data, status) {
+      var resolvedData;
+      var requestError = formatRequestError(status, err);
+
+      if (requestError) {
+        reject(requestError);
+        return;
+      }
+
+      resolvedData = assign({_httpStatus: status}, data);
+
+      resolve(resolvedData);
+    });
+  });
+
+  if (typeof callback === 'function') {
+    callback = once(deferred(callback));
+
+    requestPromise.then(function (response) {
+      callback(null, response, response._httpStatus);
+    }).catch(function (err) {
+      var status = err && err.details && err.details.httpStatus;
+
+      callback(err, null, status);
+    });
+    return;
+  }
+
+  return requestPromise; // eslint-disable-line consistent-return
+};
+
+function formatRequestError(status, err) { // eslint-disable-line consistent-return
+  var requestError;
+
+  if (status === -1) {
+    requestError = new BraintreeError(errors.CLIENT_REQUEST_TIMEOUT);
+  } else if (status === 403) {
+    requestError = new BraintreeError(errors.CLIENT_AUTHORIZATION_INSUFFICIENT);
+  } else if (status === 429) {
+    requestError = new BraintreeError(errors.CLIENT_RATE_LIMITED);
+  } else if (status >= 500) {
+    requestError = new BraintreeError(errors.CLIENT_GATEWAY_NETWORK);
+  } else if (status < 200 || status >= 400) {
+    requestError = convertToBraintreeError(err, {
+      type: errors.CLIENT_REQUEST_ERROR.type,
+      code: errors.CLIENT_REQUEST_ERROR.code,
+      message: errors.CLIENT_REQUEST_ERROR.message
+    });
+  }
+
+  if (requestError) {
+    requestError.details = requestError.details || {};
+    requestError.details.httpStatus = status;
+
+    return requestError;
+  }
+}
+
+Client.prototype.toJSON = function () {
+  return this.getConfiguration();
+};
+
+module.exports = Client;
+
+},{"../lib/add-metadata":62,"../lib/assign":64,"../lib/braintree-error":66,"../lib/convert-to-braintree-error":74,"../lib/deferred":76,"../lib/errors":79,"../lib/is-whitelisted-domain":92,"../lib/once":95,"../lib/promise":97,"./constants":32,"./errors":33,"./request":38}],32:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  BRAINTREE_API_VERSION_HEADER: '2017-04-03'
+};
+
+},{}],33:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+
+module.exports = {
+  CLIENT_GATEWAY_CONFIGURATION_INVALID_DOMAIN: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'CLIENT_GATEWAY_CONFIGURATION_INVALID_DOMAIN'
+  },
+  CLIENT_OPTION_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'CLIENT_OPTION_REQUIRED'
+  },
+  CLIENT_OPTION_INVALID: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'CLIENT_OPTION_INVALID'
+  },
+  CLIENT_MISSING_GATEWAY_CONFIGURATION: {
+    type: BraintreeError.types.INTERNAL,
+    code: 'CLIENT_MISSING_GATEWAY_CONFIGURATION',
+    message: 'Missing gatewayConfiguration.'
+  },
+  CLIENT_INVALID_AUTHORIZATION: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'CLIENT_INVALID_AUTHORIZATION',
+    message: 'Authorization is invalid. Make sure your client token or tokenization key is valid.'
+  },
+  CLIENT_GATEWAY_NETWORK: {
+    type: BraintreeError.types.NETWORK,
+    code: 'CLIENT_GATEWAY_NETWORK',
+    message: 'Cannot contact the gateway at this time.'
+  },
+  CLIENT_REQUEST_TIMEOUT: {
+    type: BraintreeError.types.NETWORK,
+    code: 'CLIENT_REQUEST_TIMEOUT',
+    message: 'Request timed out waiting for a reply.'
+  },
+  CLIENT_REQUEST_ERROR: {
+    type: BraintreeError.types.NETWORK,
+    code: 'CLIENT_REQUEST_ERROR',
+    message: 'There was a problem with your request.'
+  },
+  CLIENT_RATE_LIMITED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'CLIENT_RATE_LIMITED',
+    message: 'You are being rate-limited; please try again in a few minutes.'
+  },
+  CLIENT_AUTHORIZATION_INSUFFICIENT: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'CLIENT_AUTHORIZATION_INSUFFICIENT',
+    message: 'The authorization used has insufficient privileges.'
+  }
+};
+
+},{"../lib/braintree-error":66}],34:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+var request = require('./request');
+var uuid = require('../lib/uuid');
+var constants = require('../lib/constants');
+var createAuthorizationData = require('../lib/create-authorization-data');
+var errors = require('./errors');
+
+function getConfiguration(options) {
+  return new Promise(function (resolve, reject) {
+    var configuration, authData, attrs, configUrl;
+    var sessionId = uuid();
+    var analyticsMetadata = {
+      merchantAppId: global.location.host,
+      platform: constants.PLATFORM,
+      sdkVersion: constants.VERSION,
+      source: constants.SOURCE,
+      integration: constants.INTEGRATION,
+      integrationType: constants.INTEGRATION,
+      sessionId: sessionId
+    };
+
+    try {
+      authData = createAuthorizationData(options.authorization);
+    } catch (err) {
+      reject(new BraintreeError(errors.CLIENT_INVALID_AUTHORIZATION));
+      return;
+    }
+    attrs = authData.attrs;
+    configUrl = authData.configUrl;
+
+    attrs._meta = analyticsMetadata;
+    attrs.braintreeLibraryVersion = constants.BRAINTREE_LIBRARY_VERSION;
+    attrs.configVersion = '3';
+
+    request({
+      url: configUrl,
+      method: 'GET',
+      data: attrs
+    }, function (err, response, status) {
+      var errorTemplate;
+
+      if (err) {
+        if (status === 403) {
+          errorTemplate = errors.CLIENT_AUTHORIZATION_INSUFFICIENT;
+        } else {
+          errorTemplate = errors.CLIENT_GATEWAY_NETWORK;
+        }
+
+        reject(new BraintreeError({
+          type: errorTemplate.type,
+          code: errorTemplate.code,
+          message: errorTemplate.message,
+          details: {
+            originalError: err
+          }
+        }));
+        return;
+      }
+
+      configuration = {
+        authorization: options.authorization,
+        authorizationType: attrs.tokenizationKey ? 'TOKENIZATION_KEY' : 'CLIENT_TOKEN',
+        analyticsMetadata: analyticsMetadata,
+        gatewayConfiguration: response
+      };
+
+      resolve(configuration);
+    });
+  });
+}
+
+module.exports = {
+  getConfiguration: wrapPromise(getConfiguration)
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../lib/braintree-error":66,"../lib/constants":72,"../lib/create-authorization-data":75,"../lib/promise":97,"../lib/uuid":100,"./errors":33,"./request":38,"wrap-promise":672}],35:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+var Client = require('./client');
+var getConfiguration = require('./get-configuration').getConfiguration;
+var VERSION = "3.15.0";
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+var sharedErrors = require('../lib/errors');
+
+/** @module braintree-web/client */
+
+/**
+ * @function create
+ * @description This function is the entry point for the <code>braintree.client</code> module. It is used for creating {@link Client} instances that service communication to Braintree servers.
+ * @param {object} options Object containing all {@link Client} options:
+ * @param {string} options.authorization A tokenizationKey or clientToken.
+ * @param {callback} [callback] The second argument, <code>data</code>, is the {@link Client} instance.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * var createClient = require('braintree-web/client').create;
+ *
+ * createClient({
+ *   authorization: CLIENT_AUTHORIZATION
+ * }, function (createErr, clientInstance) {
+ *   // ...
+ * });
+ * @static
+ */
+function create(options) {
+  if (!options.authorization) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.authorization is required when instantiating a client.'
+    }));
+  }
+
+  return getConfiguration(options).then(function (configuration) {
+    if (options.debug) {
+      configuration.isDebug = true;
+    }
+
+    return new Client(configuration);
+  });
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./client":31,"./get-configuration":34,"wrap-promise":672}],36:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var querystring = require('../../lib/querystring');
+var assign = require('../../lib/assign').assign;
+var prepBody = require('./prep-body');
+var parseBody = require('./parse-body');
+var isXHRAvailable = global.XMLHttpRequest && 'withCredentials' in new global.XMLHttpRequest();
+
+function getRequestObject() {
+  return isXHRAvailable ? new XMLHttpRequest() : new XDomainRequest();
+}
+
+function request(options, cb) {
+  var status, resBody;
+  var method = options.method;
+  var url = options.url;
+  var body = options.data;
+  var timeout = options.timeout;
+  var headers = assign({
+    'Content-Type': 'application/json'
+  }, options.headers);
+  var req = getRequestObject();
+  var callback = cb;
+
+  if (method === 'GET') {
+    url = querystring.queryify(url, body);
+    body = null;
+  }
+
+  if (isXHRAvailable) {
+    req.onreadystatechange = function () {
+      if (req.readyState !== 4) { return; }
+
+      status = req.status;
+      resBody = parseBody(req.responseText);
+
+      if (status >= 400 || status < 200) {
+        callback(resBody || 'error', null, status || 500);
+      } else {
+        callback(null, resBody, status);
+      }
+    };
+  } else {
+    if (options.headers) {
+      url = querystring.queryify(url, headers);
+    }
+
+    req.onload = function () {
+      callback(null, parseBody(req.responseText), req.status);
+    };
+
+    req.onerror = function () {
+      // XDomainRequest does not report a body or status for errors, so
+      // hardcode to 'error' and 500, respectively
+      callback('error', null, 500);
+    };
+
+    // This must remain for IE9 to work
+    req.onprogress = function () {};
+
+    req.ontimeout = function () {
+      callback('timeout', null, -1);
+    };
+  }
+
+  req.open(method, url, true);
+  req.timeout = timeout;
+
+  if (isXHRAvailable) {
+    Object.keys(headers).forEach(function (headerKey) {
+      req.setRequestHeader(headerKey, headers[headerKey]);
+    });
+  }
+
+  try {
+    req.send(prepBody(method, body));
+  } catch (e) { /* ignored */ }
+}
+
+module.exports = {
+  request: request
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../lib/assign":64,"../../lib/querystring":98,"./parse-body":41,"./prep-body":42}],37:[function(require,module,exports){
+(function (global){
+'use strict';
+
+module.exports = function getUserAgent() {
+  return global.navigator.userAgent;
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],38:[function(require,module,exports){
+'use strict';
+
+var ajaxIsAvaliable;
+var once = require('../../lib/once');
+var JSONPDriver = require('./jsonp-driver');
+var AJAXDriver = require('./ajax-driver');
+var getUserAgent = require('./get-user-agent');
+var isHTTP = require('./is-http');
+
+function isAjaxAvailable() {
+  if (ajaxIsAvaliable == null) {
+    ajaxIsAvaliable = !(isHTTP() && /MSIE\s(8|9)/.test(getUserAgent()));
+  }
+
+  return ajaxIsAvaliable;
+}
+
+module.exports = function (options, cb) {
+  cb = once(cb || Function.prototype);
+  options.method = (options.method || 'GET').toUpperCase();
+  options.timeout = options.timeout == null ? 60000 : options.timeout;
+  options.data = options.data || {};
+
+  if (isAjaxAvailable()) {
+    AJAXDriver.request(options, cb);
+  } else {
+    JSONPDriver.request(options, cb);
+  }
+};
+
+},{"../../lib/once":95,"./ajax-driver":36,"./get-user-agent":37,"./is-http":39,"./jsonp-driver":40}],39:[function(require,module,exports){
+(function (global){
+'use strict';
+
+module.exports = function () {
+  return global.location.protocol === 'http:';
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],40:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var head;
+var uuid = require('../../lib/uuid');
+var querystring = require('../../lib/querystring');
+var timeouts = {};
+
+function _removeScript(script) {
+  if (script && script.parentNode) {
+    script.parentNode.removeChild(script);
+  }
+}
+
+function _createScriptTag(url, callbackName) {
+  var script = document.createElement('script');
+  var done = false;
+
+  script.src = url;
+  script.async = true;
+  script.onerror = function () {
+    global[callbackName]({message: 'error', status: 500});
+  };
+
+  script.onload = script.onreadystatechange = function () {
+    if (done) { return; }
+
+    if (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') {
+      done = true;
+      script.onload = script.onreadystatechange = null;
+    }
+  };
+
+  return script;
+}
+
+function _cleanupGlobal(callbackName) {
+  try {
+    delete global[callbackName];
+  } catch (_) {
+    global[callbackName] = null;
+  }
+}
+
+function _setupTimeout(timeout, callbackName) {
+  timeouts[callbackName] = setTimeout(function () {
+    timeouts[callbackName] = null;
+
+    global[callbackName]({
+      error: 'timeout',
+      status: -1
+    });
+
+    global[callbackName] = function () {
+      _cleanupGlobal(callbackName);
+    };
+  }, timeout);
+}
+
+function _setupGlobalCallback(script, callback, callbackName) {
+  global[callbackName] = function (response) {
+    var status = response.status || 500;
+    var err = null;
+    var data = null;
+
+    delete response.status;
+
+    if (status >= 400 || status < 200) {
+      err = response;
+    } else {
+      data = response;
+    }
+
+    _cleanupGlobal(callbackName);
+    _removeScript(script);
+
+    clearTimeout(timeouts[callbackName]);
+    callback(err, data, status);
+  };
+}
+
+function request(options, callback) {
+  var script;
+  var callbackName = 'callback_json_' + uuid().replace(/-/g, '');
+  var url = options.url;
+  var attrs = options.data;
+  var method = options.method;
+  var timeout = options.timeout;
+
+  url = querystring.queryify(url, attrs);
+  url = querystring.queryify(url, {
+    _method: method,
+    callback: callbackName
+  });
+
+  script = _createScriptTag(url, callbackName);
+  _setupGlobalCallback(script, callback, callbackName);
+  _setupTimeout(timeout, callbackName);
+
+  if (!head) {
+    head = document.getElementsByTagName('head')[0];
+  }
+
+  head.appendChild(script);
+}
+
+module.exports = {
+  request: request
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../lib/querystring":98,"../../lib/uuid":100}],41:[function(require,module,exports){
+'use strict';
+
+module.exports = function (body) {
+  try {
+    body = JSON.parse(body);
+  } catch (e) { /* ignored */ }
+
+  return body;
+};
+
+},{}],42:[function(require,module,exports){
+'use strict';
+
+module.exports = function (method, body) {
+  if (typeof method !== 'string') {
+    throw new Error('Method must be a string');
+  }
+
+  if (method.toLowerCase() !== 'get' && body != null) {
+    body = typeof body === 'string' ? body : JSON.stringify(body);
+  }
+
+  return body;
+};
+
+},{}],43:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+
+module.exports = {
+  DATA_COLLECTOR_KOUNT_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'DATA_COLLECTOR_KOUNT_NOT_ENABLED',
+    message: 'Kount is not enabled for this merchant.'
+  },
+  DATA_COLLECTOR_KOUNT_ERROR: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'DATA_COLLECTOR_KOUNT_ERROR'
+  },
+  DATA_COLLECTOR_REQUIRES_CREATE_OPTIONS: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'DATA_COLLECTOR_REQUIRES_CREATE_OPTIONS',
+    message: 'Data Collector must be created with Kount and/or PayPal.'
+  }
+};
+
+},{"../lib/braintree-error":66}],44:[function(require,module,exports){
+'use strict';
+
+function setup() {
+  return new Fraudnet();
+}
+
+function Fraudnet() {
+  this.sessionId = _generateSessionId();
+  this._beaconId = _generateBeaconId(this.sessionId);
+
+  this._parameterBlock = _createParameterBlock(this.sessionId, this._beaconId);
+  this._thirdPartyBlock = _createThirdPartyBlock();
+}
+
+Fraudnet.prototype.teardown = function () {
+  this._thirdPartyBlock.parentNode.removeChild(this._thirdPartyBlock);
+};
+
+function _generateSessionId() {
+  var i;
+  var id = '';
+
+  for (i = 0; i < 32; i++) {
+    id += Math.floor(Math.random() * 16).toString(16);
+  }
+
+  return id;
+}
+
+function _generateBeaconId(sessionId) {
+  var timestamp = new Date().getTime() / 1000;
+
+  return 'https://b.stats.paypal.com/counter.cgi' +
+    '?i=127.0.0.1' +
+    '&p=' + sessionId +
+    '&t=' + timestamp +
+    '&a=14';
+}
+
+function _createParameterBlock(sessionId, beaconId) {
+  var el = document.body.appendChild(document.createElement('script'));
+
+  el.type = 'application/json';
+  el.setAttribute('fncls', 'fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99');
+  el.text = JSON.stringify({
+    f: sessionId,
+    s: 'BRAINTREE_SIGNIN',
+    b: beaconId
+  });
+
+  return el;
+}
+
+function _createThirdPartyBlock() {
+  var dom, doc;
+  var scriptBaseURL = 'https://www.paypalobjects.com/webstatic/r/fb/';
+  var iframe = document.createElement('iframe');
+
+  iframe.src = 'about:blank';
+  iframe.title = '';
+  iframe.role = 'presentation'; // a11y
+  (iframe.frameElement || iframe).style.cssText = 'width: 0; height: 0; border: 0; position: absolute; z-index: -999';
+  document.body.appendChild(iframe);
+
+  try {
+    doc = iframe.contentWindow.document;
+  } catch (e) {
+    dom = document.domain;
+    iframe.src = 'javascript:var d=document.open();d.domain="' + dom + '";void(0);'; // eslint-disable-line no-script-url
+    doc = iframe.contentWindow.document;
+  }
+
+  doc.open()._l = function () {
+    var js = this.createElement('script');
+
+    if (dom) {
+      this.domain = dom;
+    }
+    js.id = 'js-iframe-async';
+    js.src = scriptBaseURL + 'fb-all-prod.pp.min.js';
+    this.body.appendChild(js);
+  };
+
+  function listener() { doc._l(); }
+
+  if (iframe.addEventListener) {
+    iframe.addEventListener('load', listener, false);
+  } else if (iframe.attachEvent) {
+    iframe.attachEvent('onload', listener);
+  } else {
+    doc.write('<body onload="document._l();">');
+  }
+
+  doc.close();
+
+  return iframe;
+}
+
+module.exports = {
+  setup: setup
+};
+
+},{}],45:[function(require,module,exports){
+'use strict';
+/** @module braintree-web/data-collector */
+
+var kount = require('./kount');
+var fraudnet = require('./fraudnet');
+var BraintreeError = require('../lib/braintree-error');
+var methods = require('../lib/methods');
+var convertMethodsToError = require('../lib/convert-methods-to-error');
+var VERSION = "3.15.0";
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+var sharedErrors = require('../lib/errors');
+var errors = require('./errors');
+
+/**
+ * @class
+ * @global
+ * @name DataCollector
+ * @description <strong>Do not use this constructor directly. Use {@link module:braintree-web/data-collector.create|braintree-web.data-collector.create} instead.</strong>
+ * @classdesc This class is used for advanced fraud integration with PayPal and Kount. Instances of this class have {@link DataCollector#deviceData|deviceData} which is used to correlate user sessions with server transactions. Before using DataCollector, make sure you have enabled advanced fraud protection in the Braintree gateway. To use your own Kount ID, contact our support team ([support@braintreepayments.com](mailto:support@braintreepayments.com) or [877.434.2894](tel:877.434.2894)).
+ */
+
+/**
+ * @memberof DataCollector
+ * @name deviceData
+ * @type string
+ * @description JSON string to pass with server transactions.
+ * @instance
+ */
+
+/**
+ * @memberof DataCollector
+ * @name teardown
+ * @function
+ * @description Cleanly remove anything set up by {@link module:braintree-web/data-collector.create|create}.
+ * @param {callback} [callback] Called on completion. If no callback is provided, `teardown` returns a promise.
+ * @instance
+ * @example
+ * dataCollectorInstance.teardown();
+ * @example <caption>With callback</caption>
+ * dataCollectorInstance.teardown(function () {
+ *   // teardown is complete
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+
+/**
+ * @static
+ * @function create
+ * @description Creates a DataCollector instance. Requires advanced fraud protection to be enabled in the Braintree gateway. Contact our [support team](mailto:support@braintreepayments.com) to configure your Kount ID.
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {boolean} [options.kount] If true, Kount fraud data collection is enabled.
+ * @param {boolean} [options.paypal] If true, PayPal fraud data collection is enabled.
+ * @param {callback} [callback] The second argument, `data`, is the {@link DataCollector} instance.
+ * @example
+ * var createClient = require('braintree-web/client').create;
+ * var createDataCollector = require('braintree-web/data-collector').create;
+ *
+ * createClient({
+ *   authorization: CLIENT_AUTHORIZATION
+ * }, function (clientErr, clientInstance) {
+ *   if (err) {
+ *     // handle client error
+ *     return;
+ *   }
+ *   createDataCollector({
+ *     client: clientInstance,
+ *     kount: true
+ *   }, function (dataCollectorErr, dataCollectorInstance) {
+ *     if (dataCollectorErr) {
+ *       // handle data collector error
+ *       return;
+ *     }
+ *     // data collector is set up
+ *   });
+ * });
+ *
+ * @returns {Promise|void} Returns a promise that resolves the {@link DataCollector} instance if no callback is provided.
+ */
+function create(options) {
+  var data, kountInstance, fraudnetInstance, config, clientVersion;
+  var result = {};
+  var instances = [];
+  var teardown = createTeardownMethod(result, instances);
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating Data Collector.'
+    }));
+  }
+
+  config = options.client.getConfiguration();
+  clientVersion = config.analyticsMetadata.sdkVersion;
+
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and Data Collector (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  if (options.kount === true) {
+    if (!config.gatewayConfiguration.kount) {
+      return Promise.reject(new BraintreeError(errors.DATA_COLLECTOR_KOUNT_NOT_ENABLED));
+    }
+
+    try {
+      kountInstance = kount.setup({
+        environment: config.gatewayConfiguration.environment,
+        merchantId: config.gatewayConfiguration.kount.kountMerchantId
+      });
+    } catch (err) {
+      return Promise.reject(new BraintreeError({
+        type: errors.DATA_COLLECTOR_KOUNT_ERROR.type,
+        code: errors.DATA_COLLECTOR_KOUNT_ERROR.code,
+        message: err.message
+      }));
+    }
+
+    data = kountInstance.deviceData;
+    instances.push(kountInstance);
+  } else {
+    data = {};
+  }
+
+  if (options.paypal === true) {
+    fraudnetInstance = fraudnet.setup();
+    data.correlation_id = fraudnetInstance.sessionId; // eslint-disable-line camelcase
+    instances.push(fraudnetInstance);
+  }
+
+  if (instances.length === 0) {
+    return Promise.reject(new BraintreeError(errors.DATA_COLLECTOR_REQUIRES_CREATE_OPTIONS));
+  }
+
+  result.deviceData = JSON.stringify(data);
+  result.teardown = teardown;
+
+  return Promise.resolve(result);
+}
+
+function createTeardownMethod(result, instances) {
+  return wrapPromise(function teardown() {
+    return new Promise(function (resolve) {
+      var i;
+
+      for (i = 0; i < instances.length; i++) {
+        instances[i].teardown();
+      }
+
+      convertMethodsToError(result, methods(result));
+
+      resolve();
+    });
+  });
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/braintree-error":66,"../lib/convert-methods-to-error":73,"../lib/errors":79,"../lib/methods":94,"../lib/promise":97,"./errors":43,"./fraudnet":44,"./kount":46,"wrap-promise":672}],46:[function(require,module,exports){
+'use strict';
+
+var sjcl = require('./vendor/sjcl');
+var camelCaseToSnakeCase = require('../lib/camel-case-to-snake-case');
+
+var QA_URL = 'https://assets.qa.braintreepayments.com/data';
+var IFRAME_ID_PREFIX = 'braintreeDataFrame-';
+var environmentUrls = {
+  development: QA_URL,
+  qa: QA_URL,
+  sandbox: 'https://assets.braintreegateway.com/sandbox/data',
+  production: 'https://assets.braintreegateway.com/data'
+};
+var cachedDeviceData = {};
+
+function setup(o) {
+  var options = o != null ? o : {};
+
+  return new Kount(options);
+}
+
+function Kount(options) {
+  var previouslyInitializedDeviceData = Kount.getCachedDeviceData(options.merchantId);
+
+  if (previouslyInitializedDeviceData) {
+    this.deviceData = previouslyInitializedDeviceData;
+    return;
+  }
+
+  this._currentEnvironment = this._initializeEnvironment(options);
+
+  sjcl.random.startCollectors();
+
+  this._deviceSessionId = this._generateDeviceSessionId();
+  this.deviceData = this._getDeviceData();
+
+  Kount.setCachedDeviceData(options.merchantId, this.deviceData);
+
+  this._iframe = this._setupIFrame();
+}
+
+Kount.getCachedDeviceData = function (merchantId) {
+  return cachedDeviceData[merchantId];
+};
+
+Kount.setCachedDeviceData = function (merchantId, data) {
+  cachedDeviceData[merchantId] = data;
+};
+
+Kount.prototype.teardown = function () {
+  sjcl.random.stopCollectors();
+  this._removeIframe();
+};
+
+Kount.prototype._removeIframe = function () {
+  this._iframe.parentNode.removeChild(this._iframe);
+};
+
+Kount.prototype._getDeviceData = function () {
+  return camelCaseToSnakeCase({
+    deviceSessionId: this._deviceSessionId,
+    fraudMerchantId: this._currentEnvironment.id
+  });
+};
+
+Kount.prototype._generateDeviceSessionId = function () {
+  var bits, hexString;
+
+  bits = sjcl.random.randomWords(4, 0);
+  hexString = sjcl.codec.hex.fromBits(bits);
+
+  return hexString;
+};
+
+Kount.prototype._setupIFrame = function () {
+  var params, iframe;
+  var self = this;
+
+  params = '?m=' + this._currentEnvironment.id + '&s=' + this._deviceSessionId;
+
+  iframe = document.createElement('iframe');
+  iframe.width = 1;
+  iframe.id = IFRAME_ID_PREFIX + this._deviceSessionId;
+  iframe.height = 1;
+  iframe.frameBorder = 0;
+  iframe.scrolling = 'no';
+
+  document.body.appendChild(iframe);
+  setTimeout(function () {
+    iframe.src = self._currentEnvironment.url + '/logo.htm' + params;
+    iframe.innerHTML = '<img src="' + self._currentEnvironment.url + '/logo.gif' + params + '" />';
+  }, 10);
+
+  return iframe;
+};
+
+Kount.prototype._initializeEnvironment = function (options) {
+  var url = environmentUrls[options.environment];
+
+  if (url == null) {
+    throw new Error(options.environment + ' is not a valid environment for kount.environment');
+  }
+
+  return {
+    url: url,
+    name: options.environment,
+    id: options.merchantId
+  };
+};
+
+module.exports = {
+  setup: setup,
+  Kount: Kount,
+  environmentUrls: environmentUrls
+};
+
+},{"../lib/camel-case-to-snake-case":70,"./vendor/sjcl":47}],47:[function(require,module,exports){
+"use strict";var sjcl={cipher:{},hash:{},keyexchange:{},mode:{},misc:{},codec:{},exception:{corrupt:function(a){this.toString=function(){return"CORRUPT: "+this.message};this.message=a},invalid:function(a){this.toString=function(){return"INVALID: "+this.message};this.message=a},bug:function(a){this.toString=function(){return"BUG: "+this.message};this.message=a},notReady:function(a){this.toString=function(){return"NOT READY: "+this.message};this.message=a}}};
+sjcl.cipher.aes=function(a){this.l[0][0][0]||this.G();var b,c,d,e,f=this.l[0][4],g=this.l[1];b=a.length;var k=1;if(4!==b&&6!==b&&8!==b)throw new sjcl.exception.invalid("invalid aes key size");this.b=[d=a.slice(0),e=[]];for(a=b;a<4*b+28;a++){c=d[a-1];if(0===a%b||8===b&&4===a%b)c=f[c>>>24]<<24^f[c>>16&255]<<16^f[c>>8&255]<<8^f[c&255],0===a%b&&(c=c<<8^c>>>24^k<<24,k=k<<1^283*(k>>7));d[a]=d[a-b]^c}for(b=0;a;b++,a--)c=d[b&3?a:a-4],e[b]=4>=a||4>b?c:g[0][f[c>>>24]]^g[1][f[c>>16&255]]^g[2][f[c>>8&255]]^g[3][f[c&
+255]]};
+sjcl.cipher.aes.prototype={encrypt:function(a){return t(this,a,0)},decrypt:function(a){return t(this,a,1)},l:[[[],[],[],[],[]],[[],[],[],[],[]]],G:function(){var a=this.l[0],b=this.l[1],c=a[4],d=b[4],e,f,g,k=[],l=[],p,n,h,m;for(e=0;0x100>e;e++)l[(k[e]=e<<1^283*(e>>7))^e]=e;for(f=g=0;!c[f];f^=p||1,g=l[g]||1)for(h=g^g<<1^g<<2^g<<3^g<<4,h=h>>8^h&255^99,c[f]=h,d[h]=f,n=k[e=k[p=k[f]]],m=0x1010101*n^0x10001*e^0x101*p^0x1010100*f,n=0x101*k[h]^0x1010100*h,e=0;4>e;e++)a[e][f]=n=n<<24^n>>>8,b[e][h]=m=m<<24^m>>>8;for(e=
+0;5>e;e++)a[e]=a[e].slice(0),b[e]=b[e].slice(0)}};
+function t(a,b,c){if(4!==b.length)throw new sjcl.exception.invalid("invalid aes block size");var d=a.b[c],e=b[0]^d[0],f=b[c?3:1]^d[1],g=b[2]^d[2];b=b[c?1:3]^d[3];var k,l,p,n=d.length/4-2,h,m=4,q=[0,0,0,0];k=a.l[c];a=k[0];var r=k[1],v=k[2],w=k[3],x=k[4];for(h=0;h<n;h++)k=a[e>>>24]^r[f>>16&255]^v[g>>8&255]^w[b&255]^d[m],l=a[f>>>24]^r[g>>16&255]^v[b>>8&255]^w[e&255]^d[m+1],p=a[g>>>24]^r[b>>16&255]^v[e>>8&255]^w[f&255]^d[m+2],b=a[b>>>24]^r[e>>16&255]^v[f>>8&255]^w[g&255]^d[m+3],m+=4,e=k,f=l,g=p;for(h=
+0;4>h;h++)q[c?3&-h:h]=x[e>>>24]<<24^x[f>>16&255]<<16^x[g>>8&255]<<8^x[b&255]^d[m++],k=e,e=f,f=g,g=b,b=k;return q}
+sjcl.bitArray={bitSlice:function(a,b,c){a=sjcl.bitArray.M(a.slice(b/32),32-(b&31)).slice(1);return void 0===c?a:sjcl.bitArray.clamp(a,c-b)},extract:function(a,b,c){var d=Math.floor(-b-c&31);return((b+c-1^b)&-32?a[b/32|0]<<32-d^a[b/32+1|0]>>>d:a[b/32|0]>>>d)&(1<<c)-1},concat:function(a,b){if(0===a.length||0===b.length)return a.concat(b);var c=a[a.length-1],d=sjcl.bitArray.getPartial(c);return 32===d?a.concat(b):sjcl.bitArray.M(b,d,c|0,a.slice(0,a.length-1))},bitLength:function(a){var b=a.length;return 0===
+b?0:32*(b-1)+sjcl.bitArray.getPartial(a[b-1])},clamp:function(a,b){if(32*a.length<b)return a;a=a.slice(0,Math.ceil(b/32));var c=a.length;b=b&31;0<c&&b&&(a[c-1]=sjcl.bitArray.partial(b,a[c-1]&2147483648>>b-1,1));return a},partial:function(a,b,c){return 32===a?b:(c?b|0:b<<32-a)+0x10000000000*a},getPartial:function(a){return Math.round(a/0x10000000000)||32},equal:function(a,b){if(sjcl.bitArray.bitLength(a)!==sjcl.bitArray.bitLength(b))return!1;var c=0,d;for(d=0;d<a.length;d++)c|=a[d]^b[d];return 0===
+c},M:function(a,b,c,d){var e;e=0;for(void 0===d&&(d=[]);32<=b;b-=32)d.push(c),c=0;if(0===b)return d.concat(a);for(e=0;e<a.length;e++)d.push(c|a[e]>>>b),c=a[e]<<32-b;e=a.length?a[a.length-1]:0;a=sjcl.bitArray.getPartial(e);d.push(sjcl.bitArray.partial(b+a&31,32<b+a?c:d.pop(),1));return d},Y:function(a,b){return[a[0]^b[0],a[1]^b[1],a[2]^b[2],a[3]^b[3]]},byteswapM:function(a){var b,c;for(b=0;b<a.length;++b)c=a[b],a[b]=c>>>24|c>>>8&0xff00|(c&0xff00)<<8|c<<24;return a}};
+sjcl.codec.utf8String={fromBits:function(a){var b="",c=sjcl.bitArray.bitLength(a),d,e;for(d=0;d<c/8;d++)0===(d&3)&&(e=a[d/4]),b+=String.fromCharCode(e>>>24),e<<=8;return decodeURIComponent(escape(b))},toBits:function(a){a=unescape(encodeURIComponent(a));var b=[],c,d=0;for(c=0;c<a.length;c++)d=d<<8|a.charCodeAt(c),3===(c&3)&&(b.push(d),d=0);c&3&&b.push(sjcl.bitArray.partial(8*(c&3),d));return b}};
+sjcl.codec.hex={fromBits:function(a){var b="",c;for(c=0;c<a.length;c++)b+=((a[c]|0)+0xf00000000000).toString(16).substr(4);return b.substr(0,sjcl.bitArray.bitLength(a)/4)},toBits:function(a){var b,c=[],d;a=a.replace(/\s|0x/g,"");d=a.length;a=a+"00000000";for(b=0;b<a.length;b+=8)c.push(parseInt(a.substr(b,8),16)^0);return sjcl.bitArray.clamp(c,4*d)}};sjcl.hash.sha256=function(a){this.b[0]||this.G();a?(this.u=a.u.slice(0),this.o=a.o.slice(0),this.h=a.h):this.reset()};sjcl.hash.sha256.hash=function(a){return(new sjcl.hash.sha256).update(a).finalize()};
+sjcl.hash.sha256.prototype={blockSize:512,reset:function(){this.u=this.K.slice(0);this.o=[];this.h=0;return this},update:function(a){"string"===typeof a&&(a=sjcl.codec.utf8String.toBits(a));var b,c=this.o=sjcl.bitArray.concat(this.o,a);b=this.h;a=this.h=b+sjcl.bitArray.bitLength(a);if(0x1fffffffffffff<a)throw new sjcl.exception.invalid("Cannot hash more than 2^53 - 1 bits");if("undefined"!==typeof Uint32Array){var d=new Uint32Array(c),e=0;for(b=512+b-(512+b&0x1ff);b<=a;b+=512)u(this,d.subarray(16*e,
+16*(e+1))),e+=1;c.splice(0,16*e)}else for(b=512+b-(512+b&0x1ff);b<=a;b+=512)u(this,c.splice(0,16));return this},finalize:function(){var a,b=this.o,c=this.u,b=sjcl.bitArray.concat(b,[sjcl.bitArray.partial(1,1)]);for(a=b.length+2;a&15;a++)b.push(0);b.push(Math.floor(this.h/0x100000000));for(b.push(this.h|0);b.length;)u(this,b.splice(0,16));this.reset();return c},K:[],b:[],G:function(){function a(a){return 0x100000000*(a-Math.floor(a))|0}for(var b=0,c=2,d,e;64>b;c++){e=!0;for(d=2;d*d<=c;d++)if(0===c%d){e=
+!1;break}e&&(8>b&&(this.K[b]=a(Math.pow(c,.5))),this.b[b]=a(Math.pow(c,1/3)),b++)}}};
+function u(a,b){var c,d,e,f=a.u,g=a.b,k=f[0],l=f[1],p=f[2],n=f[3],h=f[4],m=f[5],q=f[6],r=f[7];for(c=0;64>c;c++)16>c?d=b[c]:(d=b[c+1&15],e=b[c+14&15],d=b[c&15]=(d>>>7^d>>>18^d>>>3^d<<25^d<<14)+(e>>>17^e>>>19^e>>>10^e<<15^e<<13)+b[c&15]+b[c+9&15]|0),d=d+r+(h>>>6^h>>>11^h>>>25^h<<26^h<<21^h<<7)+(q^h&(m^q))+g[c],r=q,q=m,m=h,h=n+d|0,n=p,p=l,l=k,k=d+(l&p^n&(l^p))+(l>>>2^l>>>13^l>>>22^l<<30^l<<19^l<<10)|0;f[0]=f[0]+k|0;f[1]=f[1]+l|0;f[2]=f[2]+p|0;f[3]=f[3]+n|0;f[4]=f[4]+h|0;f[5]=f[5]+m|0;f[6]=f[6]+q|0;f[7]=
+f[7]+r|0}sjcl.prng=function(a){this.c=[new sjcl.hash.sha256];this.i=[0];this.H=0;this.v={};this.F=0;this.J={};this.L=this.f=this.j=this.T=0;this.b=[0,0,0,0,0,0,0,0];this.g=[0,0,0,0];this.C=void 0;this.D=a;this.s=!1;this.B={progress:{},seeded:{}};this.m=this.S=0;this.w=1;this.A=2;this.O=0x10000;this.I=[0,48,64,96,128,192,0x100,384,512,768,1024];this.P=3E4;this.N=80};
+sjcl.prng.prototype={randomWords:function(a,b){var c=[],d;d=this.isReady(b);var e;if(d===this.m)throw new sjcl.exception.notReady("generator isn't seeded");if(d&this.A){d=!(d&this.w);e=[];var f=0,g;this.L=e[0]=(new Date).valueOf()+this.P;for(g=0;16>g;g++)e.push(0x100000000*Math.random()|0);for(g=0;g<this.c.length&&(e=e.concat(this.c[g].finalize()),f+=this.i[g],this.i[g]=0,d||!(this.H&1<<g));g++);this.H>=1<<this.c.length&&(this.c.push(new sjcl.hash.sha256),this.i.push(0));this.f-=f;f>this.j&&(this.j=
+f);this.H++;this.b=sjcl.hash.sha256.hash(this.b.concat(e));this.C=new sjcl.cipher.aes(this.b);for(d=0;4>d&&(this.g[d]=this.g[d]+1|0,!this.g[d]);d++);}for(d=0;d<a;d+=4)0===(d+1)%this.O&&y(this),e=z(this),c.push(e[0],e[1],e[2],e[3]);y(this);return c.slice(0,a)},setDefaultParanoia:function(a,b){if(0===a&&"Setting paranoia=0 will ruin your security; use it only for testing"!==b)throw new sjcl.exception.invalid("Setting paranoia=0 will ruin your security; use it only for testing");this.D=a},addEntropy:function(a,
+b,c){c=c||"user";var d,e,f=(new Date).valueOf(),g=this.v[c],k=this.isReady(),l=0;d=this.J[c];void 0===d&&(d=this.J[c]=this.T++);void 0===g&&(g=this.v[c]=0);this.v[c]=(this.v[c]+1)%this.c.length;switch(typeof a){case "number":void 0===b&&(b=1);this.c[g].update([d,this.F++,1,b,f,1,a|0]);break;case "object":c=Object.prototype.toString.call(a);if("[object Uint32Array]"===c){e=[];for(c=0;c<a.length;c++)e.push(a[c]);a=e}else for("[object Array]"!==c&&(l=1),c=0;c<a.length&&!l;c++)"number"!==typeof a[c]&&
+(l=1);if(!l){if(void 0===b)for(c=b=0;c<a.length;c++)for(e=a[c];0<e;)b++,e=e>>>1;this.c[g].update([d,this.F++,2,b,f,a.length].concat(a))}break;case "string":void 0===b&&(b=a.length);this.c[g].update([d,this.F++,3,b,f,a.length]);this.c[g].update(a);break;default:l=1}if(l)throw new sjcl.exception.bug("random: addEntropy only supports number, array of numbers or string");this.i[g]+=b;this.f+=b;k===this.m&&(this.isReady()!==this.m&&A("seeded",Math.max(this.j,this.f)),A("progress",this.getProgress()))},
+isReady:function(a){a=this.I[void 0!==a?a:this.D];return this.j&&this.j>=a?this.i[0]>this.N&&(new Date).valueOf()>this.L?this.A|this.w:this.w:this.f>=a?this.A|this.m:this.m},getProgress:function(a){a=this.I[a?a:this.D];return this.j>=a?1:this.f>a?1:this.f/a},startCollectors:function(){if(!this.s){this.a={loadTimeCollector:B(this,this.V),mouseCollector:B(this,this.W),keyboardCollector:B(this,this.U),accelerometerCollector:B(this,this.R),touchCollector:B(this,this.X)};if(window.addEventListener)window.addEventListener("load",
+this.a.loadTimeCollector,!1),window.addEventListener("mousemove",this.a.mouseCollector,!1),window.addEventListener("keypress",this.a.keyboardCollector,!1),window.addEventListener("devicemotion",this.a.accelerometerCollector,!1),window.addEventListener("touchmove",this.a.touchCollector,!1);else if(document.attachEvent)document.attachEvent("onload",this.a.loadTimeCollector),document.attachEvent("onmousemove",this.a.mouseCollector),document.attachEvent("keypress",this.a.keyboardCollector);else throw new sjcl.exception.bug("can't attach event");
+this.s=!0}},stopCollectors:function(){this.s&&(window.removeEventListener?(window.removeEventListener("load",this.a.loadTimeCollector,!1),window.removeEventListener("mousemove",this.a.mouseCollector,!1),window.removeEventListener("keypress",this.a.keyboardCollector,!1),window.removeEventListener("devicemotion",this.a.accelerometerCollector,!1),window.removeEventListener("touchmove",this.a.touchCollector,!1)):document.detachEvent&&(document.detachEvent("onload",this.a.loadTimeCollector),document.detachEvent("onmousemove",
+this.a.mouseCollector),document.detachEvent("keypress",this.a.keyboardCollector)),this.s=!1)},addEventListener:function(a,b){this.B[a][this.S++]=b},removeEventListener:function(a,b){var c,d,e=this.B[a],f=[];for(d in e)e.hasOwnProperty(d)&&e[d]===b&&f.push(d);for(c=0;c<f.length;c++)d=f[c],delete e[d]},U:function(){C(this,1)},W:function(a){var b,c;try{b=a.x||a.clientX||a.offsetX||0,c=a.y||a.clientY||a.offsetY||0}catch(d){c=b=0}0!=b&&0!=c&&this.addEntropy([b,c],2,"mouse");C(this,0)},X:function(a){a=
+a.touches[0]||a.changedTouches[0];this.addEntropy([a.pageX||a.clientX,a.pageY||a.clientY],1,"touch");C(this,0)},V:function(){C(this,2)},R:function(a){a=a.accelerationIncludingGravity.x||a.accelerationIncludingGravity.y||a.accelerationIncludingGravity.z;if(window.orientation){var b=window.orientation;"number"===typeof b&&this.addEntropy(b,1,"accelerometer")}a&&this.addEntropy(a,2,"accelerometer");C(this,0)}};
+function A(a,b){var c,d=sjcl.random.B[a],e=[];for(c in d)d.hasOwnProperty(c)&&e.push(d[c]);for(c=0;c<e.length;c++)e[c](b)}function C(a,b){"undefined"!==typeof window&&window.performance&&"function"===typeof window.performance.now?a.addEntropy(window.performance.now(),b,"loadtime"):a.addEntropy((new Date).valueOf(),b,"loadtime")}function y(a){a.b=z(a).concat(z(a));a.C=new sjcl.cipher.aes(a.b)}function z(a){for(var b=0;4>b&&(a.g[b]=a.g[b]+1|0,!a.g[b]);b++);return a.C.encrypt(a.g)}
+function B(a,b){return function(){b.apply(a,arguments)}}sjcl.random=new sjcl.prng(6);
+a:try{var D,E,F,G;if(G="undefined"!==typeof module&&module.exports){var H;try{H=require("crypto")}catch(a){H=null}G=E=H}if(G&&E.randomBytes)D=E.randomBytes(128),D=new Uint32Array((new Uint8Array(D)).buffer),sjcl.random.addEntropy(D,1024,"crypto['randomBytes']");else if("undefined"!==typeof window&&"undefined"!==typeof Uint32Array){F=new Uint32Array(32);if(window.crypto&&window.crypto.getRandomValues)window.crypto.getRandomValues(F);else if(window.msCrypto&&window.msCrypto.getRandomValues)window.msCrypto.getRandomValues(F);
+else break a;sjcl.random.addEntropy(F,1024,"crypto['getRandomValues']")}}catch(a){"undefined"!==typeof window&&window.console&&(console.log("There was an error collecting entropy from the browser:"),console.log(a))}"undefined"!==typeof module&&module.exports&&(module.exports=sjcl);"function"===typeof define&&define([],function(){return sjcl});
+
+},{"crypto":295}],48:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../lib/braintree-error');
+var errors = require('../shared/errors');
+var whitelist = require('../shared/constants').whitelistedAttributes;
+
+function attributeValidationError(attribute, value) {
+  var err;
+
+  if (!whitelist.hasOwnProperty(attribute)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_ATTRIBUTE_NOT_SUPPORTED.type,
+      code: errors.HOSTED_FIELDS_ATTRIBUTE_NOT_SUPPORTED.code,
+      message: 'The "' + attribute + '" attribute is not supported in Hosted Fields.'
+    });
+  } else if (value != null && !_isValid(attribute, value)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_ATTRIBUTE_VALUE_NOT_ALLOWED.type,
+      code: errors.HOSTED_FIELDS_ATTRIBUTE_VALUE_NOT_ALLOWED.code,
+      message: 'Value "' + value + '" is not allowed for "' + attribute + '" attribute.'
+    });
+  }
+
+  return err;
+}
+
+function _isValid(attribute, value) {
+  if (whitelist[attribute] === 'string') {
+    return typeof value === 'string' || typeof value === 'number';
+  } else if (whitelist[attribute] === 'boolean') {
+    return String(value) === 'true' || String(value) === 'false';
+  }
+
+  return false;
+}
+
+module.exports = attributeValidationError;
+
+},{"../../lib/braintree-error":66,"../shared/constants":53,"../shared/errors":54}],49:[function(require,module,exports){
+'use strict';
+
+var constants = require('../shared/constants');
+var useMin = require('../../lib/use-min');
+
+module.exports = function composeUrl(assetsUrl, componentId, isDebug) {
+  return assetsUrl +
+    '/web/' +
+    constants.VERSION +
+    '/html/hosted-fields-frame' + useMin(isDebug) + '.html#' +
+    componentId;
+};
+
+},{"../../lib/use-min":99,"../shared/constants":53}],50:[function(require,module,exports){
+'use strict';
+
+var Destructor = require('../../lib/destructor');
+var classlist = require('../../lib/classlist');
+var iFramer = require('iframer');
+var Bus = require('../../lib/bus');
+var BraintreeError = require('../../lib/braintree-error');
+var composeUrl = require('./compose-url');
+var constants = require('../shared/constants');
+var errors = require('../shared/errors');
+var INTEGRATION_TIMEOUT_MS = require('../../lib/constants').INTEGRATION_TIMEOUT_MS;
+var uuid = require('../../lib/uuid');
+var findParentTags = require('../shared/find-parent-tags');
+var isIos = require('browser-detection/is-ios');
+var events = constants.events;
+var EventEmitter = require('../../lib/event-emitter');
+var injectFrame = require('./inject-frame');
+var analytics = require('../../lib/analytics');
+var whitelistedFields = constants.whitelistedFields;
+var VERSION = "3.15.0";
+var methods = require('../../lib/methods');
+var convertMethodsToError = require('../../lib/convert-methods-to-error');
+var sharedErrors = require('../../lib/errors');
+var getCardTypes = require('credit-card-type');
+var attributeValidationError = require('./attribute-validation-error');
+var Promise = require('../../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @typedef {object} HostedFields~tokenizePayload
+ * @property {string} nonce The payment method nonce.
+ * @property {object} details Additional account details.
+ * @property {string} details.cardType Type of card, ex: Visa, MasterCard.
+ * @property {string} details.lastTwo Last two digits of card number.
+ * @property {string} description A human-readable description.
+ * @property {string} type The payment method type, always `CreditCard`.
+ */
+
+/**
+ * @typedef {object} HostedFields~stateObject
+ * @description The event payload sent from {@link HostedFields#on|on} or {@link HostedFields#getState|getState}.
+ * @property {HostedFields~hostedFieldsCard[]} cards
+ * This will return an array of potential {@link HostedFields~hostedFieldsCard|cards}. If the card type has been determined, the array will contain only one card.
+ * Internally, Hosted Fields uses <a href="https://github.com/braintree/credit-card-type">credit-card-type</a>,
+ * an open-source card detection library.
+ * @property {string} emittedBy
+ * The name of the field associated with an event. This will not be included if returned by {@link HostedFields#getState|getState}. It will be one of the following strings:<br>
+ * - `"number"`
+ * - `"cvv"`
+ * - `"expirationDate"`
+ * - `"expirationMonth"`
+ * - `"expirationYear"`
+ * - `"postalCode"`
+ * @property {object} fields
+ * @property {?HostedFields~hostedFieldsFieldData} fields.number {@link HostedFields~hostedFieldsFieldData|hostedFieldsFieldData} for the number field, if it is present.
+ * @property {?HostedFields~hostedFieldsFieldData} fields.cvv {@link HostedFields~hostedFieldsFieldData|hostedFieldsFieldData} for the CVV field, if it is present.
+ * @property {?HostedFields~hostedFieldsFieldData} fields.expirationDate {@link HostedFields~hostedFieldsFieldData|hostedFieldsFieldData} for the expiration date field, if it is present.
+ * @property {?HostedFields~hostedFieldsFieldData} fields.expirationMonth {@link HostedFields~hostedFieldsFieldData|hostedFieldsFieldData} for the expiration month field, if it is present.
+ * @property {?HostedFields~hostedFieldsFieldData} fields.expirationYear {@link HostedFields~hostedFieldsFieldData|hostedFieldsFieldData} for the expiration year field, if it is present.
+ * @property {?HostedFields~hostedFieldsFieldData} fields.postalCode {@link HostedFields~hostedFieldsFieldData|hostedFieldsFieldData} for the postal code field, if it is present.
+ */
+
+/**
+ * @typedef {object} HostedFields~hostedFieldsFieldData
+ * @description Data about Hosted Fields fields, sent in {@link HostedFields~stateObject|stateObjects}.
+ * @property {HTMLElement} container Reference to the container DOM element on your page associated with the current event.
+ * @property {boolean} isFocused Whether or not the input is currently focused.
+ * @property {boolean} isEmpty Whether or not the user has entered a value in the input.
+ * @property {boolean} isPotentiallyValid
+ * A determination based on the future validity of the input value.
+ * This is helpful when a user is entering a card number and types <code>"41"</code>.
+ * While that value is not valid for submission, it is still possible for
+ * it to become a fully qualified entry. However, if the user enters <code>"4x"</code>
+ * it is clear that the card number can never become valid and isPotentiallyValid will
+ * return false.
+ * @property {boolean} isValid Whether or not the value of the associated input is <i>fully</i> qualified for submission.
+ */
+
+/**
+ * @typedef {object} HostedFields~hostedFieldsCard
+ * @description Information about the card type, sent in {@link HostedFields~stateObject|stateObjects}.
+ * @property {string} type The code-friendly representation of the card type. It will be one of the following strings:
+ * - `american-express`
+ * - `diners-club`
+ * - `discover`
+ * - `jcb`
+ * - `maestro`
+ * - `master-card`
+ * - `unionpay`
+ * - `visa`
+ * @property {string} niceType The pretty-printed card type. It will be one of the following strings:
+ * - `American Express`
+ * - `Diners Club`
+ * - `Discover`
+ * - `JCB`
+ * - `Maestro`
+ * - `MasterCard`
+ * - `UnionPay`
+ * - `Visa`
+ * @property {object} code
+ * This object contains data relevant to the security code requirements of the card brand.
+ * For example, on a Visa card there will be a <code>CVV</code> of 3 digits, whereas an
+ * American Express card requires a 4-digit <code>CID</code>.
+ * @property {string} code.name <code>"CVV"</code> <code>"CID"</code> <code>"CVC"</code>
+ * @property {number} code.size The expected length of the security code. Typically, this is 3 or 4.
+ */
+
+/**
+ * @name HostedFields#on
+ * @function
+ * @param {string} event The name of the event to which you are subscribing.
+ * @param {function} handler A callback to handle the event.
+ * @description Subscribes a handler function to a named event. `event` should be {@link HostedFields#event:blur|blur}, {@link HostedFields#event:focus|focus}, {@link HostedFields#event:empty|empty}, {@link HostedFields#event:notEmpty|notEmpty}, {@link HostedFields#event:cardTypeChange|cardTypeChange}, or {@link HostedFields#event:validityChange|validityChange}. Events will emit a {@link HostedFields~stateObject|stateObject}.
+ * @example
+ * <caption>Listening to a Hosted Field event, in this case 'focus'</caption>
+ * hostedFields.create({ ... }, function (createErr, hostedFieldsInstance) {
+ *   hostedFieldsInstance.on('focus', function (event) {
+ *     console.log(event.emittedBy, 'has been focused');
+ *   });
+ * });
+ * @returns {void}
+ */
+
+/**
+ * This event is emitted when the user requests submission of an input field, such as by pressing the Enter or Return key on their keyboard, or mobile equivalent.
+ * @event HostedFields#inputSubmitRequest
+ * @type {HostedFields~stateObject}
+ * @example
+ * <caption>Clicking a submit button upon hitting Enter (or equivalent) within a Hosted Field</caption>
+ * var hostedFields = require('braintree-web/hosted-fields');
+ * var submitButton = document.querySelector('input[type="submit"]');
+ *
+ * hostedFields.create({ ... }, function (createErr, hostedFieldsInstance) {
+ *   hostedFieldsInstance.on('inputSubmitRequest', function () {
+ *     // User requested submission, e.g. by pressing Enter or equivalent
+ *     submitButton.click();
+ *   });
+ * });
+ */
+
+/**
+ * This event is emitted when a field transitions from having data to being empty.
+ * @event HostedFields#empty
+ * @type {HostedFields~stateObject}
+ * @example
+ * <caption>Listening to an empty event</caption>
+ * hostedFields.create({ ... }, function (createErr, hostedFieldsInstance) {
+ *   hostedFieldsInstance.on('empty', function (event) {
+ *     console.log(event.emittedBy, 'is now empty');
+ *   });
+ * });
+ */
+
+/**
+ * This event is emitted when a field transitions from being empty to having data.
+ * @event HostedFields#notEmpty
+ * @type {HostedFields~stateObject}
+ * @example
+ * <caption>Listening to an notEmpty event</caption>
+ * hostedFields.create({ ... }, function (createErr, hostedFieldsInstance) {
+ *   hostedFieldsInstance.on('notEmpty', function (event) {
+ *     console.log(event.emittedBy, 'is now not empty');
+ *   });
+ * });
+ */
+
+/**
+ * This event is emitted when a field loses focus.
+ * @event HostedFields#blur
+ * @type {HostedFields~stateObject}
+ * @example
+ * <caption>Listening to a blur event</caption>
+ * hostedFields.create({ ... }, function (createErr, hostedFieldsInstance) {
+ *   hostedFieldsInstance.on('blur', function (event) {
+ *     console.log(event.emittedBy, 'lost focus');
+ *   });
+ * });
+ */
+
+/**
+ * This event is emitted when a field gains focus.
+ * @event HostedFields#focus
+ * @type {HostedFields~stateObject}
+ * @example
+ * <caption>Listening to a focus event</caption>
+ * hostedFields.create({ ... }, function (createErr, hostedFieldsInstance) {
+ *   hostedFieldsInstance.on('focus', function (event) {
+ *     console.log(event.emittedBy, 'gained focus');
+ *   });
+ * });
+ */
+
+/**
+ * This event is emitted when activity within the number field has changed such that the possible card type has changed.
+ * @event HostedFields#cardTypeChange
+ * @type {HostedFields~stateObject}
+ * @example
+ * <caption>Listening to a cardTypeChange event</caption>
+ * hostedFields.create({ ... }, function (createErr, hostedFieldsInstance) {
+ *   hostedFieldsInstance.on('cardTypeChange', function (event) {
+ *     if (event.cards.length === 1) {
+ *       console.log(event.cards[0].type);
+ *     } else {
+ *       console.log('Type of card not yet known');
+ *     }
+ *   });
+ * });
+ */
+
+/**
+ * This event is emitted when the validity of a field has changed. Validity is represented in the {@link HostedFields~stateObject|stateObject} as two booleans: `isValid` and `isPotentiallyValid`.
+ * @event HostedFields#validityChange
+ * @type {HostedFields~stateObject}
+ * @example
+ * <caption>Listening to a validityChange event</caption>
+ * hostedFields.create({ ... }, function (createErr, hostedFieldsInstance) {
+ *   hostedFieldsInstance.on('validityChange', function (event) {
+ *     var field = event.fields[event.emittedBy];
+ *
+ *     if (field.isValid) {
+ *       console.log(event.emittedBy, 'is fully valid');
+ *     } else if (field.isPotentiallyValid) {
+ *       console.log(event.emittedBy, 'is potentially valid');
+ *     } else {
+ *       console.log(event.emittedBy, 'is not valid');
+ *     }
+ *   });
+ * });
+ */
+
+function createInputEventHandler(fields) {
+  return function (eventData) {
+    var field;
+    var merchantPayload = eventData.merchantPayload;
+    var emittedBy = merchantPayload.emittedBy;
+    var container = fields[emittedBy].containerElement;
+
+    Object.keys(merchantPayload.fields).forEach(function (key) {
+      merchantPayload.fields[key].container = fields[key].containerElement;
+    });
+
+    field = merchantPayload.fields[emittedBy];
+
+    classlist.toggle(container, constants.externalClasses.FOCUSED, field.isFocused);
+    classlist.toggle(container, constants.externalClasses.VALID, field.isValid);
+    classlist.toggle(container, constants.externalClasses.INVALID, !field.isPotentiallyValid);
+
+    this._state = { // eslint-disable-line no-invalid-this
+      cards: merchantPayload.cards,
+      fields: merchantPayload.fields
+    };
+
+    this._emit(eventData.type, merchantPayload); // eslint-disable-line no-invalid-this
+  };
+}
+
+/**
+ * @class HostedFields
+ * @param {object} options The Hosted Fields {@link module:braintree-web/hosted-fields.create create} options.
+ * @description <strong>Do not use this constructor directly. Use {@link module:braintree-web/hosted-fields.create|braintree-web.hosted-fields.create} instead.</strong>
+ * @classdesc This class represents a Hosted Fields component produced by {@link module:braintree-web/hosted-fields.create|braintree-web/hosted-fields.create}. Instances of this class have methods for interacting with the input fields within Hosted Fields' iframes.
+ */
+function HostedFields(options) {
+  var failureTimeout, clientVersion, clientConfig;
+  var self = this;
+  var fields = {};
+  var fieldCount = 0;
+  var componentId = uuid();
+
+  if (!options.client) {
+    throw new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating Hosted Fields.'
+    });
+  }
+
+  clientConfig = options.client.getConfiguration();
+  clientVersion = clientConfig.analyticsMetadata.sdkVersion;
+  if (clientVersion !== VERSION) {
+    throw new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and Hosted Fields (version ' + VERSION + ') components must be from the same SDK version.'
+    });
+  }
+
+  if (!options.fields) {
+    throw new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.fields is required when instantiating Hosted Fields.'
+    });
+  }
+
+  EventEmitter.call(this);
+
+  this._injectedNodes = [];
+  this._destructor = new Destructor();
+  this._fields = fields;
+  this._state = {
+    fields: {},
+    cards: getCardTypes('')
+  };
+
+  this._bus = new Bus({
+    channel: componentId,
+    merchantUrl: location.href
+  });
+
+  this._destructor.registerFunctionForTeardown(function () {
+    self._bus.teardown();
+  });
+
+  this._client = options.client;
+
+  analytics.sendEvent(this._client, 'custom.hosted-fields.initialized');
+
+  Object.keys(options.fields).forEach(function (key) {
+    var field, container, frame;
+
+    if (!constants.whitelistedFields.hasOwnProperty(key)) {
+      throw new BraintreeError({
+        type: errors.HOSTED_FIELDS_INVALID_FIELD_KEY.type,
+        code: errors.HOSTED_FIELDS_INVALID_FIELD_KEY.code,
+        message: '"' + key + '" is not a valid field.'
+      });
+    }
+
+    field = options.fields[key];
+
+    container = document.querySelector(field.selector);
+
+    if (!container) {
+      throw new BraintreeError({
+        type: errors.HOSTED_FIELDS_INVALID_FIELD_SELECTOR.type,
+        code: errors.HOSTED_FIELDS_INVALID_FIELD_SELECTOR.code,
+        message: errors.HOSTED_FIELDS_INVALID_FIELD_SELECTOR.message,
+        details: {
+          fieldSelector: field.selector,
+          fieldKey: key
+        }
+      });
+    } else if (container.querySelector('iframe[name^="braintree-"]')) {
+      throw new BraintreeError({
+        type: errors.HOSTED_FIELDS_FIELD_DUPLICATE_IFRAME.type,
+        code: errors.HOSTED_FIELDS_FIELD_DUPLICATE_IFRAME.code,
+        message: errors.HOSTED_FIELDS_FIELD_DUPLICATE_IFRAME.message,
+        details: {
+          fieldSelector: field.selector,
+          fieldKey: key
+        }
+      });
+    }
+
+    if (field.maxlength && typeof field.maxlength !== 'number') {
+      throw new BraintreeError({
+        type: errors.HOSTED_FIELDS_FIELD_PROPERTY_INVALID.type,
+        code: errors.HOSTED_FIELDS_FIELD_PROPERTY_INVALID.code,
+        message: 'The value for maxlength must be a number.',
+        details: {
+          fieldKey: key
+        }
+      });
+    }
+
+    frame = iFramer({
+      type: key,
+      name: 'braintree-hosted-field-' + key,
+      style: constants.defaultIFrameStyle
+    });
+
+    this._injectedNodes = this._injectedNodes.concat(injectFrame(frame, container));
+    this._setupLabelFocus(key, container);
+    fields[key] = {
+      frameElement: frame,
+      containerElement: container
+    };
+    fieldCount++;
+
+    this._state.fields[key] = {
+      isEmpty: true,
+      isValid: false,
+      isPotentiallyValid: true,
+      isFocused: false,
+      container: container
+    };
+
+    setTimeout(function () {
+      frame.src = composeUrl(clientConfig.gatewayConfiguration.assetsUrl, componentId, clientConfig.isDebug);
+    }, 0);
+  }.bind(this));
+
+  failureTimeout = setTimeout(function () {
+    analytics.sendEvent(self._client, 'custom.hosted-fields.load.timed-out');
+  }, INTEGRATION_TIMEOUT_MS);
+
+  this._bus.on(events.FRAME_READY, function (reply) {
+    fieldCount--;
+    if (fieldCount === 0) {
+      clearTimeout(failureTimeout);
+      reply(options);
+      self._emit('ready');
+    }
+  });
+
+  this._bus.on(
+    events.INPUT_EVENT,
+    createInputEventHandler(fields).bind(this)
+  );
+
+  this._destructor.registerFunctionForTeardown(function () {
+    var j, node, parent;
+
+    for (j = 0; j < self._injectedNodes.length; j++) {
+      node = self._injectedNodes[j];
+      parent = node.parentNode;
+
+      parent.removeChild(node);
+
+      classlist.remove(
+        parent,
+        constants.externalClasses.FOCUSED,
+        constants.externalClasses.INVALID,
+        constants.externalClasses.VALID
+      );
+    }
+  });
+
+  this._destructor.registerFunctionForTeardown(function () {
+    var methodNames = methods(HostedFields.prototype).concat(methods(EventEmitter.prototype));
+
+    convertMethodsToError(self, methodNames);
+  });
+}
+
+HostedFields.prototype = Object.create(EventEmitter.prototype, {
+  constructor: HostedFields
+});
+
+HostedFields.prototype._setupLabelFocus = function (type, container) {
+  var labels, i;
+  var shouldSkipLabelFocus = isIos();
+  var bus = this._bus;
+
+  if (shouldSkipLabelFocus) { return; }
+  if (container.id == null) { return; }
+
+  function triggerFocus() {
+    bus.emit(events.TRIGGER_INPUT_FOCUS, type);
+  }
+
+  labels = Array.prototype.slice.call(document.querySelectorAll('label[for="' + container.id + '"]'));
+  labels = labels.concat(findParentTags(container, 'label'));
+
+  for (i = 0; i < labels.length; i++) {
+    labels[i].addEventListener('click', triggerFocus, false);
+  }
+
+  this._destructor.registerFunctionForTeardown(function () {
+    for (i = 0; i < labels.length; i++) {
+      labels[i].removeEventListener('click', triggerFocus, false);
+    }
+  });
+};
+
+/**
+ * Cleanly remove anything set up by {@link module:braintree-web/hosted-fields.create|create}.
+ * @public
+ * @param {callback} [callback] Called on completion, containing an error if one occurred. No data is returned if teardown completes successfully. If no callback is provided, `teardown` returns a promise.
+ * @example
+ * hostedFieldsInstance.teardown(function (teardownErr) {
+ *   if (teardownErr) {
+ *     console.error('Could not tear down Hosted Fields!');
+ *   } else {
+ *     console.info('Hosted Fields has been torn down!');
+ *   }
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+HostedFields.prototype.teardown = function () {
+  var self = this;
+
+  return new Promise(function (resolve, reject) {
+    self._destructor.teardown(function (err) {
+      analytics.sendEvent(self._client, 'custom.hosted-fields.teardown-completed');
+
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
+/**
+ * Tokenizes fields and returns a nonce payload.
+ * @public
+ * @param {object} [options] All tokenization options for the Hosted Fields component.
+ * @param {boolean} [options.vault=false] When true, will vault the tokenized card. Cards will only be vaulted when using a client created with a client token that includes a customer ID.
+ * @param {string} [options.billingAddress.postalCode] When supplied, this postal code will be tokenized along with the contents of the fields. If a postal code is provided as part of the Hosted Fields configuration, the value of the field will be tokenized and this value will be ignored.
+ * @param {callback} [callback] The second argument, <code>data</code>, is a {@link HostedFields~tokenizePayload|tokenizePayload}. If no callback is provided, `tokenize` returns a function that resolves with a {@link HostedFields~tokenizePayload|tokenizePayload}.
+ * @example <caption>Tokenize a card</caption>
+ * hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+ *   if (tokenizeErr) {
+ *     switch (tokenizeErr.code) {
+ *       case 'HOSTED_FIELDS_FIELDS_EMPTY':
+ *         console.error('All fields are empty! Please fill out the form.');
+ *         break;
+ *       case 'HOSTED_FIELDS_FIELDS_INVALID':
+ *         console.error('Some fields are invalid:', tokenizeErr.details.invalidFieldKeys);
+ *         break;
+ *       case 'HOSTED_FIELDS_FAILED_TOKENIZATION':
+ *         console.error('Tokenization failed server side. Is the card valid?');
+ *         break;
+ *       case 'HOSTED_FIELDS_TOKENIZATION_FAIL_ON_DUPLICATE':
+ *         // will only get here if you generate a client token with a customer ID
+ *         // with the fail on duplicate payment method option. See:
+ *         // https://developers.braintreepayments.com/reference/request/client-token/generate/#options.fail_on_duplicate_payment_method
+ *         console.error('This payment method already exists in your vault.');
+ *         break;
+ *       case 'HOSTED_FIELDS_TOKENIZATION_CVV_VERIFICATION_FAILED':
+ *         // will only get here if you generate a client token with a customer ID
+ *         // with the verify card option or if you have credit card verification
+ *         // turned on in your Braintree Gateway. See
+ *         // https://developers.braintreepayments.com/reference/request/client-token/generate/#options.verify_card
+ *         console.error('CVV did not pass verification');
+ *         break;
+ *       case 'HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR':
+ *         console.error('Network error occurred when tokenizing.');
+ *         break;
+ *       default:
+ *         console.error('Something bad happened!', tokenizeErr);
+ *     }
+ *   } else {
+ *     console.log('Got nonce:', payload.nonce);
+ *   }
+ * });
+ * @example <caption>Tokenize and vault a card</caption>
+ * hostedFieldsInstance.tokenize({
+ *   vault: true
+ * }, function (tokenizeErr, payload) {
+ *   if (tokenizeErr) {
+ *     console.error(tokenizeErr);
+ *   } else {
+ *     console.log('Got nonce:', payload.nonce);
+ *   }
+ * });
+ * @example <caption>Tokenize a card with the postal code option</caption>
+ * hostedFieldsInstance.tokenize({
+ *   billingAddress: {
+ *     postalCode: '11111'
+ *   }
+ * }, function (tokenizeErr, payload) {
+ *   if (tokenizeErr) {
+ *     console.error(tokenizeErr);
+ *   } else {
+ *     console.log('Got nonce:', payload.nonce);
+ *   }
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+HostedFields.prototype.tokenize = function (options) {
+  var self = this;
+
+  if (!options) {
+    options = {};
+  }
+
+  return new Promise(function (resolve, reject) {
+    self._bus.emit(events.TOKENIZATION_REQUEST, options, function (response) {
+      var err = response[0];
+      var payload = response[1];
+
+      if (err) {
+        reject(err);
+      } else {
+        resolve(payload);
+      }
+    });
+  });
+};
+
+/**
+ * Add a class to a {@link module:braintree-web/hosted-fields~field field}. Useful for updating field styles when events occur elsewhere in your checkout.
+ * @public
+ * @param {string} field The field you wish to add a class to. Must be a valid {@link module:braintree-web/hosted-fields~fieldOptions fieldOption}.
+ * @param {string} classname The class to be added.
+ * @param {callback} [callback] Callback executed on completion, containing an error if one occurred. No data is returned if the class is added successfully.
+ *
+ * @example
+ * hostedFieldsInstance.addClass('number', 'custom-class', function (addClassErr) {
+ *   if (addClassErr) {
+ *     console.error(addClassErr);
+ *   }
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+HostedFields.prototype.addClass = function (field, classname) {
+  var err;
+
+  if (!whitelistedFields.hasOwnProperty(field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_INVALID.type,
+      code: errors.HOSTED_FIELDS_FIELD_INVALID.code,
+      message: '"' + field + '" is not a valid field. You must use a valid field option when adding a class.'
+    });
+  } else if (!this._fields.hasOwnProperty(field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.type,
+      code: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.code,
+      message: 'Cannot add class to "' + field + '" field because it is not part of the current Hosted Fields options.'
+    });
+  } else {
+    this._bus.emit(events.ADD_CLASS, field, classname);
+  }
+
+  if (err) {
+    return Promise.reject(err);
+  }
+
+  return Promise.resolve();
+};
+
+/**
+ * Removes a class to a {@link module:braintree-web/hosted-fields~field field}. Useful for updating field styles when events occur elsewhere in your checkout.
+ * @public
+ * @param {string} field The field you wish to remove a class from. Must be a valid {@link module:braintree-web/hosted-fields~fieldOptions fieldOption}.
+ * @param {string} classname The class to be removed.
+ * @param {callback} [callback] Callback executed on completion, containing an error if one occurred. No data is returned if the class is removed successfully.
+ *
+ * @example
+ * hostedFieldsInstance.addClass('number', 'custom-class', function (addClassErr) {
+ *   if (addClassErr) {
+ *     console.error(addClassErr);
+ *     return;
+ *   }
+ *
+ *   // some time later...
+ *   hostedFieldsInstance.removeClass('number', 'custom-class');
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+HostedFields.prototype.removeClass = function (field, classname) {
+  var err;
+
+  if (!whitelistedFields.hasOwnProperty(field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_INVALID.type,
+      code: errors.HOSTED_FIELDS_FIELD_INVALID.code,
+      message: '"' + field + '" is not a valid field. You must use a valid field option when removing a class.'
+    });
+  } else if (!this._fields.hasOwnProperty(field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.type,
+      code: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.code,
+      message: 'Cannot remove class from "' + field + '" field because it is not part of the current Hosted Fields options.'
+    });
+  } else {
+    this._bus.emit(events.REMOVE_CLASS, field, classname);
+  }
+
+  if (err) {
+    return Promise.reject(err);
+  }
+
+  return Promise.resolve();
+};
+
+/**
+ * Sets an attribute of a {@link module:braintree-web/hosted-fields~field field}.
+ * Supported attributes are `aria-invalid`, `aria-required`, `disabled`, and `placeholder`.
+ *
+ * @public
+ * @param {object} options The options for the attribute you wish to set.
+ * @param {string} options.field The field to which you wish to add an attribute. Must be a valid {@link module:braintree-web/hosted-fields~fieldOptions fieldOption}.
+ * @param {string} options.attribute The name of the attribute you wish to add to the field.
+ * @param {string} options.value The value for the attribute.
+ * @param {callback} [callback] Callback executed on completion, containing an error if one occurred. No data is returned if the attribute is set successfully.
+ *
+ * @example <caption>Set the placeholder attribute of a field</caption>
+ * hostedFieldsInstance.setAttribute({
+ *   field: 'number',
+ *   attribute: 'placeholder',
+ *   value: '1111 1111 1111 1111'
+ * }, function (attributeErr) {
+ *   if (attributeErr) {
+ *     console.error(attributeErr);
+ *   }
+ * });
+ *
+ * @example <caption>Set the aria-required attribute of a field</caption>
+ * hostedFieldsInstance.setAttribute({
+ *   field: 'number',
+ *   attribute: 'aria-required',
+ *   value: true
+ * }, function (attributeErr) {
+ *   if (attributeErr) {
+ *     console.error(attributeErr);
+ *   }
+ * });
+ *
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+HostedFields.prototype.setAttribute = function (options) {
+  var attributeErr, err;
+
+  if (!whitelistedFields.hasOwnProperty(options.field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_INVALID.type,
+      code: errors.HOSTED_FIELDS_FIELD_INVALID.code,
+      message: '"' + options.field + '" is not a valid field. You must use a valid field option when setting an attribute.'
+    });
+  } else if (!this._fields.hasOwnProperty(options.field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.type,
+      code: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.code,
+      message: 'Cannot set attribute for "' + options.field + '" field because it is not part of the current Hosted Fields options.'
+    });
+  } else {
+    attributeErr = attributeValidationError(options.attribute, options.value);
+
+    if (attributeErr) {
+      err = attributeErr;
+    } else {
+      this._bus.emit(events.SET_ATTRIBUTE, options.field, options.attribute, options.value);
+    }
+  }
+
+  if (err) {
+    return Promise.reject(err);
+  }
+
+  return Promise.resolve();
+};
+
+/**
+ * Removes a supported attribute from a {@link module:braintree-web/hosted-fields~field field}.
+ *
+ * @public
+ * @param {object} options The options for the attribute you wish to remove.
+ * @param {string} options.field The field from which you wish to remove an attribute. Must be a valid {@link module:braintree-web/hosted-fields~fieldOptions fieldOption}.
+ * @param {string} options.attribute The name of the attribute you wish to remove from the field.
+ * @param {callback} [callback] Callback executed on completion, containing an error if one occurred. No data is returned if the attribute is removed successfully.
+ *
+ * @example <caption>Remove the placeholder attribute of a field</caption>
+ * hostedFieldsInstance.removeAttribute({
+ *   field: 'number',
+ *   attribute: 'placeholder'
+ * }, function (attributeErr) {
+ *   if (attributeErr) {
+ *     console.error(attributeErr);
+ *   }
+ * });
+ *
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+HostedFields.prototype.removeAttribute = function (options) {
+  var attributeErr, err;
+
+  if (!whitelistedFields.hasOwnProperty(options.field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_INVALID.type,
+      code: errors.HOSTED_FIELDS_FIELD_INVALID.code,
+      message: '"' + options.field + '" is not a valid field. You must use a valid field option when removing an attribute.'
+    });
+  } else if (!this._fields.hasOwnProperty(options.field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.type,
+      code: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.code,
+      message: 'Cannot remove attribute for "' + options.field + '" field because it is not part of the current Hosted Fields options.'
+    });
+  } else {
+    attributeErr = attributeValidationError(options.attribute);
+
+    if (attributeErr) {
+      err = attributeErr;
+    } else {
+      this._bus.emit(events.REMOVE_ATTRIBUTE, options.field, options.attribute);
+    }
+  }
+
+  if (err) {
+    return Promise.reject(err);
+  }
+
+  return Promise.resolve();
+};
+
+/**
+ * @deprecated since version 3.8.0. Use {@link HostedFields#setAttribute|setAttribute} instead.
+ *
+ * @public
+ * @param {string} field The field whose placeholder you wish to change. Must be a valid {@link module:braintree-web/hosted-fields~fieldOptions fieldOption}.
+ * @param {string} placeholder Will be used as the `placeholder` attribute of the input.
+ * @param {callback} [callback] Callback executed on completion, containing an error if one occurred. No data is returned if the placeholder updated successfully.
+ *
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+HostedFields.prototype.setPlaceholder = function (field, placeholder) {
+  return this.setAttribute({
+    field: field,
+    attribute: 'placeholder',
+    value: placeholder
+  });
+};
+
+/**
+ * Clear the value of a {@link module:braintree-web/hosted-fields~field field}.
+ * @public
+ * @param {string} field The field you wish to clear. Must be a valid {@link module:braintree-web/hosted-fields~fieldOptions fieldOption}.
+ * @param {callback} [callback] Callback executed on completion, containing an error if one occurred. No data is returned if the field cleared successfully.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * hostedFieldsInstance.clear('number', function (clearErr) {
+ *   if (clearErr) {
+ *     console.error(clearErr);
+ *   }
+ * });
+ *
+ * @example <caption>Clear several fields</caption>
+ * hostedFieldsInstance.clear('number');
+ * hostedFieldsInstance.clear('cvv');
+ * hostedFieldsInstance.clear('expirationDate');
+ */
+HostedFields.prototype.clear = function (field) {
+  var err;
+
+  if (!whitelistedFields.hasOwnProperty(field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_INVALID.type,
+      code: errors.HOSTED_FIELDS_FIELD_INVALID.code,
+      message: '"' + field + '" is not a valid field. You must use a valid field option when clearing a field.'
+    });
+  } else if (!this._fields.hasOwnProperty(field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.type,
+      code: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.code,
+      message: 'Cannot clear "' + field + '" field because it is not part of the current Hosted Fields options.'
+    });
+  } else {
+    this._bus.emit(events.CLEAR_FIELD, field);
+  }
+
+  if (err) {
+    return Promise.reject(err);
+  }
+
+  return Promise.resolve();
+};
+
+/**
+ * Programmatically focus a {@link module:braintree-web/hosted-fields~field field}.
+ * @public
+ * @param {string} field The field you want to focus. Must be a valid {@link module:braintree-web/hosted-fields~fieldOptions fieldOption}.
+ * @param {callback} [callback] Callback executed on completion, containing an error if one occurred. No data is returned if the field focused successfully.
+ * @returns {void}
+ * @example
+ * hostedFieldsInstance.focus('number', function (focusErr) {
+ *   if (focusErr) {
+ *     console.error(focusErr);
+ *   }
+ * });
+ * @example <caption>Using an event listener</caption>
+ * myElement.addEventListener('click', function (e) {
+ *   // Note: In Firefox, the focus method can be suppressed
+ *   // if the element has a tabindex property or the element
+ *   // is an anchor link with an href property.
+ *   e.preventDefault();
+ *   hostedFieldsInstance.focus('number');
+ * });
+ */
+HostedFields.prototype.focus = function (field) {
+  var err;
+
+  if (!whitelistedFields.hasOwnProperty(field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_INVALID.type,
+      code: errors.HOSTED_FIELDS_FIELD_INVALID.code,
+      message: '"' + field + '" is not a valid field. You must use a valid field option when focusing a field.'
+    });
+  } else if (!this._fields.hasOwnProperty(field)) {
+    err = new BraintreeError({
+      type: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.type,
+      code: errors.HOSTED_FIELDS_FIELD_NOT_PRESENT.code,
+      message: 'Cannot focus "' + field + '" field because it is not part of the current Hosted Fields options.'
+    });
+  } else {
+    this._bus.emit(events.TRIGGER_INPUT_FOCUS, field);
+  }
+
+  if (err) {
+    return Promise.reject(err);
+  }
+
+  return Promise.resolve();
+};
+
+/**
+ * Returns an {@link HostedFields~stateObject|object} that includes the state of all fields and possible card types.
+ * @public
+ * @returns {object} {@link HostedFields~stateObject|stateObject}
+ * @example <caption>Check if all fields are valid</caption>
+ * var state = hostedFields.getState();
+ *
+ * var formValid = Object.keys(state.fields).every(function (key) {
+ *   return state.fields[key].isValid;
+ * });
+ */
+HostedFields.prototype.getState = function () {
+  return this._state;
+};
+
+module.exports = wrapPromise.wrapPrototype(HostedFields);
+
+},{"../../lib/analytics":63,"../../lib/braintree-error":66,"../../lib/bus":69,"../../lib/classlist":71,"../../lib/constants":72,"../../lib/convert-methods-to-error":73,"../../lib/destructor":77,"../../lib/errors":79,"../../lib/event-emitter":80,"../../lib/methods":94,"../../lib/promise":97,"../../lib/uuid":100,"../shared/constants":53,"../shared/errors":54,"../shared/find-parent-tags":55,"./attribute-validation-error":48,"./compose-url":49,"./inject-frame":51,"browser-detection/is-ios":244,"credit-card-type":294,"iframer":371,"wrap-promise":672}],51:[function(require,module,exports){
+'use strict';
+
+module.exports = function injectFrame(frame, container) {
+  var clearboth = document.createElement('div');
+  var fragment = document.createDocumentFragment();
+
+  clearboth.style.clear = 'both';
+
+  fragment.appendChild(frame);
+  fragment.appendChild(clearboth);
+
+  container.appendChild(fragment);
+
+  return [frame, clearboth];
+};
+
+},{}],52:[function(require,module,exports){
+'use strict';
+/** @module braintree-web/hosted-fields */
+
+var HostedFields = require('./external/hosted-fields');
+var supportsInputFormatting = require('restricted-input/supports-input-formatting');
+var wrapPromise = require('wrap-promise');
+var Promise = require('../lib/promise');
+var VERSION = "3.15.0";
+
+/**
+ * Fields used in {@link module:braintree-web/hosted-fields~fieldOptions fields options}
+ * @typedef {object} field
+ * @property {string} selector A CSS selector to find the container where the hosted field will be inserted.
+ * @property {string} [placeholder] Will be used as the `placeholder` attribute of the input. If `placeholder` is not natively supported by the browser, it will be polyfilled.
+ * @property {string} [type] Will be used as the `type` attribute of the input. To mask `cvv` input, for instance, `type: "password"` can be used.
+ * @property {boolean} [formatInput=true] Enable or disable automatic formatting on this field.
+ * @property {object|boolean} [select] If truthy, this field becomes a `<select>` dropdown list. This can only be used for `expirationMonth` and `expirationYear` fields. If you do not use a `placeholder` property for the field, the current month/year will be the default selected value.
+ * @property {string[]} [select.options] An array of 12 strings, one per month. This can only be used for the `expirationMonth` field. For example, the array can look like `['01 - January', '02 - February', ...]`.
+ * @property {number} [maxlength] Will be used as the `maxlength` attribute of the input if it is less than the default. The primary use cases for the `maxlength` option are: limiting the length of the CVV input for CVV-only verifications when the card type is known and limiting the length of the postal code input when cards are coming from a known region. This option applies only to CVV and postal code fields.
+ */
+
+/**
+ * An object that has {@link module:braintree-web/hosted-fields~field field objects} for each field. Used in {@link module:braintree-web/hosted-fields~create create}.
+ * @typedef {object} fieldOptions
+ * @property {field} [number] A field for card number.
+ * @property {field} [expirationDate] A field for expiration date in `MM/YYYY` format. This should not be used with the `expirationMonth` and `expirationYear` properties.
+ * @property {field} [expirationMonth] A field for expiration month in `MM` format. This should be used with the `expirationYear` property.
+ * @property {field} [expirationYear] A field for expiration year in `YYYY` format. This should be used with the `expirationMonth` property.
+ * @property {field} [cvv] A field for 3 or 4 digit CVV or CID.
+ * @property {field} [postalCode] A field for postal or region code.
+ */
+
+/**
+ * An object that represents CSS that will be applied in each hosted field. This object looks similar to CSS. Typically, these styles involve fonts (such as `font-family` or `color`).
+ *
+ * These are the CSS properties that Hosted Fields supports. Any other CSS should be specified on your page and outside of any Braintree configuration. Trying to set unsupported properties will fail and put a warning in the console.
+ *
+ * Supported CSS properties are:
+ * `appearance`
+ * `color`
+ * `direction`
+ * `font-family`
+ * `font-size-adjust`
+ * `font-size`
+ * `font-stretch`
+ * `font-style`
+ * `font-variant-alternates`
+ * `font-variant-caps`
+ * `font-variant-east-asian`
+ * `font-variant-ligatures`
+ * `font-variant-numeric`
+ * `font-variant`
+ * `font-weight`
+ * `font`
+ * `letter-spacing`
+ * `line-height`
+ * `opacity`
+ * `outline`
+ * `text-shadow`
+ * `transition`
+ * `-moz-appearance`
+ * `-moz-osx-font-smoothing`
+ * `-moz-tap-highlight-color`
+ * `-moz-transition`
+ * `-webkit-appearance`
+ * `-webkit-font-smoothing`
+ * `-webkit-tap-highlight-color`
+ * `-webkit-transition`
+ * @typedef {object} styleOptions
+ */
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {fieldOptions} options.fields A {@link module:braintree-web/hosted-fields~fieldOptions set of options for each field}.
+ * @param {styleOptions} options.styles {@link module:braintree-web/hosted-fields~styleOptions Styles} applied to each field.
+ * @param {callback} [callback] The second argument, `data`, is the {@link HostedFields} instance. If no callback is provided, `create` returns a promise that resolves with the {@link HostedFields} instance.
+ * @returns {void}
+ * @example
+ * braintree.hostedFields.create({
+ *   client: clientInstance,
+ *   styles: {
+ *     'input': {
+ *       'font-size': '16pt',
+ *       'color': '#3A3A3A'
+ *     },
+ *     '.number': {
+ *       'font-family': 'monospace'
+ *     },
+ *     '.valid': {
+ *       'color': 'green'
+ *     }
+ *   },
+ *   fields: {
+ *     number: {
+ *       selector: '#card-number'
+ *     },
+ *     cvv: {
+ *       selector: '#cvv',
+ *       placeholder: '•••'
+ *     },
+ *     expirationDate: {
+ *       selector: '#expiration-date',
+ *       type: 'month'
+ *     }
+ *   }
+ * }, callback);
+ * @example <caption>Right to Left Language Support</caption>
+ * braintree.hostedFields.create({
+ *   client: clientInstance,
+ *   styles: {
+ *     'input': {
+ *       // other styles
+ *       direction: 'rtl'
+ *     },
+ *   },
+ *   fields: {
+ *     number: {
+ *       selector: '#card-number',
+ *       // Credit card formatting is not currently supported
+ *       // with RTL languages, so we need to turn it off for the number input
+ *       formatInput: false
+ *     },
+ *     cvv: {
+ *       selector: '#cvv',
+ *       placeholder: '•••'
+ *     },
+ *     expirationDate: {
+ *       selector: '#expiration-date',
+ *       type: 'month'
+ *     }
+ *   }
+ * }, callback);
+ */
+function create(options) {
+  var integration;
+
+  return new Promise(function (resolve) {
+    integration = new HostedFields(options);
+
+    integration.on('ready', function () {
+      resolve(integration);
+    });
+  });
+}
+
+module.exports = {
+  /**
+   * @static
+   * @function supportsInputFormatting
+   * @description Returns false if input formatting will be automatically disabled due to browser incompatibility. Otherwise, returns true. For a list of unsupported browsers, [go here](https://github.com/braintree/restricted-input/blob/master/README.md#browsers-where-formatting-is-turned-off-automatically).
+   * @returns {Boolean} Returns false if input formatting will be automatically disabled due to browser incompatibility. Otherwise, returns true.
+   * @example Conditionally choosing split expiration date inputs if formatting is unavailable
+   * var canFormat = braintree.hostedFields.supportsInputFormatting();
+   * var fields = {
+   *   number: {
+   *     selector: '#card-number'
+   *   },
+   *   cvv: {
+   *     selector: '#cvv'
+   *   }
+   * };
+   *
+   * if (canFormat) {
+   *   fields.expirationDate = {
+   *     selection: '#expiration-date'
+   *   };
+   *   functionToCreateAndInsertExpirationDateDivToForm();
+   * } else {
+   *   fields.expirationMonth = {
+   *     selection: '#expiration-month'
+   *   };
+   *   fields.expirationYear = {
+   *     selection: '#expiration-year'
+   *   };
+   *   functionToCreateAndInsertExpirationMonthAndYearDivsToForm();
+   * }
+   *
+   * braintree.hostedFields.create({
+   *   client: clientInstance,
+   *   styles: {
+   *     // Styles
+   *   },
+   *   fields: fields
+   * }, callback);
+   */
+  supportsInputFormatting: supportsInputFormatting,
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/promise":97,"./external/hosted-fields":50,"restricted-input/supports-input-formatting":607,"wrap-promise":672}],53:[function(require,module,exports){
+'use strict';
+/* eslint-disable no-reserved-keys */
+
+var enumerate = require('../../lib/enumerate');
+var errors = require('./errors');
+var VERSION = "3.15.0";
+
+var constants = {
+  VERSION: VERSION,
+  maxExpirationYearAge: 19,
+  externalEvents: {
+    FOCUS: 'focus',
+    BLUR: 'blur',
+    EMPTY: 'empty',
+    NOT_EMPTY: 'notEmpty',
+    VALIDITY_CHANGE: 'validityChange',
+    CARD_TYPE_CHANGE: 'cardTypeChange'
+  },
+  defaultMaxLengths: {
+    number: 19,
+    postalCode: 8,
+    expirationDate: 7,
+    expirationMonth: 2,
+    expirationYear: 4,
+    cvv: 3
+  },
+  externalClasses: {
+    FOCUSED: 'braintree-hosted-fields-focused',
+    INVALID: 'braintree-hosted-fields-invalid',
+    VALID: 'braintree-hosted-fields-valid'
+  },
+  defaultIFrameStyle: {
+    border: 'none',
+    width: '100%',
+    height: '100%',
+    'float': 'left'
+  },
+  tokenizationErrorCodes: {
+    81724: errors.HOSTED_FIELDS_TOKENIZATION_FAIL_ON_DUPLICATE,
+    81736: errors.HOSTED_FIELDS_TOKENIZATION_CVV_VERIFICATION_FAILED
+  },
+  whitelistedStyles: [
+    '-moz-appearance',
+    '-moz-osx-font-smoothing',
+    '-moz-tap-highlight-color',
+    '-moz-transition',
+    '-webkit-appearance',
+    '-webkit-font-smoothing',
+    '-webkit-tap-highlight-color',
+    '-webkit-transition',
+    'appearance',
+    'color',
+    'direction',
+    'font',
+    'font-family',
+    'font-size',
+    'font-size-adjust',
+    'font-stretch',
+    'font-style',
+    'font-variant',
+    'font-variant-alternates',
+    'font-variant-caps',
+    'font-variant-east-asian',
+    'font-variant-ligatures',
+    'font-variant-numeric',
+    'font-weight',
+    'letter-spacing',
+    'line-height',
+    'opacity',
+    'outline',
+    'text-shadow',
+    'transition'
+  ],
+  whitelistedFields: {
+    number: {
+      name: 'credit-card-number',
+      label: 'Credit Card Number'
+    },
+    cvv: {
+      name: 'cvv',
+      label: 'CVV'
+    },
+    expirationDate: {
+      name: 'expiration',
+      label: 'Expiration Date'
+    },
+    expirationMonth: {
+      name: 'expiration-month',
+      label: 'Expiration Month'
+    },
+    expirationYear: {
+      name: 'expiration-year',
+      label: 'Expiration Year'
+    },
+    postalCode: {
+      name: 'postal-code',
+      label: 'Postal Code'
+    }
+  },
+  whitelistedAttributes: {
+    'aria-invalid': 'boolean',
+    'aria-required': 'boolean',
+    disabled: 'boolean',
+    placeholder: 'string'
+  }
+};
+
+constants.events = enumerate([
+  'FRAME_READY',
+  'VALIDATE_STRICT',
+  'CONFIGURATION',
+  'TOKENIZATION_REQUEST',
+  'INPUT_EVENT',
+  'TRIGGER_INPUT_FOCUS',
+  'ADD_CLASS',
+  'REMOVE_CLASS',
+  'SET_ATTRIBUTE',
+  'REMOVE_ATTRIBUTE',
+  'CLEAR_FIELD'
+], 'hosted-fields:');
+
+module.exports = constants;
+
+},{"../../lib/enumerate":78,"./errors":54}],54:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../lib/braintree-error');
+
+module.exports = {
+  HOSTED_FIELDS_INVALID_FIELD_KEY: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'HOSTED_FIELDS_INVALID_FIELD_KEY'
+  },
+  HOSTED_FIELDS_INVALID_FIELD_SELECTOR: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'HOSTED_FIELDS_INVALID_FIELD_SELECTOR',
+    message: 'Selector does not reference a valid DOM node.'
+  },
+  HOSTED_FIELDS_FIELD_DUPLICATE_IFRAME: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'HOSTED_FIELDS_FIELD_DUPLICATE_IFRAME',
+    message: 'Element already contains a Braintree iframe.'
+  },
+  HOSTED_FIELDS_FIELD_INVALID: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'HOSTED_FIELDS_FIELD_INVALID'
+  },
+  HOSTED_FIELDS_FIELD_NOT_PRESENT: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'HOSTED_FIELDS_FIELD_NOT_PRESENT'
+  },
+  HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR: {
+    type: BraintreeError.types.NETWORK,
+    code: 'HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR',
+    message: 'A tokenization network error occurred.'
+  },
+  HOSTED_FIELDS_TOKENIZATION_FAIL_ON_DUPLICATE: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'HOSTED_FIELDS_TOKENIZATION_FAIL_ON_DUPLICATE',
+    message: 'This credit card already exists in the merchant\'s vault.'
+  },
+  HOSTED_FIELDS_TOKENIZATION_CVV_VERIFICATION_FAILED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'HOSTED_FIELDS_TOKENIZATION_CVV_VERIFICATION_FAILED',
+    message: 'CVV verification failed during tokenization.'
+  },
+  HOSTED_FIELDS_FAILED_TOKENIZATION: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'HOSTED_FIELDS_FAILED_TOKENIZATION',
+    message: 'The supplied card data failed tokenization.'
+  },
+  HOSTED_FIELDS_FIELDS_EMPTY: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'HOSTED_FIELDS_FIELDS_EMPTY',
+    message: 'All fields are empty. Cannot tokenize empty card fields.'
+  },
+  HOSTED_FIELDS_FIELDS_INVALID: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'HOSTED_FIELDS_FIELDS_INVALID',
+    message: 'Some payment input fields are invalid. Cannot tokenize invalid card fields.'
+  },
+  HOSTED_FIELDS_ATTRIBUTE_NOT_SUPPORTED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'HOSTED_FIELDS_ATTRIBUTE_NOT_SUPPORTED'
+  },
+  HOSTED_FIELDS_ATTRIBUTE_VALUE_NOT_ALLOWED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'HOSTED_FIELDS_ATTRIBUTE_VALUE_NOT_ALLOWED'
+  },
+  HOSTED_FIELDS_FIELD_PROPERTY_INVALID: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'HOSTED_FIELDS_FIELD_PROPERTY_INVALID'
+  }
+};
+
+},{"../../lib/braintree-error":66}],55:[function(require,module,exports){
+'use strict';
+
+function findParentTags(element, tag) {
+  var parent = element.parentNode;
+  var parents = [];
+
+  while (parent != null) {
+    if (parent.tagName != null && parent.tagName.toLowerCase() === tag) {
+      parents.push(parent);
+    }
+
+    parent = parent.parentNode;
+  }
+
+  return parents;
+}
+
+module.exports = findParentTags;
+
+},{}],56:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  MAX_TRANSACTION_STATUS_POLLING_RETRIES: 5,
+  POLL_RETRY_TIME: 10000,
+  REQUIRED_OPTIONS_FOR_START_PAYMENT: ['orderId', 'amount', 'currency']
+};
+
+},{}],57:[function(require,module,exports){
+'use strict';
+
+var Promise = require('../../lib/promise');
+var frameService = require('../../lib/frame-service/external');
+var BraintreeError = require('../../lib/braintree-error');
+var convertToBraintreeError = require('../../lib/convert-to-braintree-error');
+var errors = require('../shared/errors');
+var VERSION = "3.15.0";
+var INTEGRATION_TIMEOUT_MS = require('../../lib/constants').INTEGRATION_TIMEOUT_MS;
+var methods = require('../../lib/methods');
+var wrapPromise = require('wrap-promise');
+var convertMethodsToError = require('../../lib/convert-methods-to-error');
+var analytics = require('../../lib/analytics');
+var useMin = require('../../lib/use-min');
+var once = require('../../lib/once');
+var deferred = require('../../lib/deferred');
+var constants = require('./constants');
+var events = require('../shared/events');
+
+/**
+ * @typedef {object} iDEAL~startPaymentPayload
+ * @property {string} nonce The payment method nonce.
+ * @property {object} details Additional iDEAL payment details.
+ * @property {string} details.id The identifier for the iDEAL Payment.
+ * @property {string} details.status The status of the iDEAL Payment.
+ * @property {string} type The payment method type, always `IdealPayment`.
+ */
+
+/**
+ * @class
+ * @param {object} options see {@link module:braintree-web/ideal.create|ideal.create}
+ * @description <strong>You cannot use this constructor directly. Use {@link module:braintree-web/ideal.create|braintree.ideal.create} instead.</strong>
+ * @classdesc This class represents an iDEAL component. Instances of this class have methods for launching a new window to process a transaction with iDEAL.
+ */
+function Ideal(options) {
+  var configuration = options.client.getConfiguration();
+
+  this._client = options.client;
+  this._assetsUrl = configuration.gatewayConfiguration.assetsUrl + '/web/' + VERSION;
+  this._isDebug = configuration.isDebug;
+  this._idealPaymentStatus = {
+    authInProgress: false,
+    id: '',
+    status: ''
+  };
+}
+
+Ideal.prototype._initialize = function () {
+  var self = this;
+
+  var failureTimeout = setTimeout(function () {
+    analytics.sendEvent(self._client, 'ideal.load.timed-out');
+  }, INTEGRATION_TIMEOUT_MS);
+
+  return this._client.request({
+    api: 'braintreeApi',
+    method: 'get',
+    endpoint: 'issuers/ideal'
+  }).then(function (response) {
+    return new Promise(function (resolve) {
+      frameService.create({
+        name: 'braintreeideallanding',
+        dispatchFrameUrl: self._assetsUrl + '/html/dispatch-frame' + useMin(self._isDebug) + '.html',
+        openFrameUrl: self._assetsUrl + '/html/ideal-issuers-frame' + useMin(self._isDebug) + '.html',
+        state: {bankData: response.data}
+      }, function (service) {
+        self._frameService = service;
+        clearTimeout(failureTimeout);
+        analytics.sendEvent(self._client, 'ideal.load.succeeded');
+
+        self._frameService._bus.on(events.BANK_CHOSEN, self._createBankChosenHandler());
+        self._frameService._bus.on(events.REDIRECT_PAGE_REACHED, self._createRedirectPageReachedHandler());
+
+        resolve(self);
+      });
+    });
+  });
+};
+
+/**
+ * Launches the iDEAL flow and returns a nonce payload. Only one iDEAL flow should be active at a time. One way to achieve this is to disable your iDEAL button while the flow is open.
+ * @public
+ * @function
+ * @param {object} options All options for initiating the iDEAL payment flow.
+ * @param {string} options.orderId An ID supplied by the merchant for creating the iDEAL transaction.
+ * @param {string} options.amount The amount to authorize for the transaction.
+ * @param {string} options.currency The currency to process the payment.
+ * @param {string} [options.descriptor] An optional string that will appear on the customer's bank statement.
+ * @param {function} options.onPaymentStart A function that will be called with an object containing the iDEAL Payment `id` and `status` when the customer chooses an issuing bank. You can use this hook to update your payment page.
+ * @param {callback} [callback] The second argument, <code>data</code>, is a {@link iDEAL~startPaymentPayload|startPaymentPayload}. If no callback is provided, the method will return a Promise that resolves with a {@link iDEAL~startPaymentPayload|startPaymentPayload}.
+ * @example
+ * button.addEventListener('click', function () {
+ *   // Disable the button when iDEAL payment is in progress
+ *   button.setAttribute('disabled', 'disabled');
+ *
+ *   // Because startPayment opens a new window, this must be called
+ *   // as a result of a user action, such as a button click.
+ *   idealInstance.startPayment({
+ *     orderId: 'some id',
+ *     amount: '10.00',
+ *     currency: 'EUR',
+ *     descriptor: 'Merchant Name',
+ *     onPaymentStart: function (data) {
+ *       // disable payment form on the page
+ *     }
+ *   }).then(function (payload) {
+ *     button.removeAttribute('disabled');
+ *     // Submit payload.nonce to your server
+ *   }).catch(function (startPaymentError) {
+ *     button.removeAttribute('disabled');
+ *     // Handle flow errors or premature flow closure
+ *
+ *     switch (startPaymentError.code) {
+ *       case 'IDEAL_WINDOW_CLOSED':
+ *         console.error('Customer closed iDEAL window.');
+ *         break;
+ *       case 'IDEAL_START_PAYMENT_FAILED':
+ *         console.error('iDEAL startPayment failed. See details:', startPaymentError.details);
+ *         break;
+ *       default:
+ *         console.error('Error!', startPaymentError);
+ *     }
+ *   });
+ * });
+ * @returns {Promise|void}
+ */
+Ideal.prototype.startPayment = wrapPromise(function (options) {
+  var self = this; // eslint-disable-line no-invalid-this
+
+  return new Promise(function (resolve, reject) {
+    if (!options || hasMissingOption(options)) {
+      reject(new BraintreeError(errors.IDEAL_START_PAYMENT_MISSING_REQUIRED_OPTION));
+      return;
+    }
+
+    if (self._idealPaymentStatus.authInProgress) {
+      analytics.sendEvent(self._client, 'ideal.start-payment.error.already-opened');
+      reject(new BraintreeError(errors.IDEAL_PAYMENT_ALREADY_IN_PROGRESS));
+      return;
+    }
+
+    self._idealPaymentStatus.authInProgress = true;
+    analytics.sendEvent(self._client, 'ideal.start-payment.opened');
+
+    self._startPaymentCallback = self._createStartPaymentCallback(resolve, reject);
+    self._startPaymentOptions = options;
+
+    self._frameService.open(self._startPaymentCallback);
+  });
+});
+
+/**
+ * Closes the iDEAL window if it is open.
+ * @public
+ * @example
+ * idealInstance.closeWindow();
+ * @returns {void}
+ */
+Ideal.prototype.closeWindow = function () {
+  if (this._idealPaymentStatus.authInProgress) {
+    analytics.sendEvent(this._client, 'ideal.start-payment.closed.by-merchant');
+  }
+  this._frameService.close();
+};
+
+/**
+ * Focuses the iDEAL window if it is open.
+ * @public
+ * @example
+ * idealInstance.focusWindow();
+ * @returns {void}
+ */
+Ideal.prototype.focusWindow = function () {
+  this._frameService.focus();
+};
+
+Ideal.prototype._createRedirectPageReachedHandler = function () {
+  var self = this;
+
+  return function () {
+    self._pollForCompleteTransactionStatus(0);
+  };
+};
+
+Ideal.prototype._createStartPaymentCallback = function (resolve, reject) {
+  var self = this;
+
+  return function (err) {
+    var idealPaymentId = self._idealPaymentStatus.id;
+    var idealPaymentStatus = self._idealPaymentStatus.status;
+
+    self._idealPaymentStatus.authInProgress = false;
+    delete self._idealPaymentStatus.id;
+    delete self._idealPaymentStatus.status;
+
+    self._frameService.close();
+
+    if (shouldResolveWithSuccess(err, idealPaymentStatus)) {
+      analytics.sendEvent(self._client, 'ideal.start-payment.success-' + idealPaymentStatus.toLowerCase());
+      resolve({
+        nonce: idealPaymentId,
+        type: 'IdealPayment',
+        details: {
+          id: idealPaymentId,
+          status: idealPaymentStatus
+        }
+      });
+      return;
+    }
+
+    if (err) {
+      if (err.code === 'FRAME_SERVICE_FRAME_CLOSED') {
+        analytics.sendEvent(self._client, 'ideal.start-payment.closed.by-user');
+        reject(new BraintreeError(errors.IDEAL_WINDOW_CLOSED));
+        return;
+      } else if (err.code === 'FRAME_SERVICE_FRAME_OPEN_FAILED') {
+        reject(new BraintreeError(errors.IDEAL_WINDOW_OPEN_FAILED));
+        return;
+      }
+
+      analytics.sendEvent(self._client, 'ideal.start-payment.failed');
+
+      reject(convertToBraintreeError(err, errors.IDEAL_START_PAYMENT_FAILED));
+    } else {
+      reject(new BraintreeError(errors.IDEAL_START_PAYMENT_UNEXPECTED_STATUS));
+    }
+  };
+};
+
+function shouldResolveWithSuccess(err, status) {
+  if (err && err.code !== 'FRAME_SERVICE_FRAME_CLOSED') {
+    return false;
+  }
+
+  return status === 'COMPLETE' || status === 'PENDING';
+}
+
+Ideal.prototype._createBankChosenHandler = function () {
+  var self = this;
+
+  return function (config) {
+    var options = self._startPaymentOptions;
+    var onPaymentStart;
+
+    if (typeof options.onPaymentStart === 'function') {
+      onPaymentStart = once(deferred(options.onPaymentStart));
+    } else {
+      onPaymentStart = function noop() {};
+    }
+
+    self._client.request({
+      api: 'braintreeApi',
+      method: 'post',
+      data: {
+        route_id: self._client.getConfiguration().gatewayConfiguration.ideal.routeId, // eslint-disable-line camelcase
+        issuer: config.issuingBankId,
+        order_id: options.orderId, // eslint-disable-line camelcase
+        amount: options.amount,
+        currency: options.currency,
+        descriptor: options.descriptor,
+        redirect_url: self._assetsUrl + '/html/ideal-redirect-frame.html' // eslint-disable-line camelcase
+      },
+      endpoint: 'ideal-payments'
+    }).then(function (response) {
+      onPaymentStart({
+        id: response.data.id,
+        status: response.data.status
+      });
+
+      self._idealPaymentStatus.id = response.data.id;
+      self._idealPaymentStatus.status = response.data.status;
+      self._frameService.redirect(response.data.approval_url);
+    }).catch(function (err) {
+      self._idealPaymentStatus.authInProgress = false;
+      self._startPaymentCallback(err);
+    });
+  };
+};
+
+Ideal.prototype._pollForCompleteTransactionStatus = function (retryCount) {
+  var self = this;
+
+  if (!this._idealPaymentStatus.id) {
+    this._startPaymentCallback(errors.IDEAL_PAYMENT_ALREADY_IN_PROGRESS);
+    return;
+  }
+
+  this._client.request({
+    api: 'braintreeApi',
+    method: 'get',
+    endpoint: 'ideal-payments/' + this._idealPaymentStatus.id + '/status'
+  }).then(function (response) {
+    self._idealPaymentStatus.status = response.data.status;
+
+    if (response.data.status === 'PENDING' && retryCount < constants.MAX_TRANSACTION_STATUS_POLLING_RETRIES) {
+      setTimeout(function () {
+        self._pollForCompleteTransactionStatus(retryCount + 1);
+      }, constants.POLL_RETRY_TIME);
+    } else if (response.data.status === 'COMPLETE' || response.data.status === 'PENDING') {
+      self._startPaymentCallback();
+    } else {
+      self._startPaymentCallback(new BraintreeError({
+        code: errors.IDEAL_PAYMENT_NOT_COMPLETE_OR_PENDING.code,
+        type: errors.IDEAL_PAYMENT_NOT_COMPLETE_OR_PENDING.type,
+        message: 'Transaction is not complete. It has a status of: ' + response.data.status
+      }));
+    }
+  }).catch(self._startPaymentCallback);
+};
+
+function hasMissingOption(options) {
+  var i, option;
+
+  for (i = 0; i < constants.REQUIRED_OPTIONS_FOR_START_PAYMENT.length; i++) {
+    option = constants.REQUIRED_OPTIONS_FOR_START_PAYMENT[i];
+
+    if (!options.hasOwnProperty(option)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Cleanly tear down anything set up by {@link module:braintree-web/ideal.create|create}.
+ * @public
+ * @function
+ * @param {callback} [callback] Called once teardown is complete. No data is returned if teardown completes successfully.
+ * @returns {Promise|void} If no callback is provided, returns a promise.
+ */
+Ideal.prototype.teardown = wrapPromise(function () {
+  var self = this; // eslint-disable-line no-invalid-this
+
+  self._frameService.teardown();
+
+  convertMethodsToError(self, methods(Ideal.prototype));
+
+  analytics.sendEvent(self._client, 'ideal.teardown-completed');
+
+  return Promise.resolve();
+});
+
+module.exports = Ideal;
+
+},{"../../lib/analytics":63,"../../lib/braintree-error":66,"../../lib/constants":72,"../../lib/convert-methods-to-error":73,"../../lib/convert-to-braintree-error":74,"../../lib/deferred":76,"../../lib/frame-service/external":82,"../../lib/methods":94,"../../lib/once":95,"../../lib/promise":97,"../../lib/use-min":99,"../shared/errors":59,"../shared/events":60,"./constants":56,"wrap-promise":672}],58:[function(require,module,exports){
+'use strict';
+/** @module braintree-web/ideal */
+
+var BraintreeError = require('../lib/braintree-error');
+var browserDetection = require('browser-detection');
+var Ideal = require('./external/ideal');
+var VERSION = "3.15.0";
+var errors = require('./shared/errors');
+var sharedErrors = require('../lib/errors');
+var analytics = require('../lib/analytics');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} [callback] The second argument, `data`, is the {@link Ideal} instance. If no callback is passed in, the create function returns a promise that resolves the {@link Ideal} instance.
+ * @example
+ * braintree.ideal.create({
+ *   client: clientInstance
+ * }, function (createErr, idealInstance) {
+ *   if (createErr) {
+ *     if (createErr.code === 'IDEAL_BROWSER_NOT_SUPPORTED') {
+ *       console.error('This browser is not supported.');
+ *     } else {
+ *       console.error('Error!', createErr);
+ *     }
+ *     return;
+ *   }
+ * });
+ * @returns {Promise|void} Resolves with the iDEAL Payment instance.
+ */
+function create(options) {
+  var idealInstance, clientVersion, configuration;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating iDEAL.'
+    }));
+  }
+
+  clientVersion = options.client.getConfiguration().analyticsMetadata.sdkVersion;
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and iDEAL (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  if (!browserDetection.supportsPopups()) {
+    return Promise.reject(new BraintreeError(errors.IDEAL_BROWSER_NOT_SUPPORTED));
+  }
+
+  configuration = options.client.getConfiguration().gatewayConfiguration;
+  if (!configuration.braintreeApi) {
+    return Promise.reject(new BraintreeError(sharedErrors.BRAINTREE_API_ACCESS_RESTRICTED));
+  } else if (!configuration.ideal) {
+    return Promise.reject(new BraintreeError(errors.IDEAL_NOT_ENABLED));
+  }
+
+  analytics.sendEvent(options.client, 'ideal.initialization');
+  idealInstance = new Ideal(options);
+
+  return idealInstance._initialize();
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./external/ideal":57,"./shared/errors":59,"browser-detection":240,"wrap-promise":672}],59:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../lib/braintree-error');
+
+module.exports = {
+  IDEAL_BROWSER_NOT_SUPPORTED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'IDEAL_BROWSER_NOT_SUPPORTED',
+    message: 'Browser is not supported.'
+  },
+  IDEAL_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'IDEAL_NOT_ENABLED',
+    message: 'iDEAL is not enabled for this merchant.'
+  },
+  IDEAL_PAYMENT_ALREADY_IN_PROGRESS: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'IDEAL_PAYMENT_ALREADY_IN_PROGRESS',
+    message: 'iDEAL payment is already in progress.'
+  },
+  IDEAL_PAYMENT_NOT_COMPLETE_OR_PENDING: {
+    code: 'IDEAL_PAYMENT_NOT_COMPLETE_OR_PENDING',
+    type: BraintreeError.types.CUSTOMER
+  },
+  IDEAL_WINDOW_CLOSED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'IDEAL_WINDOW_CLOSED',
+    message: 'Customer closed iDEAL window before authorizing.'
+  },
+  IDEAL_WINDOW_OPEN_FAILED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'IDEAL_WINDOW_OPEN_FAILED',
+    message: 'iDEAL window failed to open; make sure startPayment was called in response to a user action.'
+  },
+  IDEAL_START_PAYMENT_FAILED: {
+    type: BraintreeError.types.NETWORK,
+    code: 'IDEAL_START_PAYMENT_FAILED',
+    message: 'iDEAL startPayment failed.'
+  },
+  IDEAL_START_PAYMENT_UNEXPECTED_STATUS: {
+    type: BraintreeError.types.INTERNAL,
+    code: 'IDEAL_START_PAYMENT_UNEXPECTED_STATUS',
+    message: 'iDEAL startPayment returned an unexpected status without an error.'
+  },
+  IDEAL_START_PAYMENT_MISSING_REQUIRED_OPTION: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'IDEAL_START_PAYMENT_MISSING_REQUIRED_OPTION',
+    message: 'Missing required option for startPayment.'
+  }
+};
+
+
+},{"../../lib/braintree-error":66}],60:[function(require,module,exports){
+'use strict';
+
+var enumerate = require('../../lib/enumerate');
+
+module.exports = enumerate([
+  'BANK_CHOSEN',
+  'REDIRECT_PAGE_REACHED'
+], 'ideal:');
+
+},{"../../lib/enumerate":78}],61:[function(require,module,exports){
+'use strict';
+/**
+ * @module braintree-web
+ * @description This is the top-level module exported by the Braintree JavaScript SDK. In a browser environment, this will be the global <code>braintree</code> object. In a CommonJS environment (like Browserify or Webpack), it will be the default export of the <code>braintree-web</code> package. In AMD environments (like RequireJS), it can be `require`d like other modules.
+ * @example
+ * <caption>CommonJS</caption>
+ * var braintree = require('braintree-web');
+ *
+ * braintree.client.create(...);
+ * @example
+ * <caption>In the browser</caption>
+ * <script src="https://js.braintreegateway.com/web/{@pkg version}/js/client.min.js"></script>
+ * <script>
+ *   window.braintree.client.create(...);
+ * </script>
+ * @example
+ * <caption>AMD</caption>
+ * // main.js
+ * require.config({
+ *   paths: {
+ *     braintreeClient: 'https://js.braintreegateway.com/web/{@pkg version}/js/client.min'
+ *   }
+ * });
+ *
+ * require(['braintreeClient'], function (braintreeClient) {
+ *   braintreeClient.create(...);
+ * });
+ */
+
+/**
+ * @global
+ * @callback callback
+ * @param {?BraintreeError} [err] `null` or `undefined` if there was no error.
+ * @param {?any} [data] The successful result of the asynchronous function call (if data exists).
+ * @description The Node.js-style callback pattern used throughout the SDK.
+ * @returns {void}
+ */
+
+var client = require('./client');
+var paypal = require('./paypal');
+var paypalCheckout = require('./paypal-checkout');
+var hostedFields = require('./hosted-fields');
+var dataCollector = require('./data-collector');
+var americanExpress = require('./american-express');
+var unionpay = require('./unionpay');
+var vaultManager = require('./vault-manager');
+var applePay = require('./apple-pay');
+var ideal = require('./ideal');
+var threeDSecure = require('./three-d-secure');
+var usBankAccount = require('./us-bank-account');
+var visaCheckout = require('./visa-checkout');
+var masterpass = require('./masterpass');
+var VERSION = "3.15.0";
+
+module.exports = {
+  /** @type {module:braintree-web/client} */
+  client: client,
+  /** @type {module:braintree-web/paypal} */
+  paypal: paypal,
+  /** @type {module:braintree-web/paypal-checkout} */
+  paypalCheckout: paypalCheckout,
+  /** @type {module:braintree-web/hosted-fields} */
+  hostedFields: hostedFields,
+  /** @type {module:braintree-web/three-d-secure} */
+  threeDSecure: threeDSecure,
+  /** @type {module:braintree-web/data-collector} */
+  dataCollector: dataCollector,
+  /** @type {module:braintree-web/american-express} */
+  americanExpress: americanExpress,
+  /** @type {module:braintree-web/unionpay} */
+  unionpay: unionpay,
+  /** @type {module:braintree-web/apple-pay} */
+  applePay: applePay,
+  /** @type {module:braintree-web/us-bank-account} */
+  usBankAccount: usBankAccount,
+  /** @type {module:braintree-web/visa-checkout} */
+  visaCheckout: visaCheckout,
+  /** @type {module:braintree-web/vault-manager} */
+  vaultManager: vaultManager,
+  /** @type {module:braintree-web/masterpass} */
+  masterpass: masterpass,
+  /** @type {module:braintree-web/ideal} */
+  ideal: ideal,
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"./american-express":27,"./apple-pay":30,"./client":35,"./data-collector":45,"./hosted-fields":52,"./ideal":58,"./masterpass":102,"./paypal":109,"./paypal-checkout":106,"./three-d-secure":113,"./unionpay":117,"./us-bank-account":123,"./vault-manager":125,"./visa-checkout":128}],62:[function(require,module,exports){
+'use strict';
+
+var createAuthorizationData = require('./create-authorization-data');
+var jsonClone = require('./json-clone');
+var constants = require('./constants');
+
+function addMetadata(configuration, data) {
+  var key;
+  var attrs = data ? jsonClone(data) : {};
+  var authAttrs = createAuthorizationData(configuration.authorization).attrs;
+  var _meta = jsonClone(configuration.analyticsMetadata);
+
+  attrs.braintreeLibraryVersion = constants.BRAINTREE_LIBRARY_VERSION;
+
+  for (key in attrs._meta) {
+    if (attrs._meta.hasOwnProperty(key)) {
+      _meta[key] = attrs._meta[key];
+    }
+  }
+
+  attrs._meta = _meta;
+
+  if (authAttrs.tokenizationKey) {
+    attrs.tokenizationKey = authAttrs.tokenizationKey;
+  } else {
+    attrs.authorizationFingerprint = authAttrs.authorizationFingerprint;
+  }
+
+  return attrs;
+}
+
+module.exports = addMetadata;
+
+},{"./constants":72,"./create-authorization-data":75,"./json-clone":93}],63:[function(require,module,exports){
+'use strict';
+
+var constants = require('./constants');
+var addMetadata = require('./add-metadata');
+
+function _millisToSeconds(millis) {
+  return Math.floor(millis / 1000);
+}
+
+function sendAnalyticsEvent(client, kind, callback) {
+  var configuration = client.getConfiguration();
+  var request = client._request;
+  var timestamp = _millisToSeconds(Date.now());
+  var url = configuration.gatewayConfiguration.analytics.url;
+  var data = {
+    analytics: [{
+      kind: constants.ANALYTICS_PREFIX + kind,
+      timestamp: timestamp
+    }]
+  };
+
+  request({
+    url: url,
+    method: 'post',
+    data: addMetadata(configuration, data),
+    timeout: constants.ANALYTICS_REQUEST_TIMEOUT_MS
+  }, callback);
+}
+
+module.exports = {
+  sendEvent: sendAnalyticsEvent
+};
+
+},{"./add-metadata":62,"./constants":72}],64:[function(require,module,exports){
+'use strict';
+
+var assignNormalized = typeof Object.assign === 'function' ? Object.assign : assignPolyfill;
+
+function assignPolyfill(destination) {
+  var i, source, key;
+
+  for (i = 1; i < arguments.length; i++) {
+    source = arguments[i];
+    for (key in source) {
+      if (source.hasOwnProperty(key)) {
+        destination[key] = source[key];
+      }
+    }
+  }
+
+  return destination;
+}
+
+module.exports = {
+  assign: assignNormalized,
+  _assign: assignPolyfill
+};
+
+},{}],65:[function(require,module,exports){
+'use strict';
+
+var once = require('./once');
+
+function call(fn, callback) {
+  var isSync = fn.length === 0;
+
+  if (isSync) {
+    fn();
+    callback(null);
+  } else {
+    fn(callback);
+  }
+}
+
+module.exports = function (functions, cb) {
+  var i;
+  var length = functions.length;
+  var remaining = length;
+  var callback = once(cb);
+
+  if (length === 0) {
+    callback(null);
+    return;
+  }
+
+  function finish(err) {
+    if (err) {
+      callback(err);
+      return;
+    }
+
+    remaining -= 1;
+    if (remaining === 0) {
+      callback(null);
+    }
+  }
+
+  for (i = 0; i < length; i++) {
+    call(functions[i], finish);
+  }
+};
+
+},{"./once":95}],66:[function(require,module,exports){
+'use strict';
+
+var enumerate = require('./enumerate');
+
+/**
+ * @class
+ * @global
+ * @param {object} options Construction options
+ * @classdesc This class is used to report error conditions, frequently as the first parameter to callbacks throughout the Braintree SDK.
+ * @description <strong>You cannot use this constructor directly. Interact with instances of this class through {@link callback callbacks}.</strong>
+ */
+function BraintreeError(options) {
+  if (!BraintreeError.types.hasOwnProperty(options.type)) {
+    throw new Error(options.type + ' is not a valid type.');
+  }
+
+  if (!options.code) {
+    throw new Error('Error code required.');
+  }
+
+  if (!options.message) {
+    throw new Error('Error message required.');
+  }
+
+  this.name = 'BraintreeError';
+
+  /**
+   * @type {string}
+   * @description A code that corresponds to specific errors.
+   */
+  this.code = options.code;
+
+  /**
+   * @type {string}
+   * @description A short description of the error.
+   */
+  this.message = options.message;
+
+  /**
+   * @type {BraintreeError.types}
+   * @description The type of error.
+   */
+  this.type = options.type;
+
+  /**
+   * @type {object=}
+   * @description Additional information about the error, such as an underlying network error response.
+   */
+  this.details = options.details;
+}
+
+BraintreeError.prototype = Object.create(Error.prototype);
+BraintreeError.prototype.constructor = BraintreeError;
+
+/**
+ * Enum for {@link BraintreeError} types.
+ * @name BraintreeError.types
+ * @enum
+ * @readonly
+ * @memberof BraintreeError
+ * @property {string} CUSTOMER An error caused by the customer.
+ * @property {string} MERCHANT An error that is actionable by the merchant.
+ * @property {string} NETWORK An error due to a network problem.
+ * @property {string} INTERNAL An error caused by Braintree code.
+ * @property {string} UNKNOWN An error where the origin is unknown.
+ */
+BraintreeError.types = enumerate([
+  'CUSTOMER',
+  'MERCHANT',
+  'NETWORK',
+  'INTERNAL',
+  'UNKNOWN'
+]);
+
+BraintreeError.findRootError = function (err) {
+  if (err instanceof BraintreeError && err.details && err.details.originalError) {
+    return BraintreeError.findRootError(err.details.originalError);
+  }
+
+  return err;
+};
+
+module.exports = BraintreeError;
+
+},{"./enumerate":78}],67:[function(require,module,exports){
+'use strict';
+
+var isWhitelistedDomain = require('../is-whitelisted-domain');
+
+function checkOrigin(postMessageOrigin, merchantUrl) {
+  var merchantOrigin, merchantHost;
+  var a = document.createElement('a');
+
+  a.href = merchantUrl;
+
+  if (a.protocol === 'https:') {
+    merchantHost = a.host.replace(/:443$/, '');
+  } else if (a.protocol === 'http:') {
+    merchantHost = a.host.replace(/:80$/, '');
+  } else {
+    merchantHost = a.host;
+  }
+
+  merchantOrigin = a.protocol + '//' + merchantHost;
+
+  if (merchantOrigin === postMessageOrigin) { return true; }
+
+  a.href = postMessageOrigin;
+
+  return isWhitelistedDomain(postMessageOrigin);
+}
+
+module.exports = {
+  checkOrigin: checkOrigin
+};
+
+},{"../is-whitelisted-domain":92}],68:[function(require,module,exports){
+'use strict';
+
+var enumerate = require('../enumerate');
+
+module.exports = enumerate([
+  'CONFIGURATION_REQUEST'
+], 'bus:');
+
+},{"../enumerate":78}],69:[function(require,module,exports){
+'use strict';
+
+var bus = require('framebus');
+var events = require('./events');
+var checkOrigin = require('./check-origin').checkOrigin;
+var BraintreeError = require('../braintree-error');
+
+function BraintreeBus(options) {
+  options = options || {};
+
+  this.channel = options.channel;
+  if (!this.channel) {
+    throw new BraintreeError({
+      type: BraintreeError.types.INTERNAL,
+      code: 'MISSING_CHANNEL_ID',
+      message: 'Channel ID must be specified.'
+    });
+  }
+
+  this.merchantUrl = options.merchantUrl;
+
+  this._isDestroyed = false;
+  this._isVerbose = false;
+
+  this._listeners = [];
+
+  this._log('new bus on channel ' + this.channel, [location.href]);
+}
+
+BraintreeBus.prototype.on = function (eventName, originalHandler) {
+  var namespacedEvent, args;
+  var handler = originalHandler;
+  var self = this;
+
+  if (this._isDestroyed) { return; }
+
+  if (this.merchantUrl) {
+    handler = function () {
+      /* eslint-disable no-invalid-this */
+      if (checkOrigin(this.origin, self.merchantUrl)) {
+        originalHandler.apply(this, arguments);
+      }
+      /* eslint-enable no-invalid-this */
+    };
+  }
+
+  namespacedEvent = this._namespaceEvent(eventName);
+  args = Array.prototype.slice.call(arguments);
+  args[0] = namespacedEvent;
+  args[1] = handler;
+
+  this._log('on', args);
+  bus.on.apply(bus, args);
+
+  this._listeners.push({
+    eventName: eventName,
+    handler: handler,
+    originalHandler: originalHandler
+  });
+};
+
+BraintreeBus.prototype.emit = function (eventName) {
+  var args;
+
+  if (this._isDestroyed) { return; }
+
+  args = Array.prototype.slice.call(arguments);
+  args[0] = this._namespaceEvent(eventName);
+
+  this._log('emit', args);
+  bus.emit.apply(bus, args);
+};
+
+BraintreeBus.prototype._offDirect = function (eventName) {
+  var args = Array.prototype.slice.call(arguments);
+
+  if (this._isDestroyed) { return; }
+
+  args[0] = this._namespaceEvent(eventName);
+
+  this._log('off', args);
+  bus.off.apply(bus, args);
+};
+
+BraintreeBus.prototype.off = function (eventName, originalHandler) {
+  var i, listener;
+  var handler = originalHandler;
+
+  if (this._isDestroyed) { return; }
+
+  if (this.merchantUrl) {
+    for (i = 0; i < this._listeners.length; i++) {
+      listener = this._listeners[i];
+
+      if (listener.originalHandler === originalHandler) {
+        handler = listener.handler;
+      }
+    }
+  }
+
+  this._offDirect(eventName, handler);
+};
+
+BraintreeBus.prototype._namespaceEvent = function (eventName) {
+  return ['braintree', this.channel, eventName].join(':');
+};
+
+BraintreeBus.prototype.teardown = function () {
+  var listener, i;
+
+  for (i = 0; i < this._listeners.length; i++) {
+    listener = this._listeners[i];
+    this._offDirect(listener.eventName, listener.handler);
+  }
+
+  this._listeners.length = 0;
+
+  this._isDestroyed = true;
+};
+
+BraintreeBus.prototype._log = function (functionName, args) {
+  if (this._isVerbose) {
+    console.log(functionName, args); // eslint-disable-line no-console
+  }
+};
+
+BraintreeBus.events = events;
+
+module.exports = BraintreeBus;
+
+},{"../braintree-error":66,"./check-origin":67,"./events":68,"framebus":359}],70:[function(require,module,exports){
+'use strict';
+
+// Taken from https://github.com/sindresorhus/decamelize/blob/95980ab6fb44c40eaca7792bdf93aff7c210c805/index.js
+function transformKey(key) {
+  return key.replace(/([a-z\d])([A-Z])/g, '$1_$2')
+    .replace(/([A-Z]+)([A-Z][a-z\d]+)/g, '$1_$2')
+    .toLowerCase();
+}
+
+module.exports = function (obj) {
+  return Object.keys(obj).reduce(function (newObj, key) {
+    var transformedKey = transformKey(key);
+
+    newObj[transformedKey] = obj[key];
+
+    return newObj;
+  }, {});
+};
+
+},{}],71:[function(require,module,exports){
+'use strict';
+
+function _classesOf(element) {
+  return element.className.trim().split(/\s+/);
+}
+
+function add(element) {
+  var toAdd = Array.prototype.slice.call(arguments, 1);
+  var className = _classesOf(element).filter(function (classname) {
+    return toAdd.indexOf(classname) === -1;
+  }).concat(toAdd).join(' ');
+
+  element.className = className;
+}
+
+function remove(element) {
+  var toRemove = Array.prototype.slice.call(arguments, 1);
+  var className = _classesOf(element).filter(function (classname) {
+    return toRemove.indexOf(classname) === -1;
+  }).join(' ');
+
+  element.className = className;
+}
+
+function toggle(element, classname, adding) {
+  if (adding) {
+    add(element, classname);
+  } else {
+    remove(element, classname);
+  }
+}
+
+module.exports = {
+  add: add,
+  remove: remove,
+  toggle: toggle
+};
+
+},{}],72:[function(require,module,exports){
+'use strict';
+
+var VERSION = "3.15.0";
+var PLATFORM = 'web';
+
+module.exports = {
+  ANALYTICS_PREFIX: 'web.',
+  ANALYTICS_REQUEST_TIMEOUT_MS: 2000,
+  INTEGRATION_TIMEOUT_MS: 60000,
+  VERSION: VERSION,
+  INTEGRATION: 'custom',
+  SOURCE: 'client',
+  PLATFORM: PLATFORM,
+  BRAINTREE_LIBRARY_VERSION: 'braintree/' + PLATFORM + '/' + VERSION
+};
+
+},{}],73:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('./braintree-error');
+var sharedErrors = require('./errors');
+
+module.exports = function (instance, methodNames) {
+  methodNames.forEach(function (methodName) {
+    instance[methodName] = function () {
+      throw new BraintreeError({
+        type: sharedErrors.METHOD_CALLED_AFTER_TEARDOWN.type,
+        code: sharedErrors.METHOD_CALLED_AFTER_TEARDOWN.code,
+        message: methodName + ' cannot be called after teardown.'
+      });
+    };
+  });
+};
+
+},{"./braintree-error":66,"./errors":79}],74:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('./braintree-error');
+
+function convertToBraintreeError(originalErr, btErrorObject) {
+  if (originalErr instanceof BraintreeError) {
+    return originalErr;
+  }
+
+  return new BraintreeError({
+    type: btErrorObject.type,
+    code: btErrorObject.code,
+    message: btErrorObject.message,
+    details: {
+      originalError: originalErr
+    }
+  });
+}
+
+module.exports = convertToBraintreeError;
+
+},{"./braintree-error":66}],75:[function(require,module,exports){
+'use strict';
+
+var atob = require('../lib/polyfill').atob;
+
+var apiUrls = {
+  production: 'https://api.braintreegateway.com:443',
+  sandbox: 'https://api.sandbox.braintreegateway.com:443'
+};
+
+function _isTokenizationKey(str) {
+  return /^[a-zA-Z0-9]+_[a-zA-Z0-9]+_[a-zA-Z0-9_]+$/.test(str);
+}
+
+function _parseTokenizationKey(tokenizationKey) {
+  var tokens = tokenizationKey.split('_');
+  var environment = tokens[0];
+  var merchantId = tokens.slice(2).join('_');
+
+  return {
+    merchantId: merchantId,
+    environment: environment
+  };
+}
+
+function createAuthorizationData(authorization) {
+  var parsedClientToken, parsedTokenizationKey;
+  var data = {
+    attrs: {},
+    configUrl: ''
+  };
+
+  if (_isTokenizationKey(authorization)) {
+    parsedTokenizationKey = _parseTokenizationKey(authorization);
+    data.attrs.tokenizationKey = authorization;
+    data.configUrl = apiUrls[parsedTokenizationKey.environment] + '/merchants/' + parsedTokenizationKey.merchantId + '/client_api/v1/configuration';
+  } else {
+    parsedClientToken = JSON.parse(atob(authorization));
+    data.attrs.authorizationFingerprint = parsedClientToken.authorizationFingerprint;
+    data.configUrl = parsedClientToken.configUrl;
+  }
+
+  return data;
+}
+
+module.exports = createAuthorizationData;
+
+},{"../lib/polyfill":96}],76:[function(require,module,exports){
+'use strict';
+
+module.exports = function (fn) {
+  return function () {
+    // IE9 doesn't support passing arguments to setTimeout so we have to emulate it.
+    var args = arguments;
+
+    setTimeout(function () {
+      fn.apply(null, args);
+    }, 1);
+  };
+};
+
+},{}],77:[function(require,module,exports){
+'use strict';
+
+var batchExecuteFunctions = require('./batch-execute-functions');
+
+function Destructor() {
+  this._teardownRegistry = [];
+
+  this._isTearingDown = false;
+}
+
+Destructor.prototype.registerFunctionForTeardown = function (fn) {
+  if (typeof fn === 'function') {
+    this._teardownRegistry.push(fn);
+  }
+};
+
+Destructor.prototype.teardown = function (callback) {
+  if (this._isTearingDown) {
+    callback(new Error('Destructor is already tearing down'));
+    return;
+  }
+
+  this._isTearingDown = true;
+
+  batchExecuteFunctions(this._teardownRegistry, function (err) {
+    this._teardownRegistry = [];
+    this._isTearingDown = false;
+
+    if (typeof callback === 'function') {
+      callback(err);
+    }
+  }.bind(this));
+};
+
+module.exports = Destructor;
+
+},{"./batch-execute-functions":65}],78:[function(require,module,exports){
+'use strict';
+
+function enumerate(values, prefix) {
+  prefix = prefix == null ? '' : prefix;
+
+  return values.reduce(function (enumeration, value) {
+    enumeration[value] = prefix + value;
+    return enumeration;
+  }, {});
+}
+
+module.exports = enumerate;
+
+},{}],79:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('./braintree-error');
+
+module.exports = {
+  CALLBACK_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'CALLBACK_REQUIRED'
+  },
+  INSTANTIATION_OPTION_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'INSTANTIATION_OPTION_REQUIRED'
+  },
+  INVALID_OPTION: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'INVALID_OPTION'
+  },
+  INCOMPATIBLE_VERSIONS: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'INCOMPATIBLE_VERSIONS'
+  },
+  METHOD_CALLED_AFTER_TEARDOWN: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'METHOD_CALLED_AFTER_TEARDOWN'
+  },
+  BRAINTREE_API_ACCESS_RESTRICTED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'BRAINTREE_API_ACCESS_RESTRICTED',
+    message: 'Your access is restricted and cannot use this part of the Braintree API.'
+  }
+};
+
+},{"./braintree-error":66}],80:[function(require,module,exports){
+'use strict';
+
+function EventEmitter() {
+  this._events = {};
+}
+
+EventEmitter.prototype.on = function (event, callback) {
+  if (this._events[event]) {
+    this._events[event].push(callback);
+  } else {
+    this._events[event] = [callback];
+  }
+};
+
+EventEmitter.prototype._emit = function (event) {
+  var i, args;
+  var callbacks = this._events[event];
+
+  if (!callbacks) { return; }
+
+  args = Array.prototype.slice.call(arguments, 1);
+
+  for (i = 0; i < callbacks.length; i++) {
+    callbacks[i].apply(null, args);
+  }
+};
+
+module.exports = EventEmitter;
+
+},{}],81:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var Popup = require('./strategies/popup');
+var PopupBridge = require('./strategies/popup-bridge');
+var Modal = require('./strategies/modal');
+var Bus = require('../../bus');
+var events = require('../shared/events');
+var errors = require('../shared/errors');
+var constants = require('../shared/constants');
+var uuid = require('../../uuid');
+var iFramer = require('iframer');
+var BraintreeError = require('../../braintree-error');
+var browserDetection = require('browser-detection');
+
+var REQUIRED_CONFIG_KEYS = [
+  'name',
+  'dispatchFrameUrl',
+  'openFrameUrl'
+];
+
+function noop() {}
+
+function _validateFrameConfiguration(options) {
+  if (!options) {
+    throw new Error('Valid configuration is required');
+  }
+
+  REQUIRED_CONFIG_KEYS.forEach(function (key) {
+    if (!options.hasOwnProperty(key)) {
+      throw new Error('A valid frame ' + key + ' must be provided');
+    }
+  });
+
+  if (!/^[\w_]+$/.test(options.name)) {
+    throw new Error('A valid frame name must be provided');
+  }
+}
+
+function FrameService(options) {
+  _validateFrameConfiguration(options);
+
+  this._serviceId = uuid().replace(/-/g, '');
+
+  this._options = {
+    name: options.name + '_' + this._serviceId,
+    dispatchFrameUrl: options.dispatchFrameUrl,
+    openFrameUrl: options.openFrameUrl,
+    height: options.height,
+    width: options.width
+  };
+  this.state = options.state;
+
+  this._bus = new Bus({channel: this._serviceId});
+  this._setBusEvents();
+}
+
+FrameService.prototype.initialize = function (callback) {
+  var dispatchFrameReadyHandler = function () {
+    callback();
+    this._bus.off(events.DISPATCH_FRAME_READY, dispatchFrameReadyHandler);
+  }.bind(this);
+
+  this._bus.on(events.DISPATCH_FRAME_READY, dispatchFrameReadyHandler);
+  this._writeDispatchFrame();
+};
+
+FrameService.prototype._writeDispatchFrame = function () {
+  var frameName = constants.DISPATCH_FRAME_NAME + '_' + this._serviceId;
+  var frameSrc = this._options.dispatchFrameUrl;
+
+  this._dispatchFrame = iFramer({
+    name: frameName,
+    src: frameSrc,
+    'class': constants.DISPATCH_FRAME_CLASS,
+    height: 0,
+    width: 0,
+    style: {
+      position: 'absolute',
+      left: '-9999px'
+    }
+  });
+
+  document.body.appendChild(this._dispatchFrame);
+};
+
+FrameService.prototype._setBusEvents = function () {
+  this._bus.on(events.DISPATCH_FRAME_REPORT, function (res, reply) {
+    if (this._onCompleteCallback) {
+      this._onCompleteCallback.call(null, res.err, res.payload);
+    }
+    this._frame.close();
+
+    this._onCompleteCallback = null;
+
+    if (reply) {
+      reply();
+    }
+  }.bind(this));
+
+  this._bus.on(Bus.events.CONFIGURATION_REQUEST, function (reply) {
+    reply(this.state);
+  }.bind(this));
+};
+
+FrameService.prototype.open = function (callback) {
+  this._frame = this._getFrameForEnvironment();
+  this._frame.initialize(callback);
+
+  if (this._frame instanceof PopupBridge) {
+    return;
+  }
+
+  this._onCompleteCallback = callback;
+  this._frame.open();
+
+  if (this.isFrameClosed()) {
+    this._cleanupFrame();
+    if (callback) {
+      callback(new BraintreeError(errors.FRAME_SERVICE_FRAME_OPEN_FAILED));
+    }
+    return;
+  }
+  this._pollForPopupClose();
+};
+
+FrameService.prototype.redirect = function (url) {
+  if (this._frame && !this.isFrameClosed()) {
+    this._frame.redirect(url);
+  }
+};
+
+FrameService.prototype.close = function () {
+  if (!this.isFrameClosed()) {
+    this._frame.close();
+  }
+};
+
+FrameService.prototype.focus = function () {
+  if (!this.isFrameClosed()) {
+    this._frame.focus();
+  }
+};
+
+FrameService.prototype.createHandler = function (options) {
+  options = options || {};
+
+  return {
+    close: function () {
+      if (options.beforeClose) {
+        options.beforeClose();
+      }
+
+      this.close();
+    }.bind(this),
+    focus: function () {
+      if (options.beforeFocus) {
+        options.beforeFocus();
+      }
+
+      this.focus();
+    }.bind(this)
+  };
+};
+
+FrameService.prototype.createNoopHandler = function () {
+  return {
+    close: noop,
+    focus: noop
+  };
+};
+
+FrameService.prototype.teardown = function () {
+  this.close();
+  this._dispatchFrame.parentNode.removeChild(this._dispatchFrame);
+  this._dispatchFrame = null;
+  this._cleanupFrame();
+};
+
+FrameService.prototype.isFrameClosed = function () {
+  return this._frame == null || this._frame.isClosed();
+};
+
+FrameService.prototype._cleanupFrame = function () {
+  this._frame = null;
+  clearInterval(this._popupInterval);
+  this._popupInterval = null;
+};
+
+FrameService.prototype._pollForPopupClose = function () {
+  this._popupInterval = setInterval(function () {
+    if (this.isFrameClosed()) {
+      this._cleanupFrame();
+      if (this._onCompleteCallback) {
+        this._onCompleteCallback(new BraintreeError(errors.FRAME_SERVICE_FRAME_CLOSED));
+      }
+    }
+  }.bind(this), constants.POPUP_POLL_INTERVAL);
+
+  return this._popupInterval;
+};
+
+FrameService.prototype._getFrameForEnvironment = function () {
+  var usePopup = browserDetection.supportsPopups();
+  var popupBridgeExists = Boolean(global.popupBridge);
+
+  if (usePopup) {
+    return new Popup(this._options);
+  } else if (popupBridgeExists) {
+    return new PopupBridge(this._options);
+  }
+
+  return new Modal(this._options);
+};
+
+module.exports = FrameService;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../braintree-error":66,"../../bus":69,"../../uuid":100,"../shared/constants":88,"../shared/errors":89,"../shared/events":90,"./strategies/modal":83,"./strategies/popup":86,"./strategies/popup-bridge":84,"browser-detection":240,"iframer":371}],82:[function(require,module,exports){
+'use strict';
+
+var FrameService = require('./frame-service');
+
+module.exports = {
+  create: function createFrameService(options, callback) {
+    var frameService = new FrameService(options);
+
+    frameService.initialize(function () {
+      callback(frameService);
+    });
+  }
+};
+
+},{"./frame-service":81}],83:[function(require,module,exports){
+'use strict';
+
+var iFramer = require('iframer');
+var assign = require('../../../assign').assign;
+var browserDetection = require('browser-detection');
+
+var ELEMENT_STYLES = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  bottom: 0,
+  padding: 0,
+  margin: 0,
+  border: 0,
+  outline: 'none',
+  zIndex: 20001,
+  background: '#FFFFFF'
+};
+
+function noop() {}
+
+function Modal(options) {
+  this._closed = null;
+  this._frame = null;
+  this._options = options || {};
+  this._container = this._options.container || document.body;
+}
+
+Modal.prototype.initialize = noop;
+
+Modal.prototype.open = function () {
+  var iframerConfig = {
+    src: this._options.openFrameUrl,
+    name: this._options.name,
+    scrolling: 'yes',
+    height: '100%',
+    width: '100%',
+    style: assign({}, ELEMENT_STYLES)
+  };
+
+  if (browserDetection.isIos()) {
+    iframerConfig.style.position = 'absolute';
+
+    this._el = document.createElement('div');
+    this._frame = iFramer(iframerConfig);
+    this._el.appendChild(this._frame);
+  } else {
+    this._el = this._frame = iFramer(iframerConfig);
+  }
+  this._closed = false;
+
+  this._container.appendChild(this._el);
+};
+
+Modal.prototype.focus = noop;
+
+Modal.prototype.close = function () {
+  this._container.removeChild(this._el);
+  this._frame = null;
+  this._closed = true;
+};
+
+Modal.prototype.isClosed = function () {
+  return Boolean(this._closed);
+};
+
+Modal.prototype.redirect = function (redirectUrl) {
+  this._frame.src = redirectUrl;
+};
+
+module.exports = Modal;
+
+},{"../../../assign":64,"browser-detection":240,"iframer":371}],84:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var BraintreeError = require('../../../braintree-error');
+var errors = require('../../shared/errors');
+
+function noop() {}
+
+function PopupBridge(options) {
+  this._closed = null;
+  this._options = options;
+}
+
+PopupBridge.prototype.initialize = function (callback) {
+  var self = this;
+
+  global.popupBridge.onComplete = function (err, payload) {
+    var popupDismissed = !payload && !err;
+
+    self._closed = true;
+
+    if (err || popupDismissed) {
+      // User clicked "Done" button of browser view
+      callback(new BraintreeError(errors.FRAME_SERVICE_FRAME_CLOSED));
+      return;
+    }
+    // User completed popup flow (includes success and cancel cases)
+    callback(null, payload);
+  };
+};
+
+PopupBridge.prototype.open = function (options) {
+  var url;
+
+  options = options || {};
+  url = options.openFrameUrl || this._options.openFrameUrl;
+
+  this._closed = false;
+  global.popupBridge.open(url);
+};
+
+PopupBridge.prototype.focus = noop;
+
+PopupBridge.prototype.close = noop;
+
+PopupBridge.prototype.isClosed = function () {
+  return Boolean(this._closed);
+};
+
+PopupBridge.prototype.redirect = function (redirectUrl) {
+  this.open({openFrameUrl: redirectUrl});
+};
+
+module.exports = PopupBridge;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../../braintree-error":66,"../../shared/errors":89}],85:[function(require,module,exports){
+'use strict';
+
+var constants = require('../../../shared/constants');
+var position = require('./position');
+
+module.exports = function composePopupOptions(options) {
+  var height = options.height || constants.DEFAULT_POPUP_HEIGHT;
+  var width = options.width || constants.DEFAULT_POPUP_WIDTH;
+
+  return [
+    constants.POPUP_BASE_OPTIONS,
+    'height=' + height,
+    'width=' + width,
+    'top=' + position.top(height),
+    'left=' + position.left(width)
+  ].join(',');
+};
+
+},{"../../../shared/constants":88,"./position":87}],86:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var composeOptions = require('./compose-options');
+
+function noop() {}
+
+function Popup(options) {
+  this._frame = null;
+  this._options = options || {};
+
+  this.open();
+}
+
+Popup.prototype.initialize = noop;
+
+Popup.prototype.open = function () {
+  this._frame = global.open(
+    this._options.openFrameUrl,
+    this._options.name,
+    composeOptions(this._options)
+  );
+};
+
+Popup.prototype.focus = function () {
+  this._frame.focus();
+};
+
+Popup.prototype.close = function () {
+  this._frame.close();
+};
+
+Popup.prototype.isClosed = function () {
+  return this._frame && Boolean(this._frame.closed);
+};
+
+Popup.prototype.redirect = function (redirectUrl) {
+  this._frame.location.href = redirectUrl;
+};
+
+module.exports = Popup;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./compose-options":85}],87:[function(require,module,exports){
+(function (global){
+'use strict';
+
+function top(height) {
+  var windowHeight = global.outerHeight || document.documentElement.clientHeight;
+  var windowTop = global.screenY == null ? global.screenTop : global.screenY;
+
+  return center(windowHeight, height, windowTop);
+}
+
+function left(width) {
+  var windowWidth = global.outerWidth || document.documentElement.clientWidth;
+  var windowLeft = global.screenX == null ? global.screenLeft : global.screenX;
+
+  return center(windowWidth, width, windowLeft);
+}
+
+function center(windowMetric, popupMetric, offset) {
+  return (windowMetric - popupMetric) / 2 + offset;
+}
+
+module.exports = {
+  top: top,
+  left: left,
+  center: center
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],88:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  DISPATCH_FRAME_NAME: 'dispatch',
+  DISPATCH_FRAME_CLASS: 'braintree-dispatch-frame',
+  POPUP_BASE_OPTIONS: 'resizable,scrollbars',
+  DEFAULT_POPUP_WIDTH: 450,
+  DEFAULT_POPUP_HEIGHT: 535,
+  POPUP_POLL_INTERVAL: 100,
+  POPUP_CLOSE_TIMEOUT: 100
+};
+
+},{}],89:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../braintree-error');
+
+module.exports = {
+  FRAME_SERVICE_FRAME_CLOSED: {
+    type: BraintreeError.types.INTERNAL,
+    code: 'FRAME_SERVICE_FRAME_CLOSED',
+    message: 'Frame closed before tokenization could occur.'
+  },
+  FRAME_SERVICE_FRAME_OPEN_FAILED: {
+    type: BraintreeError.types.INTERNAL,
+    code: 'FRAME_SERVICE_FRAME_OPEN_FAILED',
+    message: 'Frame failed to open.'
+  }
+};
+
+},{"../../braintree-error":66}],90:[function(require,module,exports){
+'use strict';
+
+var enumerate = require('../../enumerate');
+
+module.exports = enumerate([
+  'DISPATCH_FRAME_READY',
+  'DISPATCH_FRAME_REPORT'
+], 'frameService:');
+
+},{"../../enumerate":78}],91:[function(require,module,exports){
+(function (global){
+'use strict';
+
+function isHTTPS(protocol) {
+  protocol = protocol || global.location.protocol;
+  return protocol === 'https:';
+}
+
+module.exports = {
+  isHTTPS: isHTTPS
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],92:[function(require,module,exports){
+'use strict';
+
+var parser;
+var legalHosts = {
+  'paypal.com': 1,
+  'braintreepayments.com': 1,
+  'braintreegateway.com': 1,
+  'braintree-api.com': 1
+};
+
+function stripSubdomains(domain) {
+  return domain.split('.').slice(-2).join('.');
+}
+
+function isWhitelistedDomain(url) {
+  var mainDomain;
+
+  url = url.toLowerCase();
+
+  if (!/^https:/.test(url)) {
+    return false;
+  }
+
+  parser = parser || document.createElement('a');
+  parser.href = url;
+  mainDomain = stripSubdomains(parser.hostname);
+
+  return legalHosts.hasOwnProperty(mainDomain);
+}
+
+module.exports = isWhitelistedDomain;
+
+},{}],93:[function(require,module,exports){
+'use strict';
+
+module.exports = function (value) {
+  return JSON.parse(JSON.stringify(value));
+};
+
+},{}],94:[function(require,module,exports){
+'use strict';
+
+module.exports = function (obj) {
+  return Object.keys(obj).filter(function (key) {
+    return typeof obj[key] === 'function';
+  });
+};
+
+},{}],95:[function(require,module,exports){
+'use strict';
+
+function once(fn) {
+  var called = false;
+
+  return function () {
+    if (!called) {
+      called = true;
+      fn.apply(null, arguments);
+    }
+  };
+}
+
+module.exports = once;
+
+},{}],96:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var atobNormalized = typeof global.atob === 'function' ? global.atob : atob;
+
+function atob(base64String) {
+  var a, b, c, b1, b2, b3, b4, i;
+  var base64Matcher = new RegExp('^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})([=]{1,2})?$');
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  var result = '';
+
+  if (!base64Matcher.test(base64String)) {
+    throw new Error('Non base64 encoded input passed to window.atob polyfill');
+  }
+
+  i = 0;
+  do {
+    b1 = characters.indexOf(base64String.charAt(i++));
+    b2 = characters.indexOf(base64String.charAt(i++));
+    b3 = characters.indexOf(base64String.charAt(i++));
+    b4 = characters.indexOf(base64String.charAt(i++));
+
+    a = (b1 & 0x3F) << 2 | b2 >> 4 & 0x3;
+    b = (b2 & 0xF) << 4 | b3 >> 2 & 0xF;
+    c = (b3 & 0x3) << 6 | b4 & 0x3F;
+
+    result += String.fromCharCode(a) + (b ? String.fromCharCode(b) : '') + (c ? String.fromCharCode(c) : '');
+  } while (i < base64String.length);
+
+  return result;
+}
+
+module.exports = {
+  atob: function (base64String) {
+    return atobNormalized.call(global, base64String);
+  },
+  _atob: atob
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],97:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var Promise = global.Promise || require('promise-polyfill');
+
+module.exports = Promise;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"promise-polyfill":444}],98:[function(require,module,exports){
+(function (global){
+'use strict';
+
+function _notEmpty(obj) {
+  var key;
+
+  for (key in obj) {
+    if (obj.hasOwnProperty(key)) { return true; }
+  }
+
+  return false;
+}
+
+function _isArray(value) {
+  return value && typeof value === 'object' && typeof value.length === 'number' &&
+    Object.prototype.toString.call(value) === '[object Array]' || false;
+}
+
+function parse(url) {
+  var query, params;
+
+  url = url || global.location.href;
+
+  if (!/\?/.test(url)) {
+    return {};
+  }
+
+  query = url.replace(/#.*$/, '').replace(/^.*\?/, '').split('&');
+
+  params = query.reduce(function (toReturn, keyValue) {
+    var parts = keyValue.split('=');
+    var key = decodeURIComponent(parts[0]);
+    var value = decodeURIComponent(parts[1]);
+
+    toReturn[key] = value;
+    return toReturn;
+  }, {});
+
+  return params;
+}
+
+function stringify(params, namespace) {
+  var k, v, p;
+  var query = [];
+
+  for (p in params) {
+    if (!params.hasOwnProperty(p)) {
+      continue;
+    }
+
+    v = params[p];
+
+    if (namespace) {
+      if (_isArray(params)) {
+        k = namespace + '[]';
+      } else {
+        k = namespace + '[' + p + ']';
+      }
+    } else {
+      k = p;
+    }
+    if (typeof v === 'object') {
+      query.push(stringify(v, k));
+    } else {
+      query.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
+    }
+  }
+
+  return query.join('&');
+}
+
+function queryify(url, params) {
+  url = url || '';
+
+  if (params != null && typeof params === 'object' && _notEmpty(params)) {
+    url += url.indexOf('?') === -1 ? '?' : '';
+    url += url.indexOf('=') !== -1 ? '&' : '';
+    url += stringify(params);
+  }
+
+  return url;
+}
+
+module.exports = {
+  parse: parse,
+  stringify: stringify,
+  queryify: queryify
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],99:[function(require,module,exports){
+'use strict';
+
+function useMin(isDebug) {
+  return isDebug ? '' : '.min';
+}
+
+module.exports = useMin;
+
+},{}],100:[function(require,module,exports){
+'use strict';
+
+function uuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0;
+    var v = c === 'x' ? r : r & 0x3 | 0x8;
+
+    return v.toString(16);
+  });
+}
+
+module.exports = uuid;
+
+},{}],101:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var Promise = require('../../lib/promise');
+var frameService = require('../../lib/frame-service/external');
+var BraintreeError = require('../../lib/braintree-error');
+var errors = require('../shared/errors');
+var VERSION = "3.15.0";
+var methods = require('../../lib/methods');
+var wrapPromise = require('wrap-promise');
+var analytics = require('../../lib/analytics');
+var convertMethodsToError = require('../../lib/convert-methods-to-error');
+var convertToBraintreeError = require('../../lib/convert-to-braintree-error');
+var constants = require('../shared/constants');
+
+var INTEGRATION_TIMEOUT_MS = require('../../lib/constants').INTEGRATION_TIMEOUT_MS;
+
+/**
+ * Masterpass Address object.
+ * @typedef {object} Masterpass~Address
+ * @property {string} countryCodeAlpha2 The customer's country code.
+ * @property {string} extendedAddress The customer's extended address.
+ * @property {string} locality The customer's locality.
+ * @property {string} postalCode The customer's postal code.
+ * @property {string} region The customer's region.
+ * @property {string} streetAddress The customer's street address.
+ */
+
+/**
+ * @typedef {object} Masterpass~tokenizePayload
+ * @property {string} nonce The payment method nonce.
+ * @property {string} description The human readable description.
+ * @property {string} type The payment method type, always `MasterpassCard`.
+ * @property {object} details Additional account details.
+ * @property {string} details.cardType Type of card, ex: Visa, MasterCard.
+ * @property {string} details.lastTwo Last two digits of card number.
+ * @property {Masterpass~Address} billingAddress The customer's billing address.
+ * @property {Masterpass~Address} shippingAddress The customer's shipping address.
+ */
+
+/**
+ * @class
+ * @param {object} options see {@link module:braintree-web/masterpass.create|masterpass.create}
+ * @description <strong>You cannot use this constructor directly. Use {@link module:braintree-web/masterpass.create|braintree.masterpass.create} instead.</strong>
+ * @classdesc This class represents an Masterpass component. Instances of this class have methods for launching a new window to process a transaction with Masterpass.
+ */
+function Masterpass(options) {
+  var configuration = options.client.getConfiguration();
+
+  this._client = options.client;
+  this._assetsUrl = configuration.gatewayConfiguration.assetsUrl + '/web/' + VERSION;
+  this._isDebug = configuration.isDebug;
+  this._authInProgress = false;
+  if (global.popupBridge && typeof global.popupBridge.getReturnUrlPrefix === 'function') {
+    this._callbackUrl = global.popupBridge.getReturnUrlPrefix() + 'return';
+  } else {
+    this._callbackUrl = this._assetsUrl + '/html/masterpass-redirect-frame' + (this._isDebug ? '' : '.min') + '.html';
+  }
+}
+
+Masterpass.prototype._initialize = function () {
+  var self = this;
+
+  return new Promise(function (resolve) {
+    var failureTimeout = setTimeout(function () {
+      analytics.sendEvent(self._client, 'masterpass.load.timed-out');
+    }, INTEGRATION_TIMEOUT_MS);
+
+    frameService.create({
+      name: constants.LANDING_FRAME_NAME,
+      height: constants.POPUP_HEIGHT,
+      width: constants.POPUP_WIDTH,
+      dispatchFrameUrl: self._assetsUrl + '/html/dispatch-frame' + (self._isDebug ? '' : '.min') + '.html',
+      openFrameUrl: self._assetsUrl + '/html/masterpass-landing-frame' + (self._isDebug ? '' : '.min') + '.html'
+    }, function (service) {
+      self._frameService = service;
+      clearTimeout(failureTimeout);
+      analytics.sendEvent(self._client, 'masterpass.load.succeeded');
+      resolve(self);
+    });
+  });
+};
+
+/**
+ * Launches the Masterpass flow and returns a nonce payload. Only one Masterpass flow should be active at a time. One way to achieve this is to disable your Masterpass button while the flow is open.
+ * @public
+ * @param {object} options All options for initiating the Masterpass payment flow.
+ * @param {string} options.currencyCode The currency code to process the payment.
+ * @param {string} options.subtotal The amount to authorize for the transaction.
+ * @param {object} options.config All configuration parameters accepted by Masterpass lightbox, except `function` data type. These options will override the values set by Braintree server. Please see {@link Masterpass Lightbox Parameters|https://developer.mastercard.com/page/masterpass-lightbox-parameters} for more information.
+ * @param {callback} [callback] The second argument, <code>data</code>, is a {@link Masterpass~tokenizePayload|tokenizePayload}. If no callback is provided, the method will return a Promise that resolves with a {@link Masterpass~tokenizePayload|tokenizePayload}.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * button.addEventListener('click', function () {
+ *   // Disable the button so that we don't attempt to open multiple popups.
+ *   button.setAttribute('disabled', 'disabled');
+ *
+ *   // Because tokenize opens a new window, this must be called
+ *   // as a result of a user action, such as a button click.
+ *   masterpassInstance.tokenize({
+ *     currencyCode: 'USD',
+ *     subtotal: '10.00'
+ *   }).then(function (payload) {
+ *     button.removeAttribute('disabled');
+ *     // Submit payload.nonce to your server
+ *   }).catch(function (tokenizeError) {
+ *     button.removeAttribute('disabled');
+ *     // Handle flow errors or premature flow closure
+ *
+ *     switch (tokenizeErr.code) {
+ *       case 'MASTERPASS_POPUP_CLOSED':
+ *         console.error('Customer closed Masterpass popup.');
+ *         break;
+ *       case 'MASTERPASS_ACCOUNT_TOKENIZATION_FAILED':
+ *         console.error('Masterpass tokenization failed. See details:', tokenizeErr.details);
+ *         break;
+ *       case 'MASTERPASS_FLOW_FAILED':
+ *         console.error('Unable to initialize Masterpass flow. Are your options correct?', tokenizeErr.details);
+ *         break;
+ *       default:
+ *         console.error('Error!', tokenizeErr);
+ *     }
+ *   });
+ * });
+ */
+Masterpass.prototype.tokenize = function (options) {
+  var self = this;
+
+  if (!options || hasMissingOption(options)) {
+    return Promise.reject(new BraintreeError(errors.MASTERPASS_TOKENIZE_MISSING_REQUIRED_OPTION));
+  }
+
+  if (self._authInProgress) {
+    return Promise.reject(new BraintreeError(errors.MASTERPASS_TOKENIZATION_ALREADY_IN_PROGRESS));
+  }
+
+  return new Promise(function (resolve, reject) {
+    self._navigateFrameToLoadingPage(options).catch(reject);
+    // This MUST happen after _navigateFrameToLoadingPage for Metro browsers to work.
+    self._frameService.open(self._createFrameOpenHandler(resolve, reject));
+  });
+};
+
+Masterpass.prototype._navigateFrameToLoadingPage = function (options) {
+  var self = this;
+
+  this._authInProgress = true;
+
+  return this._client.request({
+    method: 'post',
+    endpoint: 'masterpass/request_token',
+    data: {
+      requestToken: {
+        originUrl: global.location.protocol + '//' + global.location.hostname,
+        subtotal: options.subtotal,
+        currencyCode: options.currencyCode,
+        callbackUrl: this._callbackUrl
+      }
+    }
+  }).then(function (response) {
+    var redirectUrl = self._assetsUrl + '/html/masterpass-loading-frame' + (self._isDebug ? '' : '.min') + '.html?';
+    var gatewayConfiguration = self._client.getConfiguration().gatewayConfiguration;
+    var config = options.config || {};
+    var queryParams;
+
+    queryParams = {
+      environment: gatewayConfiguration.environment,
+      requestToken: response.requestToken,
+      callbackUrl: self._callbackUrl,
+      merchantCheckoutId: gatewayConfiguration.masterpass.merchantCheckoutId,
+      allowedCardTypes: gatewayConfiguration.masterpass.supportedNetworks
+    };
+
+    Object.keys(config).forEach(function (key) {
+      if (typeof config[key] !== 'function') {
+        queryParams[key] = config[key];
+      }
+    });
+
+    redirectUrl += Object.keys(queryParams).map(function (key) {
+      return key + '=' + queryParams[key];
+    }).join('&');
+
+    self._frameService.redirect(redirectUrl);
+  }).catch(function (err) {
+    var status = err.details && err.details.httpStatus;
+
+    self._closeWindow();
+
+    if (status === 422) {
+      return Promise.reject(convertToBraintreeError(err, errors.MASTERPASS_INVALID_PAYMENT_OPTION));
+    }
+
+    return Promise.reject(convertToBraintreeError(err, errors.MASTERPASS_FLOW_FAILED));
+  });
+};
+
+Masterpass.prototype._createFrameOpenHandler = function (resolve, reject) {
+  var self = this;
+
+  if (global.popupBridge) {
+    return function (popupBridgeErr, payload) {
+      self._authInProgress = false;
+
+      if (popupBridgeErr) {
+        analytics.sendEvent(self._client, 'masterpass.tokenization.closed-popupbridge.by-user');
+        reject(convertToBraintreeError(popupBridgeErr, errors.MASTERPASS_POPUP_CLOSED));
+        return;
+      } else if (!payload.queryItems) {
+        analytics.sendEvent(self._client, 'masterpass.tokenization.failed-popupbridge');
+        reject(new BraintreeError(errors.MASTERPASS_FLOW_FAILED));
+        return;
+      }
+
+      self._tokenizeMasterpass(payload.queryItems).then(resolve).catch(reject);
+    };
+  }
+
+  return function (frameServiceErr, payload) {
+    if (frameServiceErr) {
+      self._authInProgress = false;
+
+      if (frameServiceErr.code === 'FRAME_SERVICE_FRAME_CLOSED') {
+        analytics.sendEvent(self._client, 'masterpass.tokenization.closed.by-user');
+        reject(new BraintreeError(errors.MASTERPASS_POPUP_CLOSED));
+        return;
+      }
+
+      if (frameServiceErr.code === 'FRAME_SERVICE_FRAME_OPEN_FAILED') {
+        analytics.sendEvent(self._client, 'masterpass.tokenization.failed.to-open');
+        reject(new BraintreeError(errors.MASTERPASS_POPUP_OPEN_FAILED));
+        return;
+      }
+
+      analytics.sendEvent(self._client, 'masterpass.tokenization.failed');
+      self._closeWindow();
+      reject(convertToBraintreeError(frameServiceErr, errors.MASTERPASS_FLOW_FAILED));
+      return;
+    }
+
+    self._tokenizeMasterpass(payload).then(resolve).catch(reject);
+  };
+};
+
+Masterpass.prototype._tokenizeMasterpass = function (payload) {
+  var self = this;
+
+  if (payload.mpstatus !== 'success') {
+    analytics.sendEvent(self._client, 'masterpass.tokenization.closed.by-user');
+    self._closeWindow();
+    return Promise.reject(new BraintreeError(errors.MASTERPASS_POPUP_CLOSED));
+  }
+
+  return self._client.request({
+    endpoint: 'payment_methods/masterpass_cards',
+    method: 'post',
+    data: {
+      masterpassCard: {
+        checkoutResourceUrl: payload.checkout_resource_url,
+        requestToken: payload.oauth_token,
+        verifierToken: payload.oauth_verifier
+      }
+    }
+  }).then(function (response) {
+    self._closeWindow();
+    if (global.popupBridge) {
+      analytics.sendEvent(self._client, 'masterpass.tokenization.success-popupbridge');
+    } else {
+      analytics.sendEvent(self._client, 'masterpass.tokenization.success');
+    }
+    return response.masterpassCards[0];
+  }).catch(function (tokenizeErr) {
+    self._closeWindow();
+    if (global.popupBridge) {
+      analytics.sendEvent(self._client, 'masterpass.tokenization.failed-popupbridge');
+    } else {
+      analytics.sendEvent(self._client, 'masterpass.tokenization.failed');
+    }
+
+    return Promise.reject(convertToBraintreeError(tokenizeErr, errors.MASTERPASS_ACCOUNT_TOKENIZATION_FAILED));
+  });
+};
+
+Masterpass.prototype._closeWindow = function () {
+  this._authInProgress = false;
+  this._frameService.close();
+};
+
+/**
+ * Cleanly tear down anything set up by {@link module:braintree-web/masterpass.create|create}.
+ * @public
+ * @param {callback} [callback] Called on completion. If no callback is provided, `teardown` returns a promise.
+ * @example
+ * masterpassInstance.teardown();
+ * @example <caption>With callback</caption>
+ * masterpassInstance.teardown(function () {
+ *   // teardown is complete
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+Masterpass.prototype.teardown = function () {
+  var self = this;
+
+  return new Promise(function (resolve) {
+    self._frameService.teardown();
+
+    convertMethodsToError(self, methods(Masterpass.prototype));
+
+    analytics.sendEvent(self._client, 'masterpass.teardown-completed');
+
+    resolve();
+  });
+};
+
+function hasMissingOption(options) {
+  var i, option;
+
+  for (i = 0; i < constants.REQUIRED_OPTIONS_FOR_TOKENIZE.length; i++) {
+    option = constants.REQUIRED_OPTIONS_FOR_TOKENIZE[i];
+
+    if (!options.hasOwnProperty(option)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+module.exports = wrapPromise.wrapPrototype(Masterpass);
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../lib/analytics":63,"../../lib/braintree-error":66,"../../lib/constants":72,"../../lib/convert-methods-to-error":73,"../../lib/convert-to-braintree-error":74,"../../lib/frame-service/external":82,"../../lib/methods":94,"../../lib/promise":97,"../shared/constants":103,"../shared/errors":104,"wrap-promise":672}],102:[function(require,module,exports){
+(function (global){
+'use strict';
+/** @module braintree-web/masterpass
+ * @description Processes Masterpass. *This component is currently in beta and is subject to change.*
+ */
+
+var BraintreeError = require('../lib/braintree-error');
+var browserDetection = require('browser-detection');
+var Masterpass = require('./external/masterpass');
+var VERSION = "3.15.0";
+var errors = require('./shared/errors');
+var sharedErrors = require('../lib/errors');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} [callback] The second argument, `data`, is the {@link Masterpass} instance. If no callback is passed in, the create function returns a promise that resolves the {@link Masterpass} instance.
+ * @example
+ * braintree.masterpass.create({
+ *   client: clientInstance
+ * }, function (createErr, masterpassInstance) {
+ *   if (createErr) {
+ *     if (createErr.code === 'MASTERPASS_BROWSER_NOT_SUPPORTED') {
+ *       console.error('This browser is not supported.');
+ *     } else {
+ *       console.error('Error!', createErr);
+ *     }
+ *     return;
+ *   }
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+function create(options) {
+  var masterpassInstance, clientVersion, configuration;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating Masterpass.'
+    }));
+  }
+
+  clientVersion = options.client.getConfiguration().analyticsMetadata.sdkVersion;
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and Masterpass (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  if (!isSupported()) {
+    return Promise.reject(new BraintreeError(errors.MASTERPASS_BROWSER_NOT_SUPPORTED));
+  }
+
+  configuration = options.client.getConfiguration().gatewayConfiguration;
+  if (!configuration.masterpass) {
+    return Promise.reject(new BraintreeError(errors.MASTERPASS_NOT_ENABLED));
+  }
+
+  masterpassInstance = new Masterpass(options);
+
+  return masterpassInstance._initialize();
+}
+
+/**
+ * @static
+ * @function isSupported
+ * @description Returns true if Masterpass supports this browser.
+ * @example
+ * if (braintree.masterpass.isSupported()) {
+ *   // Add Masterpass button to the page
+ * } else {
+ *   // Hide Masterpass payment option
+ * }
+ * @returns {Boolean} Returns true if Masterpass supports this browser.
+ */
+function isSupported() {
+  return Boolean(global.popupBridge || browserDetection.supportsPopups());
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  isSupported: isSupported,
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./external/masterpass":101,"./shared/errors":104,"browser-detection":240,"wrap-promise":672}],103:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  LANDING_FRAME_NAME: 'braintreemasterpasslanding',
+  POPUP_WIDTH: 450,
+  POPUP_HEIGHT: 660,
+  REQUIRED_OPTIONS_FOR_TOKENIZE: [
+    'subtotal',
+    'currencyCode'
+  ]
+};
+
+},{}],104:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../lib/braintree-error');
+
+module.exports = {
+  MASTERPASS_BROWSER_NOT_SUPPORTED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'MASTERPASS_BROWSER_NOT_SUPPORTED',
+    message: 'Browser is not supported.'
+  },
+  MASTERPASS_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'MASTERPASS_NOT_ENABLED',
+    message: 'Masterpass is not enabled for this merchant.'
+  },
+  MASTERPASS_TOKENIZE_MISSING_REQUIRED_OPTION: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'MASTERPASS_TOKENIZE_MISSING_REQUIRED_OPTION',
+    message: 'Missing required option for tokenize.'
+  },
+  MASTERPASS_TOKENIZATION_ALREADY_IN_PROGRESS: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'MASTERPASS_TOKENIZATION_ALREADY_IN_PROGRESS',
+    message: 'Masterpass tokenization is already in progress.'
+  },
+  MASTERPASS_ACCOUNT_TOKENIZATION_FAILED: {
+    type: BraintreeError.types.NETWORK,
+    code: 'MASTERPASS_ACCOUNT_TOKENIZATION_FAILED',
+    message: 'Could not tokenize user\'s Masterpass account.'
+  },
+  MASTERPASS_POPUP_OPEN_FAILED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'MASTERPASS_POPUP_OPEN_FAILED',
+    message: 'Masterpass popup failed to open. Make sure to tokenize in response to a user action, such as a click.'
+  },
+  MASTERPASS_POPUP_CLOSED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'MASTERPASS_POPUP_CLOSED',
+    message: 'Customer closed Masterpass popup before authorizing.'
+  },
+  MASTERPASS_INVALID_PAYMENT_OPTION: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'MASTERPASS_INVALID_PAYMENT_OPTION',
+    message: 'Masterpass payment options are invalid.'
+  },
+  MASTERPASS_FLOW_FAILED: {
+    type: BraintreeError.types.NETWORK,
+    code: 'MASTERPASS_FLOW_FAILED',
+    message: 'Could not initialize Masterpass flow.'
+  }
+};
+
+
+},{"../../lib/braintree-error":66}],105:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+
+module.exports = {
+  PAYPAL_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_NOT_ENABLED',
+    message: 'PayPal is not enabled for this merchant.'
+  },
+  PAYPAL_SANDBOX_ACCOUNT_NOT_LINKED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_SANDBOX_ACCOUNT_NOT_LINKED',
+    message: 'A linked PayPal Sandbox account is required to use PayPal Checkout in Sandbox. See https://developers.braintreepayments.com/guides/paypal/testing-go-live/#linked-paypal-testing for details on linking your PayPal sandbox with Braintree.'
+  },
+  PAYPAL_TOKENIZATION_REQUEST_ACTIVE: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_TOKENIZATION_REQUEST_ACTIVE',
+    message: 'Another tokenization request is active.'
+  },
+  PAYPAL_ACCOUNT_TOKENIZATION_FAILED: {
+    type: BraintreeError.types.NETWORK,
+    code: 'PAYPAL_ACCOUNT_TOKENIZATION_FAILED',
+    message: 'Could not tokenize user\'s PayPal account.'
+  },
+  PAYPAL_FLOW_FAILED: {
+    type: BraintreeError.types.NETWORK,
+    code: 'PAYPAL_FLOW_FAILED',
+    message: 'Could not initialize PayPal flow.'
+  },
+  PAYPAL_FLOW_OPTION_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_FLOW_OPTION_REQUIRED',
+    message: 'PayPal flow property is invalid or missing.'
+  },
+  PAYPAL_POPUP_OPEN_FAILED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_POPUP_OPEN_FAILED',
+    message: 'PayPal popup failed to open, make sure to tokenize in response to a user action.'
+  },
+  PAYPAL_POPUP_CLOSED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'PAYPAL_POPUP_CLOSED',
+    message: 'Customer closed PayPal popup before authorizing.'
+  },
+  PAYPAL_INVALID_PAYMENT_OPTION: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_INVALID_PAYMENT_OPTION',
+    message: 'PayPal payment options are invalid.'
+  }
+};
+
+},{"../lib/braintree-error":66}],106:[function(require,module,exports){
+'use strict';
+/**
+ * @module braintree-web/paypal-checkout
+ * @description A component to integrate with the [PayPal Checkout.js library](https://github.com/paypal/paypal-checkout).
+ */
+
+var BraintreeError = require('../lib/braintree-error');
+var analytics = require('../lib/analytics');
+var errors = require('./errors');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+var PayPalCheckout = require('./paypal-checkout');
+var sharedErrors = require('../lib/errors');
+var VERSION = "3.15.0";
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} [callback] The second argument, `data`, is the {@link PayPalCheckout} instance.
+ * @example
+ * // Be sure to have checkout.js loaded on your page.
+ * // You can use the paypal-checkout package on npm
+ * // with a build tool or use a script hosted by PayPal:
+ * // <script src="https://www.paypalobjects.com/api/checkout.js" data-version-4 log-level="warn"></script>
+ *
+ * braintree.paypalCheckout.create({
+ *   client: clientInstance
+ * }, function (createErr, paypalCheckoutInstance) {
+ *   if (createErr) {
+ *     console.error('Error!', createErr);
+ *     return;
+ *   }
+ *
+ *   paypal.Button.render({
+ *     env: 'production', // or 'sandbox'
+ *
+ *     locale: 'en_US',
+ *
+ *     payment: function () {
+ *       return paypalCheckoutInstance.createPayment({
+ *         flow: 'vault'
+ *       });
+ *     },
+ *
+ *     onAuthorize: function (data, actions) {
+ *       return paypalCheckoutInstance.tokenizePayment(data).then(function (payload) {
+ *         // Submit payload.nonce to your server
+ *       });
+ *     },
+ *
+ *     onCancel: function (data) {
+ *       console.log('checkout.js payment cancelled', JSON.stringify(data, 0, 2));
+ *     },
+ *
+ *     onError: function (err) {
+ *       console.error('checkout.js error', err);
+ *     }
+ *   }, '#paypal-button'); // the PayPal button will be rendered in an html element with the id `paypal-button`
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+function create(options) {
+  var config, clientVersion;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating PayPal Checkout.'
+    }));
+  }
+
+  config = options.client.getConfiguration();
+  clientVersion = config.analyticsMetadata.sdkVersion;
+
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and PayPal Checkout (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  if (!config.gatewayConfiguration.paypalEnabled) {
+    return Promise.reject(new BraintreeError(errors.PAYPAL_NOT_ENABLED));
+  }
+
+  if (!config.gatewayConfiguration.paypal.clientId) {
+    return Promise.reject(new BraintreeError(errors.PAYPAL_SANDBOX_ACCOUNT_NOT_LINKED));
+  }
+
+  analytics.sendEvent(options.client, 'paypal-checkout.initialized');
+
+  return Promise.resolve(new PayPalCheckout(options));
+}
+
+/**
+ * @static
+ * @function isSupported
+ * @description Returns true if PayPal Checkout [supports this browser](/current/#browser-support-webviews).
+ * @deprecated Previously, this method checked for Popup support in the brower. Checkout.js now falls back to a modal if popups are not supported.
+ * @example
+ * if (braintree.paypalCheckout.isSupported()) {
+ *   // Add PayPal button to the page
+ * } else {
+ *   // Hide PayPal payment option
+ * }
+ * @returns {Boolean} Returns true if PayPal Checkout supports this browser.
+ */
+function isSupported() {
+  return true;
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  isSupported: isSupported,
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./errors":105,"./paypal-checkout":107,"wrap-promise":672}],107:[function(require,module,exports){
+'use strict';
+
+var analytics = require('../lib/analytics');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+var BraintreeError = require('../lib/braintree-error');
+var convertToBraintreeError = require('../lib/convert-to-braintree-error');
+var errors = require('./errors');
+var constants = require('../paypal/shared/constants');
+
+/**
+ * PayPal Checkout tokenized payload. Returned in {@link PayPalCheckout#tokenizePayment}'s callback as the second argument, `data`.
+ * @typedef {object} PayPalCheckout~tokenizePayload
+ * @property {string} nonce The payment method nonce.
+ * @property {string} type The payment method type, always `PayPalAccount`.
+ * @property {object} details Additional PayPal account details.
+ * @property {string} details.email User's email address.
+ * @property {string} details.payerId User's payer ID, the unique identifier for each PayPal account.
+ * @property {string} details.firstName User's given name.
+ * @property {string} details.lastName User's surname.
+ * @property {?string} details.countryCode User's 2 character country code.
+ * @property {?string} details.phone User's phone number (e.g. 555-867-5309).
+ * @property {?object} details.shippingAddress User's shipping address details, only available if shipping address is enabled.
+ * @property {string} details.shippingAddress.recipientName Recipient of postage.
+ * @property {string} details.shippingAddress.line1 Street number and name.
+ * @property {string} details.shippingAddress.line2 Extended address.
+ * @property {string} details.shippingAddress.city City or locality.
+ * @property {string} details.shippingAddress.state State or region.
+ * @property {string} details.shippingAddress.postalCode Postal code.
+ * @property {string} details.shippingAddress.countryCode 2 character country code (e.g. US).
+ * @property {?object} details.billingAddress User's billing address details.
+ * Not available to all merchants; [contact PayPal](https://developers.braintreepayments.com/support/guides/paypal/setup-guide#contacting-paypal-support) for details on eligibility and enabling this feature.
+ * Alternatively, see `shippingAddress` above as an available client option.
+ * @property {string} details.billingAddress.line1 Street number and name.
+ * @property {string} details.billingAddress.line2 Extended address.
+ * @property {string} details.billingAddress.city City or locality.
+ * @property {string} details.billingAddress.state State or region.
+ * @property {string} details.billingAddress.postalCode Postal code.
+ * @property {string} details.billingAddress.countryCode 2 character country code (e.g. US).
+ * @property {?object} creditFinancingOffered This property will only be present when the customer pays with PayPal Credit.
+ * @property {object} creditFinancingOffered.totalCost This is the estimated total payment amount including interest and fees the user will pay during the lifetime of the loan.
+ * @property {string} creditFinancingOffered.totalCost.value An amount defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm) for the given currency.
+ * @property {string} creditFinancingOffered.totalCost.currency 3 letter currency code as defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm).
+ * @property {number} creditFinancingOffered.term Length of financing terms in months.
+ * @property {object} creditFinancingOffered.monthlyPayment This is the estimated amount per month that the customer will need to pay including fees and interest.
+ * @property {string} creditFinancingOffered.monthlyPayment.value An amount defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm) for the given currency.
+ * @property {string} creditFinancingOffered.monthlyPayment.currency 3 letter currency code as defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm).
+ * @property {object} creditFinancingOffered.totalInterest Estimated interest or fees amount the payer will have to pay during the lifetime of the loan.
+ * @property {string} creditFinancingOffered.totalInterest.value An amount defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm) for the given currency.
+ * @property {string} creditFinancingOffered.totalInterest.currency 3 letter currency code as defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm).
+ * @property {boolean} creditFinancingOffered.payerAcceptance Status of whether the customer ultimately was approved for and chose to make the payment using the approved installment credit.
+ * @property {boolean} creditFinancingOffered.cartAmountImmutable Indicates whether the cart amount is editable after payer's acceptance on PayPal side.
+ */
+
+/**
+ * @class
+ * @param {object} options see {@link module:braintree-web/paypal-checkout.create|paypal-checkout.create}
+ * @classdesc This class represents a PayPal Checkout component that coordinates with the {@link https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4|PayPal checkout.js} library. Instances of this class can generate payment data and tokenize authorized payments.
+ * @description <strong>Do not use this constructor directly. Use {@link module:braintree-web/paypal-checkout.create|braintree-web.paypal-checkout.create} instead.</strong>
+ */
+function PayPalCheckout(options) {
+  this._client = options.client;
+}
+
+/**
+ * Creates a PayPal payment ID or billing token using the given options. This is meant to be passed to PayPal's checkout.js library.
+ * When a {@link callback} is defined, the function returns undefined and invokes the callback with the id to be used with the checkout.js library. Otherwise, it returns a Promise that resolves with the id.
+ * @public
+ * @param {object} options All options for the PayPalCheckout component.
+ * @param {string} options.flow Set to 'checkout' for one-time payment flow, or 'vault' for Vault flow. If 'vault' is used with a client token generated with a customer ID, the PayPal account will be added to that customer as a saved payment method.
+ * @param {string} [options.intent=authorize]
+ * Checkout flows only.
+ * * `authorize` - Submits the transaction for authorization but not settlement.
+ * * `sale` - Payment will be immediately submitted for settlement upon creating a transaction.
+ * @param {boolean} [options.offerCredit=false] Offers the customer PayPal Credit if they qualify.
+ * @param {string|number} [options.amount] The amount of the transaction. Required when using the Checkout flow.
+ * @param {string} [options.currency] The currency code of the amount, such as 'USD'. Required when using the Checkout flow.
+ * @param {string} [options.displayName] The merchant name displayed inside of the PayPal lightbox; defaults to the company name on your Braintree account
+ * @param {string} [options.locale=en_US] Use this option to change the language, links, and terminology used in the PayPal flow. This locale will be used unless the buyer has set a preferred locale for their account. If an unsupported locale is supplied, a fallback locale (determined by buyer preference or browser data) will be used and no error will be thrown.
+ *
+ * Supported locales are:
+ * `da_DK`,
+ * `de_DE`,
+ * `en_AU`,
+ * `en_GB`,
+ * `en_US`,
+ * `es_ES`,
+ * `fr_CA`,
+ * `fr_FR`,
+ * `id_ID`,
+ * `it_IT`,
+ * `ja_JP`,
+ * `ko_KR`,
+ * `nl_NL`,
+ * `no_NO`,
+ * `pl_PL`,
+ * `pt_BR`,
+ * `pt_PT`,
+ * `ru_RU`,
+ * `sv_SE`,
+ * `th_TH`,
+ * `zh_CN`,
+ * `zh_HK`,
+ * and `zh_TW`.
+ *
+ * @param {boolean} [options.enableShippingAddress=false] Returns a shipping address object in {@link PayPal#tokenize}.
+ * @param {object} [options.shippingAddressOverride] Allows you to pass a shipping address you have already collected into the PayPal payment flow.
+ * @param {string} options.shippingAddressOverride.line1 Street address.
+ * @param {string} [options.shippingAddressOverride.line2] Street address (extended).
+ * @param {string} options.shippingAddressOverride.city City.
+ * @param {string} options.shippingAddressOverride.state State.
+ * @param {string} options.shippingAddressOverride.postalCode Postal code.
+ * @param {string} options.shippingAddressOverride.countryCode Country.
+ * @param {string} [options.shippingAddressOverride.phone] Phone number.
+ * @param {string} [options.shippingAddressOverride.recipientName] Recipient's name.
+ * @param {boolean} [options.shippingAddressEditable=true] Set to false to disable user editing of the shipping address.
+ * @param {string} [options.billingAgreementDescription] Use this option to set the description of the preapproved payment agreement visible to customers in their PayPal profile during Vault flows. Max 255 characters.
+ * @param {string} [options.landingPageType=login] Use this option to specify the PayPal page to display when a user lands on the PayPal site to complete the payment.
+ * * `login` - A PayPal account login page is used.
+ * * `billing` - A non-PayPal account landing page is used.
+ * @param {callback} [callback] The second argument is a PayPal `paymentId` or `billingToken` string, depending on whether `options.flow` is `checkout` or `vault`. This is also what is resolved by the promise if no callback is provided.
+ * @example
+ * // this paypal object is created by checkout.js
+ * // see https://github.com/paypal/paypal-checkout
+ * paypal.Button.render({
+ *   // when createPayment resolves, it is automatically passed to checkout.js
+ *   payment: function () {
+ *    return paypalCheckoutInstance.createPayment({
+ *       flow: 'checkout',
+ *       amount: '10.00',
+ *       currency: 'USD',
+ *       intent: 'sale'
+ *     });
+ *   },
+ *   // Add other options, e.g. onAuthorize, env, locale
+ * }, '#paypal-button');
+ *
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+PayPalCheckout.prototype.createPayment = function (options) {
+  var endpoint;
+
+  if (!options || !constants.FLOW_ENDPOINTS.hasOwnProperty(options.flow)) {
+    return Promise.reject(new BraintreeError(errors.PAYPAL_FLOW_OPTION_REQUIRED));
+  }
+
+  endpoint = 'paypal_hermes/' + constants.FLOW_ENDPOINTS[options.flow];
+
+  analytics.sendEvent(this._client, 'paypal-checkout.createPayment');
+  if (options.offerCredit === true) {
+    analytics.sendEvent(this._client, 'paypal-checkout.credit.offered');
+  }
+
+  return this._client.request({
+    endpoint: endpoint,
+    method: 'post',
+    data: this._formatPaymentResourceData(options)
+  }).then(function (response) {
+    var flowToken;
+
+    if (options.flow === 'checkout') {
+      flowToken = response.paymentResource.paymentToken;
+    } else {
+      flowToken = response.agreementSetup.tokenId;
+    }
+
+    return flowToken;
+  }).catch(function (err) {
+    var status = err.details && err.details.httpStatus;
+
+    if (status === 422) {
+      return Promise.reject(new BraintreeError({
+        type: errors.PAYPAL_INVALID_PAYMENT_OPTION.type,
+        code: errors.PAYPAL_INVALID_PAYMENT_OPTION.code,
+        message: errors.PAYPAL_INVALID_PAYMENT_OPTION.message,
+        details: {
+          originalError: err
+        }
+      }));
+    }
+
+    return Promise.reject(convertToBraintreeError(err, {
+      type: errors.PAYPAL_FLOW_FAILED.type,
+      code: errors.PAYPAL_FLOW_FAILED.code,
+      message: errors.PAYPAL_FLOW_FAILED.message
+    }));
+  });
+};
+
+/**
+ * Tokenizes the authorize data from PayPal's checkout.js library when completing a buyer approval flow.
+ * When a {@link callback} is defined, invokes the callback with {@link PayPalCheckout~tokenizePayload|tokenizePayload} and returns undefined. Otherwise, returns a Promise that resolves with a {@link PayPalCheckout~tokenizePayload|tokenizePayload}.
+ * @public
+ * @param {object} tokenizeOptions Tokens and IDs required to tokenize the payment.
+ * @param {string} tokenizeOptions.payerId Payer ID returned by PayPal `onAuthorize` callback.
+ * @param {string} [tokenizeOptions.paymentId] Payment ID returned by PayPal `onAuthorize` callback.
+ * @param {string} [tokenizeOptions.billingToken] Billing Token returned by PayPal `onAuthorize` callback.
+ * @param {callback} [callback] The second argument, <code>payload</code>, is a {@link PayPalCheckout~tokenizePayload|tokenizePayload}. If no callback is provided, the promise resolves with a {@link PayPalCheckout~tokenizePayload|tokenizePayload}.
+ * @example
+ * // this paypal object is created by checkout.js
+ * // see https://github.com/paypal/paypal-checkout
+ * paypal.Button.render({
+ *   onAuthorize: function (data, actions) {
+ *     return paypalCheckoutInstance.tokenizePayment(data).then(function (payload) {
+ *       // Submit payload.nonce to your server
+ *     }).catch(function (err) {
+ *       // handle error
+ *     });
+ *   },
+ *   // Add other options, e.g. payment, env, locale
+ * }, '#paypal-button');
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+PayPalCheckout.prototype.tokenizePayment = function (tokenizeOptions) {
+  var self = this;
+  var payload;
+  var client = this._client;
+  var options = {
+    flow: tokenizeOptions.billingToken ? 'vault' : 'checkout',
+    intent: tokenizeOptions.intent
+  };
+  var params = {
+    // The paymentToken provided by Checkout.js v4 is the ECToken
+    ecToken: tokenizeOptions.paymentToken,
+    billingToken: tokenizeOptions.billingToken,
+    payerId: tokenizeOptions.payerID,
+    paymentId: tokenizeOptions.paymentID
+  };
+
+  analytics.sendEvent(client, 'paypal-checkout.tokenization.started');
+
+  return client.request({
+    endpoint: 'payment_methods/paypal_accounts',
+    method: 'post',
+    data: self._formatTokenizeData(options, params)
+  }).then(function (response) {
+    payload = self._formatTokenizePayload(response);
+
+    analytics.sendEvent(client, 'paypal-checkout.tokenization.success');
+    if (payload.creditFinancingOffered) {
+      analytics.sendEvent(client, 'paypal-checkout.credit.accepted');
+    }
+
+    return payload;
+  }).catch(function (err) {
+    analytics.sendEvent(client, 'paypal-checkout.tokenization.failed');
+
+    return Promise.reject(convertToBraintreeError(err, {
+      type: errors.PAYPAL_ACCOUNT_TOKENIZATION_FAILED.type,
+      code: errors.PAYPAL_ACCOUNT_TOKENIZATION_FAILED.code,
+      message: errors.PAYPAL_ACCOUNT_TOKENIZATION_FAILED.message
+    }));
+  });
+};
+
+PayPalCheckout.prototype._formatPaymentResourceData = function (options) {
+  var key;
+  var gatewayConfiguration = this._client.getConfiguration().gatewayConfiguration;
+  var paymentResource = {
+    // returnUrl and cancelUrl are required in hermes create_payment_resource route
+    // but are not validated and are not actually used with checkout.js
+    returnUrl: 'x',
+    cancelUrl: 'x',
+    offerPaypalCredit: options.offerCredit === true,
+    experienceProfile: {
+      brandName: options.displayName || gatewayConfiguration.paypal.displayName,
+      localeCode: options.locale,
+      noShipping: (!options.enableShippingAddress).toString(),
+      addressOverride: options.shippingAddressEditable === false,
+      landingPageType: options.landingPageType
+    }
+  };
+
+  if (options.flow === 'checkout') {
+    paymentResource.amount = options.amount;
+    paymentResource.currencyIsoCode = options.currency;
+
+    if (options.hasOwnProperty('intent')) {
+      paymentResource.intent = options.intent;
+    }
+
+    for (key in options.shippingAddressOverride) {
+      if (options.shippingAddressOverride.hasOwnProperty(key)) {
+        paymentResource[key] = options.shippingAddressOverride[key];
+      }
+    }
+  } else {
+    paymentResource.shippingAddress = options.shippingAddressOverride;
+
+    if (options.billingAgreementDescription) {
+      paymentResource.description = options.billingAgreementDescription;
+    }
+  }
+
+  return paymentResource;
+};
+
+PayPalCheckout.prototype._formatTokenizeData = function (options, params) {
+  var clientConfiguration = this._client.getConfiguration();
+  var gatewayConfiguration = clientConfiguration.gatewayConfiguration;
+  var isTokenizationKey = clientConfiguration.authorizationType === 'TOKENIZATION_KEY';
+  var data = {
+    paypalAccount: {
+      correlationId: params.billingToken || params.ecToken,
+      options: {
+        validate: options.flow === 'vault' && !isTokenizationKey
+      }
+    }
+  };
+
+  if (params.billingToken) {
+    data.paypalAccount.billingAgreementToken = params.billingToken;
+  } else {
+    data.paypalAccount.paymentToken = params.paymentId;
+    data.paypalAccount.payerId = params.payerId;
+    data.paypalAccount.unilateral = gatewayConfiguration.paypal.unvettedMerchant;
+
+    if (options.intent) {
+      data.paypalAccount.intent = options.intent;
+    }
+  }
+
+  return data;
+};
+
+PayPalCheckout.prototype._formatTokenizePayload = function (response) {
+  var payload;
+  var account = {};
+
+  if (response.paypalAccounts) {
+    account = response.paypalAccounts[0];
+  }
+
+  payload = {
+    nonce: account.nonce,
+    details: {},
+    type: account.type
+  };
+
+  if (account.details && account.details.payerInfo) {
+    payload.details = account.details.payerInfo;
+  }
+
+  if (account.details && account.details.creditFinancingOffered) {
+    payload.creditFinancingOffered = account.details.creditFinancingOffered;
+  }
+
+  return payload;
+};
+
+module.exports = wrapPromise.wrapPrototype(PayPalCheckout);
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/convert-to-braintree-error":74,"../lib/promise":97,"../paypal/shared/constants":110,"./errors":105,"wrap-promise":672}],108:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var frameService = require('../../lib/frame-service/external');
+var BraintreeError = require('../../lib/braintree-error');
+var convertToBraintreeError = require('../../lib/convert-to-braintree-error');
+var useMin = require('../../lib/use-min');
+var once = require('../../lib/once');
+var VERSION = "3.15.0";
+var constants = require('../shared/constants');
+var INTEGRATION_TIMEOUT_MS = require('../../lib/constants').INTEGRATION_TIMEOUT_MS;
+var analytics = require('../../lib/analytics');
+var methods = require('../../lib/methods');
+var deferred = require('../../lib/deferred');
+var errors = require('../shared/errors');
+var convertMethodsToError = require('../../lib/convert-methods-to-error');
+var querystring = require('../../lib/querystring');
+var Promise = require('../../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @typedef {object} PayPal~tokenizePayload
+ * @property {string} nonce The payment method nonce.
+ * @property {string} type The payment method type, always `PayPalAccount`.
+ * @property {object} details Additional PayPal account details.
+ * @property {string} details.email User's email address.
+ * @property {string} details.payerId User's payer ID, the unique identifier for each PayPal account.
+ * @property {string} details.firstName User's given name.
+ * @property {string} details.lastName User's surname.
+ * @property {?string} details.countryCode User's 2 character country code.
+ * @property {?string} details.phone User's phone number (e.g. 555-867-5309).
+ * @property {?object} details.shippingAddress User's shipping address details, only available if shipping address is enabled.
+ * @property {string} details.shippingAddress.recipientName Recipient of postage.
+ * @property {string} details.shippingAddress.line1 Street number and name.
+ * @property {string} details.shippingAddress.line2 Extended address.
+ * @property {string} details.shippingAddress.city City or locality.
+ * @property {string} details.shippingAddress.state State or region.
+ * @property {string} details.shippingAddress.postalCode Postal code.
+ * @property {string} details.shippingAddress.countryCode 2 character country code (e.g. US).
+ * @property {?object} details.billingAddress User's billing address details.
+ * Not available to all merchants; [contact PayPal](https://developers.braintreepayments.com/support/guides/paypal/setup-guide#contacting-paypal-support) for details on eligibility and enabling this feature.
+ * Alternatively, see `shippingAddress` above as an available client option.
+ * @property {string} details.billingAddress.line1 Street number and name.
+ * @property {string} details.billingAddress.line2 Extended address.
+ * @property {string} details.billingAddress.city City or locality.
+ * @property {string} details.billingAddress.state State or region.
+ * @property {string} details.billingAddress.postalCode Postal code.
+ * @property {string} details.billingAddress.countryCode 2 character country code (e.g. US).
+ * @property {?object} creditFinancingOffered This property will only be present when the customer pays with PayPal Credit.
+ * @property {object} creditFinancingOffered.totalCost This is the estimated total payment amount including interest and fees the user will pay during the lifetime of the loan.
+ * @property {string} creditFinancingOffered.totalCost.value An amount defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm) for the given currency.
+ * @property {string} creditFinancingOffered.totalCost.currency 3 letter currency code as defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm).
+ * @property {number} creditFinancingOffered.term Length of financing terms in months.
+ * @property {object} creditFinancingOffered.monthlyPayment This is the estimated amount per month that the customer will need to pay including fees and interest.
+ * @property {string} creditFinancingOffered.monthlyPayment.value An amount defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm) for the given currency.
+ * @property {string} creditFinancingOffered.monthlyPayment.currency 3 letter currency code as defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm).
+ * @property {object} creditFinancingOffered.totalInterest Estimated interest or fees amount the payer will have to pay during the lifetime of the loan.
+ * @property {string} creditFinancingOffered.totalInterest.value An amount defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm) for the given currency.
+ * @property {string} creditFinancingOffered.totalInterest.currency 3 letter currency code as defined by [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm).
+ * @property {boolean} creditFinancingOffered.payerAcceptance Status of whether the customer ultimately was approved for and chose to make the payment using the approved installment credit.
+ * @property {boolean} creditFinancingOffered.cartAmountImmutable Indicates whether the cart amount is editable after payer's acceptance on PayPal side.
+ *
+ */
+
+/**
+ * @typedef {object} PayPal~tokenizeReturn
+ * @property {Function} close A handle to close the PayPal checkout flow.
+ * @property {Function} focus A handle to focus the PayPal checkout flow. Note that some browsers (notably iOS Safari) do not support focusing popups. Firefox requires the focus call to occur as the result of a user interaction, such as a button click.
+ */
+
+/**
+ * @class
+ * @param {object} options see {@link module:braintree-web/paypal.create|paypal.create}
+ * @classdesc This class represents a PayPal component. Instances of this class have methods for launching auth dialogs and other programmatic interactions with the PayPal component.
+ * @description <strong>Do not use this constructor directly. Use {@link module:braintree-web/paypal.create|braintree-web.paypal.create} instead.</strong>
+ */
+function PayPal(options) {
+  this._client = options.client;
+  this._assetsUrl = options.client.getConfiguration().gatewayConfiguration.paypal.assetsUrl + '/web/' + VERSION;
+  this._isDebug = options.client.getConfiguration().isDebug;
+  this._loadingFrameUrl = this._assetsUrl + '/html/paypal-landing-frame' + useMin(this._isDebug) + '.html';
+  this._authorizationInProgress = false;
+}
+
+PayPal.prototype._initialize = function () {
+  var self = this;
+  var client = this._client;
+  var failureTimeout = setTimeout(function () {
+    analytics.sendEvent(client, 'paypal.load.timed-out');
+  }, INTEGRATION_TIMEOUT_MS);
+
+  return new Promise(function (resolve) {
+    frameService.create({
+      name: constants.LANDING_FRAME_NAME,
+      dispatchFrameUrl: self._assetsUrl + '/html/dispatch-frame' + useMin(self._isDebug) + '.html',
+      openFrameUrl: self._loadingFrameUrl
+    }, function (service) {
+      self._frameService = service;
+      clearTimeout(failureTimeout);
+      analytics.sendEvent(client, 'paypal.load.succeeded');
+      resolve(self);
+    });
+  });
+};
+
+/**
+ * Launches the PayPal login flow and returns a nonce payload. Only one PayPal login flow should be active at a time. One way to achieve this is to disable your PayPal button while the flow is open.
+ * @public
+ * @param {object} options All tokenization options for the PayPal component.
+ * @param {string} options.flow Set to 'checkout' for one-time payment flow, or 'vault' for Vault flow. If 'vault' is used with a client token generated with a customer id, the PayPal account will be added to that customer as a saved payment method.
+ * @param {string} [options.intent=authorize]
+ * Checkout flows only.
+ * * `authorize` - Submits the transaction for authorization but not settlement.
+ * * `sale` - Payment will be immediately submitted for settlement upon creating a transaction.
+ * @param {boolean} [options.offerCredit=false] Offers the customer PayPal Credit if they qualify.
+ * @param {string} [options.useraction]
+ * Changes the call-to-action in the PayPal flow. By default the final button will show the localized
+ * word for "Continue" and implies that the final amount billed is not yet known.
+ *
+ * Setting this option to `commit` changes the button text to "Pay Now" and page text will convey to
+ * the user that billing will take place immediately.
+ * @param {string|number} [options.amount] The amount of the transaction. Required when using the Checkout flow.
+ * @param {string} [options.currency] The currency code of the amount, such as 'USD'. Required when using the Checkout flow.
+ * @param {string} [options.displayName] The merchant name displayed inside of the PayPal lightbox; defaults to the company name on your Braintree account
+ * @param {string} [options.locale=en_US] Use this option to change the language, links, and terminology used in the PayPal flow. This locale will be used unless the buyer has set a preferred locale for their account. If an unsupported locale is supplied, a fallback locale (determined by buyer preference or browser data) will be used and no error will be thrown.
+ *
+ * Supported locales are:
+ * `da_DK`,
+ * `de_DE`,
+ * `en_AU`,
+ * `en_GB`,
+ * `en_US`,
+ * `es_ES`,
+ * `fr_CA`,
+ * `fr_FR`,
+ * `id_ID`,
+ * `it_IT`,
+ * `ja_JP`,
+ * `ko_KR`,
+ * `nl_NL`,
+ * `no_NO`,
+ * `pl_PL`,
+ * `pt_BR`,
+ * `pt_PT`,
+ * `ru_RU`,
+ * `sv_SE`,
+ * `th_TH`,
+ * `zh_CN`,
+ * `zh_HK`,
+ * and `zh_TW`.
+ *
+ * @param {boolean} [options.enableShippingAddress=false] Returns a shipping address object in {@link PayPal#tokenize}.
+ * @param {object} [options.shippingAddressOverride] Allows you to pass a shipping address you have already collected into the PayPal payment flow.
+ * @param {string} options.shippingAddressOverride.line1 Street address.
+ * @param {string} [options.shippingAddressOverride.line2] Street address (extended).
+ * @param {string} options.shippingAddressOverride.city City.
+ * @param {string} options.shippingAddressOverride.state State.
+ * @param {string} options.shippingAddressOverride.postalCode Postal code.
+ * @param {string} options.shippingAddressOverride.countryCode Country.
+ * @param {string} [options.shippingAddressOverride.phone] Phone number.
+ * @param {string} [options.shippingAddressOverride.recipientName] Recipient's name.
+ * @param {boolean} [options.shippingAddressEditable=true] Set to false to disable user editing of the shipping address.
+ * @param {string} [options.billingAgreementDescription] Use this option to set the description of the preapproved payment agreement visible to customers in their PayPal profile during Vault flows. Max 255 characters.
+ * @param {string} [options.landingPageType=login] Use this option to specify the PayPal page to display when a user lands on the PayPal site to complete the payment. It defaults to `login`.
+ * * `login` - A PayPal account login page is used.
+ * * `billing` - A non-PayPal account landing page is used.
+ * @param {callback} callback The second argument, <code>data</code>, is a {@link PayPal~tokenizePayload|tokenizePayload}.
+ * @example Tokenizing with the vault flow
+ * button.addEventListener('click', function () {
+ *   // Disable the button so that we don't attempt to open multiple popups.
+ *   button.setAttribute('disabled', 'disabled');
+ *
+ *   // Because PayPal tokenization opens a popup, this must be called
+ *   // as a result of a user action, such as a button click.
+ *   paypalInstance.tokenize({
+ *     flow: 'vault' // Required
+ *     // Any other tokenization options
+ *   }, function (tokenizeErr, payload) {
+ *     button.removeAttribute('disabled');
+ *
+ *     if (tokenizeErr) {
+ *       // Handle tokenization errors or premature flow closure
+ *
+ *       switch (tokenizeErr.code) {
+ *         case 'PAYPAL_POPUP_CLOSED':
+ *           console.error('Customer closed PayPal popup.');
+ *           break;
+ *         case 'PAYPAL_ACCOUNT_TOKENIZATION_FAILED':
+ *           console.error('PayPal tokenization failed. See details:', tokenizeErr.details);
+ *           break;
+ *         case 'PAYPAL_FLOW_FAILED':
+ *           console.error('Unable to initialize PayPal flow. Are your options correct?', tokenizeErr.details);
+ *           break;
+ *         default:
+ *           console.error('Error!', tokenizeErr);
+ *       }
+ *     } else {
+ *       // Submit payload.nonce to your server
+ *     }
+ *   });
+ * });
+
+ * @example Tokenizing with the checkout flow
+ * button.addEventListener('click', function () {
+ *   // Disable the button so that we don't attempt to open multiple popups.
+ *   button.setAttribute('disabled', 'disabled');
+ *
+ *   // Because PayPal tokenization opens a popup, this must be called
+ *   // as a result of a user action, such as a button click.
+ *   paypalInstance.tokenize({
+ *     flow: 'checkout', // Required
+ *     amount: '10.00', // Required
+ *     currency: 'USD' // Required
+ *     // Any other tokenization options
+ *   }, function (tokenizeErr, payload) {
+ *     button.removeAttribute('disabled');
+ *
+ *     if (tokenizeErr) {
+ *       // Handle tokenization errors or premature flow closure
+ *
+ *       switch (tokenizeErr.code) {
+ *         case 'PAYPAL_POPUP_CLOSED':
+ *           console.error('Customer closed PayPal popup.');
+ *           break;
+ *         case 'PAYPAL_ACCOUNT_TOKENIZATION_FAILED':
+ *           console.error('PayPal tokenization failed. See details:', tokenizeErr.details);
+ *           break;
+ *         case 'PAYPAL_FLOW_FAILED':
+ *           console.error('Unable to initialize PayPal flow. Are your options correct?', tokenizeErr.details);
+ *           break;
+ *         default:
+ *           console.error('Error!', tokenizeErr);
+ *       }
+ *     } else {
+ *       // Submit payload.nonce to your server
+ *     }
+ *   });
+ * });
+ * @returns {Promise|PayPal~tokenizeReturn} A handle to manage the PayPal checkout frame. If no callback is provided, returns a promise.
+ */
+PayPal.prototype.tokenize = function (options, callback) {
+  var self = this;
+  var client = this._client;
+  var tokenizePromise, optionError;
+
+  if (callback) {
+    callback = once(deferred(callback));
+  }
+
+  if (!options || !constants.FLOW_ENDPOINTS.hasOwnProperty(options.flow)) {
+    optionError = new BraintreeError(errors.PAYPAL_FLOW_OPTION_REQUIRED);
+
+    if (callback) {
+      callback(optionError);
+      return this._frameService.createNoopHandler();
+    }
+
+    return Promise.reject(optionError);
+  }
+
+  tokenizePromise = new Promise(function (resolve, reject) {
+    if (self._authorizationInProgress) {
+      analytics.sendEvent(client, 'paypal.tokenization.error.already-opened');
+
+      reject(new BraintreeError(errors.PAYPAL_TOKENIZATION_REQUEST_ACTIVE));
+    } else {
+      self._authorizationInProgress = true;
+
+      if (!global.popupBridge) {
+        analytics.sendEvent(client, 'paypal.tokenization.opened');
+      }
+
+      if (options.offerCredit === true) {
+        analytics.sendEvent(client, 'paypal.credit.offered');
+      }
+
+      self._navigateFrameToAuth(options).catch(reject);
+      // self MUST happen after _navigateFrameToAuth for Metro browsers to work.
+      self._frameService.open(self._createFrameServiceCallback(options, resolve, reject));
+    }
+  });
+
+  if (callback) {
+    tokenizePromise.then(function (res) {
+      callback(null, res);
+    }).catch(callback);
+
+    return this._frameService.createHandler({
+      beforeClose: function () {
+        analytics.sendEvent(client, 'paypal.tokenization.closed.by-merchant');
+      }
+    });
+  }
+
+  return tokenizePromise;
+};
+
+PayPal.prototype._createFrameServiceCallback = function (options, resolve, reject) {
+  var self = this;
+  var client = this._client;
+
+  if (global.popupBridge) {
+    return function (err, payload) {
+      var cancelled = payload && payload.path && payload.path.substring(0, 7) === '/cancel';
+
+      self._authorizationInProgress = false;
+
+      // `err` exists when the user clicks "Done" button of browser view
+      if (err || cancelled) {
+        analytics.sendEvent(client, 'paypal.tokenization.closed-popupbridge.by-user');
+        // Call merchant's tokenize callback with an error
+        reject(new BraintreeError(errors.PAYPAL_POPUP_CLOSED));
+      } else if (payload) {
+        self._tokenizePayPal(options, payload.queryItems).then(resolve).catch(reject);
+      }
+    };
+  }
+
+  return function (err, params) {
+    self._authorizationInProgress = false;
+
+    if (err) {
+      if (err.code === 'FRAME_SERVICE_FRAME_CLOSED') {
+        analytics.sendEvent(client, 'paypal.tokenization.closed.by-user');
+        reject(new BraintreeError(errors.PAYPAL_POPUP_CLOSED));
+      } else if (err.code === 'FRAME_SERVICE_FRAME_OPEN_FAILED') {
+        reject(new BraintreeError(errors.PAYPAL_POPUP_OPEN_FAILED));
+      }
+    } else if (params) {
+      self._tokenizePayPal(options, params).then(resolve).catch(reject);
+    }
+  };
+};
+
+PayPal.prototype._tokenizePayPal = function (options, params) {
+  var self = this;
+  var client = this._client;
+
+  if (!global.popupBridge) {
+    this._frameService.redirect(this._loadingFrameUrl);
+  }
+
+  return client.request({
+    endpoint: 'payment_methods/paypal_accounts',
+    method: 'post',
+    data: this._formatTokenizeData(options, params)
+  }).then(function (response) {
+    var payload = self._formatTokenizePayload(response);
+
+    if (global.popupBridge) {
+      analytics.sendEvent(client, 'paypal.tokenization.success-popupbridge');
+    } else {
+      analytics.sendEvent(client, 'paypal.tokenization.success');
+    }
+
+    if (payload.creditFinancingOffered) {
+      analytics.sendEvent(client, 'paypal.credit.accepted');
+    }
+
+    self._frameService.close();
+
+    return payload;
+  }).catch(function (err) {
+    if (global.popupBridge) {
+      analytics.sendEvent(client, 'paypal.tokenization.failed-popupbridge');
+    } else {
+      analytics.sendEvent(client, 'paypal.tokenization.failed');
+    }
+
+    self._frameService.close();
+
+    return Promise.reject(convertToBraintreeError(err, {
+      type: errors.PAYPAL_ACCOUNT_TOKENIZATION_FAILED.type,
+      code: errors.PAYPAL_ACCOUNT_TOKENIZATION_FAILED.code,
+      message: errors.PAYPAL_ACCOUNT_TOKENIZATION_FAILED.message
+    }));
+  });
+};
+
+PayPal.prototype._formatTokenizePayload = function (response) {
+  var payload;
+  var account = {};
+
+  if (response.paypalAccounts) {
+    account = response.paypalAccounts[0];
+  }
+
+  payload = {
+    nonce: account.nonce,
+    details: {},
+    type: account.type
+  };
+
+  if (account.details && account.details.payerInfo) {
+    payload.details = account.details.payerInfo;
+  }
+
+  if (account.details && account.details.creditFinancingOffered) {
+    payload.creditFinancingOffered = account.details.creditFinancingOffered;
+  }
+
+  return payload;
+};
+
+PayPal.prototype._formatTokenizeData = function (options, params) {
+  var clientConfiguration = this._client.getConfiguration();
+  var gatewayConfiguration = clientConfiguration.gatewayConfiguration;
+  var isTokenizationKey = clientConfiguration.authorizationType === 'TOKENIZATION_KEY';
+  var data = {
+    paypalAccount: {
+      correlationId: params.ba_token || params.token,
+      options: {
+        validate: options.flow === 'vault' && !isTokenizationKey
+      }
+    }
+  };
+
+  if (params.ba_token) {
+    data.paypalAccount.billingAgreementToken = params.ba_token;
+  } else {
+    data.paypalAccount.paymentToken = params.paymentId;
+    data.paypalAccount.payerId = params.PayerID;
+    data.paypalAccount.unilateral = gatewayConfiguration.paypal.unvettedMerchant;
+
+    if (options.hasOwnProperty('intent')) {
+      data.paypalAccount.intent = options.intent;
+    }
+  }
+
+  return data;
+};
+
+PayPal.prototype._navigateFrameToAuth = function (options) {
+  var self = this;
+  var client = this._client;
+  var endpoint = 'paypal_hermes/' + constants.FLOW_ENDPOINTS[options.flow];
+
+  return client.request({
+    endpoint: endpoint,
+    method: 'post',
+    data: this._formatPaymentResourceData(options)
+  }).then(function (response) {
+    var redirectUrl;
+
+    if (options.flow === 'checkout') {
+      redirectUrl = response.paymentResource.redirectUrl;
+    } else {
+      redirectUrl = response.agreementSetup.approvalUrl;
+    }
+
+    if (options.useraction === 'commit') {
+      redirectUrl = querystring.queryify(redirectUrl, {useraction: 'commit'});
+    }
+
+    if (global.popupBridge) {
+      analytics.sendEvent(client, 'paypal.tokenization.opened-popupbridge');
+    }
+
+    self._frameService.redirect(redirectUrl);
+  }).catch(function (err) {
+    var status = err.details && err.details.httpStatus;
+
+    self._frameService.close();
+    self._authorizationInProgress = false;
+
+    if (status === 422) {
+      return Promise.reject(new BraintreeError({
+        type: errors.PAYPAL_INVALID_PAYMENT_OPTION.type,
+        code: errors.PAYPAL_INVALID_PAYMENT_OPTION.code,
+        message: errors.PAYPAL_INVALID_PAYMENT_OPTION.message,
+        details: {
+          originalError: err
+        }
+      }));
+    }
+
+    return Promise.reject(convertToBraintreeError(err, {
+      type: errors.PAYPAL_FLOW_FAILED.type,
+      code: errors.PAYPAL_FLOW_FAILED.code,
+      message: errors.PAYPAL_FLOW_FAILED.message
+    }));
+  });
+};
+
+PayPal.prototype._formatPaymentResourceData = function (options) {
+  var key;
+  var gatewayConfiguration = this._client.getConfiguration().gatewayConfiguration;
+  var serviceId = this._frameService._serviceId;
+  var paymentResource = {
+    returnUrl: gatewayConfiguration.paypal.assetsUrl + '/web/' + VERSION + '/html/paypal-redirect-frame' + useMin(this._isDebug) + '.html?channel=' + serviceId,
+    cancelUrl: gatewayConfiguration.paypal.assetsUrl + '/web/' + VERSION + '/html/paypal-cancel-frame' + useMin(this._isDebug) + '.html?channel=' + serviceId,
+    offerPaypalCredit: options.offerCredit === true,
+    experienceProfile: {
+      brandName: options.displayName || gatewayConfiguration.paypal.displayName,
+      localeCode: options.locale,
+      noShipping: (!options.enableShippingAddress).toString(),
+      addressOverride: options.shippingAddressEditable === false,
+      landingPageType: options.landingPageType
+    }
+  };
+
+  if (global.popupBridge && typeof global.popupBridge.getReturnUrlPrefix === 'function') {
+    paymentResource.returnUrl = global.popupBridge.getReturnUrlPrefix() + 'return';
+    paymentResource.cancelUrl = global.popupBridge.getReturnUrlPrefix() + 'cancel';
+  }
+
+  if (options.flow === 'checkout') {
+    paymentResource.amount = options.amount;
+    paymentResource.currencyIsoCode = options.currency;
+
+    if (options.hasOwnProperty('intent')) {
+      paymentResource.intent = options.intent;
+    }
+
+    for (key in options.shippingAddressOverride) {
+      if (options.shippingAddressOverride.hasOwnProperty(key)) {
+        paymentResource[key] = options.shippingAddressOverride[key];
+      }
+    }
+  } else {
+    paymentResource.shippingAddress = options.shippingAddressOverride;
+
+    if (options.billingAgreementDescription) {
+      paymentResource.description = options.billingAgreementDescription;
+    }
+  }
+
+  return paymentResource;
+};
+
+/**
+ * Closes the PayPal window if it is open.
+ * @public
+ * @example
+ * paypalInstance.closeWindow();
+ * @returns {void}
+ */
+PayPal.prototype.closeWindow = function () {
+  if (this._authorizationInProgress) {
+    analytics.sendEvent(this._client, 'paypal.tokenize.closed.by-merchant');
+  }
+  this._frameService.close();
+};
+
+/**
+ * Focuses the PayPal window if it is open.
+ * @public
+ * @example
+ * paypalInstance.focusWindow();
+ * @returns {void}
+ */
+PayPal.prototype.focusWindow = function () {
+  this._frameService.focus();
+};
+
+/**
+ * Cleanly remove anything set up by {@link module:braintree-web/paypal.create|create}.
+ * @public
+ * @param {callback} [callback] Called on completion.
+ * @example
+ * paypalInstance.teardown();
+ * @example <caption>With callback</caption>
+ * paypalInstance.teardown(function () {
+ *   // teardown is complete
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+PayPal.prototype.teardown = wrapPromise(function () {
+  var self = this; // eslint-disable-line no-invalid-this
+
+  self._frameService.teardown();
+
+  convertMethodsToError(self, methods(PayPal.prototype));
+
+  analytics.sendEvent(self._client, 'paypal.teardown-completed');
+
+  return Promise.resolve();
+});
+
+module.exports = PayPal;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../lib/analytics":63,"../../lib/braintree-error":66,"../../lib/constants":72,"../../lib/convert-methods-to-error":73,"../../lib/convert-to-braintree-error":74,"../../lib/deferred":76,"../../lib/frame-service/external":82,"../../lib/methods":94,"../../lib/once":95,"../../lib/promise":97,"../../lib/querystring":98,"../../lib/use-min":99,"../shared/constants":110,"../shared/errors":111,"wrap-promise":672}],109:[function(require,module,exports){
+'use strict';
+/**
+ * @module braintree-web/paypal
+ * @description A component to integrate with PayPal.
+ */
+
+var analytics = require('../lib/analytics');
+var BraintreeError = require('../lib/braintree-error');
+var errors = require('./shared/errors');
+var PayPal = require('./external/paypal');
+var sharedErrors = require('../lib/errors');
+var VERSION = "3.15.0";
+var wrapPromise = require('wrap-promise');
+var Promise = require('../lib/promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} callback The second argument, `data`, is the {@link PayPal} instance.
+ * @example
+ * // We recomend creating your PayPal button with button.js
+ * // For an example, see http://codepen.io/braintree/pen/LNKJWa
+ * var paypalButton = document.querySelector('.paypal-button');
+ *
+ * braintree.client.create({
+ *   authorization: CLIENT_AUTHORIZATION
+ * }, function (clientErr, clientInstance) {
+ *   if (clientErr) {
+ *     console.error('Error creating client:', clientErr);
+ *     return;
+ *   }
+ *
+ *   braintree.paypal.create({
+ *     client: clientInstance
+ *   }, function (paypalErr, paypalInstance) {
+ *     if (paypalErr) {
+ *       console.error('Error creating PayPal:', paypalErr);
+ *       return;
+ *     }
+ *
+ *     paypalButton.removeAttribute('disabled');
+ *
+ *     // When the button is clicked, attempt to tokenize.
+ *     paypalButton.addEventListener('click', function (event) {
+ *       // Because tokenization opens a popup, this has to be called as a result of
+ *       // customer action, like clicking a button. You cannot call this at any time.
+ *       paypalInstance.tokenize({
+ *         flow: 'vault'
+ *         // For more tokenization options, see the full PayPal tokenization documentation
+ *         // http://braintree.github.io/braintree-web/current/PayPal.html#tokenize
+ *       }, function (tokenizeErr, payload) {
+ *         if (tokenizeErr) {
+ *           if (tokenizeErr.type !== 'CUSTOMER') {
+ *             console.error('Error tokenizing:', tokenizeErr);
+ *           }
+ *           return;
+ *         }
+ *
+ *         // Tokenization succeeded
+ *         paypalButton.setAttribute('disabled', true);
+ *         console.log('Got a nonce! You should submit this to your server.');
+ *         console.log(payload.nonce);
+ *       });
+ *     }, false);
+ *   });
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+function create(options) {
+  var config, pp, clientVersion;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating PayPal.'
+    }));
+  }
+
+  config = options.client.getConfiguration();
+  clientVersion = config.analyticsMetadata.sdkVersion;
+
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and PayPal (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  if (config.gatewayConfiguration.paypalEnabled !== true) {
+    return Promise.reject(new BraintreeError(errors.PAYPAL_NOT_ENABLED));
+  }
+
+  analytics.sendEvent(options.client, 'paypal.initialized');
+
+  pp = new PayPal(options);
+  return pp._initialize();
+}
+
+/**
+ * @static
+ * @function isSupported
+ * @description Returns true if PayPal [supports this browser](/current/#browser-support-webviews).
+ * @example
+ * if (braintree.paypal.isSupported()) {
+ *   // Add PayPal button to the page
+ * } else {
+ *   // Hide PayPal payment option
+ * }
+ * @returns {Boolean} Returns true if PayPal supports this browser.
+ */
+function isSupported() {
+  return true;
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  isSupported: isSupported,
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./external/paypal":108,"./shared/errors":111,"wrap-promise":672}],110:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  LANDING_FRAME_NAME: 'braintreepaypallanding',
+  FLOW_ENDPOINTS: {
+    checkout: 'create_payment_resource',
+    vault: 'setup_billing_agreement'
+  }
+};
+
+},{}],111:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../lib/braintree-error');
+
+module.exports = {
+  PAYPAL_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_NOT_ENABLED',
+    message: 'PayPal is not enabled for this merchant.'
+  },
+  PAYPAL_TOKENIZATION_REQUEST_ACTIVE: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_TOKENIZATION_REQUEST_ACTIVE',
+    message: 'Another tokenization request is active.'
+  },
+  PAYPAL_ACCOUNT_TOKENIZATION_FAILED: {
+    type: BraintreeError.types.NETWORK,
+    code: 'PAYPAL_ACCOUNT_TOKENIZATION_FAILED',
+    message: 'Could not tokenize user\'s PayPal account.'
+  },
+  PAYPAL_FLOW_FAILED: {
+    type: BraintreeError.types.NETWORK,
+    code: 'PAYPAL_FLOW_FAILED',
+    message: 'Could not initialize PayPal flow.'
+  },
+  PAYPAL_FLOW_OPTION_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_FLOW_OPTION_REQUIRED',
+    message: 'PayPal flow property is invalid or missing.'
+  },
+  PAYPAL_BROWSER_NOT_SUPPORTED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'PAYPAL_BROWSER_NOT_SUPPORTED',
+    message: 'Browser is not supported.'
+  },
+  PAYPAL_POPUP_OPEN_FAILED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_POPUP_OPEN_FAILED',
+    message: 'PayPal popup failed to open, make sure to tokenize in response to a user action.'
+  },
+  PAYPAL_POPUP_CLOSED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'PAYPAL_POPUP_CLOSED',
+    message: 'Customer closed PayPal popup before authorizing.'
+  },
+  PAYPAL_INVALID_PAYMENT_OPTION: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'PAYPAL_INVALID_PAYMENT_OPTION',
+    message: 'PayPal payment options are invalid.'
+  }
+};
+
+},{"../../lib/braintree-error":66}],112:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../lib/braintree-error');
+var analytics = require('../../lib/analytics');
+var methods = require('../../lib/methods');
+var convertMethodsToError = require('../../lib/convert-methods-to-error');
+var constants = require('../shared/constants');
+var useMin = require('../../lib/use-min');
+var Bus = require('../../lib/bus');
+var uuid = require('../../lib/uuid');
+var deferred = require('../../lib/deferred');
+var errors = require('../shared/errors');
+var events = require('../shared/events');
+var VERSION = "3.15.0";
+var iFramer = require('iframer');
+var Promise = require('../../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+var IFRAME_HEIGHT = 400;
+var IFRAME_WIDTH = 400;
+
+/**
+ * @typedef {object} ThreeDSecure~verifyPayload
+ * @property {string} nonce The new payment method nonce produced by the 3D Secure lookup. The original nonce passed into {@link ThreeDSecure#verifyCard|verifyCard} was consumed. This new nonce should be used to transact on your server.
+ * @property {object} details Additional account details.
+ * @property {string} details.cardType Type of card, ex: Visa, MasterCard.
+ * @property {string} details.lastTwo Last two digits of card number.
+ * @property {string} description A human-readable description.
+ * @property {boolean} liabilityShiftPossible Indicates whether the card was eligible for 3D Secure.
+ * @property {boolean} liabilityShifted Indicates whether the liability for fraud has been shifted away from the merchant.
+ */
+
+/**
+ * @class
+ * @param {object} options 3D Secure {@link module:braintree-web/three-d-secure.create create} options
+ * @description <strong>Do not use this constructor directly. Use {@link module:braintree-web/three-d-secure.create|braintree.threeDSecure.create} instead.</strong>
+ * @classdesc This class represents a ThreeDSecure component produced by {@link module:braintree-web/three-d-secure.create|braintree.threeDSecure.create}. Instances of this class have a method for launching a 3D Secure authentication flow.
+ */
+function ThreeDSecure(options) {
+  this._options = options;
+  this._assetsUrl = options.client.getConfiguration().gatewayConfiguration.assetsUrl;
+  this._isDebug = options.client.getConfiguration().isDebug;
+  this._client = options.client;
+}
+
+/**
+ * @callback ThreeDSecure~addFrameCallback
+ * @param {?BraintreeError} [err] `null` or `undefined` if there was no error.
+ * @param {HTMLIFrameElement} iframe An iframe element containing the bank's authentication page that you must put on your page.
+ * @description The callback used for options.addFrame in {@link ThreeDSecure#verifyCard|verifyCard}.
+ * @returns {void}
+ */
+
+/**
+ * @callback ThreeDSecure~removeFrameCallback
+ * @description The callback used for options.removeFrame in {@link ThreeDSecure#verifyCard|verifyCard}.
+ * @returns {void}
+ */
+
+/**
+ * Launch the 3D Secure login flow, returning a nonce payload.
+ * @public
+ * @param {object} options Options for card verification.
+ * @param {string} options.nonce A nonce referencing the card to be verified. For example, this can be a nonce that was returned by Hosted Fields.
+ * @param {number} options.amount The amount of the transaction in the current merchant account's currency. For example, if you are running a transaction of $123.45 US dollars, `amount` would be 123.45.
+ * @param {errback} options.addFrame This {@link ThreeDSecure~addFrameCallback|addFrameCallback} will be called when the bank frame needs to be added to your page.
+ * @param {callback} options.removeFrame This {@link ThreeDSecure~removeFrameCallback|removeFrameCallback} will be called when the bank frame needs to be removed from your page.
+ * @param {errback} [callback] The second argument, <code>data</code>, is a {@link ThreeDSecure~verifyPayload|verifyPayload}. If no callback is provided, it will return a promise that resolves {@link ThreeDSecure~verifyPayload|verifyPayload}.
+
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * <caption>Verifying an existing nonce with 3DS</caption>
+ * var my3DSContainer;
+ *
+ * threeDSecure.verifyCard({
+ *   nonce: existingNonce,
+ *   amount: 123.45,
+ *   addFrame: function (err, iframe) {
+ *     // Set up your UI and add the iframe.
+ *     my3DSContainer = document.createElement('div');
+ *     my3DSContainer.appendChild(iframe);
+ *     document.body.appendChild(my3DSContainer);
+ *   },
+ *   removeFrame: function () {
+ *     // Remove UI that you added in addFrame.
+ *     document.body.removeChild(my3DSContainer);
+ *   }
+ * }, function (err, payload) {
+ *   if (err) {
+ *     console.error(err);
+ *     return;
+ *   }
+ *
+ *   if (payload.liabilityShifted) {
+ *     // Liablity has shifted
+ *     submitNonceToServer(payload.nonce);
+ *   } else if (payload.liabilityShiftPossible) {
+ *     // Liablity may still be shifted
+ *     // Decide if you want to submit the nonce
+ *   } else {
+ *     // Liablity has not shifted and will not shift
+ *     // Decide if you want to submit the nonce
+ *   }
+ * });
+ */
+ThreeDSecure.prototype.verifyCard = function (options) {
+  var url, addFrame, removeFrame, error, errorOption;
+  var self = this;
+
+  options = options || {};
+
+  if (this._verifyCardInProgress === true) {
+    error = errors.THREEDS_AUTHENTICATION_IN_PROGRESS;
+  } else if (!options.nonce) {
+    errorOption = 'a nonce';
+  } else if (!options.amount) {
+    errorOption = 'an amount';
+  } else if (typeof options.addFrame !== 'function') {
+    errorOption = 'an addFrame function';
+  } else if (typeof options.removeFrame !== 'function') {
+    errorOption = 'a removeFrame function';
+  }
+
+  if (errorOption) {
+    error = {
+      type: errors.THREEDS_MISSING_VERIFY_CARD_OPTION.type,
+      code: errors.THREEDS_MISSING_VERIFY_CARD_OPTION.code,
+      message: 'verifyCard options must include ' + errorOption + '.'
+    };
+  }
+
+  if (error) {
+    return Promise.reject(new BraintreeError(error));
+  }
+
+  this._verifyCardInProgress = true;
+
+  addFrame = deferred(options.addFrame);
+  removeFrame = deferred(options.removeFrame);
+
+  url = 'payment_methods/' + options.nonce + '/three_d_secure/lookup';
+
+  return this._client.request({
+    endpoint: url,
+    method: 'post',
+    data: {amount: options.amount}
+  }).then(function (response) {
+    self._lookupPaymentMethod = response.paymentMethod;
+
+    return new Promise(function (resolve, reject) {
+      self._verifyCardCallback = function (verifyErr, payload) {
+        self._verifyCardInProgress = false;
+
+        if (verifyErr) {
+          reject(verifyErr);
+        } else {
+          resolve(payload);
+        }
+      };
+
+      self._handleLookupResponse({
+        lookupResponse: response,
+        addFrame: addFrame,
+        removeFrame: removeFrame
+      });
+    });
+  }).catch(function (err) {
+    self._verifyCardInProgress = false;
+    return Promise.reject(err);
+  });
+};
+
+/**
+ * Cancel the 3DS flow and return the verification payload if available.
+ * @public
+ * @param {errback} [callback] The second argument is a {@link ThreeDSecure~verifyPayload|verifyPayload}. If there is no verifyPayload (the initial lookup did not complete), an error will be returned. If no callback is passed, `cancelVerifyCard` will return a promise.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * threeDSecure.cancelVerifyCard(function (err, verifyPayload) {
+ *   if (err) {
+ *     // Handle error
+ *     console.log(err.message); // No verification payload available
+ *     return;
+ *   }
+ *
+ *   verifyPayload.nonce; // The nonce returned from the 3ds lookup call
+ *   verifyPayload.liabilityShifted; // boolean
+ *   verifyPayload.liabilityShiftPossible; // boolean
+ * });
+ */
+ThreeDSecure.prototype.cancelVerifyCard = function () {
+  this._verifyCardInProgress = false;
+
+  if (!this._lookupPaymentMethod) {
+    return Promise.reject(new BraintreeError(errors.THREEDS_NO_VERIFICATION_PAYLOAD));
+  }
+
+  return Promise.resolve(this._lookupPaymentMethod);
+};
+
+ThreeDSecure.prototype._handleLookupResponse = function (options) {
+  var lookupResponse = options.lookupResponse;
+
+  if (lookupResponse.lookup && lookupResponse.lookup.acsUrl && lookupResponse.lookup.acsUrl.length > 0) {
+    options.addFrame(null, this._createIframe({
+      response: lookupResponse.lookup,
+      removeFrame: options.removeFrame
+    }));
+  } else {
+    this._verifyCardCallback(null, {
+      nonce: lookupResponse.paymentMethod.nonce,
+      verificationDetails: lookupResponse.threeDSecureInfo
+    });
+  }
+};
+
+ThreeDSecure.prototype._createIframe = function (options) {
+  var url, authenticationCompleteBaseUrl;
+  var parentURL = window.location.href;
+  var response = options.response;
+
+  this._bus = new Bus({
+    channel: uuid(),
+    merchantUrl: location.href
+  });
+
+  authenticationCompleteBaseUrl = this._assetsUrl + '/web/' + VERSION + '/html/three-d-secure-authentication-complete-frame.html?channel=' + encodeURIComponent(this._bus.channel) + '&';
+
+  if (parentURL.indexOf('#') > -1) {
+    parentURL = parentURL.split('#')[0];
+  }
+
+  this._bus.on(Bus.events.CONFIGURATION_REQUEST, function (reply) {
+    reply({
+      acsUrl: response.acsUrl,
+      pareq: response.pareq,
+      termUrl: response.termUrl + '&three_d_secure_version=' + VERSION + '&authentication_complete_base_url=' + encodeURIComponent(authenticationCompleteBaseUrl),
+      md: response.md,
+      parentUrl: parentURL
+    });
+  });
+
+  this._bus.on(events.AUTHENTICATION_COMPLETE, function (data) {
+    this._handleAuthResponse(data, options);
+  }.bind(this));
+
+  url = this._assetsUrl + '/web/' + VERSION + '/html/three-d-secure-bank-frame' + useMin(this._isDebug) + '.html';
+
+  this._bankIframe = iFramer({
+    src: url,
+    height: IFRAME_HEIGHT,
+    width: IFRAME_WIDTH,
+    name: constants.LANDING_FRAME_NAME + '_' + this._bus.channel
+  });
+
+  return this._bankIframe;
+};
+
+ThreeDSecure.prototype._handleAuthResponse = function (data, options) {
+  var authResponse = JSON.parse(data.auth_response);
+
+  this._bus.teardown();
+
+  options.removeFrame();
+
+  // This also has to be in a setTimeout so it executes after the `removeFrame`.
+  deferred(function () {
+    if (authResponse.success) {
+      this._verifyCardCallback(null, this._formatAuthResponse(authResponse.paymentMethod, authResponse.threeDSecureInfo));
+    } else if (authResponse.threeDSecureInfo && authResponse.threeDSecureInfo.liabilityShiftPossible) {
+      this._verifyCardCallback(null, this._formatAuthResponse(this._lookupPaymentMethod, authResponse.threeDSecureInfo));
+    } else {
+      this._verifyCardCallback(new BraintreeError({
+        type: BraintreeError.types.UNKNOWN,
+        code: 'UNKNOWN_AUTH_RESPONSE',
+        message: authResponse.error.message
+      }));
+    }
+  }.bind(this))();
+};
+
+ThreeDSecure.prototype._formatAuthResponse = function (paymentMethod, threeDSecureInfo) {
+  return {
+    nonce: paymentMethod.nonce,
+    details: paymentMethod.details,
+    description: paymentMethod.description,
+    liabilityShifted: threeDSecureInfo.liabilityShifted,
+    liabilityShiftPossible: threeDSecureInfo.liabilityShiftPossible
+  };
+};
+
+/**
+ * Cleanly remove anything set up by {@link module:braintree-web/three-d-secure.create|create}.
+ * @public
+ * @param {callback} [callback] Called on completion. If no callback is passed, `teardown` will return a promise.
+ * @example
+ * threeDSecure.teardown();
+ * @example <caption>With callback</caption>
+ * threeDSecure.teardown(function () {
+ *   // teardown is complete
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+ThreeDSecure.prototype.teardown = function () {
+  var iframeParent;
+
+  convertMethodsToError(this, methods(ThreeDSecure.prototype));
+
+  analytics.sendEvent(this._options.client, 'threedsecure.teardown-completed');
+
+  if (this._bus) {
+    this._bus.teardown();
+  }
+
+  if (this._bankIframe) {
+    iframeParent = this._bankIframe.parentNode;
+
+    if (iframeParent) {
+      iframeParent.removeChild(this._bankIframe);
+    }
+  }
+
+  return Promise.resolve();
+};
+
+module.exports = wrapPromise.wrapPrototype(ThreeDSecure);
+
+},{"../../lib/analytics":63,"../../lib/braintree-error":66,"../../lib/bus":69,"../../lib/convert-methods-to-error":73,"../../lib/deferred":76,"../../lib/methods":94,"../../lib/promise":97,"../../lib/use-min":99,"../../lib/uuid":100,"../shared/constants":114,"../shared/errors":115,"../shared/events":116,"iframer":371,"wrap-promise":672}],113:[function(require,module,exports){
+'use strict';
+/** @module braintree-web/three-d-secure */
+
+var ThreeDSecure = require('./external/three-d-secure');
+var isHTTPS = require('../lib/is-https').isHTTPS;
+var BraintreeError = require('../lib/braintree-error');
+var analytics = require('../lib/analytics');
+var errors = require('./shared/errors');
+var sharedErrors = require('../lib/errors');
+var VERSION = "3.15.0";
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} [callback] The second argument, `data`, is the {@link ThreeDSecure} instance. If no callback is provided, it returns a promise that resolves the {@link ThreeDSecure} instance.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * braintree.threeDSecure.create({
+ *   client: client
+ * }, callback);
+ */
+function create(options) {
+  var config, error, clientVersion, isProduction;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating 3D Secure.'
+    }));
+  }
+
+  config = options.client.getConfiguration();
+  clientVersion = config.analyticsMetadata.sdkVersion;
+
+  if (!config.gatewayConfiguration.threeDSecureEnabled) {
+    error = errors.THREEDS_NOT_ENABLED;
+  } else if (config.analyticsMetadata.sdkVersion !== VERSION) {
+    error = {
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and 3D Secure (version ' + VERSION + ') components must be from the same SDK version.'
+    };
+  }
+
+  isProduction = config.gatewayConfiguration.environment === 'production';
+
+  if (isProduction && !isHTTPS()) {
+    error = errors.THREEDS_HTTPS_REQUIRED;
+  }
+
+  if (error) {
+    return Promise.reject(new BraintreeError(error));
+  }
+
+  analytics.sendEvent(options.client, 'threedsecure.initialized');
+
+  return Promise.resolve(new ThreeDSecure(options));
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/errors":79,"../lib/is-https":91,"../lib/promise":97,"./external/three-d-secure":112,"./shared/errors":115,"wrap-promise":672}],114:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  LANDING_FRAME_NAME: 'braintreethreedsecurelanding'
+};
+
+},{}],115:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../lib/braintree-error');
+
+module.exports = {
+  THREEDS_AUTHENTICATION_IN_PROGRESS: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'THREEDS_AUTHENTICATION_IN_PROGRESS',
+    message: 'Cannot call verifyCard while existing authentication is in progress.'
+  },
+  THREEDS_MISSING_VERIFY_CARD_OPTION: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'THREEDS_MISSING_VERIFY_CARD_OPTION'
+  },
+  THREEDS_NO_VERIFICATION_PAYLOAD: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'THREEDS_NO_VERIFICATION_PAYLOAD',
+    message: 'No verification payload available.'
+  },
+  THREEDS_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'THREEDS_NOT_ENABLED',
+    message: '3D Secure is not enabled for this merchant.'
+  },
+  THREEDS_HTTPS_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'THREEDS_HTTPS_REQUIRED',
+    message: '3D Secure requires HTTPS.'
+  },
+  THREEDS_TERM_URL_REQUIRES_BRAINTREE_DOMAIN: {
+    type: BraintreeError.types.INTERNAL,
+    code: 'THREEDS_TERM_URL_REQUIRES_BRAINTREE_DOMAIN',
+    message: 'Term Url must be on a Braintree domain.'
+  }
+};
+
+},{"../../lib/braintree-error":66}],116:[function(require,module,exports){
+'use strict';
+
+var enumerate = require('../../lib/enumerate');
+
+module.exports = enumerate([
+  'AUTHENTICATION_COMPLETE'
+], 'threedsecure:');
+
+},{"../../lib/enumerate":78}],117:[function(require,module,exports){
+'use strict';
+/**
+ * @module braintree-web/unionpay
+ * @description This module allows you to accept UnionPay payments. *It is currently in beta and is subject to change.*
+ */
+
+var UnionPay = require('./shared/unionpay');
+var BraintreeError = require('../lib/braintree-error');
+var analytics = require('../lib/analytics');
+var errors = require('./shared/errors');
+var sharedErrors = require('../lib/errors');
+var VERSION = "3.15.0";
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+* @static
+* @function create
+* @param {object} options Creation options:
+* @param {Client} options.client A {@link Client} instance.
+* @param {callback} [callback] The second argument, `data`, is the {@link UnionPay} instance. If no callback is provided, `create` returns a promise that resolves with the {@link UnionPay} instance.
+* @returns {Promise|void} Returns a promise if no callback is provided.
+* @example
+* braintree.unionpay.create({ client: clientInstance }, function (createErr, unionpayInstance) {
+*   if (createErr) {
+*     console.error(createErr);
+*     return;
+*   }
+*   // ...
+* });
+*/
+function create(options) {
+  var config, clientVersion;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating UnionPay.'
+    }));
+  }
+
+  config = options.client.getConfiguration();
+  clientVersion = config.analyticsMetadata.sdkVersion;
+
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and UnionPay (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  if (!config.gatewayConfiguration.unionPay || config.gatewayConfiguration.unionPay.enabled !== true) {
+    return Promise.reject(new BraintreeError(errors.UNIONPAY_NOT_ENABLED));
+  }
+
+  analytics.sendEvent(options.client, 'unionpay.initialized');
+
+  return Promise.resolve(new UnionPay(options));
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./shared/errors":119,"./shared/unionpay":120,"wrap-promise":672}],118:[function(require,module,exports){
+'use strict';
+
+var enumerate = require('../../lib/enumerate');
+
+module.exports = {
+  events: enumerate([
+    'HOSTED_FIELDS_FETCH_CAPABILITIES',
+    'HOSTED_FIELDS_ENROLL',
+    'HOSTED_FIELDS_TOKENIZE'
+  ], 'union-pay:'),
+  HOSTED_FIELDS_FRAME_NAME: 'braintreeunionpayhostedfields'
+};
+
+},{"../../lib/enumerate":78}],119:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../../lib/braintree-error');
+
+module.exports = {
+  UNIONPAY_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'UNIONPAY_NOT_ENABLED',
+    message: 'UnionPay is not enabled for this merchant.'
+  },
+  UNIONPAY_HOSTED_FIELDS_INSTANCE_INVALID: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'UNIONPAY_HOSTED_FIELDS_INSTANCE_INVALID',
+    message: 'Found an invalid Hosted Fields instance. Please use a valid Hosted Fields instance.'
+  },
+  UNIONPAY_HOSTED_FIELDS_INSTANCE_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'UNIONPAY_HOSTED_FIELDS_INSTANCE_REQUIRED',
+    message: 'Could not find the Hosted Fields instance.'
+  },
+  UNIONPAY_CARD_OR_HOSTED_FIELDS_INSTANCE_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'UNIONPAY_CARD_OR_HOSTED_FIELDS_INSTANCE_REQUIRED',
+    message: 'A card or a Hosted Fields instance is required. Please supply a card or a Hosted Fields instance.'
+  },
+  UNIONPAY_CARD_AND_HOSTED_FIELDS_INSTANCES: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'UNIONPAY_CARD_AND_HOSTED_FIELDS_INSTANCES',
+    message: 'Please supply either a card or a Hosted Fields instance, not both.'
+  },
+  UNIONPAY_EXPIRATION_DATE_INCOMPLETE: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'UNIONPAY_EXPIRATION_DATE_INCOMPLETE',
+    message: 'You must supply expiration month and year or neither.'
+  },
+  UNIONPAY_ENROLLMENT_CUSTOMER_INPUT_INVALID: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'UNIONPAY_ENROLLMENT_CUSTOMER_INPUT_INVALID',
+    message: 'Enrollment failed due to user input error.'
+  },
+  UNIONPAY_ENROLLMENT_NETWORK_ERROR: {
+    type: BraintreeError.types.NETWORK,
+    code: 'UNIONPAY_ENROLLMENT_NETWORK_ERROR',
+    message: 'Could not enroll UnionPay card.'
+  },
+  UNIONPAY_FETCH_CAPABILITIES_NETWORK_ERROR: {
+    type: BraintreeError.types.NETWORK,
+    code: 'UNIONPAY_FETCH_CAPABILITIES_NETWORK_ERROR',
+    message: 'Could not fetch card capabilities.'
+  },
+  UNIONPAY_TOKENIZATION_NETWORK_ERROR: {
+    type: BraintreeError.types.NETWORK,
+    code: 'UNIONPAY_TOKENIZATION_NETWORK_ERROR',
+    message: 'A tokenization network error occurred.'
+  },
+  UNIONPAY_MISSING_MOBILE_PHONE_DATA: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'UNIONPAY_MISSING_MOBILE_PHONE_DATA',
+    message: 'A `mobile` with `countryCode` and `number` is required.'
+  },
+  UNIONPAY_FAILED_TOKENIZATION: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'UNIONPAY_FAILED_TOKENIZATION',
+    message: 'The supplied card data failed tokenization.'
+  }
+};
+
+},{"../../lib/braintree-error":66}],120:[function(require,module,exports){
+'use strict';
+
+var analytics = require('../../lib/analytics');
+var BraintreeError = require('../../lib/braintree-error');
+var Bus = require('../../lib/bus');
+var constants = require('./constants');
+var useMin = require('../../lib/use-min');
+var convertMethodsToError = require('../../lib/convert-methods-to-error');
+var errors = require('./errors');
+var events = constants.events;
+var iFramer = require('iframer');
+var methods = require('../../lib/methods');
+var VERSION = "3.15.0";
+var uuid = require('../../lib/uuid');
+var Promise = require('../../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @class
+ * @param {object} options See {@link module:braintree-web/unionpay.create|unionpay.create}.
+ * @description <strong>You cannot use this constructor directly. Use {@link module:braintree-web/unionpay.create|braintree-web.unionpay.create} instead.</strong>
+ * @classdesc This class represents a UnionPay component. Instances of this class have methods for {@link UnionPay#fetchCapabilities fetching capabilities} of UnionPay cards, {@link UnionPay#enroll enrolling} a UnionPay card, and {@link UnionPay#tokenize tokenizing} a UnionPay card.
+ */
+function UnionPay(options) {
+  this._options = options;
+}
+
+/**
+ * @typedef {object} UnionPay~fetchCapabilitiesPayload
+ * @property {boolean} isUnionPay Determines if this card is a UnionPay card.
+ * @property {boolean} isDebit Determines if this card is a debit card. This property is only present if `isUnionPay` is `true`.
+ * @property {object} unionPay UnionPay specific properties. This property is only present if `isUnionPay` is `true`.
+ * @property {boolean} unionPay.supportsTwoStepAuthAndCapture Determines if the card allows for an authorization, but settling the transaction later.
+ * @property {boolean} unionPay.isSupported Determines if Braintree can process this UnionPay card. When false, Braintree cannot process this card and the user should use a different card.
+ */
+
+/**
+ * Fetches the capabilities of a card, including whether or not the SMS enrollment process is required.
+ * @public
+ * @param {object} options UnionPay {@link UnionPay#fetchCapabilities fetchCapabilities} options
+ * @param {object} [options.card] The card from which to fetch capabilities. Note that this will only have one property, `number`. Required if you are not using the `hostedFields` option.
+ * @param {string} options.card.number Card number.
+ * @param {HostedFields} [options.hostedFields] The Hosted Fields instance used to collect card data. Required if you are not using the `card` option.
+ * @param {callback} [callback] The second argument, <code>data</code>, is a {@link UnionPay#fetchCapabilitiesPayload fetchCapabilitiesPayload}. If no callback is provided, `fetchCapabilities` returns a promise that resolves with a {@link UnionPay#fetchCapabilitiesPayload fetchCapabilitiesPayload}.
+ * @example <caption>With raw card data</caption>
+ * unionpayInstance.fetchCapabilities({
+ *   card: {
+ *     number: '4111111111111111'
+ *   }
+ * }, function (fetchErr, cardCapabilities) {
+ *   if (fetchErr) {
+ *     console.error(fetchErr);
+ *     return;
+ *   }
+ *
+ *   if (cardCapabilities.isUnionPay) {
+ *     if (cardCapabilities.unionPay && !cardCapabilities.unionPay.isSupported) {
+ *       // Braintree cannot process this UnionPay card.
+ *       // Ask the user for a different card.
+ *       return;
+ *     }
+ *
+ *     if (cardCapabilities.isDebit) {
+ *       // CVV and expiration date are not required
+ *     } else {
+ *       // CVV and expiration date are required
+ *     }
+ *
+ *     // Show mobile phone number field for enrollment
+ *   }
+ * });
+ * @example <caption>With Hosted Fields</caption>
+ * // Fetch capabilities on `validityChange` inside of the Hosted Fields `create` callback
+ * hostedFieldsInstance.on('validityChange', function (event) {
+ *   // Only attempt to fetch capabilities when a valid card number has been entered
+ *   if (event.emittedBy === 'number' && event.fields.number.isValid) {
+ *     unionpayInstance.fetchCapabilities({
+ *       hostedFields: hostedFieldsInstance
+ *     }, function (fetchErr, cardCapabilities) {
+ *       if (fetchErr) {
+ *         console.error(fetchErr);
+ *         return;
+ *       }
+ *
+ *       if (cardCapabilities.isUnionPay) {
+ *         if (cardCapabilities.unionPay && !cardCapabilities.unionPay.isSupported) {
+ *           // Braintree cannot process this UnionPay card.
+ *           // Ask the user for a different card.
+ *           return;
+ *         }
+ *         if (cardCapabilities.isDebit) {
+ *           // CVV and expiration date are not required
+ *           // Hide the containers with your `cvv` and `expirationDate` fields
+ *         } else {
+ *           // CVV and expiration date are required
+ *         }
+ *       } else {
+ *         // Not a UnionPay card
+ *         // When form is complete, tokenize using your Hosted Fields instance
+ *       }
+ *
+ *       // Show your own mobile country code and phone number inputs for enrollment
+ *     });
+ *   });
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+UnionPay.prototype.fetchCapabilities = function (options) {
+  var self = this;
+  var client = this._options.client;
+  var cardNumber = options.card ? options.card.number : null;
+  var hostedFields = options.hostedFields;
+
+  if (cardNumber && hostedFields) {
+    return Promise.reject(new BraintreeError(errors.UNIONPAY_CARD_AND_HOSTED_FIELDS_INSTANCES));
+  } else if (cardNumber) {
+    return client.request({
+      method: 'get',
+      endpoint: 'payment_methods/credit_cards/capabilities',
+      data: {
+        _meta: {source: 'unionpay'},
+        creditCard: {
+          number: cardNumber
+        }
+      }
+    }).then(function (response) {
+      analytics.sendEvent(client, 'unionpay.capabilities-received');
+      return response;
+    }).catch(function (err) {
+      var status = err.details && err.details.httpStatus;
+
+      analytics.sendEvent(client, 'unionpay.capabilities-failed');
+
+      if (status === 403) {
+        return Promise.reject(err);
+      }
+      return Promise.reject(new BraintreeError({
+        type: errors.UNIONPAY_FETCH_CAPABILITIES_NETWORK_ERROR.type,
+        code: errors.UNIONPAY_FETCH_CAPABILITIES_NETWORK_ERROR.code,
+        message: errors.UNIONPAY_FETCH_CAPABILITIES_NETWORK_ERROR.message,
+        details: {
+          originalError: err
+        }
+      }));
+    });
+  } else if (hostedFields) {
+    if (!hostedFields._bus) {
+      return Promise.reject(new BraintreeError(errors.UNIONPAY_HOSTED_FIELDS_INSTANCE_INVALID));
+    }
+
+    return new Promise(function (resolve, reject) {
+      self._initializeHostedFields(function () {
+        self._bus.emit(events.HOSTED_FIELDS_FETCH_CAPABILITIES, {hostedFields: hostedFields}, function (response) {
+          if (response.err) {
+            reject(new BraintreeError(response.err));
+            return;
+          }
+
+          resolve(response.payload);
+        });
+      });
+    });
+  }
+
+  return Promise.reject(new BraintreeError(errors.UNIONPAY_CARD_OR_HOSTED_FIELDS_INSTANCE_REQUIRED));
+};
+
+/**
+ * @typedef {object} UnionPay~enrollPayload
+ * @property {string} enrollmentId UnionPay enrollment ID. This value should be passed to `tokenize`.
+ * @property {boolean} smsCodeRequired UnionPay `smsCodeRequired` flag.
+ * </p><b>true</b> - the user will receive an SMS code that needs to be supplied for tokenization.
+ * </p><b>false</b> - the card can be immediately tokenized.
+ */
+
+/**
+ * Enrolls a UnionPay card. Use {@link UnionPay#fetchCapabilities|fetchCapabilities} to determine if the SMS enrollment process is required.
+ * @public
+ * @param {object} options UnionPay enrollment options:
+ * @param {object} [options.card] The card to enroll. Required if you are not using the `hostedFields` option.
+ * @param {string} options.card.number The card number.
+ * @param {string} [options.card.expirationDate] The card's expiration date. May be in the form `MM/YY` or `MM/YYYY`. When defined `expirationMonth` and `expirationYear` are ignored.
+ * @param {string} [options.card.expirationMonth] The card's expiration month. This should be used with the `expirationYear` parameter. When `expirationDate` is defined this parameter is ignored.
+ * @param {string} [options.card.expirationYear] The card's expiration year. This should be used with the `expirationMonth` parameter. When `expirationDate` is defined this parameter is ignored.
+ * @param {HostedFields} [options.hostedFields] The Hosted Fields instance used to collect card data. Required if you are not using the `card` option.
+ * @param {object} options.mobile The mobile information collected from the customer.
+ * @param {string} options.mobile.countryCode The country code of the customer's mobile phone number.
+ * @param {string} options.mobile.number The customer's mobile phone number.
+ * @param {callback} [callback] The second argument, <code>data</code>, is a {@link UnionPay~enrollPayload|enrollPayload}. If no callback is provided, `enroll` returns a promise that resolves with {@link UnionPay~enrollPayload|enrollPayload}.
+ * @example <caption>With raw card data</caption>
+ * unionpayInstance.enroll({
+ *   card: {
+ *     number: '4111111111111111',
+ *     expirationMonth: '12',
+ *     expirationYear: '2038'
+ *   },
+ *   mobile: {
+ *     countryCode: '62',
+ *     number: '111111111111'
+ *   }
+ * }, function (enrollErr, response) {
+ *   if (enrollErr) {
+ *      console.error(enrollErr);
+ *      return;
+ *   }
+ *
+ *   if (response.smsCodeRequired) {
+ *     // If smsCodeRequired, wait for SMS auth code from customer
+ *     // Then use response.enrollmentId during {@link UnionPay#tokenize}
+ *   } else {
+ *     // SMS code is not required from the user.
+ *     // {@link UnionPay#tokenize} can be called immediately
+ * });
+ * @example <caption>With Hosted Fields</caption>
+ * unionpayInstance.enroll({
+ *   hostedFields: hostedFields,
+ *   mobile: {
+ *     countryCode: '62',
+ *     number: '111111111111'
+ *   }
+ * }, function (enrollErr, response) {
+ *   if (enrollErr) {
+ *     console.error(enrollErr);
+ *     return;
+ *   }
+ *
+ *   if (response.smsCodeRequired) {
+ *     // If smsCodeRequired, wait for SMS auth code from customer
+ *     // Then use response.enrollmentId during {@link UnionPay#tokenize}
+ *   } else {
+ *     // SMS code is not required from the user.
+ *     // {@link UnionPay#tokenize} can be called immediately
+ *   }
+ * });
+ * @returns {void}
+ */
+UnionPay.prototype.enroll = function (options) {
+  var self = this;
+  var client = this._options.client;
+  var card = options.card;
+  var mobile = options.mobile;
+  var hostedFields = options.hostedFields;
+  var data;
+
+  if (!mobile) {
+    return Promise.reject(new BraintreeError(errors.UNIONPAY_MISSING_MOBILE_PHONE_DATA));
+  }
+
+  if (hostedFields) {
+    if (!hostedFields._bus) {
+      return Promise.reject(new BraintreeError(errors.UNIONPAY_HOSTED_FIELDS_INSTANCE_INVALID));
+    } else if (card) {
+      return Promise.reject(new BraintreeError(errors.UNIONPAY_CARD_AND_HOSTED_FIELDS_INSTANCES));
+    }
+
+    return new Promise(function (resolve, reject) {
+      self._initializeHostedFields(function () {
+        self._bus.emit(events.HOSTED_FIELDS_ENROLL, {hostedFields: hostedFields, mobile: mobile}, function (response) {
+          if (response.err) {
+            reject(new BraintreeError(response.err));
+            return;
+          }
+
+          resolve(response.payload);
+        });
+      });
+    });
+  } else if (card && card.number) {
+    data = {
+      _meta: {source: 'unionpay'},
+      unionPayEnrollment: {
+        number: card.number,
+        mobileCountryCode: mobile.countryCode,
+        mobileNumber: mobile.number
+      }
+    };
+
+    if (card.expirationDate) {
+      data.unionPayEnrollment.expirationDate = card.expirationDate;
+    } else if (card.expirationMonth || card.expirationYear) {
+      if (card.expirationMonth && card.expirationYear) {
+        data.unionPayEnrollment.expirationYear = card.expirationYear;
+        data.unionPayEnrollment.expirationMonth = card.expirationMonth;
+      } else {
+        return Promise.reject(new BraintreeError(errors.UNIONPAY_EXPIRATION_DATE_INCOMPLETE));
+      }
+    }
+
+    return client.request({
+      method: 'post',
+      endpoint: 'union_pay_enrollments',
+      data: data
+    }).then(function (response) {
+      analytics.sendEvent(client, 'unionpay.enrollment-succeeded');
+      return {
+        enrollmentId: response.unionPayEnrollmentId,
+        smsCodeRequired: response.smsCodeRequired
+      };
+    }).catch(function (err) {
+      var error;
+      var status = err.details && err.details.httpStatus;
+
+      if (status === 403) {
+        error = err;
+      } else if (status < 500) {
+        error = new BraintreeError(errors.UNIONPAY_ENROLLMENT_CUSTOMER_INPUT_INVALID);
+        error.details = {originalError: err};
+      } else {
+        error = new BraintreeError(errors.UNIONPAY_ENROLLMENT_NETWORK_ERROR);
+        error.details = {originalError: err};
+      }
+
+      analytics.sendEvent(client, 'unionpay.enrollment-failed');
+      return Promise.reject(error);
+    });
+  }
+
+  return Promise.reject(new BraintreeError(errors.UNIONPAY_CARD_OR_HOSTED_FIELDS_INSTANCE_REQUIRED));
+};
+
+/**
+ * @typedef {object} UnionPay~tokenizePayload
+ * @property {string} nonce The payment method nonce.
+ * @property {string} type Always <code>CreditCard</code>.
+ * @property {object} details Additional account details:
+ * @property {string} details.cardType Type of card, ex: Visa, MasterCard.
+ * @property {string} details.lastTwo Last two digits of card number.
+ * @property {string} description A human-readable description.
+ */
+
+/**
+ * Tokenizes a UnionPay card and returns a nonce payload.
+ * @public
+ * @param {object} options UnionPay tokenization options:
+ * @param {object} [options.card] The card to enroll. Required if you are not using the `hostedFields` option.
+ * @param {string} options.card.number The card number.
+ * @param {string} [options.card.expirationDate] The card's expiration date. May be in the form `MM/YY` or `MM/YYYY`. When defined `expirationMonth` and `expirationYear` are ignored.
+ * @param {string} [options.card.expirationMonth] The card's expiration month. This should be used with the `expirationYear` parameter. When `expirationDate` is defined this parameter is ignored.
+ * @param {string} [options.card.expirationYear] The card's expiration year. This should be used with the `expirationMonth` parameter. When `expirationDate` is defined this parameter is ignored.
+ * @param {string} [options.card.cvv] The card's security number.
+ * @param {HostedFields} [options.hostedFields] The Hosted Fields instance used to collect card data. Required if you are not using the `card` option.
+ * @param {string} options.enrollmentId The enrollment ID from {@link UnionPay#enroll}.
+ * @param {string} [options.smsCode] The SMS code received from the user if {@link UnionPay#enroll} payload have `smsCodeRequired`. if `smsCodeRequired` is false, smsCode should not be passed.
+ * @param {callback} [callback] The second argument, <code>data</code>, is a {@link UnionPay~tokenizePayload|tokenizePayload}. If no callback is provided, `tokenize` returns a promise that resolves with a {@link UnionPay~tokenizePayload|tokenizePayload}.
+ * @example <caption>With raw card data</caption>
+ * unionpayInstance.tokenize({
+ *   card: {
+ *     number: '4111111111111111',
+ *     expirationMonth: '12',
+ *     expirationYear: '2038',
+ *     cvv: '123'
+ *   },
+ *   enrollmentId: enrollResponse.enrollmentId, // Returned from enroll
+ *   smsCode: '11111' // Received by customer's phone, if SMS enrollment was required. Otherwise it should be omitted
+ * }, function (tokenizeErr, response) {
+ *   if (tokenizeErr) {
+ *     console.error(tokenizeErr);
+ *     return;
+ *   }
+ *
+ *   // Send response.nonce to your server
+ * });
+ * @example <caption>With Hosted Fields</caption>
+ * unionpayInstance.tokenize({
+ *   hostedFields: hostedFieldsInstance,
+ *   enrollmentId: enrollResponse.enrollmentId, // Returned from enroll
+ *   smsCode: '11111' // Received by customer's phone, if SMS enrollment was required. Otherwise it should be omitted
+ * }, function (tokenizeErr, response) {
+ *   if (tokenizeErr) {
+ *     console.error(tokenizeErr);
+ *     return;
+ *   }
+ *
+ *   // Send response.nonce to your server
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+UnionPay.prototype.tokenize = function (options) {
+  var data;
+  var self = this;
+  var client = this._options.client;
+  var card = options.card;
+  var hostedFields = options.hostedFields;
+
+  if (card && hostedFields) {
+    return Promise.reject(new BraintreeError(errors.UNIONPAY_CARD_AND_HOSTED_FIELDS_INSTANCES));
+  } else if (card) {
+    data = {
+      _meta: {source: 'unionpay'},
+      creditCard: {
+        number: options.card.number,
+        options: {
+          unionPayEnrollment: {
+            id: options.enrollmentId
+          }
+        }
+      }
+    };
+
+    if (options.smsCode) {
+      data.creditCard.options.unionPayEnrollment.smsCode = options.smsCode;
+    }
+
+    if (card.expirationDate) {
+      data.creditCard.expirationDate = card.expirationDate;
+    } else if (card.expirationMonth && card.expirationYear) {
+      data.creditCard.expirationYear = card.expirationYear;
+      data.creditCard.expirationMonth = card.expirationMonth;
+    }
+
+    if (options.card.cvv) {
+      data.creditCard.cvv = options.card.cvv;
+    }
+
+    return client.request({
+      method: 'post',
+      endpoint: 'payment_methods/credit_cards',
+      data: data
+    }).then(function (response) {
+      var tokenizedCard = response.creditCards[0];
+
+      delete tokenizedCard.consumed;
+      delete tokenizedCard.threeDSecureInfo;
+
+      analytics.sendEvent(client, 'unionpay.nonce-received');
+      return tokenizedCard;
+    }).catch(function (err) {
+      var error;
+      var status = err.details && err.details.httpStatus;
+
+      analytics.sendEvent(client, 'unionpay.nonce-failed');
+
+      if (status === 403) {
+        error = err;
+      } else if (status < 500) {
+        error = new BraintreeError(errors.UNIONPAY_FAILED_TOKENIZATION);
+        error.details = {originalError: err};
+      } else {
+        error = new BraintreeError(errors.UNIONPAY_TOKENIZATION_NETWORK_ERROR);
+        error.details = {originalError: err};
+      }
+
+      return Promise.reject(error);
+    });
+  } else if (hostedFields) {
+    if (!hostedFields._bus) {
+      return Promise.reject(new BraintreeError(errors.UNIONPAY_HOSTED_FIELDS_INSTANCE_INVALID));
+    }
+
+    return new Promise(function (resolve, reject) {
+      self._initializeHostedFields(function () {
+        self._bus.emit(events.HOSTED_FIELDS_TOKENIZE, options, function (response) {
+          if (response.err) {
+            reject(new BraintreeError(response.err));
+            return;
+          }
+
+          resolve(response.payload);
+        });
+      });
+    });
+  }
+
+  return Promise.reject(new BraintreeError(errors.UNIONPAY_CARD_OR_HOSTED_FIELDS_INSTANCE_REQUIRED));
+};
+
+/**
+ * Cleanly remove anything set up by {@link module:braintree-web/unionpay.create|create}. This only needs to be called when using UnionPay with Hosted Fields.
+ * @public
+ * @param {callback} [callback] Called on completion. If no callback is provided, returns a promise.
+ * @example
+ * unionpayInstance.teardown();
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+UnionPay.prototype.teardown = function () {
+  if (this._bus) {
+    this._hostedFieldsFrame.parentNode.removeChild(this._hostedFieldsFrame);
+    this._bus.teardown();
+  }
+
+  convertMethodsToError(this, methods(UnionPay.prototype));
+
+  return Promise.resolve();
+};
+
+UnionPay.prototype._initializeHostedFields = function (callback) {
+  var assetsUrl, isDebug;
+  var componentId = uuid();
+
+  if (this._bus) {
+    callback();
+    return;
+  }
+
+  assetsUrl = this._options.client.getConfiguration().gatewayConfiguration.assetsUrl;
+  isDebug = this._options.client.getConfiguration().isDebug;
+
+  this._bus = new Bus({
+    channel: componentId,
+    merchantUrl: location.href
+  });
+  this._hostedFieldsFrame = iFramer({
+    name: constants.HOSTED_FIELDS_FRAME_NAME + '_' + componentId,
+    src: assetsUrl + '/web/' + VERSION + '/html/unionpay-hosted-fields-frame' + useMin(isDebug) + '.html',
+    height: 0,
+    width: 0
+  });
+
+  this._bus.on(Bus.events.CONFIGURATION_REQUEST, function (reply) {
+    reply(this._options.client);
+
+    callback();
+  }.bind(this));
+
+  document.body.appendChild(this._hostedFieldsFrame);
+};
+
+module.exports = wrapPromise.wrapPrototype(UnionPay);
+
+},{"../../lib/analytics":63,"../../lib/braintree-error":66,"../../lib/bus":69,"../../lib/convert-methods-to-error":73,"../../lib/methods":94,"../../lib/promise":97,"../../lib/use-min":99,"../../lib/uuid":100,"./constants":118,"./errors":119,"iframer":371,"wrap-promise":672}],121:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  PLAID_LINK_JS: 'https://cdn.plaid.com/link/v2/stable/link-initialize.js'
+};
+
+},{}],122:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+
+module.exports = {
+  US_BANK_ACCOUNT_OPTION_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'US_BANK_ACCOUNT_OPTION_REQUIRED'
+  },
+  US_BANK_ACCOUNT_MUTUALLY_EXCLUSIVE_OPTIONS: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'US_BANK_ACCOUNT_MUTUALLY_EXCLUSIVE_OPTIONS'
+  },
+  US_BANK_ACCOUNT_LOGIN_LOAD_FAILED: {
+    type: BraintreeError.types.NETWORK,
+    code: 'US_BANK_ACCOUNT_LOGIN_LOAD_FAILED',
+    message: 'Bank login flow failed to load.'
+  },
+  US_BANK_ACCOUNT_LOGIN_CLOSED: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'US_BANK_ACCOUNT_LOGIN_CLOSED',
+    message: 'Customer closed bank login flow before authorizing.'
+  },
+  US_BANK_ACCOUNT_LOGIN_REQUEST_ACTIVE: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'US_BANK_ACCOUNT_LOGIN_REQUEST_ACTIVE',
+    message: 'Another bank login tokenization request is active.'
+  },
+  US_BANK_ACCOUNT_TOKENIZATION_NETWORK_ERROR: {
+    type: BraintreeError.types.NETWORK,
+    code: 'US_BANK_ACCOUNT_TOKENIZATION_NETWORK_ERROR',
+    message: 'A tokenization network error occurred.'
+  },
+  US_BANK_ACCOUNT_FAILED_TOKENIZATION: {
+    type: BraintreeError.types.CUSTOMER,
+    code: 'US_BANK_ACCOUNT_FAILED_TOKENIZATION',
+    message: 'The supplied data failed tokenization.'
+  },
+  US_BANK_ACCOUNT_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'US_BANK_ACCOUNT_NOT_ENABLED',
+    message: 'US bank account is not enabled.'
+  },
+  US_BANK_ACCOUNT_BANK_LOGIN_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'US_BANK_ACCOUNT_BANK_LOGIN_NOT_ENABLED',
+    message: 'Bank login is not enabled.'
+  }
+};
+
+},{"../lib/braintree-error":66}],123:[function(require,module,exports){
+'use strict';
+/**
+ * @module braintree-web/us-bank-account
+ * @description This module is for accepting payments of US bank accounts.
+ */
+
+var BraintreeError = require('../lib/braintree-error');
+var errors = require('./errors');
+var USBankAccount = require('./us-bank-account');
+var VERSION = "3.15.0";
+var sharedErrors = require('../lib/errors');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} [callback] The second argument, `data`, is the {@link USBankAccount} instance. If no callback is provided, `create` returns a promise that resolves with the {@link USBankAccount} instance.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+function create(options) {
+  var clientVersion, braintreeApi, usBankAccount;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating US Bank Account.'
+    }));
+  }
+
+  clientVersion = options.client.getConfiguration().analyticsMetadata.sdkVersion;
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and US Bank Account (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  braintreeApi = options.client.getConfiguration().gatewayConfiguration.braintreeApi;
+  if (!braintreeApi) {
+    return Promise.reject(new BraintreeError(sharedErrors.BRAINTREE_API_ACCESS_RESTRICTED));
+  }
+
+  usBankAccount = options.client.getConfiguration().gatewayConfiguration.usBankAccount;
+  if (!usBankAccount) {
+    return Promise.reject(new BraintreeError(errors.US_BANK_ACCOUNT_NOT_ENABLED));
+  }
+
+  return Promise.resolve(new USBankAccount(options));
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./errors":122,"./us-bank-account":124,"wrap-promise":672}],124:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+var constants = require('./constants');
+var errors = require('./errors');
+var sharedErrors = require('../lib/errors');
+var analytics = require('../lib/analytics');
+var once = require('../lib/once');
+var convertMethodsToError = require('../lib/convert-methods-to-error');
+var methods = require('../lib/methods');
+var camelCaseToSnakeCase = require('../lib/camel-case-to-snake-case');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @typedef {object} USBankAccount~tokenizePayload
+ * @property {string} nonce The payment method nonce.
+ * @property {string} type The payment method type, always `us_bank_account`.
+ * @property {object} details Additional account details. Currently empty.
+ */
+
+/**
+ * @class
+ * @param {object} options See {@link module:braintree-web/us-bank-account.create|us-bank-account.create}.
+ * @classdesc This class represents a US Bank Account component. Instances of this class can tokenize raw bank details or present a bank login. <strong>You cannot use this constructor directly. Use {@link module:braintree-web/us-bank-account.create|braintree.us-bank-account.create} instead.</strong>
+ */
+function USBankAccount(options) {
+  this._client = options.client;
+
+  this._isTokenizingBankLogin = false;
+
+  analytics.sendEvent(this._client, 'usbankaccount.initialized');
+}
+
+/**
+ * Tokenizes bank information to return a payment method nonce. You can tokenize bank details by providing information like account and routing numbers. You can also tokenize with a bank login UI that prompts the customer to log into their bank account.
+ * @public
+ * @param {object} options All tokenization options for the US Bank Account component.
+ * @param {string} options.mandateText A string for proof of customer authorization. For example, `'I authorize Braintree to debit my bank account on behalf of My Online Store.'`.
+ * @param {object} [options.bankDetails] Bank detail information (such as account and routing numbers). `bankDetails` or `bankLogin` option must be provided.
+ * @param {string} options.bankDetails.routingNumber The customer's bank routing number, such as `'307075259'`.
+ * @param {string} options.bankDetails.accountNumber The customer's bank account number, such as `'999999999'`.
+ * @param {string} options.bankDetails.accountType The customer's bank account type. Must be `'checking'` or `'savings'`.
+ * @param {string} options.bankDetails.ownershipType The customer's bank account ownership type. Must be `'personal'` or `'business'`.
+ * @param {string} [options.bankDetails.firstName] The customer's first name. Required when account ownership type is `personal`.
+ * @param {string} [options.bankDetails.lastName] The customer's last name. Required when account ownership type is `personal`.
+ * @param {string} [options.bankDetails.businessName] The customer's business name. Required when account ownership type is `business`.
+ * @param {object} options.bankDetails.billingAddress The customer's billing address.
+ * @param {string} options.bankDetails.billingAddress.streetAddress The street address for the customer's billing address, such as `'123 Fake St'`.
+ * @param {string} [options.bankDetails.billingAddress.extendedAddress] The extended street address for the customer's billing address, such as `'Apartment B'`.
+ * @param {string} options.bankDetails.billingAddress.locality The locality for the customer's billing address. This is typically a city, such as `'San Francisco'`.
+ * @param {string} options.bankDetails.billingAddress.region The region for the customer's billing address. This is typically a state, such as `'CA'`.
+ * @param {string} options.bankDetails.billingAddress.postalCode The postal code for the customer's billing address. This is typically a ZIP code, such as `'94119'`.
+ * @param {object} [options.bankLogin] Bank login information. `bankLogin` or `bankDetails` option must be provided.
+ * @param {string} options.bankLogin.displayName Display name for the bank login UI, such as `'My Store'`.
+ * @param {string} options.bankLogin.ownershipType The customer's bank account ownership type. Must be `'personal'` or `'business'`.
+ * @param {string} [options.bankLogin.firstName] The customer's first name. Required when account ownership type is `personal`.
+ * @param {string} [options.bankLogin.lastName] The customer's last name. Required when account ownership type is `personal`.
+ * @param {string} [options.bankLogin.businessName] The customer's business name. Required when account ownership type is `business`.
+ * @param {object} options.bankLogin.billingAddress The customer's billing address.
+ * @param {string} options.bankLogin.billingAddress.streetAddress The street address for the customer's billing address, such as `'123 Fake St'`.
+ * @param {string} [options.bankLogin.billingAddress.extendedAddress] The extended street address for the customer's billing address, such as `'Apartment B'`.
+ * @param {string} options.bankLogin.billingAddress.locality The locality for the customer's billing address. This is typically a city, such as `'San Francisco'`.
+ * @param {string} options.bankLogin.billingAddress.region The region for the customer's billing address. This is typically a state, such as `'CA'`.
+ * @param {string} options.bankLogin.billingAddress.postalCode The postal code for the customer's billing address. This is typically a ZIP code, such as `'94119'`.
+ * @param {callback} [callback] The second argument, <code>data</code>, is a {@link USBankAccount~tokenizePayload|tokenizePayload}. If no callback is provided, `tokenize` returns a promise that resolves with {@link USBankAccount~tokenizePayload|tokenizePayload}.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * <caption>Tokenizing raw bank details</caption>
+ * var routingNumberInput = document.querySelector('input[name="routing-number"]');
+ * var accountNumberInput = document.querySelector('input[name="account-number"]');
+ * var accountTypeInput = document.querySelector('input[name="account-type"]:checked');
+ * var ownershipTypeInput = document.querySelector('input[name="ownership-type"]:checked');
+ * var firstNameInput = document.querySelector('input[name="first-name"]');
+ * var lastNameInput = document.querySelector('input[name="last-name"]');
+ * var businessNameInput = document.querySelector('input[name="business-name"]');
+ * var billingAddressStreetInput = document.querySelector('input[name="street-address"]');
+ * var billingAddressExtendedInput = document.querySelector('input[name="extended-address"]');
+ * var billingAddressLocalityInput = document.querySelector('input[name="locality"]');
+ * var billingAddressRegionSelect = document.querySelector('select[name="region"]');
+ * var billingAddressPostalInput = document.querySelector('input[name="postal-code"]');
+ *
+ * submitButton.addEventListener('click', function (event) {
+ *   var bankDetails = {
+ *     routingNumber: routingNumberInput.value,
+ *     accountNumber: accountNumberInput.value,
+ *     accountType: accountTypeInput.value,
+ *     ownershipType: ownershipTypeInput.value,
+ *     billingAddress: {
+ *       streetAddress: billingAddressStreetInput.value,
+ *       extendedAddress: billingAddressExtendedInput.value,
+ *       locality: billingAddressLocalityInput.value,
+ *       region: billingAddressRegionSelect.value,
+ *       postalCode: billingAddressPostalInput.value
+ *     }
+ *   };
+ *
+ *   if (bankDetails.ownershipType === 'personal') {
+ *     bankDetails.firstName = firstNameInput.value;
+ *     bankDetails.lastName = lastNameInput.value;
+ *   } else {
+ *     bankDetails.businessName = businessNameInput.value;
+ *   }
+ *
+ *   event.preventDefault();
+ *
+ *   usBankAccountInstance.tokenize({
+ *     bankDetails: bankDetails,
+ *     mandateText: 'I authorize Braintree to debit my bank account on behalf of My Online Store.'
+ *   }, function (tokenizeErr, tokenizedPayload) {
+ *     if (tokenizeErr) {
+ *       console.error('There was an error tokenizing the bank details.');
+ *       return;
+ *     }
+ *
+ *     // Send tokenizePayload.nonce to your server here!
+ *   });
+ * });
+ * @example
+ * <caption>Tokenizing with bank login UI</caption>
+ * var ownershipTypeInput = document.querySelector('input[name="ownership-type"]:checked');
+ * var firstNameInput = document.querySelector('input[name="first-name"]');
+ * var lastNameInput = document.querySelector('input[name="last-name"]');
+ * var businessNameInput = document.querySelector('input[name="business-name"]');
+ * var billingAddressStreetInput = document.querySelector('input[name="street-address"]');
+ * var billingAddressExtendedInput = document.querySelector('input[name="extended-address"]');
+ * var billingAddressLocalityInput = document.querySelector('input[name="locality"]');
+ * var billingAddressRegionSelect = document.querySelector('select[name="region"]');
+ * var billingAddressPostalInput = document.querySelector('input[name="postal-code"]');
+ *
+ * bankLoginButton.addEventListener('click', function (event) {
+ *   var bankLogin = {
+ *     displayName: 'My Online Store',
+ *     ownershipType: ownershipTypeInput.value,
+ *     billingAddress: {
+ *       streetAddress: billingAddressStreetInput.value,
+ *       extendedAddress: billingAddressExtendedInput.value,
+ *       locality: billingAddressLocalityInput.value,
+ *       region: billingAddressRegionSelect.value,
+ *       postalCode: billingAddressPostalInput.value
+ *     }
+ *   }
+ *   event.preventDefault();
+ *
+ *   if (bankLogin.ownershipType === 'personal') {
+ *     bankLogin.firstName = firstNameInput.value;
+ *     bankLogin.lastName = lastNameInput.value;
+ *   } else {
+ *     bankLogin.businessName = businessNameInput.value;
+ *   }
+ *
+ *   usBankAccountInstance.tokenize({
+ *     bankLogin: bankLogin,
+ *     mandateText: 'I authorize Braintree to debit my bank account on behalf of My Online Store.'
+ *   }, function (tokenizeErr, tokenizedPayload) {
+ *     if (tokenizeErr) {
+ *       console.error('There was an error tokenizing the bank details.');
+ *       return;
+ *     }
+ *
+ *     // Send tokenizePayload.nonce to your server here!
+ *   });
+ * });
+ */
+USBankAccount.prototype.tokenize = function (options) {
+  options = options || {};
+
+  if (!options.mandateText) {
+    return Promise.reject(new BraintreeError({
+      type: errors.US_BANK_ACCOUNT_OPTION_REQUIRED.type,
+      code: errors.US_BANK_ACCOUNT_OPTION_REQUIRED.code,
+      message: 'mandateText property is required.'
+    }));
+  }
+
+  if (options.bankDetails && options.bankLogin) {
+    return Promise.reject(new BraintreeError({
+      type: errors.US_BANK_ACCOUNT_MUTUALLY_EXCLUSIVE_OPTIONS.type,
+      code: errors.US_BANK_ACCOUNT_MUTUALLY_EXCLUSIVE_OPTIONS.code,
+      message: 'tokenize must be called with bankDetails or bankLogin, not both.'
+    }));
+  } else if (options.bankDetails) {
+    return this._tokenizeBankDetails(options);
+  } else if (options.bankLogin) {
+    return this._tokenizeBankLogin(options);
+  }
+
+  return Promise.reject(new BraintreeError({
+    type: errors.US_BANK_ACCOUNT_OPTION_REQUIRED.type,
+    code: errors.US_BANK_ACCOUNT_OPTION_REQUIRED.code,
+    message: 'tokenize must be called with bankDetails or bankLogin.'
+  }));
+};
+
+USBankAccount.prototype._tokenizeBankDetails = function (options) {
+  var client = this._client;
+  var bankDetails = options.bankDetails;
+
+  return client.request({
+    method: 'POST',
+    endpoint: 'tokens',
+    api: 'braintreeApi',
+    data: camelCaseToSnakeCase({
+      type: 'us_bank_account',
+      routingNumber: bankDetails.routingNumber,
+      accountNumber: bankDetails.accountNumber,
+      firstName: bankDetails.firstName,
+      lastName: bankDetails.lastName,
+      businessName: bankDetails.businessName,
+      accountType: bankDetails.accountType,
+      ownershipType: bankDetails.ownershipType,
+      billingAddress: camelCaseToSnakeCase(bankDetails.billingAddress || {}),
+      achMandate: {
+        text: options.mandateText
+      }
+    })
+  }).then(function (response) {
+    analytics.sendEvent(client, 'usbankaccount.bankdetails.tokenization.succeeded');
+
+    return Promise.resolve(formatTokenizeResponse(response));
+  }).catch(function (err) {
+    var error = errorFrom(err);
+
+    analytics.sendEvent(client, 'usbankaccount.bankdetails.tokenization.failed');
+
+    return Promise.reject(error);
+  });
+};
+
+USBankAccount.prototype._tokenizeBankLogin = function (options) {
+  var self = this;
+  var client = this._client;
+  var gatewayConfiguration = client.getConfiguration().gatewayConfiguration;
+  var isProduction = gatewayConfiguration.environment === 'production';
+  var plaidConfig = gatewayConfiguration.usBankAccount.plaid;
+
+  if (!options.bankLogin.displayName) {
+    return Promise.reject(new BraintreeError({
+      type: errors.US_BANK_ACCOUNT_OPTION_REQUIRED.type,
+      code: errors.US_BANK_ACCOUNT_OPTION_REQUIRED.code,
+      message: 'displayName property is required when using bankLogin.'
+    }));
+  }
+
+  if (!plaidConfig) {
+    return Promise.reject(new BraintreeError(errors.US_BANK_ACCOUNT_BANK_LOGIN_NOT_ENABLED));
+  }
+
+  if (this._isTokenizingBankLogin) {
+    return Promise.reject(new BraintreeError(errors.US_BANK_ACCOUNT_LOGIN_REQUEST_ACTIVE));
+  }
+  this._isTokenizingBankLogin = true;
+
+  return new Promise(function (resolve, reject) {
+    self._loadPlaid(function (plaidLoadErr, plaid) {
+      if (plaidLoadErr) {
+        reject(plaidLoadErr);
+        return;
+      }
+
+      plaid.create({
+        clientName: options.bankLogin.displayName,
+        env: isProduction ? 'production' : 'tartan',
+        key: isProduction ? plaidConfig.publicKey : 'test_key',
+        product: 'auth',
+        selectAccount: true,
+        onExit: function () {
+          self._isTokenizingBankLogin = false;
+
+          analytics.sendEvent(client, 'usbankaccount.banklogin.tokenization.closed.by-user');
+
+          reject(new BraintreeError(errors.US_BANK_ACCOUNT_LOGIN_CLOSED));
+        },
+        onSuccess: function (publicToken, metadata) {
+          client.request({
+            method: 'POST',
+            endpoint: 'tokens',
+            api: 'braintreeApi',
+            data: camelCaseToSnakeCase({
+              type: 'plaid_public_token',
+              publicToken: publicToken,
+              accountId: metadata.account_id,
+              achMandate: {
+                text: options.mandateText
+              },
+              ownershipType: options.bankLogin.ownershipType,
+              firstName: options.bankLogin.firstName,
+              lastName: options.bankLogin.lastName,
+              businessName: options.bankLogin.businessName,
+              billingAddress: camelCaseToSnakeCase(options.bankLogin.billingAddress || {})
+            })
+          }).then(function (response) {
+            self._isTokenizingBankLogin = false;
+
+            analytics.sendEvent(client, 'usbankaccount.banklogin.tokenization.succeeded');
+
+            resolve(formatTokenizeResponse(response));
+          }).catch(function (tokenizeErr) {
+            var error;
+
+            self._isTokenizingBankLogin = false;
+            error = errorFrom(tokenizeErr);
+
+            analytics.sendEvent(client, 'usbankaccount.banklogin.tokenization.failed');
+
+            reject(error);
+          });
+        }
+      }).open();
+
+      analytics.sendEvent(client, 'usbankaccount.banklogin.tokenization.started');
+    });
+  });
+};
+
+function errorFrom(err) {
+  var error;
+  var status = err.details && err.details.httpStatus;
+
+  if (status === 401) {
+    error = new BraintreeError(sharedErrors.BRAINTREE_API_ACCESS_RESTRICTED);
+  } else if (status < 500) {
+    error = new BraintreeError(errors.US_BANK_ACCOUNT_FAILED_TOKENIZATION);
+  } else {
+    error = new BraintreeError(errors.US_BANK_ACCOUNT_TOKENIZATION_NETWORK_ERROR);
+  }
+  error.details = {originalError: err};
+  return error;
+}
+
+function formatTokenizeResponse(response) {
+  return {
+    nonce: response.data.id,
+    details: {},
+    description: response.data.description,
+    type: response.data.type
+  };
+}
+
+USBankAccount.prototype._loadPlaid = function (callback) {
+  var existingScript, script;
+
+  callback = once(callback);
+
+  if (global.Plaid) {
+    callback(null, global.Plaid);
+    return;
+  }
+
+  existingScript = document.querySelector('script[src="' + constants.PLAID_LINK_JS + '"]');
+
+  if (existingScript) {
+    addLoadListeners(existingScript, callback);
+  } else {
+    script = document.createElement('script');
+
+    script.src = constants.PLAID_LINK_JS;
+    script.async = true;
+
+    addLoadListeners(script, callback);
+
+    document.body.appendChild(script);
+
+    this._plaidScript = script;
+  }
+};
+
+function addLoadListeners(script, callback) {
+  function loadHandler() {
+    var readyState = this.readyState; // eslint-disable-line no-invalid-this
+
+    if (!readyState || readyState === 'loaded' || readyState === 'complete') {
+      removeLoadListeners();
+      callback(null, global.Plaid);
+    }
+  }
+
+  function errorHandler() {
+    script.parentNode.removeChild(script);
+
+    callback(new BraintreeError(errors.US_BANK_ACCOUNT_LOGIN_LOAD_FAILED));
+  }
+
+  function removeLoadListeners() {
+    script.removeEventListener('error', errorHandler);
+    script.removeEventListener('load', loadHandler);
+    script.removeEventListener('readystatechange', loadHandler);
+  }
+
+  script.addEventListener('error', errorHandler);
+  script.addEventListener('load', loadHandler);
+  script.addEventListener('readystatechange', loadHandler);
+}
+
+/**
+ * Cleanly tear down anything set up by {@link module:braintree-web/us-bank-account.create|create}.
+ * @public
+ * @param {callback} [callback] Called once teardown is complete. No data is returned if teardown completes successfully.
+ * @example
+ * usBankAccountInstance.teardown();
+ * @example <caption>With callback</caption>
+ * usBankAccountInstance.teardown(function () {
+ *   // teardown is complete
+ * });
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+USBankAccount.prototype.teardown = function () {
+  if (this._plaidScript) {
+    document.body.removeChild(this._plaidScript);
+  }
+
+  convertMethodsToError(this, methods(USBankAccount.prototype));
+
+  return Promise.resolve();
+};
+
+module.exports = wrapPromise.wrapPrototype(USBankAccount);
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/camel-case-to-snake-case":70,"../lib/convert-methods-to-error":73,"../lib/errors":79,"../lib/methods":94,"../lib/once":95,"../lib/promise":97,"./constants":121,"./errors":122,"wrap-promise":672}],125:[function(require,module,exports){
+'use strict';
+/**
+ * @module braintree-web/vault-manager
+ * @description Manages customer's payment methods.
+ */
+
+var BraintreeError = require('../lib/braintree-error');
+var VaultManager = require('./vault-manager');
+var sharedErrors = require('../lib/errors');
+var VERSION = "3.15.0";
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} callback The second argument, `data`, is the {@link VaultManager} instance.
+ * @returns {void}
+ */
+function create(options) {
+  var clientVersion;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating Vault Manager.'
+    }));
+  }
+
+  clientVersion = options.client.getConfiguration().analyticsMetadata.sdkVersion;
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and Vault Manager (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  return Promise.resolve(new VaultManager(options));
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./vault-manager":126,"wrap-promise":672}],126:[function(require,module,exports){
+'use strict';
+
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @typedef {array} VaultManager~fetchPaymentMethodsPayload The customer's payment methods.
+ * @property {object} paymentMethod The payment method object.
+ * @property {string} paymentMethod.nonce A nonce that can be sent to your server to transact on the payment method.
+ * @property {boolean} paymentMethod.default Whether or not this is the default payment method for the customer.
+ * @property {object} paymentMethod.details Any additional details about the payment method. Varies depending on the type of payment method.
+ * @property {string} paymentMethod.type A constant indicating the type of payment method.
+ * @property {?string} paymentMethod.description Additional description about the payment method.
+ *
+ */
+
+/**
+ * @class
+ * @param {object} options Options
+ * @description <strong>You cannot use this constructor directly. Use {@link module:braintree-web/vault-manager.create|braintree.vault-manager.create} instead.</strong>
+ * @classdesc This class allows you to manage a customer's payment methods on the client.
+ */
+function VaultManager(options) {
+  this._client = options.client;
+}
+
+/**
+ * Fetches payment methods owned by the customer whose id was used to generate the client token used to create the {@link module:braintree-web/client|client}.
+ * @public
+ * @param {object} [options] Options for fetching payment methods.
+ * @param {boolean} [options.defaultFirst = false] If `true`, the payment methods will be returned with the default payment method for the customer first. Otherwise, the payment methods will be returned with the most recently used payment method first.
+ * @param {callback} [callback] The second argument is a {@link VaultManager~fetchPaymentMethodsPayload|fetchPaymentMehodsPayload}. This is also what is resolved by the promise if no callback is provided.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * vaultManagerInstance.fetchPaymentMethods(function (err, paymentMethods) {
+ *   paymentMethods.forEach(function (paymentMethod) {
+ *     // add payment method to UI
+ *     // paymentMethod.nonce <- transactable nonce associated with payment method
+ *     // paymentMethod.details <- object with additional information about payment method
+ *     // paymentMethod.type <- a constant signifying the type
+ *   });
+ * });
+ */
+VaultManager.prototype.fetchPaymentMethods = function (options) {
+  var defaultFirst;
+
+  options = options || {};
+
+  defaultFirst = options.defaultFirst === true ? 1 : 0;
+
+  return this._client.request({
+    endpoint: 'payment_methods',
+    method: 'get',
+    data: {
+      defaultFirst: defaultFirst
+    }
+  }).then(function (paymentMethodsPayload) {
+    return paymentMethodsPayload.paymentMethods.map(formatPaymentMethodPayload);
+  });
+};
+
+function formatPaymentMethodPayload(paymentMethod) {
+  var formattedPaymentMethod = {
+    nonce: paymentMethod.nonce,
+    'default': paymentMethod.default,
+    details: paymentMethod.details,
+    type: paymentMethod.type
+  };
+
+  if (paymentMethod.description) {
+    formattedPaymentMethod.description = paymentMethod.description;
+  }
+
+  return formattedPaymentMethod;
+}
+
+module.exports = wrapPromise.wrapPrototype(VaultManager);
+
+},{"wrap-promise":672}],127:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+
+module.exports = {
+  VISA_CHECKOUT_NOT_ENABLED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'VISA_CHECKOUT_NOT_ENABLED',
+    message: 'Visa Checkout is not enabled for this merchant.'
+  },
+  VISA_CHECKOUT_INIT_OPTIONS_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'VISA_CHECKOUT_INIT_OPTIONS_REQUIRED',
+    message: 'initOptions requires an object.'
+  },
+  VISA_CHECKOUT_PAYMENT_REQUIRED: {
+    type: BraintreeError.types.MERCHANT,
+    code: 'VISA_CHECKOUT_PAYMENT_REQUIRED',
+    message: 'tokenize requires callid, encKey, and encPaymentData.'
+  },
+  VISA_CHECKOUT_TOKENIZATION: {
+    type: BraintreeError.types.NETWORK,
+    code: 'VISA_CHECKOUT_TOKENIZATION',
+    message: 'A network error occurred when processing the Visa Checkout payment.'
+  }
+};
+
+},{"../lib/braintree-error":66}],128:[function(require,module,exports){
+'use strict';
+
+/**
+ * @module braintree-web/visa-checkout
+ * @description Processes Visa Checkout. *This component is currently in beta and is subject to change.*
+ */
+
+var BraintreeError = require('../lib/braintree-error');
+var VisaCheckout = require('./visa-checkout');
+var analytics = require('../lib/analytics');
+var sharedErrors = require('../lib/errors');
+var errors = require('./errors');
+var VERSION = "3.15.0";
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+
+/**
+ * @static
+ * @function create
+ * @param {object} options Creation options:
+ * @param {Client} options.client A {@link Client} instance.
+ * @param {callback} [callback] The second argument, `data`, is the {@link VisaCheckout} instance. If no callback is provided, `create` returns a promise that resolves with the {@link VisaCheckout} instance.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ */
+function create(options) {
+  var clientVersion;
+
+  if (options.client == null) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INSTANTIATION_OPTION_REQUIRED.type,
+      code: sharedErrors.INSTANTIATION_OPTION_REQUIRED.code,
+      message: 'options.client is required when instantiating Visa Checkout.'
+    }));
+  }
+
+  clientVersion = options.client.getConfiguration().analyticsMetadata.sdkVersion;
+  if (clientVersion !== VERSION) {
+    return Promise.reject(new BraintreeError({
+      type: sharedErrors.INCOMPATIBLE_VERSIONS.type,
+      code: sharedErrors.INCOMPATIBLE_VERSIONS.code,
+      message: 'Client (version ' + clientVersion + ') and Visa Checkout (version ' + VERSION + ') components must be from the same SDK version.'
+    }));
+  }
+
+  if (!options.client.getConfiguration().gatewayConfiguration.visaCheckout) {
+    return Promise.reject(new BraintreeError(errors.VISA_CHECKOUT_NOT_ENABLED));
+  }
+
+  analytics.sendEvent(options.client, 'visacheckout.initialized');
+
+  return Promise.resolve(new VisaCheckout(options));
+}
+
+module.exports = {
+  create: wrapPromise(create),
+  /**
+   * @description The current version of the SDK, i.e. `{@pkg version}`.
+   * @type {string}
+   */
+  VERSION: VERSION
+};
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/errors":79,"../lib/promise":97,"./errors":127,"./visa-checkout":129,"wrap-promise":672}],129:[function(require,module,exports){
+'use strict';
+
+var BraintreeError = require('../lib/braintree-error');
+var analytics = require('../lib/analytics');
+var errors = require('./errors');
+var jsonClone = require('../lib/json-clone');
+var Promise = require('../lib/promise');
+var wrapPromise = require('wrap-promise');
+var cardTypeTransformMap = {
+  Visa: 'VISA',
+  MasterCard: 'MASTERCARD',
+  Discover: 'DISCOVER',
+  'American Express': 'AMEX'
+};
+
+/**
+ * Visa Checkout Address object.
+ * @typedef {object} VisaCheckout~Address
+ * @property {string} countryCode The customer's country code.
+ * @property {string} extendedAddress The customer's extended address.
+ * @property {string} firstName The customer's first name.
+ * @property {string} lastName The customer's last name.
+ * @property {string} locality The customer's locality.
+ * @property {string} postalCode The customer's postal code.
+ * @property {string} region The customer's region.
+ * @property {string} streetAddress The customer's street address.
+ * @property {string} phoneNumber The customer's phone number.
+ */
+
+/**
+ * Visa Checkout UserData object.
+ * @typedef {object} VisaCheckout~UserData
+ * @property {string} userEmail The customer's email address.
+ * @property {string} userFirstName The customer's first name.
+ * @property {string} userLastName The customer's last name.
+ * @property {string} userFullName The customer's full name.
+ * @property {string} userName The customer's username.
+ */
+
+/**
+ * Visa Checkout tokenize payload.
+ * @typedef {object} VisaCheckout~tokenizePayload
+ * @property {string} nonce The payment method nonce.
+ * @property {object} details Additional account details.
+ * @property {string} details.cardType Type of card, ex: Visa, MasterCard.
+ * @property {string} details.lastTwo Last two digits of card number.
+ * @property {string} description A human-readable description.
+ * @property {string} type The payment method type, always `VisaCheckoutCard`.
+ * @property {VisaCheckout~Address} billingAddress The customer's billing address.
+ * @property {VisaCheckout~Address} shippingAddress The customer's shipping address.
+ * @property {VisaCheckout~UserData} userData Information about the customer.
+ */
+
+/**
+ * @class
+ * @param {object} options The Visa Checkout {@link module:braintree-web/visa-checkout.create create} options.
+ * @description <strong>Do not use this constructor directly. Use {@link module:braintree-web/visa-checkout.create|braintree-web.visa-checkout.create} instead.</strong>
+ * @classdesc This class represents a Visa Checkout component produced by {@link module:braintree-web/visa-checkout.create|braintree-web/visa-checkout.create}. Instances of this class have methods for interacting with Visa Checkout's JavaScript library.
+ */
+function VisaCheckout(options) {
+  this._client = options.client;
+}
+
+function transformCardTypes(cardTypes) {
+  return cardTypes.reduce(function (acc, type) {
+    if (cardTypeTransformMap.hasOwnProperty(type)) {
+      return acc.concat(cardTypeTransformMap[type]);
+    }
+
+    return acc;
+  }, []);
+}
+
+/**
+ * Creates an `initOptions` object from the passed `options`, applying properties that Braintree needs to transact Visa Checkout.
+ *
+ * Braintree will apply these properties if they do not exist on the given `options`:
+ *  - `apikey`
+ *  - `externalClientId`
+ *  - `settings.payment.cardBrands`
+ *
+ * Braintree will overwrite `settings.dataLevel = 'FULL'` to access the full payment method.
+ * @public
+ * @param {object} options The base `initOptions` that will be used to init Visa Checkout.
+ * @param {string} [options.apikey] The API key used to initialize Visa Checkout. When not supplied, Braintree will set this property.
+ * @param {string} [options.externalClientId] The external client ID key used to initialize Visa Checkout. When not supplied, Braintree will set this property.
+ * @param {object} [options.settings] The settings object used to initialize Visa Checkout.
+ * @param {string} [options.settings.dataLevel] The data level used to initialize Visa Checkout. Braintree will overwrite this property to 'FULL'.
+ * @param {object} [options.settings.payment] The payment object used to initialize Visa Checkout.
+ * @param {string[]} [options.settings.payment.cardBrands] The card brands that Visa Checkout will allow the customer to pay with. When not supplied, Braintree will set this property.
+ * @returns {object} `initOptions` The `initOptions` that Visa Checkout should be initialized with.
+ * @example
+ * <caption>Applying Braintree properties to initOptions</caption>
+ * var baseInitOptions = {
+ *    paymentRequest: {
+ *      currencyCode: 'USD',
+ *      subtotal: '1.00',
+ *      total: '1.00'
+ *    }
+ *  };
+ *
+ *  var initOptions = visaCheckoutInstance.createInitOptions(baseInitOptions);
+ *
+ *  console.log('initOptions with Braintree properties', initOptions);
+ *
+ *  V.init(initOptions);
+ */
+VisaCheckout.prototype.createInitOptions = function (options) {
+  var initOptions;
+  var gatewayConfiguration = this._client.getConfiguration().gatewayConfiguration;
+  var visaCheckoutConfiguration = gatewayConfiguration.visaCheckout;
+
+  if (!options) {
+    throw new BraintreeError(errors.VISA_CHECKOUT_INIT_OPTIONS_REQUIRED);
+  }
+
+  initOptions = jsonClone(options);
+  initOptions.apikey = initOptions.apikey || visaCheckoutConfiguration.apikey;
+  initOptions.externalClientId = initOptions.externalClientId || visaCheckoutConfiguration.externalClientId;
+  initOptions.settings = initOptions.settings || {};
+  initOptions.settings.dataLevel = 'FULL';
+  initOptions.settings.payment = initOptions.settings.payment || {};
+
+  if (!initOptions.settings.payment.cardBrands) {
+    initOptions.settings.payment.cardBrands = transformCardTypes(gatewayConfiguration.visaCheckout.supportedCardTypes);
+  }
+
+  return initOptions;
+};
+
+/**
+ * Tokenizes the Visa Checkout payload, returning a payment method nonce.
+ * @public
+ * @param {object} payment The object that Visa Checkout supplies on `payment.success`.
+ * @param {string} payment.callid Visa Checkout transaction ID associated with this payment.
+ * @param {string} payment.encKey The encrypted key used to decrypt the payment data.
+ * @param {string} payment.encPaymentData The encrypted payment data.
+ * @param {callback} [callback] The second argument, <code>tokenizePayload</code> is a {@link VisaCheckout~tokenizePayload|tokenizePayload}. If no callback is provided, `tokenize` returns a promise that resolves with the {@link VisaCheckout~tokenizePayload|tokenizePayload}.
+ * @returns {Promise|void} Returns a promise if no callback is provided.
+ * @example
+ * V.on('payment.success', function (payment) {
+ *   visaCheckoutInstance.tokenize(payment, function (err, tokenizePayload) {
+ *     if (err) {
+ *       console.error('There was an error tokenizing Visa Checkout', err);
+ *       return;
+ *     }
+ *     console.log('Send tokenizePayload.nonce to your server here!', tokenizePayload);
+ *   });
+ * });
+ */
+VisaCheckout.prototype.tokenize = function (payment) {
+  var self = this;
+
+  if (!payment.callid || !payment.encKey || !payment.encPaymentData) {
+    return Promise.reject(new BraintreeError(errors.VISA_CHECKOUT_PAYMENT_REQUIRED));
+  }
+
+  return this._client.request({
+    method: 'post',
+    endpoint: 'payment_methods/visa_checkout_cards',
+    data: {
+      _meta: {
+        source: 'visa-checkout'
+      },
+      visaCheckoutCard: {
+        callId: payment.callid,
+        encryptedPaymentData: payment.encPaymentData,
+        encryptedKey: payment.encKey
+      }
+    }
+  }).then(function (response) {
+    analytics.sendEvent(self._client, 'visacheckout.tokenize.succeeded');
+    return response.visaCheckoutCards[0];
+  }).catch(function (err) {
+    analytics.sendEvent(self._client, 'visacheckout.tokenize.failed');
+    return Promise.reject(new BraintreeError({
+      type: errors.VISA_CHECKOUT_TOKENIZATION.type,
+      code: errors.VISA_CHECKOUT_TOKENIZATION.code,
+      message: errors.VISA_CHECKOUT_TOKENIZATION.message,
+      details: {
+        originalError: err
+      }
+    }));
+  });
+};
+
+module.exports = wrapPromise.wrapPrototype(VisaCheckout);
+
+},{"../lib/analytics":63,"../lib/braintree-error":66,"../lib/json-clone":93,"../lib/promise":97,"./errors":127,"wrap-promise":672}],130:[function(require,module,exports){
+'use strict';
+
+module.exports = require('./lib/braintree');
+
+},{"./lib/braintree":131}],131:[function(require,module,exports){
+'use strict';
+
+let version = require('../package.json').version;
+let Config = require('./braintree/config').Config;
+let Environment = require('./braintree/environment').Environment;
+let BraintreeGateway = require('./braintree/braintree_gateway').BraintreeGateway;
+let errorTypes = require('./braintree/error_types').errorTypes;
+
+let Transaction = require('./braintree/transaction').Transaction;
+
+let CreditCard = require('./braintree/credit_card').CreditCard;
+let PayPalAccount = require('./braintree/paypal_account').PayPalAccount;
+let AndroidPayCard = require('./braintree/android_pay_card').AndroidPayCard;
+let ApplePayCard = require('./braintree/apple_pay_card').ApplePayCard;
+let VenmoAccount = require('./braintree/venmo_account').VenmoAccount;
+let CoinbaseAccount = require('./braintree/coinbase_account').CoinbaseAccount;
+let AmexExpressCheckoutCard = require('./braintree/amex_express_checkout_card').AmexExpressCheckoutCard;
+let VisaCheckoutCard = require('./braintree/visa_checkout_card').VisaCheckoutCard;
+let MasterpassCard = require('./braintree/masterpass_card').MasterpassCard;
+
+let CreditCardVerification = require('./braintree/credit_card_verification').CreditCardVerification;
+let Subscription = require('./braintree/subscription').Subscription;
+let MerchantAccount = require('./braintree/merchant_account').MerchantAccount;
+let PaymentInstrumentTypes = require('./braintree/payment_instrument_types').PaymentInstrumentTypes;
+let WebhookNotification = require('./braintree/webhook_notification').WebhookNotification;
+let TestingGateway = require('./braintree/testing_gateway').TestingGateway;
+let ValidationErrorCodes = require('./braintree/validation_error_codes').ValidationErrorCodes;
+
+let CreditCardDefaults = require('./braintree/test/credit_card_defaults').CreditCardDefaults;
+let CreditCardNumbers = require('./braintree/test/credit_card_numbers').CreditCardNumbers;
+let MerchantAccountTest = require('./braintree/test/merchant_account').MerchantAccountTest;
+let Nonces = require('./braintree/test/nonces').Nonces;
+let TransactionAmounts = require('./braintree/test/transaction_amounts').TransactionAmounts;
+
+let connect = config => new BraintreeGateway(new Config(config)); // eslint-disable-line func-style
+let Test = {
+  CreditCardDefaults: CreditCardDefaults,
+  CreditCardNumbers: CreditCardNumbers,
+  MerchantAccountTest: MerchantAccountTest,
+  Nonces: Nonces,
+  TransactionAmounts: TransactionAmounts
+};
+
+module.exports = {
+  connect: connect,
+  version: version,
+  Environment: Environment,
+  errorTypes: errorTypes,
+
+  Transaction: Transaction,
+
+  CreditCard: CreditCard,
+  PayPalAccount: PayPalAccount,
+  AndroidPayCard: AndroidPayCard,
+  ApplePayCard: ApplePayCard,
+  VenmoAccount: VenmoAccount,
+  CoinbaseAccount: CoinbaseAccount,
+  AmexExpressCheckoutCard: AmexExpressCheckoutCard,
+  VisaCheckoutCard: VisaCheckoutCard,
+  MasterpassCard: MasterpassCard,
+
+  CreditCardVerification: CreditCardVerification,
+  Subscription: Subscription,
+  MerchantAccount: MerchantAccount,
+  PaymentInstrumentTypes: PaymentInstrumentTypes,
+  WebhookNotification: WebhookNotification,
+  TestingGateway: TestingGateway,
+  ValidationErrorCodes: ValidationErrorCodes,
+
+  Test: Test
+};
+
+},{"../package.json":234,"./braintree/amex_express_checkout_card":139,"./braintree/android_pay_card":140,"./braintree/apple_pay_card":141,"./braintree/braintree_gateway":143,"./braintree/coinbase_account":145,"./braintree/config":146,"./braintree/credit_card":150,"./braintree/credit_card_verification":152,"./braintree/environment":165,"./braintree/error_types":167,"./braintree/masterpass_card":174,"./braintree/merchant_account":176,"./braintree/payment_instrument_types":184,"./braintree/paypal_account":188,"./braintree/subscription":198,"./braintree/test/credit_card_defaults":201,"./braintree/test/credit_card_numbers":202,"./braintree/test/merchant_account":203,"./braintree/test/nonces":204,"./braintree/test/transaction_amounts":205,"./braintree/testing_gateway":206,"./braintree/transaction":208,"./braintree/validation_error_codes":218,"./braintree/venmo_account":220,"./braintree/visa_checkout_card":221,"./braintree/webhook_notification":222}],132:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class AccountUpdaterDailyReport extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {AccountUpdaterDailyReport: AccountUpdaterDailyReport};
+
+},{"./attribute_setter":142}],133:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class AchMandate extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+    this.acceptedAt = new Date(this.acceptedAt);
+  }
+}
+
+module.exports = {AchMandate: AchMandate};
+
+},{"./attribute_setter":142}],134:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class AddOn extends AttributeSetter {}
+
+module.exports = {AddOn: AddOn};
+
+},{"./attribute_setter":142}],135:[function(require,module,exports){
+'use strict';
+
+let AddOn = require('./add_on').AddOn;
+let Gateway = require('./gateway').Gateway;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class AddOnGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  all() {
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/add_ons`).then(this.createResponseHandler('add_on', AddOn));
+  }
+}
+
+module.exports = {AddOnGateway: wrapPrototype(AddOnGateway)};
+
+},{"./add_on":134,"./gateway":170,"wrap-promise":672}],136:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class Address extends AttributeSetter {}
+
+module.exports = {Address: Address};
+
+},{"./attribute_setter":142}],137:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let Address = require('./address').Address;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class AddressGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  create(attributes) {
+    let customerId = attributes.customerId;
+
+    delete attributes.customerId;
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/customers/${customerId}/addresses`, {address: attributes}).then(this.responseHandler());
+  }
+
+  delete(customerId, id) {
+    let path = `${this.config.baseMerchantPath()}/customers/${customerId}/addresses/${id}`;
+
+    return this.gateway.http.delete(path);
+  }
+
+  find(customerId, id) {
+    if (customerId.trim() === '' || id.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found')); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/customers/${customerId}/addresses/${id}`).then((response) => {
+      return response.address;
+    });
+  }
+
+  update(customerId, id, attributes) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/customers/${customerId}/addresses/${id}`, {address: attributes}).then(this.responseHandler());
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('address', Address);
+  }
+
+  sharedSignature(prefix) {
+    let signatureKeys = [
+      'company', 'countryCodeAlpha2', 'countryCodeAlpha3', 'countryCodeNumeric',
+      'countryName', 'extendedAddress', 'firstName',
+      'lastName', 'locality', 'postalCode', 'region', 'streetAddress'
+    ];
+
+    let signature = [];
+
+    for (let val of signatureKeys) {
+      signature.push(prefix + '[' + val + ']');
+    }
+
+    return signature;
+  }
+}
+
+module.exports = {AddressGateway: wrapPrototype(AddressGateway)};
+
+},{"./address":136,"./exceptions":168,"./gateway":170,"wrap-promise":672}],138:[function(require,module,exports){
+'use strict';
+
+/* eslint-disable no-invalid-this, no-use-before-define */
+let Util = require('./util').Util;
+let _ = require('underscore');
+
+function argsToArray(argsObject) {
+  return Array.prototype.slice.call(argsObject);
+}
+
+class AdvancedSearch {
+  static equalityFields() {
+    let fields = argsToArray(arguments);
+
+    return this._createFieldAccessors(fields, EqualityNode);
+  }
+
+  static partialMatchFields() {
+    let fields = argsToArray(arguments);
+
+    return this._createFieldAccessors(fields, PartialMatchNode);
+  }
+
+  static textFields() {
+    let fields = argsToArray(arguments);
+
+    return this._createFieldAccessors(fields, TextNode);
+  }
+
+  static keyValueFields() {
+    let fields = argsToArray(arguments);
+
+    return this._createFieldAccessors(fields, KeyValueNode);
+  }
+
+  static multipleValueField(field, options) {
+    options = options || {};
+    return this._createFieldAccessors([field], MultipleValueNode, options);
+  }
+
+  static multipleValueOrTextField(field, options) {
+    options = options || {};
+    return this._createFieldAccessors([field], MultipleValueOrTextNode, options);
+  }
+
+  static rangeFields() {
+    let fields = argsToArray(arguments);
+
+    return this._createFieldAccessors(fields, RangeNode);
+  }
+
+  static _createFieldAccessors(fields, nodeClass, options) {
+    return fields.map((field) => {
+      this.prototype[field] = this._fieldTemplate(field, nodeClass, options);
+      return this.prototype[field];
+    });
+  }
+
+  static _fieldTemplate(field, NodeClass, options) {
+    return function () { return new NodeClass(field, this, options); };
+  }
+
+  constructor() { this.criteria = {}; }
+
+  addCriteria(key, value) { // eslint-disable-line consistent-return
+    if (this.criteria[key] === Object(this.criteria[key]) && !_.isArray(this.criteria[key])) {
+      return Util.merge(this.criteria[key], value);
+    }
+
+    this.criteria[key] = value;
+  }
+
+  toHash() { return this.criteria; }
+}
+
+class SearchNode {
+  static operators() {
+    let operators = argsToArray(arguments);
+
+    let operatorTemplate = operator => { // eslint-disable-line func-style
+      return function (value) {
+        let criterion = {};
+
+        criterion[operator] = `${value}`;
+        return this.parent.addCriteria(this.nodeName, criterion);
+      };
+    };
+
+    return operators.map((operator) => {
+      this.prototype[operator] = operatorTemplate(operator);
+    });
+  }
+
+  constructor(nodeName, parent) {
+    this.nodeName = nodeName;
+    this.parent = parent;
+  }
+}
+
+class EqualityNode extends SearchNode {
+  static initClass() {
+    this.operators('is', 'isNot');
+  }
+}
+EqualityNode.initClass();
+
+class PartialMatchNode extends EqualityNode {
+  static initClass() {
+    this.operators('endsWith', 'startsWith');
+  }
+}
+PartialMatchNode.initClass();
+
+class TextNode extends PartialMatchNode {
+  static initClass() {
+    this.operators('contains');
+  }
+}
+TextNode.initClass();
+
+class KeyValueNode extends SearchNode {
+  is(value) { return this.parent.addCriteria(this.nodeName, value); }
+}
+
+class MultipleValueNode extends SearchNode {
+  constructor(nodeName, parent, options) {
+    super(nodeName, parent);
+    this.options = options;
+  }
+
+  allowedValues() { return this.options.allows; }
+
+  in() {
+    let values = argsToArray(arguments);
+
+    values = Util.flatten(values);
+
+    if (__guardMethod__(this, 'allowedValues', o => o.allowedValues())) {
+      let allowedValues = this.allowedValues();
+      let badValues = Util.without(values, allowedValues);
+
+      if (!Util.arrayIsEmpty(badValues)) { throw new Error(`Invalid argument(s) for ${this.nodeName}`); }
+    }
+
+    return this.parent.addCriteria(this.nodeName, values);
+  }
+
+  is(value) { return this.in(value); }
+}
+
+class MultipleValueOrTextNode extends MultipleValueNode {
+  static initClass() {
+    this.delegators('contains', 'endsWith', 'is', 'isNot', 'startsWith');
+  }
+
+  static delegators() {
+    let delegatedMethods = argsToArray(arguments);
+    let delegatorTemplate = methodName => { // eslint-disable-line func-style
+      return function (value) { return this.textNode[methodName](value); };
+    };
+
+    return delegatedMethods.map((methodName) => {
+      this.prototype[methodName] = delegatorTemplate(methodName);
+    });
+  }
+
+  constructor(nodeName, parent, options) {
+    super(nodeName, parent, options);
+    this.textNode = new TextNode(nodeName, parent);
+  }
+}
+MultipleValueOrTextNode.initClass();
+
+class RangeNode extends SearchNode {
+  static initClass() {
+    this.operators('is');
+  }
+
+  between(min, max) {
+    this.min(min);
+    return this.max(max);
+  }
+
+  max(value) {
+    return this.parent.addCriteria(this.nodeName, {max: value});
+  }
+
+  min(value) {
+    return this.parent.addCriteria(this.nodeName, {min: value});
+  }
+}
+RangeNode.initClass();
+
+module.exports = {AdvancedSearch: AdvancedSearch};
+
+function __guardMethod__(obj, methodName, transform) { // eslint-disable-line consistent-return
+  if (typeof obj !== 'undefined' && obj !== null && typeof obj[methodName] === 'function') {
+    return transform(obj, methodName);
+  }
+}
+
+},{"./util":216,"underscore":232}],139:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class AmexExpressCheckoutCard extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {AmexExpressCheckoutCard: AmexExpressCheckoutCard};
+
+},{"./attribute_setter":142}],140:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class AndroidPayCard extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+
+    if (attributes) {
+      this.cardType = attributes.virtualCardType;
+      this.last4 = attributes.virtualCardLast4;
+    }
+  }
+}
+
+module.exports = {AndroidPayCard: AndroidPayCard};
+
+},{"./attribute_setter":142}],141:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class ApplePayCard extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {ApplePayCard: ApplePayCard};
+
+},{"./attribute_setter":142}],142:[function(require,module,exports){
+'use strict';
+
+class AttributeSetter {
+  constructor(attributes) {
+    for (let key in attributes) {
+      if (!attributes.hasOwnProperty(key)) {
+        continue;
+      }
+      let value = attributes[key];
+
+      this[key] = value;
+    }
+  }
+}
+
+module.exports = {AttributeSetter: AttributeSetter};
+
+},{}],143:[function(require,module,exports){
+'use strict';
+
+let Http = require('./http').Http;
+let AddOnGateway = require('./add_on_gateway').AddOnGateway;
+let AddressGateway = require('./address_gateway').AddressGateway;
+let ClientTokenGateway = require('./client_token_gateway').ClientTokenGateway;
+let CreditCardGateway = require('./credit_card_gateway').CreditCardGateway;
+let CreditCardVerificationGateway = require('./credit_card_verification_gateway').CreditCardVerificationGateway;
+let CustomerGateway = require('./customer_gateway').CustomerGateway;
+let DisbursementGateway = require('./disbursement_gateway').DisbursementGateway;
+let DiscountGateway = require('./discount_gateway').DiscountGateway;
+let MerchantAccountGateway = require('./merchant_account_gateway').MerchantAccountGateway;
+let MerchantGateway = require('./merchant_gateway').MerchantGateway;
+let OAuthGateway = require('./oauth_gateway').OAuthGateway;
+let PaymentMethodGateway = require('./payment_method_gateway').PaymentMethodGateway;
+let PaymentMethodNonceGateway = require('./payment_method_nonce_gateway').PaymentMethodNonceGateway;
+let PayPalAccountGateway = require('./paypal_account_gateway').PayPalAccountGateway;
+let PlanGateway = require('./plan_gateway').PlanGateway;
+let SettlementBatchSummaryGateway = require('./settlement_batch_summary_gateway').SettlementBatchSummaryGateway;
+let SubscriptionGateway = require('./subscription_gateway').SubscriptionGateway;
+let TestingGateway = require('./testing_gateway').TestingGateway;
+let TransactionGateway = require('./transaction_gateway').TransactionGateway;
+let TransparentRedirectGateway = require('./transparent_redirect_gateway').TransparentRedirectGateway;
+let UsBankAccountGateway = require('./us_bank_account_gateway').UsBankAccountGateway;
+let IdealPaymentGateway = require('./ideal_payment_gateway').IdealPaymentGateway;
+let WebhookNotificationGateway = require('./webhook_notification_gateway').WebhookNotificationGateway;
+let WebhookTestingGateway = require('./webhook_testing_gateway').WebhookTestingGateway;
+
+class BraintreeGateway {
+  constructor(config) {
+    this.config = config;
+    this.http = new Http(this.config);
+    this.addOn = new AddOnGateway(this);
+    this.address = new AddressGateway(this);
+    this.clientToken = new ClientTokenGateway(this);
+    this.creditCard = new CreditCardGateway(this);
+    this.creditCardVerification = new CreditCardVerificationGateway(this);
+    this.customer = new CustomerGateway(this);
+    this.disbursement = new DisbursementGateway(this);
+    this.discount = new DiscountGateway(this);
+    this.merchantAccount = new MerchantAccountGateway(this);
+    this.merchant = new MerchantGateway(this);
+    this.oauth = new OAuthGateway(this);
+    this.paymentMethod = new PaymentMethodGateway(this);
+    this.paymentMethodNonce = new PaymentMethodNonceGateway(this);
+    this.paypalAccount = new PayPalAccountGateway(this);
+    this.plan = new PlanGateway(this);
+    this.settlementBatchSummary = new SettlementBatchSummaryGateway(this);
+    this.subscription = new SubscriptionGateway(this);
+    this.testing = new TestingGateway(this);
+    this.transaction = new TransactionGateway(this);
+    this.transparentRedirect = new TransparentRedirectGateway(this);
+    this.usBankAccount = new UsBankAccountGateway(this);
+    this.idealPayment = new IdealPaymentGateway(this);
+    this.webhookNotification = new WebhookNotificationGateway(this);
+    this.webhookTesting = new WebhookTestingGateway(this);
+  }
+}
+
+module.exports = {BraintreeGateway: BraintreeGateway};
+
+},{"./add_on_gateway":135,"./address_gateway":137,"./client_token_gateway":144,"./credit_card_gateway":151,"./credit_card_verification_gateway":153,"./customer_gateway":156,"./disbursement_gateway":161,"./discount_gateway":163,"./http":171,"./ideal_payment_gateway":173,"./merchant_account_gateway":177,"./merchant_gateway":178,"./oauth_gateway":180,"./payment_method_gateway":185,"./payment_method_nonce_gateway":187,"./paypal_account_gateway":189,"./plan_gateway":191,"./settlement_batch_summary_gateway":196,"./subscription_gateway":199,"./testing_gateway":206,"./transaction_gateway":210,"./transparent_redirect_gateway":212,"./us_bank_account_gateway":215,"./webhook_notification_gateway":223,"./webhook_testing_gateway":224}],144:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let ErrorResponse = require('./error_response').ErrorResponse;
+let Util = require('./util').Util;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+let DEFAULT_VERSION = 2;
+
+class ClientTokenGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  generate(params) {
+    let err;
+
+    params = params || {};
+
+    if (!params.version) { params.version = DEFAULT_VERSION; }
+
+    err = Util.verifyKeys(this._generateSignature(), params);
+
+    if (!err) {
+      err = this.validateParams(params);
+    }
+
+    if (err) {
+      return Promise.reject(err);
+    }
+    params = {client_token: params}; // eslint-disable-line camelcase
+
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/client_token`, params).then(this.responseHandler());
+  }
+
+  validateParams(params) {
+    if (params.customerId || !params.options) { return; }
+
+    let options = ['makeDefault', 'verifyCard', 'failOnDuplicatePaymentMethod'];
+    let invalidOptions = options.filter((name) => params.options[name]).map((name) => name);
+
+    if (invalidOptions.length > 0) {
+      return exceptions.UnexpectedError(`A customer id is required for the following options: ${invalidOptions.join(', ')}`); // eslint-disable-line consistent-return, new-cap
+    }
+
+    return null; // eslint-disable-line consistent-return
+  }
+
+  responseHandler() {
+    return function (response) { // eslint-disable-line consistent-return
+      if (response.clientToken) {
+        response.success = true;
+        response.clientToken = response.clientToken.value;
+        return response;
+      } else if (response.apiErrorResponse) {
+        return new ErrorResponse(response.apiErrorResponse);
+      }
+    };
+  }
+
+  _generateSignature() {
+    return {
+      valid: [
+        'addressId', 'customerId', 'proxyMerchantId', 'merchantAccountId',
+        'version', 'sepaMandateAcceptanceLocation', 'sepaMandateType',
+        'options', 'options[makeDefault]', 'options[verifyCard]', 'options[failOnDuplicatePaymentMethod]'
+      ]
+    };
+  }
+}
+
+module.exports = {ClientTokenGateway: wrapPrototype(ClientTokenGateway)};
+
+},{"./error_response":166,"./exceptions":168,"./gateway":170,"./util":216,"wrap-promise":672}],145:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class CoinbaseAccount extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {CoinbaseAccount: CoinbaseAccount};
+
+},{"./attribute_setter":142}],146:[function(require,module,exports){
+'use strict';
+
+let CredentialsParser = require('./credentials_parser').CredentialsParser;
+
+class Config {
+  constructor(rawConfig) {
+    this.timeout = 60000;
+    this.apiVersion = '4';
+    let parser = new CredentialsParser();
+
+    if (rawConfig.clientId || rawConfig.clientSecret) {
+      parser.parseClientCredentials(rawConfig.clientId, rawConfig.clientSecret);
+      this.clientId = parser.clientId;
+      this.clientSecret = parser.clientSecret;
+      this.environment = parser.environment;
+    } else if (rawConfig.accessToken) {
+      parser.parseAccessToken(rawConfig.accessToken);
+      this.accessToken = parser.accessToken;
+      this.environment = parser.environment;
+      this.merchantId = parser.merchantId;
+    } else {
+      this.publicKey = rawConfig.publicKey;
+      this.privateKey = rawConfig.privateKey;
+      this.merchantId = rawConfig.merchantId || rawConfig.partnerId;
+      this.environment = rawConfig.environment;
+      if (!this.publicKey) { throw new Error('Missing publicKey'); }
+      if (!this.privateKey) { throw new Error('Missing privateKey'); }
+      if (!this.merchantId) { throw new Error('Missing merchantId'); }
+      if (!this.environment) { throw new Error('Missing environment'); }
+    }
+  }
+
+  baseMerchantPath() { return `/merchants/${this.merchantId}`; }
+
+  baseUrl() { return this.environment.baseUrl(); }
+
+  baseMerchantUrl() { return this.baseUrl() + this.baseMerchantPath(); }
+}
+
+module.exports = {Config: Config};
+
+},{"./credentials_parser":149}],147:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class ConnectedMerchantPayPalStatusChanged extends AttributeSetter {}
+
+module.exports = {ConnectedMerchantPayPalStatusChanged};
+
+},{"./attribute_setter":142}],148:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class ConnectedMerchantStatusTransitioned extends AttributeSetter {}
+
+module.exports = {ConnectedMerchantStatusTransitioned};
+
+},{"./attribute_setter":142}],149:[function(require,module,exports){
+'use strict';
+
+let Environment = require('./environment').Environment;
+
+class CredentialsParser {
+  parseClientCredentials(clientId, clientSecret) {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    if (!this.clientId) { throw new Error('Missing clientId'); }
+    if (!this.clientSecret) { throw new Error('Missing clientSecret'); }
+
+    if (this.clientId.indexOf('client_id') !== 0) { throw new Error('Value passed for clientId is not a client id'); }
+    if (this.clientSecret.indexOf('client_secret') !== 0) { throw new Error('Value passed for clientSecret is not a client secret'); }
+
+    let clientIdEnvironment = this.parseEnvironment(this.clientId);
+    let clientSecretEnvironment = this.parseEnvironment(this.clientSecret);
+
+    if (clientIdEnvironment !== clientSecretEnvironment) {
+      throw new Error(`Mismatched credential environments: clientId environment is ${clientIdEnvironment} and clientSecret environment is ${clientSecretEnvironment}`);
+    }
+
+    this.environment = clientIdEnvironment;
+
+    return this.environment;
+  }
+
+  parseAccessToken(accessToken) {
+    this.accessToken = accessToken;
+    if (!this.accessToken) { throw new Error('Missing access token'); }
+
+    if (this.accessToken.indexOf('access_token') !== 0) { throw new Error('Value passed for accessToken is not a valid access token'); }
+
+    this.merchantId = this.accessToken.split('$')[2];
+    this.environment = this.parseEnvironment(this.accessToken);
+
+    return this.environment;
+  }
+
+  parseEnvironment(credential) {
+    let env = credential.split('$')[1];
+
+    switch (env) {
+      case 'development':
+      case 'integration': return Environment.Development;
+      case 'qa': return Environment.Qa;
+      case 'sandbox': return Environment.Sandbox;
+      case 'production': return Environment.Production;
+      default: throw new Error(`Unknown environment: ${env}`);
+    }
+  }
+}
+
+module.exports = {CredentialsParser: CredentialsParser};
+
+},{"./environment":165}],150:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let CreditCardVerification = require('./credit_card_verification').CreditCardVerification;
+
+class CreditCard extends AttributeSetter {
+  static initClass() {
+    this.CardType = {
+      AmEx: 'American Express',
+      CarteBlanche: 'Carte Blanche',
+      ChinaUnionPay: 'China UnionPay',
+      DinersClubInternational: 'Diners Club',
+      Discover: 'Discover',
+      JCB: 'JCB',
+      Laser: 'Laser',
+      UKMaestro: 'UK Maestro',
+      Maestro: 'Maestro',
+      MasterCard: 'MasterCard',
+      Solo: 'Solo',
+      Switch: 'Switch',
+      Visa: 'Visa',
+      Unknown: 'Unknown',
+      All() {
+        let all = [];
+
+        for (let key in this) {
+          if (!this.hasOwnProperty(key)) {
+            continue;
+          }
+          let value = this[key];
+
+          if (key !== 'All') { all.push(value); }
+        }
+        return all;
+      }
+    };
+
+    this.CustomerLocation = {
+      International: 'international',
+      US: 'us'
+    };
+
+    this.CardTypeIndicator = {
+      Yes: 'Yes',
+      No: 'No',
+      Unknown: 'Unknown'
+    };
+
+    this.Prepaid = this.Commercial = this.Payroll = this.Healthcare = this.DurbinRegulated =
+      this.Debit = this.CountryOfIssuance = this.IssuingBank = this.ProductId = this.CardTypeIndicator;
+  }
+
+  constructor(attributes) {
+    super(attributes);
+    this.maskedNumber = `${this.bin}******${this.last4}`;
+    this.expirationDate = `${this.expirationMonth}/${this.expirationYear}`;
+    if (attributes) {
+      let sortedVerifications = (attributes.verifications || []).sort((a, b) => b.created_at - a.created_at);
+
+      if (sortedVerifications[0]) { this.verification = new CreditCardVerification(sortedVerifications[0]); }
+    }
+  }
+}
+CreditCard.initClass();
+
+module.exports = {CreditCard: CreditCard};
+
+},{"./attribute_setter":142,"./credit_card_verification":152}],151:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let CreditCard = require('./credit_card').CreditCard;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class CreditCardGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  create(attributes) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/payment_methods`, {creditCard: attributes}).then(this.responseHandler());
+  }
+
+  delete(token) {
+    let path = `${this.config.baseMerchantPath()}/payment_methods/credit_card/${token}`;
+
+    return this.gateway.http.delete(path);
+  }
+
+  find(token) {
+    if (token.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found')); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/payment_methods/credit_card/${token}`).then(function (response) {
+      return new CreditCard(response.creditCard);
+    });
+  }
+
+  fromNonce(nonce) {
+    if (nonce.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found')); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/payment_methods/from_nonce/${nonce}`).then((response) => {
+      return new CreditCard(response.creditCard);
+    }).catch((err) => {
+      err.message = `Payment method with nonce ${nonce} locked, consumed or not found`;
+      return Promise.reject(err);
+    });
+  }
+
+  update(token, attributes) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/payment_methods/credit_card/${token}`, {creditCard: attributes}).then(this.responseHandler());
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('creditCard', CreditCard);
+  }
+
+  expired() {
+    return new Promise((resolve, reject) => {
+      this.gateway.http.post(`${this.config.baseMerchantPath()}/payment_methods/all/expired_ids`, {}, this.searchResponseHandler(this, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      }));
+    });
+  }
+
+  expiringBetween(after, before) {
+    let url = `${this.config.baseMerchantPath()}/payment_methods/all/expiring_ids?start=${this.dateFormat(after)}&end=${this.dateFormat(before)}`;
+
+    return new Promise((resolve, reject) => {
+      this.gateway.http.post(url, {}, this.searchResponseHandler(this, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      }));
+    });
+  }
+
+  dateFormat(date) {
+    let month = date.getMonth() + 1;
+
+    if (month < 10) {
+      month = `0${month}`;
+    } else {
+      month = `${month}`;
+    }
+    return month + date.getFullYear();
+  }
+}
+
+module.exports = {CreditCardGateway: wrapPrototype(CreditCardGateway)};
+
+},{"./credit_card":150,"./exceptions":168,"./gateway":170,"wrap-promise":672}],152:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let RiskData = require('./risk_data').RiskData;
+
+class CreditCardVerification extends AttributeSetter {
+  static initClass() {
+    this.StatusType = {
+      Failed: 'failed',
+      GatewayRejected: 'gateway_rejected',
+      ProcessorDeclined: 'processor_declined',
+      Verified: 'verified',
+      All() {
+        let all = [];
+
+        for (let key in this) {
+          if (!this.hasOwnProperty(key)) {
+            continue;
+          }
+          let value = this[key];
+
+          if (key !== 'All') { all.push(value); }
+        }
+        return all;
+      }
+    };
+  }
+
+  constructor(attributes) {
+    super(attributes);
+    if (attributes.riskData) { this.riskData = new RiskData(attributes.riskData); }
+  }
+}
+CreditCardVerification.initClass();
+
+module.exports = {CreditCardVerification: CreditCardVerification};
+
+},{"./attribute_setter":142,"./risk_data":192}],153:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let CreditCardVerification = require('./credit_card_verification').CreditCardVerification;
+let CreditCardVerificationSearch = require('./credit_card_verification_search').CreditCardVerificationSearch;
+let _ = require('underscore');
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class CreditCardVerificationGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  find(creditCardVerificationId) {
+    if (creditCardVerificationId.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found')); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/verifications/${creditCardVerificationId}`).then(function (response) {
+      return new CreditCardVerification(response.verification);
+    });
+  }
+
+  search(fn, callback) {
+    let search = new CreditCardVerificationSearch();
+
+    fn(search);
+    return this.createSearchResponse(`${this.config.baseMerchantPath()}/verifications/advanced_search_ids`, search, this.pagingFunctionGenerator(search), callback);
+  }
+
+  create(params) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/verifications`, {
+      verification: params
+    }).then(this.createResponseHandler('verification', CreditCardVerification));
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('creditCardVerification', CreditCardVerification);
+  }
+
+  pagingFunctionGenerator(search) {
+    return (ids, callback) => {
+      let searchCriteria = search.toHash();
+
+      searchCriteria.ids = ids;
+      return this.gateway.http.post(`${this.config.baseMerchantPath()}/verifications/advanced_search`,
+        {search: searchCriteria},
+        function (err, response) {
+          if (err) {
+            return callback(err, null);
+          } else if (_.isArray(response.creditCardVerifications.verification)) {
+            return response.creditCardVerifications.verification.map((creditCardVerification) =>
+                callback(null, new CreditCardVerification(creditCardVerification)));
+          }
+
+          return callback(null, new CreditCardVerification(response.creditCardVerifications.verification));
+        });
+    };
+  }
+}
+
+module.exports = {CreditCardVerificationGateway: wrapPrototype(CreditCardVerificationGateway, {
+  ignoreMethods: ['search']
+})};
+
+},{"./credit_card_verification":152,"./credit_card_verification_search":154,"./exceptions":168,"./gateway":170,"underscore":232,"wrap-promise":672}],154:[function(require,module,exports){
+'use strict';
+
+let AdvancedSearch = require('./advanced_search').AdvancedSearch;
+let CreditCard = require('./credit_card').CreditCard;
+let CreditCardVerification = require('./credit_card_verification').CreditCardVerification;
+
+class CreditCardVerificationSearch extends AdvancedSearch {
+  static initClass() {
+    this.textFields(
+        'billingAddressDetailsPostalCode',
+        'creditCardCardholderName',
+        'customerEmail',
+        'customerId',
+        'id',
+        'paymentMethodToken'
+      );
+
+    this.equalityFields('creditCardExpirationDate');
+
+    this.partialMatchFields('creditCardNumber');
+
+    this.multipleValueField('creditCardCardType', {allows: CreditCard.CardType.All()}); // eslint-disable-line new-cap
+    this.multipleValueField('status', {allows: CreditCardVerification.StatusType.All()}); // eslint-disable-line new-cap
+    this.multipleValueField('ids');
+
+    this.rangeFields('createdAt');
+  }
+}
+CreditCardVerificationSearch.initClass();
+
+module.exports = {CreditCardVerificationSearch: CreditCardVerificationSearch};
+
+},{"./advanced_search":138,"./credit_card":150,"./credit_card_verification":152}],155:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let ApplePayCard = require('./apple_pay_card').ApplePayCard;
+let AndroidPayCard = require('./android_pay_card').AndroidPayCard;
+let AmexExpressCheckoutCard = require('./amex_express_checkout_card').AmexExpressCheckoutCard;
+let CreditCard = require('./credit_card').CreditCard;
+let PayPalAccount = require('./paypal_account').PayPalAccount;
+let CoinbaseAccount = require('./coinbase_account').CoinbaseAccount;
+let VenmoAccount = require('./venmo_account').VenmoAccount;
+let UsBankAccount = require('./us_bank_account').UsBankAccount;
+
+class Customer extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+    this.paymentMethods = [];
+
+    if (attributes.creditCards) {
+      this.creditCards = attributes.creditCards.map((cardAttributes) => new CreditCard(cardAttributes));
+      this._addPaymentMethods(this.creditCards);
+    }
+
+    if (attributes.applePayCards) {
+      this.applePayCards = attributes.applePayCards.map((cardAttributes) => new ApplePayCard(cardAttributes));
+      this._addPaymentMethods(this.applePayCards);
+    }
+
+    if (attributes.androidPayCards) {
+      this.androidPayCards = attributes.androidPayCards.map((cardAttributes) => new AndroidPayCard(cardAttributes));
+      this._addPaymentMethods(this.androidPayCards);
+    }
+
+    if (attributes.amexExpressCheckoutCards) {
+      this.amexExpressCheckoutCards = attributes.amexExpressCheckoutCards.map((cardAttributes) => new AmexExpressCheckoutCard(cardAttributes));
+      this._addPaymentMethods(this.amexExpressCheckoutCards);
+    }
+
+    if (attributes.paypalAccounts) {
+      this.paypalAccounts = attributes.paypalAccounts.map((paypalAccountAttributes) => new PayPalAccount(paypalAccountAttributes));
+      this._addPaymentMethods(this.paypalAccounts);
+    }
+
+    if (attributes.coinbaseAccounts) {
+      this.coinbaseAccounts = attributes.coinbaseAccounts.map((coinbaseAccountAttributes) => new CoinbaseAccount(coinbaseAccountAttributes));
+      this._addPaymentMethods(this.coinbaseAccounts);
+    }
+
+    if (attributes.venmoAccounts) {
+      this.venmoAccounts = attributes.venmoAccounts.map((venmoAccountAttributes) => new VenmoAccount(venmoAccountAttributes));
+      this._addPaymentMethods(this.venmoAccounts);
+    }
+
+    if (attributes.usBankAccounts) {
+      this.usBankAccounts = attributes.usBankAccounts.map((usBankAccountAttributes) => new UsBankAccount(usBankAccountAttributes));
+      this._addPaymentMethods(this.usBankAccounts);
+    }
+  }
+
+  _addPaymentMethods(paymentMethods) {
+    return paymentMethods.map((paymentMethod) =>
+      this.paymentMethods.push(paymentMethod));
+  }
+}
+
+module.exports = {Customer: Customer};
+
+},{"./amex_express_checkout_card":139,"./android_pay_card":140,"./apple_pay_card":141,"./attribute_setter":142,"./coinbase_account":145,"./credit_card":150,"./paypal_account":188,"./us_bank_account":214,"./venmo_account":220}],156:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let Customer = require('./customer').Customer;
+let CustomerSearch = require('./customer_search').CustomerSearch;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class CustomerGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  create(attributes) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/customers`, {customer: attributes}).then(this.responseHandler());
+  }
+
+  delete(customerId) {
+    return this.gateway.http.delete(`${this.config.baseMerchantPath()}/customers/${customerId}`);
+  }
+
+  find(customerId) {
+    if (customerId.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/customers/${customerId}`).then(function (response) {
+      return new Customer(response.customer);
+    });
+  }
+
+  update(customerId, attributes) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/customers/${customerId}`, {customer: attributes}).then(this.responseHandler());
+  }
+
+  search(fn, callback) {
+    let search = new CustomerSearch();
+
+    fn(search);
+    return this.createSearchResponse(`${this.config.baseMerchantPath()}/customers/advanced_search_ids`, search, this.pagingFunctionGenerator(search), callback);
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('customer', Customer);
+  }
+
+  pagingFunctionGenerator(search) {
+    return super.pagingFunctionGenerator(search, 'customers', Customer, 'customers', response => response.customers.customer);
+  }
+}
+
+module.exports = {CustomerGateway: wrapPrototype(CustomerGateway, {
+  ignoreMethods: ['search']
+})};
+
+},{"./customer":155,"./customer_search":157,"./exceptions":168,"./gateway":170,"wrap-promise":672}],157:[function(require,module,exports){
+'use strict';
+
+let AdvancedSearch = require('./advanced_search').AdvancedSearch;
+
+class CustomerSearch extends AdvancedSearch {
+  static initClass() {
+    this.textFields(
+      'addressCountryName',
+      'addressExtendedAddress',
+      'addressFirstName',
+      'addressLastName',
+      'addressLocality',
+      'addressPostalCode',
+      'addressRegion',
+      'addressStreetAddress',
+      'cardholderName',
+      'company',
+      'email',
+      'fax',
+      'firstName',
+      'id',
+      'lastName',
+      'paymentMethodToken',
+      'paypalAccountEmail',
+      'phone',
+      'website',
+      'paymentMethodTokenWithDuplicates'
+    );
+
+    this.equalityFields('creditCardExpirationDate');
+    this.partialMatchFields('creditCardNumber');
+    this.multipleValueField('ids');
+    this.rangeFields('createdAt');
+  }
+}
+CustomerSearch.initClass();
+
+module.exports = {CustomerSearch: CustomerSearch};
+
+},{"./advanced_search":138}],158:[function(require,module,exports){
+'use strict';
+
+let crypto = require('crypto');
+let _ = require('underscore');
+
+class Digest {
+  static Sha1hexdigest(privateKey, string) {
+    return new Digest().hmacSha1(privateKey, string);
+  }
+
+  static Sha256hexdigest(privateKey, string) {
+    return new Digest().hmacSha256(privateKey, string);
+  }
+
+  static secureCompare(left, right) {
+    return new Digest().secureCompare(left, right);
+  }
+
+  hmacSha256(key, data) {
+    let hmac = crypto.createHmac('sha256', this.sha256(key));
+
+    hmac.update(data, 'binary');
+    return hmac.digest('hex');
+  }
+
+  hmacSha1(key, data) {
+    let hmac = crypto.createHmac('sha1', this.sha1(key));
+
+    hmac.update(data, 'binary');
+    return hmac.digest('hex');
+  }
+
+  secureCompare(left, right) {
+    if (left == null || right == null) { return false; }
+
+    let leftBytes = this.unpack(left);
+    let rightBytes = this.unpack(right);
+
+    let result = 0;
+
+    for (let bytePair of _.zip(leftBytes, rightBytes)) {
+      let leftByte = bytePair[0];
+      let rightByte = bytePair[1];
+
+      result |= leftByte ^ rightByte;
+    }
+
+    return result === 0;
+  }
+
+  sha1(data) {
+    let hash = crypto.createHash('sha1');
+
+    hash.update(data, 'binary');
+    return hash.digest();
+  }
+
+  sha256(data) {
+    let hash = crypto.createHash('sha256');
+
+    hash.update(data, 'binary');
+    return hash.digest();
+  }
+
+  unpack(string) {
+    let bytes = [];
+
+    for (let index = 0; index < string.length; index++) {
+      bytes.push(string.charCodeAt(index));
+    }
+    return bytes;
+  }
+}
+
+module.exports = {Digest: Digest};
+
+},{"crypto":295,"underscore":232}],159:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class Disbursement extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {Disbursement: Disbursement};
+
+},{"./attribute_setter":142}],160:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class DisbursementDetails extends AttributeSetter {
+  isValid() {
+    return this.disbursementDate != null;
+  }
+}
+
+module.exports = {DisbursementDetails: DisbursementDetails};
+
+},{"./attribute_setter":142}],161:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class DisbursementGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  transactions(disbursement) {
+    let transactionIds = disbursement.transactionIds;
+
+    return new Promise((resolve, reject) => {
+      this.gateway.transaction.search((search) => {
+        search.ids().in(transactionIds);
+      }, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      });
+    });
+  }
+}
+
+module.exports = {DisbursementGateway: wrapPrototype(DisbursementGateway)};
+
+},{"./gateway":170,"wrap-promise":672}],162:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class Discount extends AttributeSetter {}
+
+module.exports = {Discount: Discount};
+
+},{"./attribute_setter":142}],163:[function(require,module,exports){
+'use strict';
+
+let Discount = require('./discount').Discount;
+let Gateway = require('./gateway').Gateway;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class DiscountGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  all() {
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/discounts`).then(this.createResponseHandler('discount', Discount));
+  }
+}
+
+module.exports = {DiscountGateway: wrapPrototype(DiscountGateway)};
+
+},{"./discount":162,"./gateway":170,"wrap-promise":672}],164:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let TransactionDetails = require('./transaction_details').TransactionDetails;
+
+class Dispute extends AttributeSetter {
+  static initClass() {
+    this.Status = {
+      Open: 'open',
+      Lost: 'lost',
+      Won: 'won'
+    };
+    this.Reason = {
+      CancelledRecurringTransaction: 'cancelled_recurring_transaction',
+      CreditNotProcessed: 'credit_not_processed',
+      Duplicate: 'duplicate',
+      Fraud: 'fraud',
+      General: 'general',
+      InvalidAccount: 'invalid_account',
+      NotRecognized: 'not_recognized',
+      ProductNotReceived: 'product_not_received',
+      ProductUnsatisfactory: 'product_unsatisfactory',
+      Retrieval: 'retrieval',
+      TransactionAmountDiffers: 'transaction_amount_differs'
+    };
+    this.Kind = {
+      Chargeback: 'chargeback',
+      PreArbitration: 'pre_arbitration',
+      Retrieval: 'retrieval'
+    };
+  }
+
+  constructor(attributes) {
+    super(attributes);
+    this.transactionDetails = new TransactionDetails(attributes.transaction);
+  }
+}
+Dispute.initClass();
+
+module.exports = {Dispute: Dispute};
+
+},{"./attribute_setter":142,"./transaction_details":209}],165:[function(require,module,exports){
+(function (process){
+'use strict';
+
+let DEVELOPMENT_PORT;
+
+class Environment {
+  static initClass() {
+    DEVELOPMENT_PORT = process.env.GATEWAY_PORT || '3000';
+    this.Development = new Environment('localhost', DEVELOPMENT_PORT, 'http://auth.venmo.dev:9292', false);
+    this.Qa = new Environment('gateway.qa.braintreepayments.com', '443', 'https://auth.venmo.qa2.braintreegateway.com', true);
+    this.Sandbox = new Environment('api.sandbox.braintreegateway.com', '443', 'https://auth.sandbox.venmo.com', true);
+    this.Production = new Environment('api.braintreegateway.com', '443', 'https://auth.venmo.com', true);
+  }
+
+  constructor(server, port, authUrl, ssl) {
+    this.server = server;
+    this.port = port;
+    this.authUrl = authUrl;
+    this.ssl = ssl;
+  }
+
+  baseUrl() {
+    let url = this.uriScheme() + this.server;
+
+    if (this === Environment.Development) {
+      url += `:${this.port}`;
+    }
+
+    return url;
+  }
+
+  uriScheme() {
+    return this.ssl ? 'https://' : 'http://';
+  }
+}
+Environment.initClass();
+
+module.exports = {Environment: Environment};
+
+}).call(this,require('_process'))
+},{"_process":443}],166:[function(require,module,exports){
+'use strict';
+
+let Transaction = require('./transaction').Transaction;
+let ValidationErrorsCollection = require('./validation_errors_collection').ValidationErrorsCollection;
+
+class ErrorResponse {
+  constructor(attributes) {
+    for (let key in attributes) {
+      if (!attributes.hasOwnProperty(key)) {
+        continue;
+      }
+      let value = attributes[key];
+
+      this[key] = value;
+    }
+    this.success = false;
+    this.errors = new ValidationErrorsCollection(attributes.errors);
+    if (attributes.transaction) { this.transaction = new Transaction(attributes.transaction); }
+  }
+}
+
+module.exports = {ErrorResponse: ErrorResponse};
+
+},{"./transaction":208,"./validation_errors_collection":219}],167:[function(require,module,exports){
+'use strict';
+
+const errorTypes = {
+  authenticationError: 'authenticationError',
+  authorizationError: 'authorizationError',
+  downForMaintenanceError: 'downForMaintenanceError',
+  invalidSignatureError: 'invalidSignatureError',
+  invalidChallengeError: 'invalidChallengeError',
+  invalidTransparentRedirectHashError: 'invalidTransparentRedirectHashError',
+  notFoundError: 'notFoundError',
+  serverError: 'serverError',
+  testOperationPerformedInProductionError: 'testOperationPerformedInProductionError',
+  unexpectedError: 'unexpectedError',
+  invalidKeysError: 'invalidKeysError',
+  upgradeRequired: 'upgradeRequired'
+};
+
+module.exports = {
+  errorTypes: errorTypes
+};
+
+},{}],168:[function(require,module,exports){
+'use strict';
+
+let errorTypes = require('./error_types').errorTypes;
+
+function errorMaker(type) {
+  return function (message) {
+    let err = new Error(message || '');
+
+    err.type = err.name = type;
+    return err;
+  };
+}
+
+module.exports = {
+  AuthenticationError: errorMaker(errorTypes.authenticationError),
+  AuthorizationError: errorMaker(errorTypes.authorizationError),
+  DownForMaintenanceError: errorMaker(errorTypes.downForMaintenanceError),
+  InvalidSignatureError: errorMaker(errorTypes.invalidSignatureError),
+  InvalidChallengeError: errorMaker(errorTypes.invalidChallengeError),
+  InvalidTransparentRedirectHashError: errorMaker(errorTypes.invalidTransparentRedirectHashError),
+  NotFoundError: errorMaker(errorTypes.notFoundError),
+  ServerError: errorMaker(errorTypes.serverError),
+  TestOperationPerformedInProductionError: errorMaker(errorTypes.testOperationPerformedInProductionError),
+  TooManyRequestsError: errorMaker(errorTypes.tooManyRequestsError),
+  UnexpectedError: errorMaker(errorTypes.unexpectedError),
+  InvalidKeysError: errorMaker(errorTypes.invalidKeysError),
+  UpgradeRequired: errorMaker(errorTypes.upgradeRequired)
+};
+
+},{"./error_types":167}],169:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class FacilitatorDetails extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {FacilitatorDetails: FacilitatorDetails};
+
+},{"./attribute_setter":142}],170:[function(require,module,exports){
+'use strict';
+
+let ErrorResponse = require('./error_response').ErrorResponse;
+let SearchResponse = require('./search_response').SearchResponse;
+let exceptions = require('./exceptions');
+let _ = require('underscore');
+
+class Gateway {
+  createResponseHandler(attributeKlassMap, Klass) {
+    return function (response) { // eslint-disable-line consistent-return
+      if (response.apiErrorResponse) {
+        return Promise.resolve(new ErrorResponse(response.apiErrorResponse));
+      }
+
+      response.success = true;
+      if (attributeKlassMap === null) {
+        return Promise.resolve(response);
+      } else if (typeof attributeKlassMap === 'string') {
+        let attributeName = attributeKlassMap;
+
+        if (response[attributeName]) {
+          if (Klass != null) { response[attributeName] = new Klass(response[attributeName]); }
+        }
+        return Promise.resolve(response);
+      }
+      let unknown = true;
+
+      for (let attributeName in attributeKlassMap) {
+        if (!attributeKlassMap.hasOwnProperty(attributeName)) {
+          continue;
+        }
+        Klass = attributeKlassMap[attributeName];
+        if (response[attributeName]) {
+          unknown = false;
+          if (Klass != null) { response[attributeName] = new Klass(response[attributeName]); }
+          return Promise.resolve(response);
+        }
+      }
+      if (unknown) {
+        return Promise.resolve(response);
+      }
+    };
+  }
+
+  createSearchResponse(url, search, pagingFunction, callback) {
+    if (callback != null) {
+      return this.gateway.http.post(url, {search: search.toHash()}, this.searchResponseHandler(pagingFunction, callback));
+    }
+
+    let searchResponse = new SearchResponse();
+
+    this.gateway.http.post(url, {search: search.toHash()}, function (err, response) {
+      if (err != null) {
+        searchResponse.setFatalError(err);
+      } else if (response.searchResults) {
+        searchResponse.setResponse(response);
+        searchResponse.setPagingFunction(pagingFunction);
+      } else if (response.apiErrorResponse) {
+        searchResponse.setFatalError(new ErrorResponse(response.apiErrorResponse));
+      } else {
+        searchResponse.setFatalError(exceptions.DownForMaintenanceError('Down for Maintenance')); // eslint-disable-line new-cap
+      }
+
+      return searchResponse.ready();
+    });
+
+    return searchResponse.stream;
+  }
+
+  searchResponseHandler(pagingFunction, callback) {
+    return function (err, response) {
+      if (err) { return callback(err, response); }
+      if (response.searchResults) {
+        let container = new SearchResponse(pagingFunction, response);
+
+        return callback(null, container);
+      } else if (response.apiErrorResponse) {
+        return callback(null, new ErrorResponse(response.apiErrorResponse));
+      }
+
+      return callback(exceptions.DownForMaintenanceError('Down for Maintenance'), null); // eslint-disable-line new-cap
+    };
+  }
+
+  pagingFunctionGenerator(search, url, SubjectType, pagedResultsKey, getSubject) {
+    return (ids, callback) => {
+      search.ids().in(ids);
+      this.gateway.http.post(`${this.config.baseMerchantPath()}/` + url + '/advanced_search', {search: search.toHash()}, function (err, response) {
+        if (err) {
+          callback(err, null);
+          return;
+        } else if (pagedResultsKey in response) {
+          if (_.isArray(getSubject(response))) {
+            getSubject(response).map((subject) => {
+              callback(null, new SubjectType(subject));
+            });
+            return;
+          }
+
+          callback(null, new SubjectType(getSubject(response)));
+          return;
+        }
+
+        callback(exceptions.DownForMaintenanceError('Down for Maintenance'), null); // eslint-disable-line new-cap
+      });
+    };
+  }
+}
+
+module.exports = {Gateway: Gateway};
+
+},{"./error_response":166,"./exceptions":168,"./search_response":193,"underscore":232}],171:[function(require,module,exports){
+'use strict';
+
+let http = require('http');
+let https = require('https');
+let Buffer = require('buffer').Buffer;
+
+let version = require('../../package.json').version;
+let xml2js = require('xml2js');
+let exceptions = require('./exceptions');
+let Util = require('./util').Util;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class Http {
+  constructor(config) {
+    this.config = config;
+  }
+
+  checkHttpStatus(status) {
+    switch (status.toString()) {
+      case '200':
+      case '201':
+      case '422': return null;
+      case '401': return exceptions.AuthenticationError('Authentication Error'); // eslint-disable-line new-cap
+      case '403': return exceptions.AuthorizationError('Authorization Error'); // eslint-disable-line new-cap
+      case '404': return exceptions.NotFoundError('Not Found'); // eslint-disable-line new-cap
+      case '426': return exceptions.UpgradeRequired('Upgrade Required'); // eslint-disable-line new-cap
+      case '429': return exceptions.TooManyRequestsError('Too Many Requests'); // eslint-disable-line new-cap
+      case '500': return exceptions.ServerError('Server Error'); // eslint-disable-line new-cap
+      case '503': return exceptions.DownForMaintenanceError('Down for Maintenance'); // eslint-disable-line new-cap
+      default: return exceptions.UnexpectedError(`Unexpected HTTP response: ${status}`); // eslint-disable-line new-cap
+    }
+  }
+
+  delete(url) {
+    return this.request('DELETE', url, null);
+  }
+
+  get(url) {
+    return this.request('GET', url, null);
+  }
+
+  post(url, body) {
+    return this.request('POST', url, body);
+  }
+
+  put(url, body) {
+    return this.request('PUT', url, body);
+  }
+
+  request(method, url, body) {
+    let requestBody, requestAborted;
+    let client = this.config.environment.ssl ? https : http;
+
+    let options = {
+      host: this.config.environment.server,
+      port: this.config.environment.port,
+      method,
+      path: url,
+      headers: {
+        Authorization: this.authorizationHeader(),
+        'X-ApiVersion': this.config.apiVersion,
+        Accept: 'application/xml',
+        'Content-Type': 'application/json',
+        'User-Agent': `Braintree Node ${version}`
+      }
+    };
+
+    if (body) {
+      requestBody = JSON.stringify(Util.convertObjectKeysToUnderscores(body));
+
+      options.headers['Content-Length'] = Buffer.byteLength(requestBody).toString();
+    }
+
+    return new Promise((resolve, reject) => {
+      let theRequest = client.request(options, (response) => {
+        body = '';
+
+        response.on('data', (responseBody) => {
+          body += responseBody;
+        });
+
+        response.on('end', () => {
+          let parser;
+          let error = this.checkHttpStatus(response.statusCode);
+
+          if (error) {
+            reject(error);
+            return;
+          }
+          if (body !== ' ') {
+            parser = new xml2js.Parser({
+              explicitRoot: true
+            });
+
+            parser.parseString(body, (err, result) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(Util.convertNodeToObject(result));
+              }
+            });
+          } else {
+            resolve();
+          }
+        });
+
+        response.on('error', function (err) {
+          let error = exceptions.UnexpectedError(`Unexpected response error: ${err}`); // eslint-disable-line new-cap
+
+          reject(error);
+        });
+      });
+
+      function timeoutHandler() {
+        theRequest.abort();
+        requestAborted = true;
+        let error = exceptions.UnexpectedError('Request timed out'); // eslint-disable-line new-cap
+
+        reject(error);
+      }
+
+      theRequest.setTimeout(this.config.timeout, timeoutHandler);
+
+      let requestSocket = null;
+
+      theRequest.on('socket', (socket) => {
+        requestSocket = socket;
+      });
+
+      theRequest.on('error', err => {
+        if (requestAborted) { return; }
+        if (this.config.timeout > 0) {
+          requestSocket.removeListener('timeout', timeoutHandler);
+        }
+        let error = exceptions.UnexpectedError(`Unexpected request error: ${err}`); // eslint-disable-line new-cap
+
+        reject(error);
+      });
+
+      if (body) { theRequest.write(requestBody); }
+      theRequest.end();
+    });
+  }
+
+  authorizationHeader() {
+    if (this.config.accessToken) {
+      return `Bearer ${this.config.accessToken}`;
+    } else if (this.config.clientId) {
+      return `Basic ${(new Buffer(this.config.clientId + ':' + this.config.clientSecret)).toString('base64')}`;
+    }
+
+    return `Basic ${(new Buffer(this.config.publicKey + ':' + this.config.privateKey)).toString('base64')}`;
+  }
+}
+
+module.exports = {Http: wrapPrototype(Http)};
+
+},{"../../package.json":234,"./exceptions":168,"./util":216,"buffer":284,"http":633,"https":369,"wrap-promise":672,"xml2js":233}],172:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class IdealPayment extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {IdealPayment: IdealPayment};
+
+},{"./attribute_setter":142}],173:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let IdealPayment = require('./ideal_payment').IdealPayment;
+let TransactionGateway = require('./transaction_gateway').TransactionGateway;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class IdealPaymentGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  find(idealPaymentId) {
+    if (idealPaymentId.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/ideal_payments/${idealPaymentId}`).then(function (response) {
+      return new IdealPayment(response.idealPayment);
+    });
+  }
+
+  sale(idealPaymentId, transactionRequest) {
+    const request = Object.assign({}, transactionRequest);
+
+    request.paymentMethodNonce = idealPaymentId;
+    request.options = request.options || {};
+    request.options.submitForSettlement = true;
+
+    return new TransactionGateway(this.gateway).sale(request);
+  }
+}
+
+module.exports = {IdealPaymentGateway: wrapPrototype(IdealPaymentGateway)};
+
+},{"./exceptions":168,"./gateway":170,"./ideal_payment":172,"./transaction_gateway":210,"wrap-promise":672}],174:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class MasterpassCard extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {MasterpassCard: MasterpassCard};
+
+},{"./attribute_setter":142}],175:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let MerchantAccount = require('./merchant_account').MerchantAccount;
+
+class Merchant extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+
+    if (attributes.merchantAccounts) {
+      this.merchantAccounts = attributes.merchantAccounts.map((merchantAccountAttributes) => new MerchantAccount(merchantAccountAttributes));
+    }
+  }
+}
+
+module.exports = {Merchant: Merchant};
+
+},{"./attribute_setter":142,"./merchant_account":176}],176:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class MerchantAccount extends AttributeSetter {
+  static initClass() {
+    this.Status = {
+      Pending: 'pending',
+      Active: 'active',
+      Suspended: 'suspended'
+    };
+
+    this.FundingDestination = {
+      Bank: 'bank',
+      Email: 'email',
+      MobilePhone: 'mobile_phone'
+    };
+  }
+
+  constructor(attributes) {
+    super(attributes);
+    if (attributes.masterMerchantAccount) {
+      this.masterMerchantAccount = new MerchantAccount(attributes.masterMerchantAccount);
+    }
+  }
+}
+MerchantAccount.initClass();
+
+module.exports = {MerchantAccount: MerchantAccount};
+
+},{"./attribute_setter":142}],177:[function(require,module,exports){
+'use strict';
+
+let _ = require('underscore');
+let Gateway = require('./gateway').Gateway;
+let MerchantAccount = require('./merchant_account').MerchantAccount;
+let PaginatedResponse = require('./paginated_response').PaginatedResponse;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class MerchantAccountGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  create(attributes) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/merchant_accounts/create_via_api`, {merchantAccount: attributes}).then(this.responseHandler());
+  }
+
+  update(id, attributes) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/merchant_accounts/${id}/update_via_api`, {merchantAccount: attributes}).then(this.responseHandler());
+  }
+
+  find(id) {
+    if (id.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/merchant_accounts/${id}`).then(function (response) {
+      return new MerchantAccount(response.merchantAccount);
+    });
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('merchantAccount', MerchantAccount);
+  }
+
+  all(callback) {
+    let response = new PaginatedResponse(this.fetchMerchantAccounts.bind(this));
+
+    if (callback != null) {
+      return response.all(callback);
+    }
+
+    response.ready();
+    return response.stream;
+  }
+
+  fetchMerchantAccounts(pageNumber, callback) {
+    return this.gateway.http.get(this.config.baseMerchantPath() + '/merchant_accounts?page=' + pageNumber, (err, response) => {
+      let body, merchantAccounts, pageSize, ref, totalItems;
+
+      if (err) {
+        return callback(err);
+      }
+
+      body = response.merchantAccounts;
+      ref = response.merchantAccounts;
+      totalItems = ref.totalItems;
+      pageSize = ref.pageSize;
+      merchantAccounts = body.merchantAccount;
+      if (!_.isArray(merchantAccounts)) {
+        merchantAccounts = [merchantAccounts];
+      }
+      return callback(null, totalItems, pageSize, merchantAccounts);
+    });
+  }
+
+  createForCurrency(attributes) {
+    return this.gateway.http.post(this.config.baseMerchantPath() + '/merchant_accounts/create_for_currency', {
+      merchantAccount: attributes
+    }).then(this.createForCurrencyResponseHandler());
+  }
+
+  createForCurrencyResponseHandler() {
+    let handler = this.createResponseHandler(null, null);
+
+    return function (payload) {
+      return handler(payload).then((response) => {
+        if (response.success) {
+          response.merchantAccount = new MerchantAccount(response.response.merchantAccount);
+          delete response.response;
+        }
+        return response;
+      });
+    };
+  }
+}
+
+module.exports = {MerchantAccountGateway: wrapPrototype(MerchantAccountGateway, {
+  ignoreMethods: ['all', 'fetchMerchantAccounts']
+})};
+
+},{"./exceptions":168,"./gateway":170,"./merchant_account":176,"./paginated_response":181,"underscore":232,"wrap-promise":672}],178:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let Merchant = require('./merchant').Merchant;
+let OAuthCredentials = require('./oauth_credentials').OAuthCredentials;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class MerchantGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  create(attributes) {
+    return this.gateway.http.post('/merchants/create_via_api', {merchant: attributes}).then(this.responseHandler());
+  }
+
+  responseHandler() {
+    let handler = this.createResponseHandler(null, null);
+
+    return function (payload) {
+      return handler(payload).then((response) => {
+        if (response.success) {
+          response.merchant = new Merchant(response.response.merchant);
+          response.credentials = new OAuthCredentials(response.response.credentials);
+          delete response.response;
+        }
+        return response;
+      });
+    };
+  }
+}
+
+module.exports = {MerchantGateway: wrapPrototype(MerchantGateway)};
+
+},{"./gateway":170,"./merchant":175,"./oauth_credentials":179,"wrap-promise":672}],179:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class OAuthCredentials extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {OAuthCredentials: OAuthCredentials};
+
+},{"./attribute_setter":142}],180:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let OAuthCredentials = require('./oauth_credentials').OAuthCredentials;
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let Util = require('./util').Util;
+let Digest = require('./digest').Digest;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class OAuthGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  createTokenFromCode(attributes) {
+    attributes.grantType = 'authorization_code';
+    return this.gateway.http.post('/oauth/access_tokens', attributes).then(this.responseHandler());
+  }
+
+  createTokenFromRefreshToken(attributes) {
+    attributes.grantType = 'refresh_token';
+    return this.gateway.http.post('/oauth/access_tokens', attributes).then(this.responseHandler());
+  }
+
+  revokeAccessToken(accessToken) {
+    return this.gateway.http.post('/oauth/revoke_access_token', {token: accessToken}).then(this.createResponseHandler('result', AttributeSetter));
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('credentials', OAuthCredentials);
+  }
+
+  connectUrl(params) {
+    params.clientId = this.config.clientId;
+    let url = this.config.baseUrl() + '/oauth/connect?' + this.buildQuery(params);
+    let signature = Digest.Sha256hexdigest(this.config.clientSecret, url);
+
+    return url + `&signature=${signature}&algorithm=SHA256`;
+  }
+
+  buildQuery(params) {
+    params = Util.convertObjectKeysToUnderscores(params);
+
+    let paramsArray = this.buildSubQuery('user', params.user);
+
+    paramsArray.push.apply(paramsArray, this.buildSubQuery('business', params.business));
+    paramsArray.push.apply(paramsArray, this.buildSubArrayQuery('payment_methods', params.payment_methods));
+    delete params.user;
+    delete params.business;
+    delete params.payment_methods;
+
+    paramsArray.push.apply(paramsArray, (() => {
+      let result = [];
+
+      for (let key in params) {
+        if (!params.hasOwnProperty(key)) {
+          continue;
+        }
+        let val = params[key];
+
+        result.push([key, val]);
+      }
+      return result;
+    })());
+
+    let queryStringParts = paramsArray.map((paramParts) => {
+      let key = paramParts[0];
+      let value = paramParts[1];
+
+      return `${this._encodeValue(key)}=${this._encodeValue(value)}`;
+    });
+
+    return queryStringParts.join('&');
+  }
+
+  buildSubQuery(key, subParams) {
+    let arr = [];
+
+    for (let subKey in subParams) {
+      if (!subParams.hasOwnProperty(subKey)) {
+        continue;
+      }
+      let value = subParams[subKey];
+
+      arr.push([`${key}[${subKey}]`, value]);
+    }
+
+    return arr;
+  }
+
+  _encodeValue(value) {
+    return encodeURIComponent(value)
+      .replace(/[!'()]/g, escape)
+      .replace(/\*/g, '%2A');
+  }
+
+  buildSubArrayQuery(key, values) {
+    return (values || []).map(value => [`${key}[]`, value]);
+  }
+}
+
+module.exports = {OAuthGateway: wrapPrototype(OAuthGateway)};
+
+},{"./attribute_setter":142,"./digest":158,"./gateway":170,"./oauth_credentials":179,"./util":216,"wrap-promise":672}],181:[function(require,module,exports){
+'use strict';
+
+let PaginatedResponseStream = require('./paginated_response_stream').PaginatedResponseStream;
+
+class PaginatedResponse {
+  constructor(pagingFunction) {
+    this.pagingFunction = pagingFunction;
+    this.stream = new PaginatedResponseStream(this);
+  }
+
+  all(callback) {
+    var results = [];
+
+    this.stream.on('data', function (data) {
+      return results.push(data);
+    });
+    this.stream.on('end', function () {
+      return callback(null, results);
+    });
+    this.stream.on('error', function (err) {
+      return callback(err);
+    });
+    return this.stream.ready();
+  }
+
+  ready() {
+    return this.stream.ready();
+  }
+}
+
+module.exports = {PaginatedResponse: PaginatedResponse};
+
+},{"./paginated_response_stream":182}],182:[function(require,module,exports){
+'use strict';
+
+let Readable = require('stream').Readable || require('readable-stream').Readable;
+
+class PaginatedResponseStream extends Readable {
+  constructor(paginatedResponse) {
+    super({objectMode: true});
+
+    this.paginatedResponse = paginatedResponse;
+    this.pageSize = 0;
+    this.currentPage = 0;
+    this.index = 0;
+    this.totalItems = 0;
+    this.items = [];
+  }
+
+  nextItem() {
+    if (this.currentPage === 0 || this.index % this.pageSize === 0 && this.index < this.totalItems) {
+      this.currentPage++;
+      this.paginatedResponse.pagingFunction(this.currentPage, (err, totalItems, pageSize, items) => {
+        if (err) {
+          this.emit('error', err);
+          return;
+        }
+        this.totalItems = totalItems;
+        this.pageSize = pageSize;
+        this.items = items;
+        this.index++;
+        this.push(this.items.shift());
+      });
+    } else if (this.index >= this.totalItems) {
+      this.push(null);
+    } else {
+      this.index++;
+      this.push(this.items.shift());
+    }
+  }
+
+  ready() {
+    this.readyToStart = true;
+    this.emit('ready');
+  }
+
+  _read() {
+    if (this.readyToStart) {
+      this.nextItem();
+    } else {
+      this.on('ready', () => this.nextItem());
+    }
+  }
+}
+
+module.exports = {PaginatedResponseStream: PaginatedResponseStream};
+
+},{"readable-stream":230,"stream":620}],183:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class PartnerMerchant extends AttributeSetter {}
+
+module.exports = {PartnerMerchant: PartnerMerchant};
+
+},{"./attribute_setter":142}],184:[function(require,module,exports){
+'use strict';
+
+let PaymentInstrumentTypes = {
+  PayPalAccount: 'paypal_account',
+  EuropeBankAccount: 'europe_bank_account',
+  UsBankAccount: 'us_bank_account',
+  CreditCard: 'credit_card',
+  CoinbaseAccount: 'coinbase_account',
+  ApplePayCard: 'apple_pay_card',
+  AndroidPayCard: 'android_pay_card',
+  AmexExpressCheckoutCard: 'amex_express_checkout_card',
+  VenmoAccount: 'venmo_account'
+};
+
+module.exports = {PaymentInstrumentTypes: PaymentInstrumentTypes};
+
+},{}],185:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let ApplePayCard = require('./apple_pay_card').ApplePayCard;
+let AndroidPayCard = require('./android_pay_card').AndroidPayCard;
+let CreditCard = require('./credit_card').CreditCard;
+let PayPalAccount = require('./paypal_account').PayPalAccount;
+let CoinbaseAccount = require('./coinbase_account').CoinbaseAccount;
+let UnknownPaymentMethod = require('./unknown_payment_method').UnknownPaymentMethod;
+let PaymentMethodNonce = require('./payment_method_nonce').PaymentMethodNonce;
+let UsBankAccount = require('./us_bank_account').UsBankAccount;
+let VenmoAccount = require('./venmo_account').VenmoAccount;
+let VisaCheckoutCard = require('./visa_checkout_card').VisaCheckoutCard;
+let MasterpassCard = require('./masterpass_card').MasterpassCard;
+let Util = require('./util').Util;
+let exceptions = require('./exceptions');
+let querystring = require('../../vendor/querystring.node.js.511d6a2/querystring');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class PaymentMethodGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  responseHandler() {
+    let responseMapping = {
+      paypalAccount: PayPalAccount,
+      coinbaseAccount: CoinbaseAccount,
+      creditCard: CreditCard,
+      applePayCard: ApplePayCard,
+      androidPayCard: AndroidPayCard,
+      paymentMethodNonce: PaymentMethodNonce
+    };
+    let handler = this.createResponseHandler(responseMapping, null);
+
+    return function (payload) {
+      return handler(payload).then(function (response) {
+        let parsedResponse = PaymentMethodGateway.parsePaymentMethod(response);
+
+        if (parsedResponse instanceof PaymentMethodNonce) {
+          response.paymentMethodNonce = parsedResponse;
+        } else {
+          response.paymentMethod = parsedResponse;
+        }
+
+        return response;
+      });
+    };
+  }
+
+  create(attributes) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/payment_methods`, {paymentMethod: attributes}).then(this.responseHandler());
+  }
+
+  find(token) {
+    if (token.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/payment_methods/any/${token}`).then((response) => {
+      return PaymentMethodGateway.parsePaymentMethod(response);
+    });
+  }
+
+  update(token, attributes) {
+    if (token.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/payment_methods/any/${token}`, {paymentMethod: attributes}).then(this.responseHandler());
+  }
+
+  grant(token, attributes) {
+    if (token.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    let grantOptions = {
+      sharedPaymentMethodToken: token
+    };
+
+    if (typeof attributes === 'boolean') {
+      attributes = {allow_vaulting: attributes}; // eslint-disable-line camelcase
+    }
+
+    grantOptions = Util.merge(grantOptions, attributes);
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/payment_methods/grant`, {
+      payment_method: grantOptions // eslint-disable-line camelcase
+    }).then(this.responseHandler());
+  }
+
+  revoke(token) {
+    if (token.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/payment_methods/revoke`, {
+      payment_method: { // eslint-disable-line camelcase
+        sharedPaymentMethodToken: token
+      }
+    }).then(this.responseHandler());
+  }
+
+  static parsePaymentMethod(response) {
+    if (response.creditCard) {
+      return new CreditCard(response.creditCard);
+    } else if (response.paypalAccount) {
+      return new PayPalAccount(response.paypalAccount);
+    } else if (response.applePayCard) {
+      return new ApplePayCard(response.applePayCard);
+    } else if (response.androidPayCard) {
+      return new AndroidPayCard(response.androidPayCard);
+    } else if (response.coinbaseAccount) {
+      return new CoinbaseAccount(response.coinbaseAccount);
+    } else if (response.paymentMethodNonce) {
+      return new PaymentMethodNonce(response.paymentMethodNonce);
+    } else if (response.usBankAccount) {
+      return new UsBankAccount(response.usBankAccount);
+    } else if (response.venmoAccount) {
+      return new VenmoAccount(response.venmoAccount);
+    } else if (response.visaCheckoutCard) {
+      return new VisaCheckoutCard(response.visaCheckoutCard);
+    } else if (response.masterpassCard) {
+      return new MasterpassCard(response.masterpassCard);
+    }
+
+    return new UnknownPaymentMethod(response);
+  }
+
+  delete(token, options) {
+    let queryParam, invalidKeysError;
+
+    if (typeof options === 'function') {
+      options = null;
+    }
+    invalidKeysError = Util.verifyKeys(this._deleteSignature(), options);
+
+    if (invalidKeysError) {
+      return Promise.reject(invalidKeysError);
+    }
+    queryParam = options != null ? '?' + querystring.stringify(Util.convertObjectKeysToUnderscores(options)) : '';
+
+    return this.gateway.http.delete(this.config.baseMerchantPath() + '/payment_methods/any/' + token + queryParam);
+  }
+
+  _deleteSignature() {
+    return {
+      valid: ['revokeAllGrants']
+    };
+  }
+}
+
+module.exports = {PaymentMethodGateway: wrapPrototype(PaymentMethodGateway)};
+
+},{"../../vendor/querystring.node.js.511d6a2/querystring":237,"./android_pay_card":140,"./apple_pay_card":141,"./coinbase_account":145,"./credit_card":150,"./exceptions":168,"./gateway":170,"./masterpass_card":174,"./payment_method_nonce":186,"./paypal_account":188,"./unknown_payment_method":213,"./us_bank_account":214,"./util":216,"./venmo_account":220,"./visa_checkout_card":221,"wrap-promise":672}],186:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let ThreeDSecureInfo = require('./three_d_secure_info').ThreeDSecureInfo;
+
+class PaymentMethodNonce extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+    if (attributes.threeDSecureInfo) { this.threeDSecureInfo = new ThreeDSecureInfo(attributes.threeDSecureInfo); }
+  }
+}
+
+module.exports = {PaymentMethodNonce: PaymentMethodNonce};
+
+},{"./attribute_setter":142,"./three_d_secure_info":207}],187:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let PaymentMethodNonce = require('./payment_method_nonce').PaymentMethodNonce;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class PaymentMethodNonceGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  responseHandler() {
+    let handler = this.createResponseHandler('payment_method_nonce', PaymentMethodNonce);
+
+    return function (payload) {
+      return handler(payload).then((response) => {
+        response.paymentMethodNonce = new PaymentMethodNonce(response.paymentMethodNonce);
+        return response;
+      });
+    };
+  }
+
+  create(paymentMethodToken) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/payment_methods/${paymentMethodToken}/nonces`, {}).then(this.responseHandler());
+  }
+
+  find(paymentMethodNonce) {
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/payment_method_nonces/${paymentMethodNonce}`).then((response) => {
+      return new PaymentMethodNonce(response.paymentMethodNonce);
+    });
+  }
+}
+
+module.exports = {PaymentMethodNonceGateway: wrapPrototype(PaymentMethodNonceGateway)};
+
+},{"./gateway":170,"./payment_method_nonce":186,"wrap-promise":672}],188:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class PayPalAccount extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {PayPalAccount: PayPalAccount};
+
+},{"./attribute_setter":142}],189:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let PayPalAccount = require('./paypal_account').PayPalAccount;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class PayPalAccountGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  find(token) {
+    if (token.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/payment_methods/paypal_account/${token}`).then((response) => {
+      return new PayPalAccount(response.paypalAccount);
+    });
+  }
+
+  update(token, attributes) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/payment_methods/paypal_account/${token}`, {paypalAccount: attributes}).then(this.responseHandler());
+  }
+
+  delete(token) {
+    let path = `${this.config.baseMerchantPath()}/payment_methods/paypal_account/${token}`;
+
+    return this.gateway.http.delete(path);
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('paypalAccount', PayPalAccount);
+  }
+}
+
+module.exports = {PayPalAccountGateway: wrapPrototype(PayPalAccountGateway)};
+
+},{"./exceptions":168,"./gateway":170,"./paypal_account":188,"wrap-promise":672}],190:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class Plan extends AttributeSetter {}
+
+module.exports = {Plan: Plan};
+
+},{"./attribute_setter":142}],191:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let Plan = require('./plan').Plan;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class PlanGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  all() {
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/plans`).then(this.createResponseHandler('plan', Plan));
+  }
+}
+
+module.exports = {PlanGateway: wrapPrototype(PlanGateway)};
+
+},{"./gateway":170,"./plan":190,"wrap-promise":672}],192:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class RiskData extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {RiskData: RiskData};
+
+},{"./attribute_setter":142}],193:[function(require,module,exports){
+'use strict';
+
+let _ = require('underscore');
+let SearchResponseStream = require('./search_response_stream').SearchResponseStream;
+
+class SearchResponse {
+  constructor(pagingFunction, results) {
+    if (pagingFunction != null) {
+      this.setPagingFunction(pagingFunction);
+    }
+
+    if (results != null) {
+      this.setResponse(results);
+    }
+
+    this.stream = new SearchResponseStream(this);
+
+    this.success = true;
+  }
+
+  each(callback) {
+    return _.each(_.range(0, this.ids.length, this.pageSize), offset => {
+      return this.pagingFunction(this.ids.slice(offset, offset + this.pageSize), callback);
+    });
+  }
+
+  first(callback) {
+    if (this.ids.length === 0) {
+      return callback(null, null);
+    }
+
+    return this.pagingFunction([this.ids[0]], callback);
+  }
+
+  length() {
+    return this.ids.length;
+  }
+
+  ready() {
+    return this.stream.ready();
+  }
+
+  setFatalError(error) {
+    this.fatalError = error;
+  }
+
+  setResponse(results) {
+    this.ids = results.searchResults.ids;
+    this.pageSize = parseInt(results.searchResults.pageSize, 10);
+  }
+
+  setPagingFunction(pagingFunction) {
+    this.pagingFunction = pagingFunction;
+  }
+}
+
+module.exports = {SearchResponse: SearchResponse};
+
+},{"./search_response_stream":194,"underscore":232}],194:[function(require,module,exports){
+'use strict';
+
+let Readable = require('stream').Readable || require('readable-stream').Readable;
+
+class SearchResponseStream extends Readable {
+  constructor(searchResponse) {
+    super({objectMode: true});
+
+    this.searchResponse = searchResponse;
+    this.currentItem = 0;
+    this.currentOffset = 0;
+    this.bufferedResults = [];
+  }
+
+  nextItem() {
+    if (this.searchResponse.fatalError != null) {
+      this.emit('error', this.searchResponse.fatalError);
+      this.push(null);
+      return;
+    } else if (this.bufferedResults.length > 0) {
+      this.pushBufferedResults();
+      return;
+    } else if (this.currentItem >= this.searchResponse.ids.length) {
+      this.push(null);
+      return;
+    }
+
+    let index = 0;
+
+    this.searchResponse.pagingFunction(this.searchResponse.ids.slice(this.currentOffset, this.currentOffset + this.searchResponse.pageSize), (err, item) => {
+      if (err != null) {
+        this.emit('error', err);
+      } else {
+        this.bufferedResults.push(item);
+      }
+
+      this.currentItem += 1;
+      index += 1;
+
+      if (index === this.searchResponse.pageSize || this.currentItem === this.searchResponse.ids.length) {
+        this.push(this.bufferedResults.shift());
+      }
+    });
+
+    this.currentOffset += this.searchResponse.pageSize;
+  }
+
+  pushBufferedResults() {
+    return (() => {
+      let result1 = [];
+
+      while (this.bufferedResults.length > 0) {
+        let item;
+        let result = this.push(this.bufferedResults.shift());
+
+        if (result === false) { break; }
+        result1.push(item);
+      }
+      return result1;
+    })();
+  }
+
+  ready() {
+    this.readyToStart = true;
+    return this.emit('ready');
+  }
+
+  _read() {
+    if (this.readyToStart != null) {
+      return this.nextItem();
+    }
+
+    return this.on('ready', () => {
+      return this.nextItem();
+    });
+  }
+}
+
+module.exports = {SearchResponseStream: SearchResponseStream};
+
+},{"readable-stream":230,"stream":620}],195:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class SettlementBatchSummary extends AttributeSetter {}
+
+module.exports = {SettlementBatchSummary: SettlementBatchSummary};
+
+},{"./attribute_setter":142}],196:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let Util = require('./util').Util;
+let SettlementBatchSummary = require('./settlement_batch_summary').SettlementBatchSummary;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class SettlementBatchSummaryGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  generate(criteria) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/settlement_batch_summary`, {
+      settlementBatchSummary: criteria
+    }).then(this.responseHandler(criteria));
+  }
+
+  responseHandler(criteria) {
+    let handler = this.createResponseHandler('settlementBatchSummary', SettlementBatchSummary);
+
+    return (payload) => {
+      return handler(payload).then((response) => {
+        return this.underscoreCustomField(criteria, response);
+      });
+    };
+  }
+
+  underscoreCustomField(criteria, response) {
+    if (response.success && 'groupByCustomField' in criteria) {
+      let camelCustomField = Util.toCamelCase(criteria.groupByCustomField);
+
+      for (let record of response.settlementBatchSummary.records) {
+        record[criteria.groupByCustomField] = record[camelCustomField];
+        record[camelCustomField] = null;
+      }
+    }
+
+    return response;
+  }
+}
+
+module.exports = {SettlementBatchSummaryGateway: wrapPrototype(SettlementBatchSummaryGateway)};
+
+},{"./gateway":170,"./settlement_batch_summary":195,"./util":216,"wrap-promise":672}],197:[function(require,module,exports){
+'use strict';
+
+class SignatureService {
+  constructor(key, hashFunction) {
+    this.key = key;
+    this.hashFunction = hashFunction;
+  }
+
+  sign(data) {
+    return `${this.hashFunction(this.key, data)}|${data}`;
+  }
+}
+
+module.exports = {SignatureService: SignatureService};
+
+},{}],198:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let Transaction = require('./transaction').Transaction;
+
+class Subscription extends AttributeSetter {
+  static initClass() {
+    this.Source = {
+      Api: 'api',
+      ControlPanel: 'control_panel',
+      Recurring: 'recurring'
+    };
+
+    this.Status = {
+      Active: 'Active',
+      Canceled: 'Canceled',
+      Expired: 'Expired',
+      PastDue: 'Past Due',
+      Pending: 'Pending',
+      All() {
+        let all = [];
+
+        for (let key in this) {
+          if (!this.hasOwnProperty(key)) {
+            continue;
+          }
+          let value = this[key];
+
+          if (key !== 'All') { all.push(value); }
+        }
+        return all;
+      }
+    };
+  }
+
+  constructor(attributes) {
+    super(attributes);
+    this.transactions = attributes.transactions.map((transactionAttributes) => new Transaction(transactionAttributes));
+  }
+}
+Subscription.initClass();
+
+module.exports = {Subscription: Subscription};
+
+},{"./attribute_setter":142,"./transaction":208}],199:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let Subscription = require('./subscription').Subscription;
+let SubscriptionSearch = require('./subscription_search').SubscriptionSearch;
+let TransactionGateway = require('./transaction_gateway').TransactionGateway;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class SubscriptionGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  create(attributes) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/subscriptions`, {subscription: attributes}).then(this.responseHandler());
+  }
+
+  cancel(subscriptionId) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/subscriptions/${subscriptionId}/cancel`, null).then(this.responseHandler());
+  }
+
+  find(subscriptionId) {
+    if (subscriptionId.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/subscriptions/${subscriptionId}`).then((response) => {
+      return new Subscription(response.subscription);
+    });
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('subscription', Subscription);
+  }
+
+  retryCharge(subscriptionId, amount) {
+    if (typeof amount === 'function') {
+      amount = undefined; // eslint-disable-line no-undefined
+    }
+
+    return new TransactionGateway(this.gateway).sale({
+      amount: amount,
+      subscriptionId
+    });
+  }
+
+  search(fn, callback) {
+    let search = new SubscriptionSearch();
+
+    fn(search);
+    return this.createSearchResponse(`${this.config.baseMerchantPath()}/subscriptions/advanced_search_ids`, search, this.pagingFunctionGenerator(search), callback);
+  }
+
+  update(subscriptionId, attributes) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/subscriptions/${subscriptionId}`, {subscription: attributes}).then(this.responseHandler());
+  }
+
+  pagingFunctionGenerator(search) {
+    return super.pagingFunctionGenerator(search, 'subscriptions', Subscription, 'subscriptions', response => response.subscriptions.subscription);
+  }
+}
+
+module.exports = {SubscriptionGateway: wrapPrototype(SubscriptionGateway, {
+  ignoreMethods: ['search']
+})};
+
+},{"./exceptions":168,"./gateway":170,"./subscription":198,"./subscription_search":200,"./transaction_gateway":210,"wrap-promise":672}],200:[function(require,module,exports){
+'use strict';
+
+let AdvancedSearch = require('./advanced_search').AdvancedSearch;
+let Subscription = require('./subscription').Subscription;
+
+class SubscriptionSearch extends AdvancedSearch {
+  static initClass() {
+    this.multipleValueField('inTrialPeriod');
+    this.multipleValueField('ids');
+    this.textFields('id', 'transactionId');
+    this.multipleValueOrTextField('planId');
+    this.multipleValueField('status', {allows: Subscription.Status.All()}); // eslint-disable-line new-cap
+    this.multipleValueField('merchantAccountId');
+    this.rangeFields('price', 'daysPastDue', 'billingCyclesRemaining', 'nextBillingDate', 'createdAt');
+  }
+}
+SubscriptionSearch.initClass();
+
+module.exports = {SubscriptionSearch: SubscriptionSearch};
+
+},{"./advanced_search":138,"./subscription":198}],201:[function(require,module,exports){
+'use strict';
+
+let CreditCardDefaults = {
+  CountryOfIssuance: 'USA',
+  IssuingBank: 'NETWORK ONLY'
+};
+
+module.exports = {CreditCardDefaults: CreditCardDefaults};
+
+},{}],202:[function(require,module,exports){
+'use strict';
+
+let CreditCardNumbers = {
+  CardTypeIndicators: {
+    Prepaid: '4111111111111210',
+    Commercial: '4111111111131010',
+    Payroll: '4111111114101010',
+    Healthcare: '4111111510101010',
+    DurbinRegulated: '4111161010101010',
+    Debit: '4117101010101010',
+    Unknown: '4111111111112101',
+    No: '4111111111310101',
+    IssuingBank: '4111111141010101',
+    CountryOfIssuance: '4111111111121102',
+    Fraud: '4000111111111511'
+  },
+
+  AmexPayWithPoints: {
+    Success: '371260714673002',
+    IneligibleCard: '378267515471109',
+    InsufficientPoints: '371544868764018'
+  }
+};
+
+module.exports = {CreditCardNumbers: CreditCardNumbers};
+
+},{}],203:[function(require,module,exports){
+'use strict';
+
+let MerchantAccountTest = {
+  Approve: 'approve_me',
+  InsufficientFundsContactUs: 'insufficient_funds__contact',
+  AccountNotAuthorizedContactUs: 'account_not_authorized__contact',
+  BankRejectedUpdateFundingInformation: 'bank_rejected__update',
+  BankRejectedNone: 'bank_rejected__none'
+};
+
+module.exports = {MerchantAccountTest: MerchantAccountTest};
+
+},{}],204:[function(require,module,exports){
+'use strict';
+
+let Nonces = {
+  Transactable: 'fake-valid-nonce',
+  Consumed: 'fake-consumed-nonce',
+  PayPalOneTimePayment: 'fake-paypal-one-time-nonce',
+  PayPalFuturePayment: 'fake-paypal-future-nonce',
+  PayPalBillingAgreement: 'fake-paypal-billing-agreement-nonce',
+  ApplePayVisa: 'fake-apple-pay-visa-nonce',
+  ApplePayMasterCard: 'fake-apple-pay-mastercard-nonce',
+  ApplePayAmEx: 'fake-apple-pay-amex-nonce',
+  AbstractTransactable: 'fake-abstract-transactable-nonce',
+  Europe: 'fake-europe-bank-account-nonce',
+  Coinbase: 'fake-coinbase-nonce',
+  AndroidPay: 'fake-android-pay-nonce',
+  AndroidPayDiscover: 'fake-android-pay-discover-nonce',
+  AndroidPayVisa: 'fake-android-pay-visa-nonce',
+  AndroidPayMasterCard: 'fake-android-pay-mastercard-nonce',
+  AndroidPayAmEx: 'fake-android-pay-amex-nonce',
+  AmexExpressCheckout: 'fake-amex-express-checkout-nonce',
+  TransactableVisa: 'fake-valid-visa-nonce',
+  TransactableAmEx: 'fake-valid-amex-nonce',
+  TransactableMasterCard: 'fake-valid-mastercard-nonce',
+  TransactableDiscover: 'fake-valid-discover-nonce',
+  TransactableJCB: 'fake-valid-jcb-nonce',
+  TransactableMaestro: 'fake-valid-maestro-nonce',
+  TransactableDinersClub: 'fake-valid-dinersclub-nonce',
+  TransactablePrepaid: 'fake-valid-prepaid-nonce',
+  TransactableCommercial: 'fake-valid-commercial-nonce',
+  TransactableDurbinRegulated: 'fake-valid-durbin-regulated-nonce',
+  TransactableHealthcare: 'fake-valid-healthcare-nonce',
+  TransactableDebit: 'fake-valid-debit-nonce',
+  TransactablePayroll: 'fake-valid-payroll-nonce',
+  TransactableNoIndicators: 'fake-valid-no-indicators-nonce',
+  TransactableUnknownIndicators: 'fake-valid-unknown-indicators-nonce',
+  TransactableCountryOfIssuanceUSA: 'fake-valid-country-of-issuance-usa-nonce',
+  TransactableCountryOfIssuanceCAD: 'fake-valid-country-of-issuance-cad-nonce',
+  TransactableIssuingBankNetworkOnly: 'fake-valid-issuing-bank-network-only-nonce',
+  ProcessorDeclinedVisa: 'fake-processor-declined-visa-nonce',
+  ProcessorDeclinedMasterCard: 'fake-processor-declined-mastercard-nonce',
+  ProcessorDeclinedAmEx: 'fake-processor-declined-amex-nonce',
+  ProcessorDeclinedDiscover: 'fake-processor-declined-discover-nonce',
+  ProcessorFailureJCB: 'fake-processor-failure-jcb-nonce',
+  LuhnInvalid: 'fake-luhn-invalid-nonce',
+  PayPalFuturePaymentRefreshToken: 'fake-paypal-future-refresh-token-nonce',
+  SEPA: 'fake-sepa-bank-account-nonce',
+  GatewayRejectedFraud: 'fake-gateway-rejected-fraud-nonce',
+  VenmoAccount: 'fake-venmo-account-nonce',
+  MasterpassAmEx: 'fake-masterpass-amex-nonce',
+  MasterpassDiscover: 'fake-masterpass-discover-nonce',
+  MasterpassMasterCard: 'fake-masterpass-mastercard-nonce',
+  MasterpassVisa: 'fake-masterpass-visa-nonce',
+  VisaCheckoutAmEx: 'fake-visa-checkout-amex-nonce',
+  VisaCheckoutDiscover: 'fake-visa-checkout-discover-nonce',
+  VisaCheckoutMasterCard: 'fake-visa-checkout-mastercard-nonce',
+  VisaCheckoutVisa: 'fake-visa-checkout-visa-nonce'
+};
+
+module.exports = {Nonces: Nonces};
+
+},{}],205:[function(require,module,exports){
+'use strict';
+
+let TransactionAmounts = {
+  Authorize: '1000.00',
+  Decline: '2000.00',
+  Fail: '3000.00'
+};
+
+module.exports = {TransactionAmounts: TransactionAmounts};
+
+},{}],206:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let Environment = require('./environment').Environment;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class TestingGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  settle(transactionId) {
+    return this.settlementOperationWithEnvironmentCheck(transactionId, 'settle');
+  }
+
+  settlementPending(transactionId) {
+    return this.settlementOperationWithEnvironmentCheck(transactionId, 'settlement_pending');
+  }
+
+  settlementConfirm(transactionId) {
+    return this.settlementOperationWithEnvironmentCheck(transactionId, 'settlement_confirm');
+  }
+
+  settlementDecline(transactionId) {
+    return this.settlementOperationWithEnvironmentCheck(transactionId, 'settlement_decline');
+  }
+
+  settlementOperationWithEnvironmentCheck(transactionId, operation) {
+    if (this.config.environment === Environment.Production) {
+      return Promise.reject(exceptions.TestOperationPerformedInProductionError('Test operation performed in production'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.put(
+      `${this.config.baseMerchantPath()}/transactions/${transactionId}/${operation}`,
+      null
+    );
+  }
+}
+
+module.exports = {TestingGateway: wrapPrototype(TestingGateway)};
+
+},{"./environment":165,"./exceptions":168,"./gateway":170,"wrap-promise":672}],207:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class ThreeDSecureInfo extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {ThreeDSecureInfo: ThreeDSecureInfo};
+
+},{"./attribute_setter":142}],208:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let ApplePayCard = require('./apple_pay_card').ApplePayCard;
+let AndroidPayCard = require('./android_pay_card').AndroidPayCard;
+let CreditCard = require('./credit_card').CreditCard;
+let PayPalAccount = require('./paypal_account').PayPalAccount;
+let CoinbaseAccount = require('./coinbase_account').CoinbaseAccount;
+let DisbursementDetails = require('./disbursement_details').DisbursementDetails;
+let Dispute = require('./dispute').Dispute;
+let FacilitatorDetails = require('./facilitator_details').FacilitatorDetails;
+let RiskData = require('./risk_data').RiskData;
+let ThreeDSecureInfo = require('./three_d_secure_info').ThreeDSecureInfo;
+let UsBankAccount = require('./us_bank_account').UsBankAccount;
+let IdealPayment = require('./ideal_payment').IdealPayment;
+let VisaCheckoutCard = require('./visa_checkout_card').VisaCheckoutCard;
+let MasterpassCard = require('./masterpass_card').MasterpassCard;
+
+class Transaction extends AttributeSetter {
+  static initClass() {
+    this.CreatedUsing = {
+      FullInformation: 'full_information',
+      Token: 'token'
+    };
+
+    this.EscrowStatus = {
+      HoldPending: 'hold_pending',
+      Held: 'held',
+      ReleasePending: 'release_pending',
+      Released: 'released',
+      Refunded: 'refunded'
+    };
+
+    this.Source = {
+      Api: 'api',
+      ControlPanel: 'control_panel',
+      Recurring: 'recurring'
+    };
+
+    this.Type = {
+      Credit: 'credit',
+      Sale: 'sale',
+      All() {
+        let all = [];
+
+        for (let key in this) {
+          if (!this.hasOwnProperty(key)) {
+            continue;
+          }
+          let value = this[key];
+
+          if (key !== 'All') { all.push(value); }
+        }
+        return all;
+      }
+    };
+
+    this.GatewayRejectionReason = {
+      ApplicationIncomplete: 'application_incomplete',
+      Avs: 'avs',
+      Cvv: 'cvv',
+      AvsAndCvv: 'avs_and_cvv',
+      Duplicate: 'duplicate',
+      Fraud: 'fraud',
+      ThreeDSecure: 'three_d_secure'
+    };
+
+    this.IndustryData = {
+      Lodging: 'lodging',
+      TravelAndCruise: 'travel_cruise'
+    };
+
+    this.Status = {
+      AuthorizationExpired: 'authorization_expired',
+      Authorizing: 'authorizing',
+      Authorized: 'authorized',
+      GatewayRejected: 'gateway_rejected',
+      Failed: 'failed',
+      ProcessorDeclined: 'processor_declined',
+      Settled: 'settled',
+      Settling: 'settling',
+      SettlementConfirmed: 'settlement_confirmed',
+      SettlementDeclined: 'settlement_declined',
+      SettlementPending: 'settlement_pending',
+      SubmittedForSettlement: 'submitted_for_settlement',
+      Voided: 'voided',
+      All() {
+        let all = [];
+
+        for (let key in this) {
+          if (!this.hasOwnProperty(key)) {
+            continue;
+          }
+          let value = this[key];
+
+          if (key !== 'All') { all.push(value); }
+        }
+        return all;
+      }
+    };
+  }
+
+  constructor(attributes) {
+    super(attributes);
+    this.creditCard = new CreditCard(attributes.creditCard);
+    this.paypalAccount = new PayPalAccount(attributes.paypal);
+    this.coinbaseAccount = new CoinbaseAccount(attributes.coinbaseAccount);
+    this.applePayCard = new ApplePayCard(attributes.applePay);
+    this.androidPayCard = new AndroidPayCard(attributes.androidPayCard);
+    this.disbursementDetails = new DisbursementDetails(attributes.disbursementDetails);
+    this.visaCheckoutCard = new VisaCheckoutCard(attributes.visaCheckoutCard);
+    this.masterpassCard = new MasterpassCard(attributes.masterpassCard);
+    if (attributes.disputes != null) { this.disputes = attributes.disputes.map((disputeAttributes) => new Dispute(disputeAttributes)); }
+    if (attributes.facilitatorDetails) { this.facilitatorDetails = new FacilitatorDetails(attributes.facilitatorDetails); }
+    if (attributes.riskData) { this.riskData = new RiskData(attributes.riskData); }
+    if (attributes.threeDSecureInfo) { this.threeDSecureInfo = new ThreeDSecureInfo(attributes.threeDSecureInfo); }
+    if (attributes.usBankAccount) { this.usBankAccount = new UsBankAccount(attributes.usBankAccount); }
+    if (attributes.idealPayment) { this.idealPaymentDetails = new IdealPayment(attributes.idealPayment); }
+  }
+
+  isDisbursed() {
+    return this.disbursementDetails.isValid();
+  }
+}
+Transaction.initClass();
+
+module.exports = {Transaction: Transaction};
+
+},{"./android_pay_card":140,"./apple_pay_card":141,"./attribute_setter":142,"./coinbase_account":145,"./credit_card":150,"./disbursement_details":160,"./dispute":164,"./facilitator_details":169,"./ideal_payment":172,"./masterpass_card":174,"./paypal_account":188,"./risk_data":192,"./three_d_secure_info":207,"./us_bank_account":214,"./visa_checkout_card":221}],209:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class TransactionDetails extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {TransactionDetails: TransactionDetails};
+
+},{"./attribute_setter":142}],210:[function(require,module,exports){
+'use strict';
+
+let AddressGateway = require('./address_gateway').AddressGateway;
+let Gateway = require('./gateway').Gateway;
+let Transaction = require('./transaction').Transaction;
+let TransactionSearch = require('./transaction_search').TransactionSearch;
+let isFunction = require('underscore').isFunction;
+let Util = require('./util').Util;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class TransactionGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  cancelRelease(transactionId) {
+    let path = `${this.config.baseMerchantPath()}/transactions/${transactionId}/cancel_release`;
+    let body = {};
+
+    return this.gateway.http.put(path, body).then(this.responseHandler());
+  }
+
+  cloneTransaction(transactionId, attributes) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/transactions/${transactionId}/clone`, {
+      transactionClone: attributes
+    }).then(this.responseHandler());
+  }
+
+  create(attributes) {
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/transactions`, {transaction: attributes}).then(this.responseHandler());
+  }
+
+  credit(attributes) {
+    attributes.type = 'credit';
+    return this.create(attributes);
+  }
+
+  find(transactionId) {
+    if (transactionId.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/transactions/${transactionId}`).then((response) => {
+      return new Transaction(response.transaction);
+    });
+  }
+
+  holdInEscrow(transactionId) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/transactions/${transactionId}/hold_in_escrow`, {}).then(this.responseHandler());
+  }
+
+  refund(transactionId, options) {
+    if (isFunction(options)) {
+      options = {};
+    } else if (typeof options !== 'object') {
+      options = {amount: options};
+    }
+
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/transactions/${transactionId}/refund`, {transaction: options}).then(this.responseHandler());
+  }
+
+  responseHandler() {
+    return this.createResponseHandler('transaction', Transaction);
+  }
+
+  sale(attributes) {
+    let invalidKeysError;
+
+    attributes.type = 'sale';
+    invalidKeysError = Util.verifyKeys(this._createSignature(), attributes);
+
+    if (invalidKeysError) {
+      return Promise.reject(invalidKeysError, null);
+    }
+
+    return this.create(attributes);
+  }
+
+  search(fn, callback) {
+    let search = new TransactionSearch();
+
+    fn(search);
+    return this.createSearchResponse(`${this.config.baseMerchantPath()}/transactions/advanced_search_ids`, search, this.pagingFunctionGenerator(search), callback);
+  }
+
+  releaseFromEscrow(transactionId) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/transactions/${transactionId}/release_from_escrow`, {}).then(this.responseHandler());
+  }
+
+  submitForSettlement(transactionId, amount, options) {
+    let invalidKeysError;
+
+    options = options || {};
+
+    invalidKeysError = Util.verifyKeys(this._submitForSettlementSignature(), options);
+
+    if (invalidKeysError) {
+      return Promise.reject(invalidKeysError, null);
+    }
+
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/transactions/${transactionId}/submit_for_settlement`, {
+      transaction: {amount, orderId: options.orderId, descriptor: options.descriptor}
+    }).then(this.responseHandler());
+  }
+
+  updateDetails(transactionId, options) {
+    let invalidKeysError = Util.verifyKeys(this._updateDetailsSignature(), options);
+
+    if (invalidKeysError) {
+      return Promise.reject(invalidKeysError, null);
+    }
+
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/transactions/${transactionId}/update_details`, {
+      transaction: options
+    }).then(this.responseHandler());
+  }
+
+  submitForPartialSettlement(transactionId, amount, options) {
+    let invalidKeysError;
+
+    options = options || {};
+
+    invalidKeysError = Util.verifyKeys(this._submitForSettlementSignature(), options);
+
+    if (invalidKeysError) {
+      return Promise.reject(invalidKeysError, null);
+    }
+
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/transactions/${transactionId}/submit_for_partial_settlement`, {
+      transaction: {amount, orderId: options.orderId, descriptor: options.descriptor}
+    }).then(this.responseHandler());
+  }
+
+  void(transactionId) {
+    return this.gateway.http.put(`${this.config.baseMerchantPath()}/transactions/${transactionId}/void`, null).then(this.responseHandler());
+  }
+
+  pagingFunctionGenerator(search) {
+    return super.pagingFunctionGenerator(search, 'transactions', Transaction, 'creditCardTransactions', response => response.creditCardTransactions.transaction);
+  }
+
+  _submitForSettlementSignature() {
+    return {
+      valid: ['orderId', 'descriptor[name]', 'descriptor[phone]', 'descriptor[url]']
+    };
+  }
+
+  _updateDetailsSignature() {
+    return {
+      valid: ['amount', 'orderId', 'descriptor[name]', 'descriptor[phone]', 'descriptor[url]']
+    };
+  }
+
+  _createSignature() {
+    let validKeys = [
+      'amount',
+      'customerId',
+      'merchantAccountId',
+      'orderId',
+      'channel',
+      'paymentMethodToken',
+      'purchaseOrderNumber',
+      'recurring',
+      'transactionSource',
+      'shippingAddressId',
+      'type',
+      'taxAmount',
+      'taxExempt',
+      'venmoSdkPaymentMethodCode',
+      'deviceSessionId',
+      'serviceFeeAmount',
+      'deviceData',
+      'fraudMerchantId',
+      'billingAddressId',
+      'paymentMethodNonce',
+      'paymentMethodToken',
+      'threeDSecureToken',
+      'sharedPaymentMethodToken',
+      'sharedBillingAddressId',
+      'sharedCustomerId',
+      'sharedShippingAddressId',
+      'riskData',
+      'riskData[customerBrowser]',
+      'riskData[customerIp]',
+      'riskData[customerBrowser]',
+      'creditCard',
+      'creditCard[token]',
+      'creditCard[cardholderName]',
+      'creditCard[cvv]',
+      'creditCard[expirationDate]',
+      'creditCard[expirationMonth]',
+      'creditCard[expirationYear]',
+      'creditCard[number]',
+      'customer',
+      'customer[id]',
+      'customer[company]',
+      'customer[email]',
+      'customer[fax]',
+      'customer[firstName]',
+      'customer[lastName]',
+      'customer[phone]',
+      'customer[website]',
+      'threeDSecurePassThru',
+      'threeDSecurePassThru[eciFlag]',
+      'threeDSecurePassThru[cavv]',
+      'threeDSecurePassThru[xid]',
+      'options',
+      'options[holdInEscrow]',
+      'options[storeInVault]',
+      'options[storeInVaultOnSuccess]',
+      'options[submitForSettlement]',
+      'options[addBillingAddressToPaymentMethod]',
+      'options[storeShippingAddressInVault]',
+      'options[venmoSdkSession]',
+      'options[payeeEmail]',
+      'options[skipAdvancedFraudChecking]',
+      'options[skipAvs]',
+      'options[skipCvv]',
+      'options[paypal]',
+      'options[paypal][customField]',
+      'options[paypal][payeeEmail]',
+      'options[paypal][description]',
+      'options[threeDSecure]',
+      'options[threeDSecure][required]',
+      'options[amexRewards]',
+      'options[amexRewards][requestId]',
+      'options[amexRewards][points]',
+      'options[amexRewards][currencyAmount]',
+      'options[amexRewards][currencyIsoCode]',
+      'descriptor',
+      'descriptor[name]',
+      'descriptor[phone]',
+      'descriptor[url]',
+      'paypalAccount',
+      'paypalAccount[email]',
+      'paypalAccount[token]',
+      'paypalAccount[paypalData]',
+      'paypalAccount[payeeEmail]',
+      'industry',
+      'industry[industryType]',
+      'industry[data]',
+      'industry[data][folioNumber]',
+      'industry[data][checkInDate]',
+      'industry[data][checkOutDate]',
+      'industry[data][travelPackage]',
+      'industry[data][lodgingCheckInDate]',
+      'industry[data][lodgingCheckOutDate]',
+      'industry[data][departureDate]',
+      'industry[data][lodgingName]',
+      'industry[data][roomRate]',
+      'applePayCard',
+      'applePayCard[number]',
+      'applePayCard[cardholderName]',
+      'applePayCard[cryptogram]',
+      'applePayCard[expirationMonth]',
+      'applePayCard[expirationYear]',
+      'androidPayCard',
+      'androidPayCard[number]',
+      'androidPayCard[cryptogram]',
+      'androidPayCard[googleTransactionId]',
+      'androidPayCard[expirationMonth]',
+      'androidPayCard[expirationYear]',
+      'androidPayCard[sourceCardType]',
+      'androidPayCard[sourceCardLastFour]',
+      'androidPayCard[eciIndicator]',
+      'subscriptionId'
+    ];
+
+    validKeys = validKeys.concat(new AddressGateway(this).sharedSignature('shipping'), new AddressGateway(this).sharedSignature('billing'));
+    return {
+      valid: validKeys,
+      ignore: ['customFields', 'options[paypal][supplementaryData]']
+    };
+  }
+}
+
+module.exports = {TransactionGateway: wrapPrototype(TransactionGateway, {
+  ignoreMethods: ['search']
+})};
+
+},{"./address_gateway":137,"./exceptions":168,"./gateway":170,"./transaction":208,"./transaction_search":211,"./util":216,"underscore":232,"wrap-promise":672}],211:[function(require,module,exports){
+'use strict';
+
+let AdvancedSearch = require('./advanced_search').AdvancedSearch;
+let Transaction = require('./transaction').Transaction;
+let CreditCard = require('./credit_card').CreditCard;
+
+class TransactionSearch extends AdvancedSearch {
+  static initClass() {
+    this.textFields(
+        'billingCompany',
+        'billingCountryName',
+        'billingExtendedAddress',
+        'billingFirstName',
+        'billingLastName',
+        'billingLocality',
+        'billingPostalCode',
+        'billingRegion',
+        'billingStreetAddress',
+        'creditCardCardholderName',
+        'currency',
+        'customerCompany',
+        'customerEmail',
+        'customerFax',
+        'customerFirstName',
+        'customerId',
+        'customerLastName',
+        'customerPhone',
+        'customerWebsite',
+        'id',
+        'orderId',
+        'paymentMethodToken',
+        'paypalPayerEmail',
+        'paypalPaymentId',
+        'paypalAuthorizationId',
+        'processorAuthorizationCode',
+        'settlementBatchId',
+        'shippingCompany',
+        'shippingCountryName',
+        'shippingExtendedAddress',
+        'shippingFirstName',
+        'shippingLastName',
+        'shippingLocality',
+        'shippingPostalCode',
+        'shippingRegion',
+        'shippingStreetAddress',
+        'creditCardUniqueIdentifier'
+      );
+
+    this.equalityFields('creditCardExpirationDate');
+    this.partialMatchFields('creditCardNumber');
+    this.multipleValueField('createdUsing', {allows: [
+      Transaction.CreatedUsing.FullInformation,
+      Transaction.CreatedUsing.Token
+    ]});
+    this.multipleValueField('creditCardCardType', {allows: CreditCard.CardType.All()}); // eslint-disable-line new-cap
+    this.multipleValueField('creditCardCustomerLocation', {allows: [
+      CreditCard.CustomerLocation.International,
+      CreditCard.CustomerLocation.US
+    ]});
+    this.multipleValueField('ids');
+    this.multipleValueField('user');
+    this.multipleValueField('paymentInstrumentType');
+    this.multipleValueField('merchantAccountId');
+    this.multipleValueField('status', {allows: Transaction.Status.All()}); // eslint-disable-line new-cap
+    this.multipleValueField('source');
+    this.multipleValueField('type', {allows: Transaction.Type.All()}); // eslint-disable-line new-cap
+    this.keyValueFields('refund');
+    this.rangeFields(
+        'amount',
+        'authorizationExpiredAt',
+        'authorizedAt',
+        'createdAt',
+        'disbursementDate',
+        'disputeDate',
+        'failedAt',
+        'gatewayRejectedAt',
+        'processorDeclinedAt',
+        'settledAt',
+        'submittedForSettlementAt',
+        'voidedAt'
+      );
+  }
+  }
+TransactionSearch.initClass();
+
+module.exports = {TransactionSearch: TransactionSearch};
+
+},{"./advanced_search":138,"./credit_card":150,"./transaction":208}],212:[function(require,module,exports){
+'use strict';
+
+let Digest = require('./digest').Digest;
+let Util = require('./util').Util;
+let querystring = require('../../vendor/querystring.node.js.511d6a2/querystring');
+let dateFormat = require('dateformat');
+let CreditCardGateway = require('./credit_card_gateway').CreditCardGateway;
+let CustomerGateway = require('./customer_gateway').CustomerGateway;
+let TransactionGateway = require('./transaction_gateway').TransactionGateway;
+let SignatureService = require('./signature_service').SignatureService;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+let KIND;
+
+class TransparentRedirectGateway {
+  static initClass() {
+    KIND = {
+      CREATE_CUSTOMER: 'create_customer',
+      UPDATE_CUSTOMER: 'update_customer',
+      CREATE_CREDIT_CARD: 'create_payment_method',
+      UPDATE_CREDIT_CARD: 'update_payment_method',
+      CREATE_TRANSACTION: 'create_transaction'
+    };
+  }
+
+  constructor(gateway) {
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+    this.url = `${this.config.baseMerchantUrl()}/transparent_redirect_requests`;
+  }
+
+  generateTrData(inputData) {
+    let data = Util.convertObjectKeysToUnderscores(inputData);
+
+    data.api_version = this.gateway.config.apiVersion; // eslint-disable-line camelcase
+    data.time = dateFormat(new Date(), 'yyyymmddHHMMss', true);
+    data.public_key = this.gateway.config.publicKey; // eslint-disable-line camelcase
+    let dataSegment = querystring.stringify(data);
+
+    return new SignatureService(this.gateway.config.privateKey, Digest.Sha1hexdigest).sign(dataSegment);
+  }
+
+  createCreditCardData(data) {
+    data.kind = KIND.CREATE_CREDIT_CARD;
+    return this.generateTrData(data);
+  }
+
+  updateCreditCardData(data) {
+    data.kind = KIND.UPDATE_CREDIT_CARD;
+    return this.generateTrData(data);
+  }
+
+  createCustomerData(data) {
+    data.kind = KIND.CREATE_CUSTOMER;
+    return this.generateTrData(data);
+  }
+
+  updateCustomerData(data) {
+    data.kind = KIND.UPDATE_CUSTOMER;
+    return this.generateTrData(data);
+  }
+
+  transactionData(data) {
+    data.kind = KIND.CREATE_TRANSACTION;
+    return this.generateTrData(data);
+  }
+
+  validateQueryString(queryString) {
+    let matches = queryString.match(/^(.+)&hash=(.+?)$/);
+
+    return Digest.Sha1hexdigest(this.gateway.config.privateKey, matches[1]) === matches[2];
+  }
+
+  confirm(queryString) {
+    let statusMatch = queryString.match(/http_status=(\d+)/);
+
+    if (statusMatch && statusMatch[1]) {
+      let error = this.gateway.http.checkHttpStatus(statusMatch[1]);
+
+      if (error) { return Promise.reject(error); }
+    }
+    if (!this.validateQueryString(queryString)) {
+      return Promise.reject(exceptions.InvalidTransparentRedirectHashError('The transparent redirect hash is invalid'), null); // eslint-disable-line new-cap
+    }
+    let params = querystring.parse(queryString);
+    let confirmResponse = null;
+
+    switch (params.kind) { // eslint-disable-line default-case
+      case KIND.CREATE_CUSTOMER:
+      case KIND.UPDATE_CUSTOMER:
+        confirmResponse = new CustomerGateway(this.gateway).responseHandler();
+        break;
+      case KIND.CREATE_CREDIT_CARD:
+      case KIND.UPDATE_CREDIT_CARD:
+        confirmResponse = new CreditCardGateway(this.gateway).responseHandler();
+        break;
+      case KIND.CREATE_TRANSACTION:
+        confirmResponse = new TransactionGateway(this.gateway).responseHandler();
+        break;
+    }
+    return this.gateway.http.post(`${this.config.baseMerchantPath()}/transparent_redirect_requests/` + params.id + '/confirm', null).then(confirmResponse);
+  }
+}
+TransparentRedirectGateway.initClass();
+
+module.exports = {TransparentRedirectGateway: wrapPrototype(TransparentRedirectGateway)};
+
+},{"../../vendor/querystring.node.js.511d6a2/querystring":237,"./credit_card_gateway":151,"./customer_gateway":156,"./digest":158,"./exceptions":168,"./signature_service":197,"./transaction_gateway":210,"./util":216,"dateformat":300,"wrap-promise":672}],213:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class UnknownPaymentMethod extends AttributeSetter {
+  constructor(attributes) {
+    let name = ((() => {
+      let result = [];
+
+      for (let keys of Object.keys(attributes)) {
+        result.push(keys);
+      }
+      return result;
+    })())[0];
+
+    if (typeof attributes[name] === 'object') {
+      attributes[name].imageUrl = 'https://assets.braintreegateway.com/payment_method_logo/unknown.png';
+    }
+    super(attributes[name]);
+  }
+}
+
+module.exports = {UnknownPaymentMethod: UnknownPaymentMethod};
+
+},{"./attribute_setter":142}],214:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let AchMandate = require('./ach_mandate').AchMandate;
+
+class UsBankAccount extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+    this.achMandate = new AchMandate(this.achMandate);
+  }
+}
+
+module.exports = {UsBankAccount: UsBankAccount};
+
+},{"./ach_mandate":133,"./attribute_setter":142}],215:[function(require,module,exports){
+'use strict';
+
+let Gateway = require('./gateway').Gateway;
+let UsBankAccount = require('./us_bank_account').UsBankAccount;
+let TransactionGateway = require('./transaction_gateway').TransactionGateway;
+let exceptions = require('./exceptions');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class UsBankAccountGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  find(token) {
+    if (token.trim() === '') {
+      return Promise.reject(exceptions.NotFoundError('Not Found'), null); // eslint-disable-line new-cap
+    }
+
+    return this.gateway.http.get(`${this.config.baseMerchantPath()}/payment_methods/us_bank_account/${token}`).then(function (response) {
+      return new UsBankAccount(response.usBankAccount);
+    });
+  }
+
+  sale(token, transactionRequest) {
+    transactionRequest.paymentMethodToken = token;
+    if (!transactionRequest.options) { transactionRequest.options = {}; }
+    transactionRequest.options.submitForSettlement = true;
+    return new TransactionGateway(this.gateway).sale(transactionRequest);
+  }
+}
+
+module.exports = {UsBankAccountGateway: wrapPrototype(UsBankAccountGateway)};
+
+},{"./exceptions":168,"./gateway":170,"./transaction_gateway":210,"./us_bank_account":214,"wrap-promise":672}],216:[function(require,module,exports){
+(function (process){
+'use strict';
+
+let semver = require('semver');
+let exceptions = require('./exceptions');
+
+class Util {
+  static convertObjectKeysToUnderscores(obj) {
+    let newObj = {};
+
+    for (let key in obj) {
+      if (!obj.hasOwnProperty(key)) {
+        continue;
+      }
+      let value = obj[key];
+      let newKey = Util.toUnderscore(key);
+
+      if (value instanceof Array) {
+        newObj[newKey] =
+          value.map((item) => typeof item === 'object' ? Util.convertObjectKeysToUnderscores(item) : item)
+        ;
+      } else if (typeof value === 'object') {
+        if (value instanceof Date || value === null) {
+          newObj[newKey] = value;
+        } else {
+          newObj[newKey] = Util.convertObjectKeysToUnderscores(value);
+        }
+      } else {
+        newObj[newKey] = value;
+      }
+    }
+    return newObj;
+  }
+
+  static convertNodeToObject(obj) {
+    if (typeof obj === 'object' && obj['@']) {
+      if (obj['@'].type === 'array') {
+        let newArray = [];
+
+        for (let key in obj) {
+          if (!obj.hasOwnProperty(key)) {
+            continue;
+          }
+          let value = obj[key];
+
+          if (key !== '@') {
+            if (value instanceof Array) {
+              for (let item of value) {
+                newArray.push(this.convertNodeToObject(item));
+              }
+            } else {
+              newArray.push(this.convertNodeToObject(value));
+            }
+          }
+        }
+        return newArray;
+      } else if (obj['@'].type === 'collection') {
+        let newObj = {};
+
+        for (let key in obj) {
+          if (!obj.hasOwnProperty(key)) {
+            continue;
+          }
+          let value = obj[key];
+
+          if (key !== '@') {
+            newObj[this.toCamelCase(key)] = this.convertNodeToObject(value);
+          }
+        }
+        return newObj;
+      } else if (obj['@'].nil === 'true') {
+        return null;
+      } else if (obj['@'].type === 'integer') {
+        return parseInt(obj['#'], 10);
+      } else if (obj['@'].type === 'boolean') {
+        return obj['#'] === 'true';
+      }
+
+      return obj['#'];
+    } else if (obj instanceof Array) {
+      return obj.map((item) => this.convertNodeToObject(item));
+    } else if (typeof obj === 'object' && this.objectIsEmpty(obj)) {
+      return '';
+    } else if (typeof obj === 'object') {
+      let newObj = {};
+
+      for (let key in obj) {
+        if (!obj.hasOwnProperty(key)) {
+          continue;
+        }
+        let value = obj[key];
+
+        newObj[this.toCamelCase(key)] = this.convertNodeToObject(value);
+      }
+      return newObj;
+    }
+
+    return obj;
+  }
+
+  static objectIsEmpty(obj) {
+    for (let key in obj) { // eslint-disable-line no-unused-vars
+      if (!obj.hasOwnProperty(key)) {
+        continue;
+      }
+      return false;
+    }
+    return true;
+  }
+
+  static arrayIsEmpty(array) {
+    if (!(array instanceof Array)) { return false; }
+    if (array.length > 0) { return false; }
+    return true;
+  }
+
+  static toCamelCase(string) {
+    return string.replace(/([\-\_][a-z0-9])/g, match => match.toUpperCase().replace('-', '').replace('_', ''));
+  }
+
+  static toUnderscore(string) {
+    return string.replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2').replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+  }
+
+  static flatten(array) {
+    while (this._containsArray(array)) {
+      array = array.reduce((first, rest) => {
+        first = first instanceof Array ? first : [first];
+        rest = rest instanceof Array ? this.flatten(rest) : rest;
+        return first.concat(rest);
+      }
+      );
+    }
+    return array;
+  }
+
+  static merge(obj1, obj2) {
+    for (let key in obj2) {
+      if (!obj2.hasOwnProperty(key)) {
+        continue;
+      }
+      let value = obj2[key];
+
+      obj1[key] = value;
+    }
+    return obj1;
+  }
+
+  static without(array1, array2) {
+    let newArray = [];
+
+    for (let value of array1) {
+      if (!this._containsValue(array2, value)) { newArray.push(value); }
+    }
+    return newArray;
+  }
+
+  static supportsStreams2() {
+    return semver.satisfies(process.version, '>=0.10');
+  }
+
+  static flattenKeys(obj, prefix) {
+    let keys = [];
+
+    for (let key in obj) {
+      if (!obj.hasOwnProperty(key)) {
+        continue;
+      }
+      let value = obj[key];
+
+      if (typeof value === 'object') {
+        let keyToPush = prefix ? prefix + '[' + key + ']' : key;
+
+        keys.push(Util.flattenKeys(value, keyToPush));
+      } else if (prefix) {
+        keys.push(prefix + '[' + key + ']');
+      } else {
+        keys.push(key);
+      }
+    }
+
+    return this.flatten(keys);
+  }
+
+  static verifyKeys(keys, obj) { // eslint-disable-line consistent-return
+    let invalidKeys;
+    let unrecognizedKeys = this.without(this.flattenKeys(obj), keys.valid);
+
+    if (keys.ignore) {
+      invalidKeys = unrecognizedKeys.filter(function (key) {
+        for (let ignoredKey of keys.ignore) {
+          if (key.indexOf(ignoredKey) === 0) { return false; }
+        }
+        return true;
+      });
+    } else {
+      invalidKeys = unrecognizedKeys;
+    }
+
+    if (invalidKeys.length > 0) {
+      return exceptions.InvalidKeysError(`These keys are invalid: ${invalidKeys.join(', ')}`); // eslint-disable-line new-cap
+    }
+  }
+
+  static _containsValue(array, element) {
+    return array.indexOf(element) !== -1;
+  }
+
+  static _containsArray(array) {
+    for (let element of array) {
+      if (element instanceof Array) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+}
+
+module.exports = {Util: Util};
+
+}).call(this,require('_process'))
+},{"./exceptions":168,"_process":443,"semver":231}],217:[function(require,module,exports){
+'use strict';
+
+class ValidationError {
+  constructor(error) {
+    this.attribute = error.attribute;
+    this.code = error.code;
+    this.message = error.message;
+  }
+}
+
+module.exports = {ValidationError: ValidationError};
+
+},{}],218:[function(require,module,exports){
+'use strict';
+
+class ValidationErrorCodes {
+  static initClass() {
+    this.Address = {
+      CannotBeBlank: '81801',
+      CompanyIsInvalid: '91821',
+      CompanyIsTooLong: '81802',
+      CountryCodeAlpha2IsNotAccepted: '91814',
+      CountryCodeAlpha3IsNotAccepted: '91816',
+      CountryCodeNumericIsNotAccepted: '91817',
+      CountryNameIsNotAccepted: '91803',
+      ExtendedAddressIsInvalid: '91823',
+      ExtendedAddressIsTooLong: '81804',
+      FirstNameIsInvalid: '91819',
+      FirstNameIsTooLong: '81805',
+      InconsistentCountry: '91815',
+      IsInvalid: '91828',
+      LastNameIsInvalid: '91820',
+      LastNameIsTooLong: '81806',
+      LocalityIsInvalid: '91824',
+      LocalityIsTooLong: '81807',
+      PostalCodeInvalidCharacters: '81813',
+      PostalCodeIsInvalid: '91826',
+      PostalCodeIsRequired: '81808',
+      PostalCodeIsTooLong: '81809',
+      RegionIsInvalid: '91825',
+      RegionIsTooLong: '81810',
+      StateIsInvalidForSellerProtection: '81827',
+      StreetAddressIsInvalid: '91822',
+      StreetAddressIsRequired: '81811',
+      StreetAddressIsTooLong: '81812',
+      TooManyAddressesPerCustomer: '91818'
+    };
+
+    this.ApplePayCard = {
+      ApplePayCardsAreNotAccepted: '83501',
+      CustomerIdIsRequiredForVaulting: '83502',
+      TokenIsInUse: '93503',
+      PaymentMethodNonceConsumed: '93504',
+      PaymentMethodNonceUnknown: '93505',
+      PaymentMethodNonceLocked: '93506',
+      PaymentMethodNonceCardTypeIsNotAccepted: '83518',
+      CannotUpdateApplePayCardUsingPaymentMethodNonce: '93507',
+      NumberIsRequired: '93508',
+      ExpirationMonthIsRequired: '93509',
+      ExpirationYearIsRequired: '93510',
+      CryptogramIsRequired: '93511',
+      DecryptionFailed: '83512',
+      Disabled: '93513',
+      MerchantNotConfigured: '93514',
+      MerchantKeysAlreadyConfigured: '93515',
+      MerchantKeysNotConfigured: '93516',
+      CertificateInvalid: '93517',
+      CertificateMismatch: '93519',
+      InvalidToken: '83520',
+      PrivateKeyMismatch: '93521',
+      KeyMismatchStoringCertificate: '93522'
+    };
+
+    this.AuthorizationFingerprint = {
+      InvalidCreatedAt: '93204',
+      InvalidFormat: '93202',
+      InvalidPublicKey: '93205',
+      InvalidSignature: '93206',
+      MissingFingerprint: '93201',
+      OptionsNotAllowedWithoutCustomer: '93207',
+      SignatureRevoked: '93203'
+    };
+
+    this.ClientToken = {
+      CustomerDoesNotExist: '92804',
+      FailOnDuplicatePaymentMethodRequiresCustomerId: '92803',
+      MakeDefaultRequiresCustomerId: '92801',
+      ProxyMerchantDoesNotExist: '92805',
+      VerifyCardRequiresCustomerId: '92802',
+      MerchantAccountDoesNotExist: '92807',
+      UnsupportedVersion: '92806'
+    };
+
+    this.CreditCard = {
+      BillingAddressConflict: '91701',
+      BillingAddressFormatIsInvalid: '91744',
+      BillingAddressIdIsInvalid: '91702',
+      CannotUpdateCardUsingPaymentMethodNonce: '91735',
+      CardholderNameIsTooLong: '81723',
+      CreditCardTypeIsNotAccepted: '81703',
+      CreditCardTypeIsNotAcceptedBySubscriptionMerchantAccount: '81718',
+      CustomerIdIsInvalid: '91705',
+      CustomerIdIsRequired: '91704',
+      CvvIsInvalid: '81707',
+      CvvIsRequired: '81706',
+      CvvVerificationFailed: '81736',
+      DuplicateCardExists: '81724',
+      ExpirationDateConflict: '91708',
+      ExpirationDateIsInvalid: '81710',
+      ExpirationDateIsRequired: '81709',
+      ExpirationDateYearIsInvalid: '81711',
+      ExpirationMonthIsInvalid: '81712',
+      ExpirationYearIsInvalid: '81713',
+      InvalidParamsForCreditCardUpdate: '91745',
+      InvalidVenmoSDKPaymentMethodCode: '91727',
+      NumberHasInvalidLength: '81716',
+      NumberIsInvalid: '81715',
+      NumberIsProhibited: '81750',
+      NumberIsRequired: '81714',
+      NumberLengthIsInvalid: '81716',
+      NumberMustBeTestNumber: '81717',
+      PaymentMethodConflict: '81725',
+      PaymentMethodIsNotACreditCard: '91738',
+      PaymentMethodNonceCardTypeIsNotAccepted: '91734',
+      PaymentMethodNonceConsumed: '91731',
+      PaymentMethodNonceLocked: '91733',
+      PaymentMethodNonceUnknown: '91732',
+      PostalCodeVerificationFailed: '81737',
+      TokenFormatIsInvalid: '91718',
+      TokenInvalid: '91718',
+      TokenIsInUse: '91719',
+      TokenIsNotAllowed: '91721',
+      TokenIsRequired: '91722',
+      TokenIsTooLong: '91720',
+      VenmoSDKPaymentMethodCodeCardTypeIsNotAccepted: '91726',
+      VerificationNotSupportedOnThisMerchantAccount: '91730',
+      Options: {
+        UpdateExistingTokenIsInvalid: '91723',
+        UpdateExistingTokenNotAllowed: '91729',
+        VerificationAmountCannotBeNegative: '91739',
+        VerificationAmountFormatIsInvalid: '91740',
+        VerificationAmountIsTooLarge: '91752',
+        VerificationAmountNotSupportedByProcessor: '91741',
+        VerificationMerchantAccountIdIsInvalid: '91728',
+        VerificationMerchantAccountIsForbidden: '91743',
+        VerificationMerchantAccountIsSuspended: '91742',
+        VerificationMerchantAccountCannotBeSubMerchantAccount: '91755'
+      }
+    };
+
+    this.Customer = {
+      CompanyIsTooLong: '81601',
+      CustomFieldIsInvalid: '91602',
+      CustomFieldIsTooLong: '81603',
+      EmailFormatIsInvalid: '81604',
+      EmailIsRequired: '81606',
+      EmailIsTooLong: '81605',
+      FaxIsTooLong: '81607',
+      FirstNameIsTooLong: '81608',
+      IdIsInUse: '91609',
+      IdIsInvalid: '91610',
+      IdIsNotAllowed: '91611',
+      IdIsRequired: '91613',
+      IdIsTooLong: '91612',
+      LastNameIsTooLong: '81613',
+      PhoneIsTooLong: '81614',
+      VaultedPaymentInstrumentNonceBelongsToDifferentCustomer: '91617',
+      WebsiteFormatIsInvalid: '81616',
+      WebsiteIsTooLong: '81615'
+    };
+
+    this.Descriptor = {
+      InternationalNameFormatIsInvalid: '92204',
+      PhoneFormatIsInvalid: '92202',
+      DynamicDescriptorsDisabled: '92203',
+      NameFormatIsInvalid: '92201',
+      InternationalPhoneFormatIsInvalid: '92205',
+      UrlFormatIsInvalid: '92206'
+    };
+
+    this.Merchant = {
+      CountryCannotBeBlank: '83603',
+      CountryCodeAlpha2IsInvalid: '93607',
+      CountryCodeAlpha2IsNotAccepted: '93606',
+      CountryCodeAlpha3IsInvalid: '93605',
+      CountryCodeAlpha3IsNotAccepted: '93604',
+      CountryCodeNumericIsInvalid: '93609',
+      CountryCodeNumericIsNotAccepted: '93608',
+      CountryNameIsInvalid: '93611',
+      CountryNameIsNotAccepted: '93610',
+      CurrenciesAreInvalid: '93614',
+      EmailFormatIsInvalid: '93602',
+      EmailIsRequired: '83601',
+      InconsistentCountry: '93612',
+      PaymentMethodsAreInvalid: '93613',
+      PaymentMethodsAreNotAllowed: '93615',
+      MerchantAccountExistsForCurrency: '93616',
+      CurrencyIsRequired: '93617',
+      CurrencyIsInvalid: '93618',
+      NoMerchantAccounts: '93619',
+      MerchantAccountExistsForId: '93620',
+      MerchantAccountNotAuthOnboarded: '93621'
+    };
+
+    this.MerchantAccount = {
+      ApplicantDetails: {
+        AccountNumberIsInvalid: '82670',
+        AccountNumberIsRequired: '82614',
+        Address: {
+          LocalityIsRequired: '82618',
+          PostalCodeIsInvalid: '82630',
+          PostalCodeIsRequired: '82619',
+          RegionIsInvalid: '82664',
+          RegionIsRequired: '82620',
+          StreetAddressIsInvalid: '82629',
+          StreetAddressIsRequired: '82617'
+        },
+        CompanyNameIsInvalid: '82631',
+        CompanyNameIsRequiredWithTaxId: '82633',
+        DateOfBirthIsInvalid: '82663',
+        DateOfBirthIsRequired: '82612',
+        Declined: '82626',
+        DeclinedFailedKYC: '82623',
+        DeclinedMasterCardMatch: '82622',
+        DeclinedOFAC: '82621',
+        DeclinedSsnInvalid: '82624',
+        DeclinedSsnMatchesDeceased: '82625',
+        EmailAddressIsInvalid: '82616',
+        EmailAddressIsRequired: '82665',
+        FirstNameIsInvalid: '82627',
+        FirstNameIsRequired: '82609',
+        LastNameIsInvalid: '82628',
+        LastNameIsRequired: '82611',
+        PhoneIsInvalid: '82636',
+        RoutingNumberIsInvalid: '82635',
+        RoutingNumberIsRequired: '82613',
+        SsnIsInvalid: '82615',
+        TaxIdIsInvalid: '82632',
+        TaxIdIsRequiredWithCompanyName: '82634',
+        TaxIdMustBeBlank: '82673'
+      },
+      Individual: {
+        DateOfBirthIsInvalid: '82666',
+        DateOfBirthIsRequired: '82639',
+        EmailIsInvalid: '82643',
+        EmailIsRequired: '82667',
+        FirstNameIsInvalid: '82644',
+        FirstNameIsRequired: '82637',
+        LastNameIsInvalid: '82645',
+        LastNameIsRequired: '82638',
+        PhoneIsInvalid: '82656',
+        SsnIsInvalid: '82642',
+        Address: {
+          StreetAddressIsRequired: '82657',
+          LocalityIsRequired: '82658',
+          PostalCodeIsRequired: '82659',
+          RegionIsRequired: '82660',
+          StreetAddressIsInvalid: '82661',
+          PostalCodeIsInvalid: '82662',
+          RegionIsInvalid: '82668'
+        }
+      },
+      Business: {
+        DbaNameIsInvalid: '82646',
+        LegalNameIsInvalid: '82677',
+        LegalNameIsRequiredWithTaxId: '82669',
+        TaxIdIsInvalid: '82647',
+        TaxIdIsRequiredWithLegalName: '82648',
+        TaxIdMustBeBlank: '82672',
+        Address: {
+          StreetAddressIsInvalid: '82685',
+          PostalCodeIsInvalid: '82686',
+          RegionIsInvalid: '82684'
+        }
+      },
+      Funding: {
+        AccountNumberIsInvalid: '82671',
+        AccountNumberIsRequired: '82641',
+        DestinationIsInvalid: '82679',
+        DestinationIsRequired: '82678',
+        EmailIsInvalid: '82681',
+        EmailIsRequired: '82680',
+        MobilePhoneIsInvalid: '82683',
+        MobilePhoneIsRequired: '82682',
+        RoutingNumberIsInvalid: '82649',
+        RoutingNumberIsRequired: '82640'
+      },
+      CannotBeUpdated: '82674',
+      IdCannotBeUpdated: '82675',
+      IdFormatIsInvalid: '82603',
+      IdIsInUse: '82604',
+      IdIsNotAllowed: '82605',
+      IdIsTooLong: '82602',
+      MasterMerchantAccountIdCannotBeUpdated: '82676',
+      MasterMerchantAccountIdIsInvalid: '82607',
+      MasterMerchantAccountIdIsRequired: '82606',
+      MasterMerchantAccountMustBeActive: '82608',
+      TosAcceptedIsRequired: '82610'
+    };
+
+    this.OAuth = {
+      InvalidGrant: '93801',
+      InvalidCredentials: '93802',
+      InvalidScope: '93803',
+      InvalidRequest: '93804',
+      UnsupportedGrantType: '93805'
+    };
+
+    this.PaymentMethod = {
+      CannotForwardPaymentMethodType: '93106',
+      CustomerIdIsInvalid: '93105',
+      CustomerIdIsRequired: '93104',
+      NonceIsInvalid: '93102',
+      NonceIsRequired: '93103',
+      PaymentMethodParamsAreRequired: '93101',
+      PaymentMethodNonceConsumed: '93107',
+      PaymentMethodNonceUnknown: '93108',
+      PaymentMethodNonceLocked: '93109'
+    };
+
+    this.PayPalAccount = {
+      AuthExpired: '92911',
+      CannotHaveBothAccessTokenAndConsentCode: '82903',
+      CannotHaveFundingSourceWithoutAccessToken: '92912',
+      CannotUpdatePayPalAccountUsingPaymentMethodNonce: '92914',
+      CannotVaultOneTimeUsePayPalAccount: '82902',
+      ConsentCodeOrAccessTokenIsRequired: '82901',
+      CustomerIdIsRequiredForVaulting: '82905',
+      InvalidFundingSourceSelection: '92913',
+      InvalidParamsForPayPalAccountUpdate: '92915',
+      PayPalAccountsAreNotAccepted: '82904',
+      PayPalCommunicationError: '92910',
+      PaymentMethodNonceConsumed: '92907',
+      PaymentMethodNonceLocked: '92909',
+      PaymentMethodNonceUnknown: '92908',
+      TokenIsInUse: '92906'
+    };
+
+    this.SEPABankAccount = {
+      IBANIsRequired: '93001',
+      BICIsRequired: '93002',
+      AccountHolderNameIsRequired: '93003'
+    };
+
+    this.SEPAMandate = {
+      AccountHolderNameIsRequired: '83301',
+      BICIsRequired: '83302',
+      IBANIsRequired: '83303',
+      TypeIsRequired: '93304',
+      IBANInvalidCharacter: '83305',
+      BICInvalidCharacter: '83306',
+      BICLengthIsInvalid: '83307',
+      BICUnsupportedCountry: '83308',
+      IBANUnsupportedCountry: '83309',
+      IBANInvalidFormat: '83310',
+      BillingAddressConflict: '93311',
+      BillingAddressIdIsInvalid: '93312',
+      TypeIsInvalid: '93313'
+    };
+
+    this.SettlementBatchSummary = {
+      SettlementDateIsInvalid: '82302',
+      SettlementDateIsRequired: '82301',
+      CustomFieldIsInvalid: '82303'
+    };
+
+    this.Subscription = {
+      BillingDayOfMonthCannotBeUpdated: '91918',
+      BillingDayOfMonthIsInvalid: '91914',
+      BillingDayOfMonthMustBeNumeric: '91913',
+      CannotAddDuplicateAddonOrDiscount: '91911',
+      CannotEditCanceledSubscription: '81901',
+      CannotEditExpiredSubscription: '81910',
+      CannotEditPriceChangingFieldsOnPastDueSubscription: '91920',
+      FirstBillingDateCannotBeInThePast: '91916',
+      FirstBillingDateCannotBeUpdated: '91919',
+      FirstBillingDateIsInvalid: '91915',
+      IdIsInUse: '81902',
+      InconsistentNumberOfBillingCycles: '91908',
+      InconsistentStartDate: '91917',
+      InvalidRequestFormat: '91921',
+      MerchantAccountDoesNotSupportInstrumentType: '91930',
+      MerchantAccountIdIsInvalid: '91901',
+      MismatchCurrencyISOCode: '91923',
+      NumberOfBillingCyclesCannotBeBlank: '91912',
+      NumberOfBillingCyclesIsTooSmall: '91909',
+      NumberOfBillingCyclesMustBeGreaterThanZero: '91907',
+      NumberOfBillingCyclesMustBeNumeric: '91906',
+      PaymentMethodNonceCardTypeIsNotAccepted: '91924',
+      PaymentMethodNonceInstrumentTypeDoesNotSupportSubscriptions: '91929',
+      PaymentMethodNonceIsInvalid: '91925',
+      PaymentMethodNonceNotAssociatedWithCustomer: '91926',
+      PaymentMethodNonceUnvaultedCardIsNotAccepted: '91927',
+      PaymentMethodTokenCardTypeIsNotAccepted: '91902',
+      PaymentMethodTokenInstrumentTypeDoesNotSupportSubscriptions: '91928',
+      PaymentMethodTokenIsInvalid: '91903',
+      PaymentMethodTokenNotAssociatedWithCustomer: '91905',
+      PlanBillingFrequencyCannotBeUpdated: '91922',
+      PlanIdIsInvalid: '91904',
+      PriceCannotBeBlank: '81903',
+      PriceFormatIsInvalid: '81904',
+      PriceIsTooLarge: '81923',
+      StatusIsCanceled: '81905',
+      TokenFormatIsInvalid: '81906',
+      TrialDurationFormatIsInvalid: '81907',
+      TrialDurationIsRequired: '81908',
+      TrialDurationUnitIsInvalid: '81909',
+      Modification: {
+        AmountCannotBeBlank: '92003',
+        AmountIsInvalid: '92002',
+        AmountIsTooLarge: '92023',
+        CannotEditModificationsOnPastDueSubscription: '92022',
+        CannotUpdateAndRemove: '92015',
+        ExistingIdIsIncorrectKind: '92020',
+        ExistingIdIsInvalid: '92011',
+        ExistingIdIsRequired: '92012',
+        IdToRemoveIsIncorrectKind: '92021',
+        IdToRemoveIsInvalid: '92025',
+        IdToRemoveIsNotPresent: '92016',
+        InconsistentNumberOfBillingCycles: '92018',
+        InheritedFromIdIsInvalid: '92013',
+        InheritedFromIdIsRequired: '92014',
+        Missing: '92024',
+        NumberOfBillingCyclesCannotBeBlank: '92017',
+        NumberOfBillingCyclesIsInvalid: '92005',
+        NumberOfBillingCyclesMustBeGreaterThanZero: '92019',
+        QuantityCannotBeBlank: '92004',
+        QuantityIsInvalid: '92001',
+        QuantityMustBeGreaterThanZero: '92010'
+      }
+    };
+
+    this.Transaction = {
+      AmountCannotBeNegative: '81501',
+      AmountDoesNotMatch3DSecureAmount: '91585',
+      AmountDoesNotMatchIdealPaymentAmount: '915144',
+      AmountFormatIsInvalid: '81503',
+      AmountIsRequired: '81502',
+      AmountIsTooLarge: '81528',
+      AmountMustBeGreaterThanZero: '81531',
+      BillingAddressConflict: '91530',
+      CannotBeVoided: '91504',
+      CannotCancelRelease: '91562',
+      CannotCloneCredit: '91543',
+      CannotCloneMarketplaceTransaction: '915137',
+      CannotCloneTransactionWithPayPalAccount: '91573',
+      CannotCloneTransactionWithVaultCreditCard: '91540',
+      CannotCloneUnsuccessfulTransaction: '91542',
+      CannotCloneVoiceAuthorizations: '91541',
+      CannotHoldInEscrow: '91560',
+      CannotPartiallyRefundEscrowedTransaction: '91563',
+      CannotRefundCredit: '91505',
+      CannotRefundSettlingTransaction: '91574',
+      CannotRefundUnlessSettled: '91506',
+      CannotRefundWithPendingMerchantAccount: '91559',
+      CannotRefundWithSuspendedMerchantAccount: '91538',
+      CannotReleaseFromEscrow: '91561',
+      CannotSimulateSettlement: '91575',
+      CannotSubmitForPartialSettlement: '915103',
+      CannotSubmitForSettlement: '91507',
+      CannotUpdateTransactionDetailsNotSubmittedForSettlement: '915129',
+      ChannelIsTooLong: '91550',
+      CreditCardIsRequired: '91508',
+      CustomFieldIsInvalid: '91526',
+      CustomFieldIsTooLong: '81527',
+      CustomerDefaultPaymentMethodCardTypeIsNotAccepted: '81509',
+      CustomerDoesNotHaveCreditCard: '91511',
+      CustomerIdIsInvalid: '91510',
+      HasAlreadyBeenRefunded: '91512',
+      IdealPaymentNotComplete: '815141',
+      MerchantAccountDoesNotMatch3DSecureMerchantAccount: '91584',
+      MerchantAccountDoesNotMatchIdealPaymentMerchantAccount: '915143',
+      MerchantAccountDoesNotSupportMOTO: '91558',
+      MerchantAccountDoesNotSupportRefunds: '91547',
+      MerchantAccountIdIsInvalid: '91513',
+      MerchantAccountIsSuspended: '91514',
+      Options: {
+        PayPal: {
+          CustomFieldTooLong: '91580'
+        },
+        SubmitForSettlementIsRequiredForCloning: '91544',
+        SubmitForSettlementIsRequiredForPayPalUnilateral: '91582',
+        UseBillingForShippingDisabled: '91572',
+        VaultIsDisabled: '91525'
+      },
+      OrderIdDoesNotMatchIdealPaymentOrderId: '91503',
+      OrderIdIsRequiredWithIdealPayment: '91502',
+      OrderIdIsTooLong: '91501',
+      PayPalAuthExpired: '91579',
+      PayPalNotEnabled: '91576',
+      PayPalVaultRecordMissingData: '91583',
+      PaymentInstrumentNotSupportedByMerchantAccount: '91577',
+      PaymentInstrumentTypeIsNotAccepted: '915101',
+      PaymentMethodConflict: '91515',
+      PaymentMethodConflictWithVenmoSDK: '91549',
+      PaymentMethodDoesNotBelongToCustomer: '91516',
+      PaymentMethodDoesNotBelongToSubscription: '91527',
+      PaymentMethodNonceCardTypeIsNotAccepted: '91567',
+      PaymentMethodNonceConsumed: '91564',
+      PaymentMethodNonceHasNoValidPaymentInstrumentType: '91569',
+      PaymentMethodNonceLocked: '91566',
+      PaymentMethodNonceUnknown: '91565',
+      PaymentMethodTokenCardTypeIsNotAccepted: '91517',
+      PaymentMethodTokenIsInvalid: '91518',
+      ProcessorAuthorizationCodeCannotBeSet: '91519',
+      ProcessorAuthorizationCodeIsInvalid: '81520',
+      ProcessorDoesNotSupportAuths: '915104',
+      ProcessorDoesNotSupportCredits: '91546',
+      ProcessorDoesNotSupportPartialSettlement: '915102',
+      ProcessorDoesNotSupportUpdatingOrderId: '915107',
+      ProcessorDoesNotSupportUpdatingDescriptor: '915108',
+      ProcessorDoesNotSupportUpdatingTransactionDetails: '915130',
+      ProcessorDoesNotSupportVoiceAuthorizations: '91545',
+      PurchaseOrderNumberIsInvalid: '91548',
+      PurchaseOrderNumberIsTooLong: '91537',
+      RefundAmountIsTooLarge: '91521',
+      ServiceFeeAmountCannotBeNegative: '91554',
+      ServiceFeeAmountFormatIsInvalid: '91555',
+      ServiceFeeAmountIsTooLarge: '91556',
+      ServiceFeeAmountNotAllowedOnMasterMerchantAccount: '91557',
+      ServiceFeeIsNotAllowedOnCredits: '91552',
+      ServiceFeeNotAcceptedForPayPal: '91578',
+      SettlementAmountIsLessThanServiceFeeAmount: '91551',
+      SettlementAmountIsTooLarge: '91522',
+      ShippingAddressDoesntMatchCustomer: '91581',
+      SubMerchantAccountRequiresServiceFeeAmount: '91553',
+      SubscriptionDoesNotBelongToCustomer: '91529',
+      SubscriptionIdIsInvalid: '91528',
+      SubscriptionStatusMustBePastDue: '91531',
+      TaxAmountCannotBeNegative: '81534',
+      TaxAmountFormatIsInvalid: '81535',
+      TaxAmountIsTooLarge: '81536',
+      ThreeDSecureAuthenticationFailed: '81571',
+      ThreeDSecureTokenIsInvalid: '91568',
+      ThreeDSecureTransactionDataDoesntMatchVerify: '91570',
+      ThreeDSecureEciFlagIsRequired: '915113',
+      ThreeDSecureCavvIsRequired: '915116',
+      ThreeDSecureXidIsRequired: '915115',
+      ThreeDSecureEciFlagIsInvalid: '915114',
+      ThreeDSecureMerchantAccountDoesNotSupportCardType: '915131',
+      TransactionSettlementAmountIsLessThanServiceFeeAmount: '91551',
+      TypeIsInvalid: '91523',
+      TypeIsRequired: '91524',
+      UnsupportedVoiceAuthorization: '91539',
+      IndustryData: {
+        IndustryTypeIsInvalid: '93401',
+        Lodging: {
+          EmptyData: '93402',
+          FolioNumberIsInvalid: '93403',
+          CheckInDateIsInvalid: '93404',
+          CheckOutDateIsInvalid: '93405',
+          CheckOutDateMustFollowCheckInDate: '93406',
+          UnknownDataField: '93407'
+        },
+        TravelCruise: {
+          EmptyData: '93408',
+          UnknownDataField: '93409',
+          TravelPackageIsInvalid: '93410',
+          DepartureDateIsInvalid: '93411',
+          CheckInDateIsInvalid: '93412',
+          CheckOutDateIsInvalid: '93413'
+        }
+      }
+    };
+
+    this.Verification = {
+      Options: {
+        AmountCannotBeNegative: '94201',
+        AmountFormatIsInvalid: '94202',
+        AmountIsTooLarge: '94207',
+        AmountNotSupportedByProcessor: '94203',
+        MerchantAccountIdIsInvalid: '94204',
+        MerchantAccountIsSuspended: '94205',
+        MerchantAccountIsForbidden: '94206',
+        MerchantAccountCannotBeSubMerchantAccount: '94208'
+      }
+    };
+  }
+}
+ValidationErrorCodes.initClass();
+
+module.exports = {ValidationErrorCodes: ValidationErrorCodes};
+
+},{}],219:[function(require,module,exports){
+'use strict';
+
+let Util = require('./util').Util;
+let ValidationError = require('./validation_error').ValidationError;
+
+class ValidationErrorsCollection {
+  constructor(errorAttributes) {
+    this.validationErrors = {};
+    this.errorCollections = {};
+
+    for (let key in errorAttributes) {
+      if (!errorAttributes.hasOwnProperty(key)) {
+        continue;
+      }
+      let val = errorAttributes[key];
+
+      if (key === 'errors') {
+        this.buildErrors(val);
+      } else {
+        this.errorCollections[key] = new ValidationErrorsCollection(val);
+      }
+    }
+  }
+
+  buildErrors(errors) {
+    return errors.map((item) => {
+      let key = Util.toCamelCase(item.attribute);
+
+      this.validationErrors[key] = this.validationErrors[key] || [];
+
+      return this.validationErrors[key].push(new ValidationError(item));
+    });
+  }
+
+  deepErrors() {
+    let errors = [];
+
+    for (let key in this.validationErrors) {
+      if (!this.validationErrors.hasOwnProperty(key)) {
+        continue;
+      }
+      let val = this.validationErrors[key];
+
+      errors = errors.concat(val);
+    }
+
+    for (let key in this.errorCollections) {
+      if (!this.errorCollections.hasOwnProperty(key)) {
+        continue;
+      }
+      let val = this.errorCollections[key];
+
+      errors = errors.concat(val.deepErrors());
+    }
+
+    return errors;
+  }
+
+  for(name) {
+    return this.errorCollections[name];
+  }
+
+  forIndex(index) {
+    return this.errorCollections[`index${index}`];
+  }
+
+  on(name) {
+    return this.validationErrors[name];
+  }
+}
+
+module.exports = {ValidationErrorsCollection: ValidationErrorsCollection};
+
+},{"./util":216,"./validation_error":217}],220:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class VenmoAccount extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {VenmoAccount: VenmoAccount};
+
+},{"./attribute_setter":142}],221:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+
+class VisaCheckoutCard extends AttributeSetter {
+  constructor(attributes) {
+    super(attributes);
+  }
+}
+
+module.exports = {VisaCheckoutCard: VisaCheckoutCard};
+
+},{"./attribute_setter":142}],222:[function(require,module,exports){
+'use strict';
+
+let AttributeSetter = require('./attribute_setter').AttributeSetter;
+let MerchantAccount = require('./merchant_account').MerchantAccount;
+let Transaction = require('./transaction').Transaction;
+let Disbursement = require('./disbursement').Disbursement;
+let Dispute = require('./dispute').Dispute;
+let ConnectedMerchantStatusTransitioned = require('./connected_merchant_status_transitioned').ConnectedMerchantStatusTransitioned;
+let ConnectedMerchantPayPalStatusChanged = require('./connected_merchant_paypal_status_changed').ConnectedMerchantPayPalStatusChanged;
+let PartnerMerchant = require('./partner_merchant').PartnerMerchant;
+let Subscription = require('./subscription').Subscription;
+let AccountUpdaterDailyReport = require('./account_updater_daily_report').AccountUpdaterDailyReport;
+let IdealPayment = require('./ideal_payment').IdealPayment;
+let ValidationErrorsCollection = require('./validation_errors_collection').ValidationErrorsCollection;
+
+class WebhookNotification extends AttributeSetter {
+  static initClass() {
+    this.Kind = {
+      AccountUpdaterDailyReport: 'account_updater_daily_report',
+      Check: 'check',
+      ConnectedMerchantPayPalStatusChanged: 'connected_merchant_paypal_status_changed',
+      ConnectedMerchantStatusTransitioned: 'connected_merchant_status_transitioned',
+      Disbursement: 'disbursement',
+      DisbursementException: 'disbursement_exception',
+      DisputeOpened: 'dispute_opened',
+      DisputeLost: 'dispute_lost',
+      DisputeWon: 'dispute_won',
+      IdealPaymentComplete: 'ideal_payment_complete',
+      IdealPaymentFailed: 'ideal_payment_failed',
+      PartnerMerchantConnected: 'partner_merchant_connected',
+      PartnerMerchantDisconnected: 'partner_merchant_disconnected',
+      PartnerMerchantDeclined: 'partner_merchant_declined',
+      SubscriptionCanceled: 'subscription_canceled',
+      SubscriptionChargedSuccessfully: 'subscription_charged_successfully',
+      SubscriptionChargedUnsuccessfully: 'subscription_charged_unsuccessfully',
+      SubscriptionExpired: 'subscription_expired',
+      SubscriptionTrialEnded: 'subscription_trial_ended',
+      SubscriptionWentActive: 'subscription_went_active',
+      SubscriptionWentPastDue: 'subscription_went_past_due',
+      SubMerchantAccountApproved: 'sub_merchant_account_approved',
+      SubMerchantAccountDeclined: 'sub_merchant_account_declined',
+      TransactionDisbursed: 'transaction_disbursed',
+      TransactionSettled: 'transaction_settled',
+      TransactionSettlementDeclined: 'transaction_settlement_declined'
+    };
+  }
+
+  constructor(attributes) {
+    super(attributes);
+
+    let wrapperNode;
+
+    if (attributes.subject.apiErrorResponse != null) {
+      wrapperNode = attributes.subject.apiErrorResponse;
+    } else {
+      wrapperNode = attributes.subject;
+    }
+
+    if (wrapperNode.subscription != null) {
+      this.subscription = new Subscription(wrapperNode.subscription);
+    }
+
+    if (wrapperNode.merchantAccount != null) {
+      this.merchantAccount = new MerchantAccount(wrapperNode.merchantAccount);
+    }
+
+    if (wrapperNode.disbursement != null) {
+      this.disbursement = new Disbursement(wrapperNode.disbursement);
+    }
+
+    if (wrapperNode.transaction != null) {
+      this.transaction = new Transaction(wrapperNode.transaction);
+    }
+
+    if (wrapperNode.partnerMerchant != null) {
+      this.partnerMerchant = new PartnerMerchant(wrapperNode.partnerMerchant);
+    }
+
+    if (wrapperNode.connectedMerchantStatusTransitioned != null) {
+      this.connectedMerchantStatusTransitioned = new ConnectedMerchantStatusTransitioned(wrapperNode.connectedMerchantStatusTransitioned);
+    }
+
+    if (wrapperNode.connectedMerchantPaypalStatusChanged != null) {
+      this.connectedMerchantPayPalStatusChanged = new ConnectedMerchantPayPalStatusChanged(wrapperNode.connectedMerchantPaypalStatusChanged);
+    }
+
+    if (wrapperNode.dispute != null) {
+      this.dispute = new Dispute(wrapperNode.dispute);
+    }
+
+    if (wrapperNode.accountUpdaterDailyReport != null) {
+      this.accountUpdaterDailyReport = new AccountUpdaterDailyReport(wrapperNode.accountUpdaterDailyReport);
+    }
+
+    if (wrapperNode.idealPayment != null) {
+      this.idealPayment = new IdealPayment(wrapperNode.idealPayment);
+    }
+
+    if (wrapperNode.errors != null) {
+      this.errors = new ValidationErrorsCollection(wrapperNode.errors);
+      this.message = wrapperNode.message;
+    }
+  }
+}
+WebhookNotification.initClass();
+
+module.exports = {WebhookNotification: WebhookNotification};
+
+},{"./account_updater_daily_report":132,"./attribute_setter":142,"./connected_merchant_paypal_status_changed":147,"./connected_merchant_status_transitioned":148,"./disbursement":159,"./dispute":164,"./ideal_payment":172,"./merchant_account":176,"./partner_merchant":183,"./subscription":198,"./transaction":208,"./validation_errors_collection":219}],223:[function(require,module,exports){
+(function (Buffer){
+'use strict';
+
+let xml2js = require('xml2js');
+let _ = require('underscore');
+let Digest = require('./digest').Digest;
+let Gateway = require('./gateway').Gateway;
+let exceptions = require('./exceptions');
+let Util = require('./util').Util;
+let WebhookNotification = require('./webhook_notification').WebhookNotification;
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class WebhookNotificationGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  parse(signature, payload) {
+    if (payload.match(/[^A-Za-z0-9+=\/\n]/)) {
+      return Promise.reject(exceptions.InvalidSignatureError('payload contains illegal characters')); // eslint-disable-line new-cap
+    }
+    let err = this.validateSignature(signature, payload);
+
+    if (err) {
+      return Promise.reject(err);
+    }
+
+    let xmlPayload = new Buffer(payload, 'base64').toString('utf8');
+    let parser = new xml2js.Parser({
+      explicitRoot: true
+    });
+
+    return new Promise((resolve, reject) => {
+      parser.parseString(xmlPayload, (parseError, result) => {
+        if (parseError) {
+          reject(parseError);
+        } else {
+          let attributes = Util.convertNodeToObject(result);
+          let handler = this.createResponseHandler('notification', WebhookNotification);
+
+          handler(attributes).then((responseHandlerResponse) => {
+            resolve(responseHandlerResponse.notification);
+          });
+        }
+      });
+    });
+  }
+
+  validateSignature(signatureString, payload) {
+    let signaturePairs = signatureString.split('&').filter((pair) => pair.indexOf('|') !== -1).map((pair) => pair.split('|'));
+    let signature = this.matchingSignature(signaturePairs);
+
+    if (!signature) {
+      return exceptions.InvalidSignatureError('no matching public key'); // eslint-disable-line new-cap
+    }
+
+    let self = this;
+    let matches = _.some([payload, payload + '\n'], (data) => {
+      return Digest.secureCompare(signature, Digest.Sha1hexdigest(self.gateway.config.privateKey, data));
+    });
+
+    if (!matches) {
+      return exceptions.InvalidSignatureError('signature does not match payload - one has been modified'); // eslint-disable-line new-cap
+    }
+    return null;
+  }
+
+  verify(challenge, callback) {
+    if (!challenge.match(/^[a-f0-9]{20,32}$/)) {
+      if (callback != null) {
+        callback(exceptions.InvalidChallengeError('challenge contains non-hex characters'), null); // eslint-disable-line new-cap
+        return;
+      }
+
+      throw exceptions.InvalidChallengeError('challenge contains non-hex characters'); // eslint-disable-line new-cap
+    }
+    let digest = Digest.Sha1hexdigest(this.gateway.config.privateKey, challenge);
+
+    return `${this.gateway.config.publicKey}|${digest}`; // eslint-disable-line consistent-return
+  }
+
+  matchingSignature(signaturePairs) {
+    for (let keyPair of signaturePairs) {
+      let publicKey = keyPair[0];
+      let signature = keyPair[1];
+
+      if (this.gateway.config.publicKey === publicKey) {
+        return signature;
+      }
+    }
+    return null;
+  }
+}
+
+module.exports = {WebhookNotificationGateway: wrapPrototype(WebhookNotificationGateway, {
+  ignoreMethods: ['verify']
+})};
+
+}).call(this,require("buffer").Buffer)
+},{"./digest":158,"./exceptions":168,"./gateway":170,"./util":216,"./webhook_notification":222,"buffer":284,"underscore":232,"wrap-promise":672,"xml2js":233}],224:[function(require,module,exports){
+'use strict';
+
+let Buffer = require('buffer').Buffer;
+let Digest = require('./digest').Digest;
+let Gateway = require('./gateway').Gateway;
+let WebhookNotification = require('./webhook_notification').WebhookNotification;
+let dateFormat = require('dateformat');
+let wrapPrototype = require('wrap-promise').wrapPrototype;
+
+class WebhookTestingGateway extends Gateway {
+  constructor(gateway) {
+    super();
+    this.gateway = gateway;
+    this.config = this.gateway.config;
+  }
+
+  sampleNotification(kind, id) {
+    let payload = new Buffer(this.sampleXml(kind, id)).toString('base64') + '\n';
+    let signature = `${this.gateway.config.publicKey}|${Digest.Sha1hexdigest(this.gateway.config.privateKey, payload)}`;
+
+    return {
+      bt_signature: signature, // eslint-disable-line camelcase
+      bt_payload: payload // eslint-disable-line camelcase
+    };
+  }
+
+  sampleXml(kind, id) {
+    return `<notification>
+    <timestamp type="datetime">${dateFormat(new Date(), dateFormat.masks.isoUtcDateTime, true)}</timestamp>
+    <kind>${kind}</kind>
+    <subject>${this.subjectXmlFor(kind, id)}</subject>
+</notification>`;
+  }
+
+  subjectXmlFor(kind, id) { // eslint-disable-line complexity
+    switch (kind) {
+      case WebhookNotification.Kind.AccountUpdaterDailyReport: return this.subjectXmlForAccountUpdaterDailyReport();
+      case WebhookNotification.Kind.Check: return this.subjectXmlForCheck();
+      case WebhookNotification.Kind.ConnectedMerchantPayPalStatusChanged: return this.subjectXmlForConnectedMerchantPayPalStatusChanged(id);
+      case WebhookNotification.Kind.ConnectedMerchantStatusTransitioned: return this.subjectXmlForConnectedMerchantStatusTransitioned(id);
+      case WebhookNotification.Kind.TransactionDisbursed: return this.subjectXmlForTransactionDisbursed(id);
+      case WebhookNotification.Kind.TransactionSettled: return this.subjectXmlForTransactionSettled(id);
+      case WebhookNotification.Kind.TransactionSettlementDeclined: return this.subjectXmlForTransactionSettlementDeclined(id);
+      case WebhookNotification.Kind.DisbursementException: return this.subjectXmlForDisbursementException(id);
+      case WebhookNotification.Kind.Disbursement: return this.subjectXmlForDisbursement(id);
+      case WebhookNotification.Kind.DisputeOpened: return this.subjectXmlForDisputeOpened(id);
+      case WebhookNotification.Kind.DisputeLost: return this.subjectXmlForDisputeLost(id);
+      case WebhookNotification.Kind.DisputeWon: return this.subjectXmlForDisputeWon(id);
+      case WebhookNotification.Kind.IdealPaymentComplete: return this.subjectXmlForIdealPaymentComplete(id);
+      case WebhookNotification.Kind.IdealPaymentFailed: return this.subjectXmlForIdealPaymentFailed(id);
+      case WebhookNotification.Kind.SubMerchantAccountApproved: return this.subjectXmlForSubMerchantAccountApproved(id);
+      case WebhookNotification.Kind.SubMerchantAccountDeclined: return this.subjectXmlForSubMerchantAccountDeclined(id);
+      case WebhookNotification.Kind.PartnerMerchantConnected: return this.subjectXmlForPartnerMerchantConnected();
+      case WebhookNotification.Kind.PartnerMerchantDisconnected: return this.subjectXmlForPartnerMerchantDisconnected();
+      case WebhookNotification.Kind.PartnerMerchantDeclined: return this.subjectXmlForPartnerMerchantDeclined();
+      case WebhookNotification.Kind.SubscriptionChargedSuccessfully: return this.subjectXmlForSubscriptionChargedSuccessfully(id);
+      default: return this.subjectXmlForSubscription(id);
+    }
+  }
+
+  subjectXmlForAccountUpdaterDailyReport() {
+    return `<account-updater-daily-report>
+  <report-date type="date">2016-01-14</report-date>
+  <report-url>link-to-csv-report</report-url>
+</account-updater-daily-report>`;
+  }
+
+  subjectXmlForCheck() {
+    return '<check type="boolean">true</check>';
+  }
+
+  subjectXmlForTransactionDisbursed(id) {
+    return `<transaction>
+  <id>${id}</id>
+  <amount>100</amount>
+  <disbursement-details>
+    <disbursement-date type="datetime">2013-07-09T18:23:29Z</disbursement-date>
+  </disbursement-details>
+</transaction>`;
+  }
+
+  subjectXmlForTransactionSettled(id) {
+    return `<transaction>
+  <id>${id}</id>
+  <status>settled</status>
+  <type>sale</type>
+  <currency-iso-code>USD</currency-iso-code>
+  <amount>100</amount>
+  <merchant-account-id>ogaotkivejpfayqfeaimuktty</merchant-account-id>
+  <payment-instrument-type>us_bank_account</payment-instrument-type>
+  <us-bank-account>
+    <routing-number>123456789</routing-number>
+    <last-4>1234</last-4>
+    <account-type>checking</account-type>
+    <account-holder-name>Dan Schulman</account-holder-name>
+  </us-bank-account>
+</transaction>`;
+  }
+
+  subjectXmlForTransactionSettlementDeclined(id) {
+    return `<transaction>
+  <id>${id}</id>
+  <status>settlement_declined</status>
+  <type>sale</type>
+  <currency-iso-code>USD</currency-iso-code>
+  <amount>100</amount>
+  <merchant-account-id>ogaotkivejpfayqfeaimuktty</merchant-account-id>
+  <payment-instrument-type>us_bank_account</payment-instrument-type>
+  <us-bank-account>
+    <routing-number>123456789</routing-number>
+    <last-4>1234</last-4>
+    <account-type>checking</account-type>
+    <account-holder-name>Dan Schulman</account-holder-name>
+  </us-bank-account>
+</transaction>`;
+  }
+
+  subjectXmlForDisputeOpened(id) {
+    return `<dispute>
+  <amount>250.00</amount>
+  <currency-iso-code>USD</currency-iso-code>
+  <received-date type="date">2014-03-01</received-date>
+  <reply-by-date type="date">2014-03-21</reply-by-date>
+  <kind>chargeback</kind>
+  <status>open</status>
+  <reason>fraud</reason>
+  <id>${id}</id>
+  <transaction>
+    <id>${id}</id>
+    <amount>250.00</amount>
+  </transaction>
+  <date-opened type="date">2014-03-28</date-opened>
+</dispute>`;
+  }
+
+  subjectXmlForDisputeLost(id) {
+    return `<dispute>
+  <amount>250.00</amount>
+  <currency-iso-code>USD</currency-iso-code>
+  <received-date type="date">2014-03-01</received-date>
+  <reply-by-date type="date">2014-03-21</reply-by-date>
+  <kind>chargeback</kind>
+  <status>lost</status>
+  <reason>fraud</reason>
+  <id>${id}</id>
+  <transaction>
+    <id>${id}</id>
+    <amount>250.00</amount>
+  </transaction>
+  <date-opened type="date">2014-03-28</date-opened>
+</dispute>`;
+  }
+
+  subjectXmlForDisputeWon(id) {
+    return `<dispute>
+  <amount>250.00</amount>
+  <currency-iso-code>USD</currency-iso-code>
+  <received-date type="date">2014-03-01</received-date>
+  <reply-by-date type="date">2014-03-21</reply-by-date>
+  <kind>chargeback</kind>
+  <status>won</status>
+  <reason>fraud</reason>
+  <id>${id}</id>
+  <transaction>
+    <id>${id}</id>
+    <amount>250.00</amount>
+  </transaction>
+  <date-opened type="date">2014-03-28</date-opened>
+  <date-won type="date">2014-09-01</date-won>
+</dispute>`;
+  }
+
+  subjectXmlForDisbursementException(id) {
+    return `<disbursement>
+  <id>${id}</id>
+  <transaction-ids type="array">
+    <item>afv56j</item>
+    <item>kj8hjk</item>
+  </transaction-ids>
+  <success type="boolean">false</success>
+  <retry type="boolean">false</retry>
+  <merchant-account>
+    <id>merchant_account_token</id>
+    <currency-iso-code>USD</currency-iso-code>
+    <sub-merchant-account type="boolean">false</sub-merchant-account>
+    <status>active</status>
+  </merchant-account>
+  <amount>100.00</amount>
+  <disbursement-date type="date">2014-02-10</disbursement-date>
+  <exception-message>bank_rejected</exception-message>
+  <follow-up-action>update_funding_information</follow-up-action>
+</disbursement>`;
+  }
+
+  subjectXmlForDisbursement(id) {
+    return `<disbursement>
+  <id>${id}</id>
+  <transaction-ids type="array">
+    <item>afv56j</item>
+    <item>kj8hjk</item>
+  </transaction-ids>
+  <success type="boolean">true</success>
+  <retry type="boolean">false</retry>
+  <merchant-account>
+    <id>merchant_account_token</id>
+    <currency-iso-code>USD</currency-iso-code>
+    <sub-merchant-account type="boolean">false</sub-merchant-account>
+    <status>active</status>
+  </merchant-account>
+  <amount>100.00</amount>
+  <disbursement-date type="date">2014-02-10</disbursement-date>
+  <exception-message nil="true"/>
+  <follow-up-action nil="true"/>
+</disbursement>`;
+  }
+
+  subjectXmlForIdealPaymentComplete(id) {
+    return `<ideal-payment>
+  <id>${id}</id>
+  <status>COMPLETE</status>
+  <issuer>ABCISSUER</issuer>
+  <order-id>ORDERABC</order-id>
+  <currency>EUR</currency>
+  <amount>10.00</amount>
+  <created-at>2016-11-29T23:27:34.547Z</created-at>
+  <iban-bank-account>
+    <created-at>2016-11-29T23:27:36.386Z</created-at>
+    <description>DESCRIPTION ABC</description>
+    <bic>XXXXNLXX</bic>
+    <iban-country>11</iban-country>
+    <iban-account-number-last-4>0000</iban-account-number-last-4>
+    <masked-iban>NL************0000</masked-iban>
+    <account-holder-name>Account Holder</account-holder-name>
+  </iban-bank-account>
+  <approval-url>https://example.com</approval-url>
+  <ideal-transaction-id>1234567890</ideal-transaction-id>
+</ideal-payment>`;
+  }
+
+  subjectXmlForIdealPaymentFailed(id) {
+    return `<ideal-payment>
+  <id>${id}</id>
+  <status>FAILED</status>
+  <issuer>ABCISSUER</issuer>
+  <order-id>ORDERABC</order-id>
+  <currency>EUR</currency>
+  <amount>10.00</amount>
+  <created-at>2016-11-29T23:27:34.547Z</created-at>
+  <approval-url>https://example.com</approval-url>
+  <ideal-transaction-id>1234567890</ideal-transaction-id>
+</ideal-payment>`;
+  }
+
+  subjectXmlForSubMerchantAccountApproved(id) {
+    return `<merchant_account>
+  <id>${id}</id>
+</merchant_account>`;
+  }
+
+  errorSampleXml() {
+    return `<error>
+  <code>82621</code>
+  <message>Credit score is too low</message>
+  <attribute type=\"symbol\">base</attribute>
+</error>`;
+  }
+
+  subjectXmlForSubMerchantAccountDeclined(id) {
+    return `<api-error-response>
+  <message>Credit score is too low</message>
+  <errors>
+    <merchant-account>
+      <errors type="array">
+        ${this.errorSampleXml()}
+      </errors>
+    </merchant-account>
+  </errors>
+  ${this.merchantAccountSampleXml(id)}
+</api-error-response>`;
+  }
+
+  merchantAccountSampleXml(id) {
+    return `<merchant_account>
+  <id>${id}</id>
+  <master_merchant_account>
+    <id>master_ma_for_${id}</id>
+    <status>suspended</status>
+  </master_merchant_account>
+  <status>suspended</status>
+</merchant_account>`;
+  }
+
+  subjectXmlForSubscription(id) {
+    return `<subscription>
+    <id>${id}</id>
+    <transactions type="array"></transactions>
+    <add_ons type="array"></add_ons>
+    <discounts type="array"></discounts>
+</subscription>`;
+  }
+
+  subjectXmlForSubscriptionChargedSuccessfully(id) {
+    return `<subscription>
+    <id>${id}</id>
+    <transactions type="array">
+      <transaction>
+        <status>submitted_for_settlement</status>
+        <amount>49.99</amount>
+      </transaction>
+    </transactions>
+    <add_ons type="array"></add_ons>
+    <discounts type="array"></discounts>
+</subscription>`;
+  }
+
+  subjectXmlForPartnerMerchantConnected() {
+    return `<partner-merchant>
+  <merchant-public-id>public_id</merchant-public-id>
+  <public-key>public_key</public-key>
+  <private-key>private_key</private-key>
+  <partner-merchant-id>abc123</partner-merchant-id>
+  <client-side-encryption-key>cse_key</client-side-encryption-key>
+</partner-merchant>`;
+  }
+
+  subjectXmlForPartnerMerchantDisconnected() {
+    return `<partner-merchant>
+  <partner-merchant-id>abc123</partner-merchant-id>
+</partner-merchant>`;
+  }
+
+  subjectXmlForConnectedMerchantStatusTransitioned(id) {
+    return `<connected-merchant-status-transitioned>
+        <merchant-public-id>${id}</merchant-public-id>
+        <status>new_status</status>
+        <oauth-application-client-id>oauth_application_client_id</oauth-application-client-id>
+      </connected-merchant-status-transitioned>`;
+  }
+
+  subjectXmlForConnectedMerchantPayPalStatusChanged(id) {
+    return `<connected-merchant-paypal-status-changed>
+        <merchant-public-id>${id}</merchant-public-id>
+        <action>link</action>
+        <oauth-application-client-id>oauth_application_client_id</oauth-application-client-id>
+      </connected-merchant-paypal-status-changed>`;
+  }
+
+  subjectXmlForPartnerMerchantDeclined() {
+    return `<partner-merchant>
+  <partner-merchant-id>abc123</partner-merchant-id>
+</partner-merchant>`;
+  }
+}
+
+module.exports = {WebhookTestingGateway: wrapPrototype(WebhookTestingGateway)};
+
+},{"./digest":158,"./gateway":170,"./webhook_notification":222,"buffer":284,"dateformat":300,"wrap-promise":672}],225:[function(require,module,exports){
+(function (process){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// a duplex stream is just a stream that is both readable and writable.
+// Since JS doesn't have multiple prototypal inheritance, this class
+// prototypally inherits from Readable, and then parasitically from
+// Writable.
+
+module.exports = Duplex;
+var util = require('util');
+var Readable = require('./_stream_readable');
+var Writable = require('./_stream_writable');
+
+util.inherits(Duplex, Readable);
+
+Object.keys(Writable.prototype).forEach(function(method) {
+  if (!Duplex.prototype[method])
+    Duplex.prototype[method] = Writable.prototype[method];
+});
+
+function Duplex(options) {
+  if (!(this instanceof Duplex))
+    return new Duplex(options);
+
+  Readable.call(this, options);
+  Writable.call(this, options);
+
+  if (options && options.readable === false)
+    this.readable = false;
+
+  if (options && options.writable === false)
+    this.writable = false;
+
+  this.allowHalfOpen = true;
+  if (options && options.allowHalfOpen === false)
+    this.allowHalfOpen = false;
+
+  this.once('end', onend);
+}
+
+// the no-half-open enforcer
+function onend() {
+  // if we allow half-open state, or if the writable side ended,
+  // then we're ok.
+  if (this.allowHalfOpen || this._writableState.ended)
+    return;
+
+  // no more data can be written.
+  // But allow more writes to happen in this tick.
+  process.nextTick(this.end.bind(this));
+}
+
+}).call(this,require('_process'))
+},{"./_stream_readable":227,"./_stream_writable":229,"_process":443,"util":667}],226:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// a passthrough stream.
+// basically just the most minimal sort of Transform stream.
+// Every written chunk gets output as-is.
+
+module.exports = PassThrough;
+
+var Transform = require('./_stream_transform');
+var util = require('util');
+util.inherits(PassThrough, Transform);
+
+function PassThrough(options) {
+  if (!(this instanceof PassThrough))
+    return new PassThrough(options);
+
+  Transform.call(this, options);
+}
+
+PassThrough.prototype._transform = function(chunk, encoding, cb) {
+  cb(null, chunk);
+};
+
+},{"./_stream_transform":228,"util":667}],227:[function(require,module,exports){
+(function (process,global,Buffer){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module.exports = Readable;
+Readable.ReadableState = ReadableState;
+
+var EE = require('events').EventEmitter;
+if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {
+  return emitter.listeners(type).length;
+};
+
+if (!global.setImmediate) global.setImmediate = function setImmediate(fn) {
+  return setTimeout(fn, 0);
+};
+if (!global.clearImmediate) global.clearImmediate = function clearImmediate(i) {
+  return clearTimeout(i);
+};
+
+var Stream = require('stream');
+var util = require('util');
+if (!util.isUndefined) {
+  var utilIs = require('core-util-is');
+  for (var f in utilIs) {
+    util[f] = utilIs[f];
+  }
+}
+var StringDecoder;
+var debug;
+if (util.debuglog)
+  debug = util.debuglog('stream');
+else try {
+  debug = require('debuglog')('stream');
+} catch (er) {
+  debug = function() {};
+}
+
+util.inherits(Readable, Stream);
+
+function ReadableState(options, stream) {
+  options = options || {};
+
+  // the point at which it stops calling _read() to fill the buffer
+  // Note: 0 is a valid value, means "don't call _read preemptively ever"
+  var hwm = options.highWaterMark;
+  var defaultHwm = options.objectMode ? 16 : 16 * 1024;
+  this.highWaterMark = (hwm || hwm === 0) ? hwm : defaultHwm;
+
+  // cast to ints.
+  this.highWaterMark = ~~this.highWaterMark;
+
+  this.buffer = [];
+  this.length = 0;
+  this.pipes = null;
+  this.pipesCount = 0;
+  this.flowing = null;
+  this.ended = false;
+  this.endEmitted = false;
+  this.reading = false;
+
+  // a flag to be able to tell if the onwrite cb is called immediately,
+  // or on a later tick.  We set this to true at first, because any
+  // actions that shouldn't happen until "later" should generally also
+  // not happen before the first write call.
+  this.sync = true;
+
+  // whenever we return null, then we set a flag to say
+  // that we're awaiting a 'readable' event emission.
+  this.needReadable = false;
+  this.emittedReadable = false;
+  this.readableListening = false;
+
+
+  // object stream flag. Used to make read(n) ignore n and to
+  // make all the buffer merging and length checks go away
+  this.objectMode = !!options.objectMode;
+
+  // Crypto is kind of old and crusty.  Historically, its default string
+  // encoding is 'binary' so we have to make this configurable.
+  // Everything else in the universe uses 'utf8', though.
+  this.defaultEncoding = options.defaultEncoding || 'utf8';
+
+  // when piping, we only care about 'readable' events that happen
+  // after read()ing all the bytes and not getting any pushback.
+  this.ranOut = false;
+
+  // the number of writers that are awaiting a drain event in .pipe()s
+  this.awaitDrain = 0;
+
+  // if true, a maybeReadMore has been scheduled
+  this.readingMore = false;
+
+  this.decoder = null;
+  this.encoding = null;
+  if (options.encoding) {
+    if (!StringDecoder)
+      StringDecoder = require('string_decoder/').StringDecoder;
+    this.decoder = new StringDecoder(options.encoding);
+    this.encoding = options.encoding;
+  }
+}
+
+function Readable(options) {
+  if (!(this instanceof Readable))
+    return new Readable(options);
+
+  this._readableState = new ReadableState(options, this);
+
+  // legacy
+  this.readable = true;
+
+  Stream.call(this);
+}
+
+// Manually shove something into the read() buffer.
+// This returns true if the highWaterMark has not been hit yet,
+// similar to how Writable.write() returns true if you should
+// write() some more.
+Readable.prototype.push = function(chunk, encoding) {
+  var state = this._readableState;
+
+  if (util.isString(chunk) && !state.objectMode) {
+    encoding = encoding || state.defaultEncoding;
+    if (encoding !== state.encoding) {
+      chunk = new Buffer(chunk, encoding);
+      encoding = '';
+    }
+  }
+
+  return readableAddChunk(this, state, chunk, encoding, false);
+};
+
+// Unshift should *always* be something directly out of read()
+Readable.prototype.unshift = function(chunk) {
+  var state = this._readableState;
+  return readableAddChunk(this, state, chunk, '', true);
+};
+
+function readableAddChunk(stream, state, chunk, encoding, addToFront) {
+  var er = chunkInvalid(state, chunk);
+  if (er) {
+    stream.emit('error', er);
+  } else if (util.isNullOrUndefined(chunk)) {
+    state.reading = false;
+    if (!state.ended)
+      onEofChunk(stream, state);
+  } else if (state.objectMode || chunk && chunk.length > 0) {
+    if (state.ended && !addToFront) {
+      var e = new Error('stream.push() after EOF');
+      stream.emit('error', e);
+    } else if (state.endEmitted && addToFront) {
+      var e = new Error('stream.unshift() after end event');
+      stream.emit('error', e);
+    } else {
+      if (state.decoder && !addToFront && !encoding)
+        chunk = state.decoder.write(chunk);
+
+      if (!addToFront)
+        state.reading = false;
+
+      // if we want the data now, just emit it.
+      if (state.flowing && state.length === 0 && !state.sync) {
+        stream.emit('data', chunk);
+        stream.read(0);
+      } else {
+        // update the buffer info.
+        state.length += state.objectMode ? 1 : chunk.length;
+        if (addToFront)
+          state.buffer.unshift(chunk);
+        else
+          state.buffer.push(chunk);
+
+        if (state.needReadable)
+          emitReadable(stream);
+      }
+
+      maybeReadMore(stream, state);
+    }
+  } else if (!addToFront) {
+    state.reading = false;
+  }
+
+  return needMoreData(state);
+}
+
+
+
+// if it's past the high water mark, we can push in some more.
+// Also, if we have no data yet, we can stand some
+// more bytes.  This is to work around cases where hwm=0,
+// such as the repl.  Also, if the push() triggered a
+// readable event, and the user called read(largeNumber) such that
+// needReadable was set, then we ought to push more, so that another
+// 'readable' event will be triggered.
+function needMoreData(state) {
+  return !state.ended &&
+         (state.needReadable ||
+          state.length < state.highWaterMark ||
+          state.length === 0);
+}
+
+// backwards compatibility.
+Readable.prototype.setEncoding = function(enc) {
+  if (!StringDecoder)
+    StringDecoder = require('string_decoder/').StringDecoder;
+  this._readableState.decoder = new StringDecoder(enc);
+  this._readableState.encoding = enc;
+  return this;
+};
+
+// Don't raise the hwm > 128MB
+var MAX_HWM = 0x800000;
+function roundUpToNextPowerOf2(n) {
+  if (n >= MAX_HWM) {
+    n = MAX_HWM;
+  } else {
+    // Get the next highest power of 2
+    n--;
+    for (var p = 1; p < 32; p <<= 1) n |= n >> p;
+    n++;
+  }
+  return n;
+}
+
+function howMuchToRead(n, state) {
+  if (state.length === 0 && state.ended)
+    return 0;
+
+  if (state.objectMode)
+    return n === 0 ? 0 : 1;
+
+  if (isNaN(n) || util.isNull(n)) {
+    // only flow one buffer at a time
+    if (state.flowing && state.buffer.length)
+      return state.buffer[0].length;
+    else
+      return state.length;
+  }
+
+  if (n <= 0)
+    return 0;
+
+  // If we're asking for more than the target buffer level,
+  // then raise the water mark.  Bump up to the next highest
+  // power of 2, to prevent increasing it excessively in tiny
+  // amounts.
+  if (n > state.highWaterMark)
+    state.highWaterMark = roundUpToNextPowerOf2(n);
+
+  // don't have that much.  return null, unless we've ended.
+  if (n > state.length) {
+    if (!state.ended) {
+      state.needReadable = true;
+      return 0;
+    } else
+      return state.length;
+  }
+
+  return n;
+}
+
+// you can override either this method, or the async _read(n) below.
+Readable.prototype.read = function(n) {
+  debug('read', n);
+  var state = this._readableState;
+  var nOrig = n;
+
+  if (!util.isNumber(n) || n > 0)
+    state.emittedReadable = false;
+
+  // if we're doing read(0) to trigger a readable event, but we
+  // already have a bunch of data in the buffer, then just trigger
+  // the 'readable' event and move on.
+  if (n === 0 &&
+      state.needReadable &&
+      (state.length >= state.highWaterMark || state.ended)) {
+    debug('read: emitReadable', state.length, state.ended);
+    if (state.length === 0 && state.ended)
+      endReadable(this);
+    else
+      emitReadable(this);
+    return null;
+  }
+
+  n = howMuchToRead(n, state);
+
+  // if we've ended, and we're now clear, then finish it up.
+  if (n === 0 && state.ended) {
+    if (state.length === 0)
+      endReadable(this);
+    return null;
+  }
+
+  // All the actual chunk generation logic needs to be
+  // *below* the call to _read.  The reason is that in certain
+  // synthetic stream cases, such as passthrough streams, _read
+  // may be a completely synchronous operation which may change
+  // the state of the read buffer, providing enough data when
+  // before there was *not* enough.
+  //
+  // So, the steps are:
+  // 1. Figure out what the state of things will be after we do
+  // a read from the buffer.
+  //
+  // 2. If that resulting state will trigger a _read, then call _read.
+  // Note that this may be asynchronous, or synchronous.  Yes, it is
+  // deeply ugly to write APIs this way, but that still doesn't mean
+  // that the Readable class should behave improperly, as streams are
+  // designed to be sync/async agnostic.
+  // Take note if the _read call is sync or async (ie, if the read call
+  // has returned yet), so that we know whether or not it's safe to emit
+  // 'readable' etc.
+  //
+  // 3. Actually pull the requested chunks out of the buffer and return.
+
+  // if we need a readable event, then we need to do some reading.
+  var doRead = state.needReadable;
+  debug('need readable', doRead);
+
+  // if we currently have less than the highWaterMark, then also read some
+  if (state.length === 0 || state.length - n < state.highWaterMark) {
+    doRead = true;
+    debug('length less than watermark', doRead);
+  }
+
+  // however, if we've ended, then there's no point, and if we're already
+  // reading, then it's unnecessary.
+  if (state.ended || state.reading) {
+    doRead = false;
+    debug('reading or ended', doRead);
+  }
+
+  if (doRead) {
+    debug('do read');
+    state.reading = true;
+    state.sync = true;
+    // if the length is currently zero, then we *need* a readable event.
+    if (state.length === 0)
+      state.needReadable = true;
+    // call internal read method
+    this._read(state.highWaterMark);
+    state.sync = false;
+  }
+
+  // If _read pushed data synchronously, then `reading` will be false,
+  // and we need to re-evaluate how much data we can return to the user.
+  if (doRead && !state.reading)
+    n = howMuchToRead(nOrig, state);
+
+  var ret;
+  if (n > 0)
+    ret = fromList(n, state);
+  else
+    ret = null;
+
+  if (util.isNull(ret)) {
+    state.needReadable = true;
+    n = 0;
+  }
+
+  state.length -= n;
+
+  // If we have nothing in the buffer, then we want to know
+  // as soon as we *do* get something into the buffer.
+  if (state.length === 0 && !state.ended)
+    state.needReadable = true;
+
+  // If we tried to read() past the EOF, then emit end on the next tick.
+  if (nOrig !== n && state.ended && state.length === 0)
+    endReadable(this);
+
+  if (!util.isNull(ret))
+    this.emit('data', ret);
+
+  return ret;
+};
+
+function chunkInvalid(state, chunk) {
+  var er = null;
+  if (!util.isBuffer(chunk) &&
+      !util.isString(chunk) &&
+      !util.isNullOrUndefined(chunk) &&
+      !state.objectMode &&
+      !er) {
+    er = new TypeError('Invalid non-string/buffer chunk');
+  }
+  return er;
+}
+
+
+function onEofChunk(stream, state) {
+  if (state.decoder && !state.ended && state.decoder.end) {
+    var chunk = state.decoder.end();
+    if (chunk && chunk.length) {
+      state.buffer.push(chunk);
+      state.length += state.objectMode ? 1 : chunk.length;
+    }
+  }
+  state.ended = true;
+
+  // emit 'readable' now to make sure it gets picked up.
+  emitReadable(stream);
+}
+
+// Don't emit readable right away in sync mode, because this can trigger
+// another read() call => stack overflow.  This way, it might trigger
+// a nextTick recursion warning, but that's not so bad.
+function emitReadable(stream) {
+  var state = stream._readableState;
+  state.needReadable = false;
+  if (!state.emittedReadable) {
+    debug('emitReadable', state.flowing);
+    state.emittedReadable = true;
+    if (state.sync)
+      process.nextTick(function() {
+        emitReadable_(stream);
+      });
+    else
+      emitReadable_(stream);
+  }
+}
+
+function emitReadable_(stream) {
+  debug('emit readable');
+  stream.emit('readable');
+  flow(stream);
+}
+
+
+// at this point, the user has presumably seen the 'readable' event,
+// and called read() to consume some data.  that may have triggered
+// in turn another _read(n) call, in which case reading = true if
+// it's in progress.
+// However, if we're not ended, or reading, and the length < hwm,
+// then go ahead and try to read some more preemptively.
+function maybeReadMore(stream, state) {
+  if (!state.readingMore) {
+    state.readingMore = true;
+    process.nextTick(function() {
+      maybeReadMore_(stream, state);
+    });
+  }
+}
+
+function maybeReadMore_(stream, state) {
+  var len = state.length;
+  while (!state.reading && !state.flowing && !state.ended &&
+         state.length < state.highWaterMark) {
+    debug('maybeReadMore read 0');
+    stream.read(0);
+    if (len === state.length)
+      // didn't get any data, stop spinning.
+      break;
+    else
+      len = state.length;
+  }
+  state.readingMore = false;
+}
+
+// abstract method.  to be overridden in specific implementation classes.
+// call cb(er, data) where data is <= n in length.
+// for virtual (non-string, non-buffer) streams, "length" is somewhat
+// arbitrary, and perhaps not very meaningful.
+Readable.prototype._read = function(n) {
+  this.emit('error', new Error('not implemented'));
+};
+
+Readable.prototype.pipe = function(dest, pipeOpts) {
+  var src = this;
+  var state = this._readableState;
+
+  switch (state.pipesCount) {
+    case 0:
+      state.pipes = dest;
+      break;
+    case 1:
+      state.pipes = [state.pipes, dest];
+      break;
+    default:
+      state.pipes.push(dest);
+      break;
+  }
+  state.pipesCount += 1;
+  debug('pipe count=%d opts=%j', state.pipesCount, pipeOpts);
+
+  var doEnd = (!pipeOpts || pipeOpts.end !== false) &&
+              dest !== process.stdout &&
+              dest !== process.stderr;
+
+  var endFn = doEnd ? onend : cleanup;
+  if (state.endEmitted)
+    process.nextTick(endFn);
+  else
+    src.once('end', endFn);
+
+  dest.on('unpipe', onunpipe);
+  function onunpipe(readable) {
+    debug('onunpipe');
+    if (readable === src) {
+      cleanup();
+    }
+  }
+
+  function onend() {
+    debug('onend');
+    dest.end();
+  }
+
+  // when the dest drains, it reduces the awaitDrain counter
+  // on the source.  This would be more elegant with a .once()
+  // handler in flow(), but adding and removing repeatedly is
+  // too slow.
+  var ondrain = pipeOnDrain(src);
+  dest.on('drain', ondrain);
+
+  function cleanup() {
+    debug('cleanup');
+    // cleanup event handlers once the pipe is broken
+    dest.removeListener('close', onclose);
+    dest.removeListener('finish', onfinish);
+    dest.removeListener('drain', ondrain);
+    dest.removeListener('error', onerror);
+    dest.removeListener('unpipe', onunpipe);
+    src.removeListener('end', onend);
+    src.removeListener('end', cleanup);
+    src.removeListener('data', ondata);
+
+    // if the reader is waiting for a drain event from this
+    // specific writer, then it would cause it to never start
+    // flowing again.
+    // So, if this is awaiting a drain, then we just call it now.
+    // If we don't know, then assume that we are waiting for one.
+    if (state.awaitDrain &&
+        (!dest._writableState || dest._writableState.needDrain))
+      ondrain();
+  }
+
+  src.on('data', ondata);
+  function ondata(chunk) {
+    debug('ondata');
+    var ret = dest.write(chunk);
+    if (false === ret) {
+      debug('false write response, pause',
+            src._readableState.awaitDrain);
+      src._readableState.awaitDrain++;
+      src.pause();
+    }
+  }
+
+  // if the dest has an error, then stop piping into it.
+  // however, don't suppress the throwing behavior for this.
+  function onerror(er) {
+    debug('onerror', er);
+    unpipe();
+    dest.removeListener('error', onerror);
+    if (EE.listenerCount(dest, 'error') === 0)
+      dest.emit('error', er);
+  }
+  // This is a brutally ugly hack to make sure that our error handler
+  // is attached before any userland ones.  NEVER DO THIS.
+  if (!dest._events || !dest._events.error)
+    dest.on('error', onerror);
+  else if (Array.isArray(dest._events.error))
+    dest._events.error.unshift(onerror);
+  else
+    dest._events.error = [onerror, dest._events.error];
+
+
+
+  // Both close and finish should trigger unpipe, but only once.
+  function onclose() {
+    dest.removeListener('finish', onfinish);
+    unpipe();
+  }
+  dest.once('close', onclose);
+  function onfinish() {
+    debug('onfinish');
+    dest.removeListener('close', onclose);
+    unpipe();
+  }
+  dest.once('finish', onfinish);
+
+  function unpipe() {
+    debug('unpipe');
+    src.unpipe(dest);
+  }
+
+  // tell the dest that it's being piped to
+  dest.emit('pipe', src);
+
+  // start the flow if it hasn't been started already.
+  if (!state.flowing) {
+    debug('pipe resume');
+    src.resume();
+  }
+
+  return dest;
+};
+
+function pipeOnDrain(src) {
+  return function() {
+    var state = src._readableState;
+    debug('pipeOnDrain', state.awaitDrain);
+    if (state.awaitDrain)
+      state.awaitDrain--;
+    if (state.awaitDrain === 0 && EE.listenerCount(src, 'data')) {
+      state.flowing = true;
+      flow(src);
+    }
+  };
+}
+
+
+Readable.prototype.unpipe = function(dest) {
+  var state = this._readableState;
+
+  // if we're not piping anywhere, then do nothing.
+  if (state.pipesCount === 0)
+    return this;
+
+  // just one destination.  most common case.
+  if (state.pipesCount === 1) {
+    // passed in one, but it's not the right one.
+    if (dest && dest !== state.pipes)
+      return this;
+
+    if (!dest)
+      dest = state.pipes;
+
+    // got a match.
+    state.pipes = null;
+    state.pipesCount = 0;
+    state.flowing = false;
+    if (dest)
+      dest.emit('unpipe', this);
+    return this;
+  }
+
+  // slow case. multiple pipe destinations.
+
+  if (!dest) {
+    // remove all.
+    var dests = state.pipes;
+    var len = state.pipesCount;
+    state.pipes = null;
+    state.pipesCount = 0;
+    state.flowing = false;
+
+    for (var i = 0; i < len; i++)
+      dests[i].emit('unpipe', this);
+    return this;
+  }
+
+  // try to find the right one.
+  var i = state.pipes.indexOf(dest);
+  if (i === -1)
+    return this;
+
+  state.pipes.splice(i, 1);
+  state.pipesCount -= 1;
+  if (state.pipesCount === 1)
+    state.pipes = state.pipes[0];
+
+  dest.emit('unpipe', this);
+
+  return this;
+};
+
+// set up data events if they are asked for
+// Ensure readable listeners eventually get something
+Readable.prototype.on = function(ev, fn) {
+  var res = Stream.prototype.on.call(this, ev, fn);
+
+  // If listening to data, and it has not explicitly been paused,
+  // then call resume to start the flow of data on the next tick.
+  if (ev === 'data' && false !== this._readableState.flowing) {
+    this.resume();
+  }
+
+  if (ev === 'readable' && this.readable) {
+    var state = this._readableState;
+    if (!state.readableListening) {
+      state.readableListening = true;
+      state.emittedReadable = false;
+      state.needReadable = true;
+      if (!state.reading) {
+        var self = this;
+        process.nextTick(function() {
+          debug('readable nexttick read 0');
+          self.read(0);
+        });
+      } else if (state.length) {
+        emitReadable(this, state);
+      }
+    }
+  }
+
+  return res;
+};
+Readable.prototype.addListener = Readable.prototype.on;
+
+// pause() and resume() are remnants of the legacy readable stream API
+// If the user uses them, then switch into old mode.
+Readable.prototype.resume = function() {
+  var state = this._readableState;
+  if (!state.flowing) {
+    debug('resume');
+    state.flowing = true;
+    if (!state.reading) {
+      debug('resume read 0');
+      this.read(0);
+    }
+    resume(this, state);
+  }
+  return this;
+};
+
+function resume(stream, state) {
+  if (!state.resumeScheduled) {
+    state.resumeScheduled = true;
+    process.nextTick(function() {
+      resume_(stream, state);
+    });
+  }
+}
+
+function resume_(stream, state) {
+  state.resumeScheduled = false;
+  stream.emit('resume');
+  flow(stream);
+  if (state.flowing && !state.reading)
+    stream.read(0);
+}
+
+Readable.prototype.pause = function() {
+  debug('call pause flowing=%j', this._readableState.flowing);
+  if (false !== this._readableState.flowing) {
+    debug('pause');
+    this._readableState.flowing = false;
+    this.emit('pause');
+  }
+  return this;
+};
+
+function flow(stream) {
+  var state = stream._readableState;
+  debug('flow', state.flowing);
+  if (state.flowing) {
+    do {
+      var chunk = stream.read();
+    } while (null !== chunk && state.flowing);
+  }
+}
+
+// wrap an old-style stream as the async data source.
+// This is *not* part of the readable stream interface.
+// It is an ugly unfortunate mess of history.
+Readable.prototype.wrap = function(stream) {
+  var state = this._readableState;
+  var paused = false;
+
+  var self = this;
+  stream.on('end', function() {
+    debug('wrapped end');
+    if (state.decoder && !state.ended) {
+      var chunk = state.decoder.end();
+      if (chunk && chunk.length)
+        self.push(chunk);
+    }
+
+    self.push(null);
+  });
+
+  stream.on('data', function(chunk) {
+    debug('wrapped data');
+    if (state.decoder)
+      chunk = state.decoder.write(chunk);
+    if (!chunk || !state.objectMode && !chunk.length)
+      return;
+
+    var ret = self.push(chunk);
+    if (!ret) {
+      paused = true;
+      stream.pause();
+    }
+  });
+
+  // proxy all the other methods.
+  // important when wrapping filters and duplexes.
+  for (var i in stream) {
+    if (util.isFunction(stream[i]) && util.isUndefined(this[i])) {
+      this[i] = function(method) { return function() {
+        return stream[method].apply(stream, arguments);
+      }}(i);
+    }
+  }
+
+  // proxy certain important events.
+  var events = ['error', 'close', 'destroy', 'pause', 'resume'];
+  events.forEach(function(ev) {
+    stream.on(ev, self.emit.bind(self, ev));
+  });
+
+  // when we try to consume some more bytes, simply unpause the
+  // underlying stream.
+  self._read = function(n) {
+    debug('wrapped _read', n);
+    if (paused) {
+      paused = false;
+      stream.resume();
+    }
+  };
+
+  return self;
+};
+
+
+
+// exposed for testing purposes only.
+Readable._fromList = fromList;
+
+// Pluck off n bytes from an array of buffers.
+// Length is the combined lengths of all the buffers in the list.
+function fromList(n, state) {
+  var list = state.buffer;
+  var length = state.length;
+  var stringMode = !!state.decoder;
+  var objectMode = !!state.objectMode;
+  var ret;
+
+  // nothing in the list, definitely empty.
+  if (list.length === 0)
+    return null;
+
+  if (length === 0)
+    ret = null;
+  else if (objectMode)
+    ret = list.shift();
+  else if (!n || n >= length) {
+    // read it all, truncate the array.
+    if (stringMode)
+      ret = list.join('');
+    else
+      ret = Buffer.concat(list, length);
+    list.length = 0;
+  } else {
+    // read just some of it.
+    if (n < list[0].length) {
+      // just take a part of the first list item.
+      // slice is the same for buffers and strings.
+      var buf = list[0];
+      ret = buf.slice(0, n);
+      list[0] = buf.slice(n);
+    } else if (n === list[0].length) {
+      // first list is a perfect match
+      ret = list.shift();
+    } else {
+      // complex case.
+      // we have enough to cover it, but it spans past the first buffer.
+      if (stringMode)
+        ret = '';
+      else
+        ret = new Buffer(n);
+
+      var c = 0;
+      for (var i = 0, l = list.length; i < l && c < n; i++) {
+        var buf = list[0];
+        var cpy = Math.min(n - c, buf.length);
+
+        if (stringMode)
+          ret += buf.slice(0, cpy);
+        else
+          buf.copy(ret, c, 0, cpy);
+
+        if (cpy < buf.length)
+          list[0] = buf.slice(cpy);
+        else
+          list.shift();
+
+        c += cpy;
+      }
+    }
+  }
+
+  return ret;
+}
+
+function endReadable(stream) {
+  var state = stream._readableState;
+
+  // If we get here before consuming all the bytes, then that is a
+  // bug in node.  Should never happen.
+  if (state.length > 0)
+    throw new Error('endReadable called on non-empty stream');
+
+  if (!state.endEmitted) {
+    state.ended = true;
+    process.nextTick(function() {
+      // Check that we didn't get one last unshift.
+      if (!state.endEmitted && state.length === 0) {
+        state.endEmitted = true;
+        stream.readable = false;
+        stream.emit('end');
+      }
+    });
+  }
+}
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
+},{"_process":443,"buffer":284,"core-util-is":288,"debuglog":301,"events":332,"stream":620,"string_decoder/":645,"util":667}],228:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+// a transform stream is a readable/writable stream where you do
+// something with the data.  Sometimes it's called a "filter",
+// but that's not a great name for it, since that implies a thing where
+// some bits pass through, and others are simply ignored.  (That would
+// be a valid example of a transform, of course.)
+//
+// While the output is causally related to the input, it's not a
+// necessarily symmetric or synchronous transformation.  For example,
+// a zlib stream might take multiple plain-text writes(), and then
+// emit a single compressed chunk some time in the future.
+//
+// Here's how this works:
+//
+// The Transform stream has all the aspects of the readable and writable
+// stream classes.  When you write(chunk), that calls _write(chunk,cb)
+// internally, and returns false if there's a lot of pending writes
+// buffered up.  When you call read(), that calls _read(n) until
+// there's enough pending readable data buffered up.
+//
+// In a transform stream, the written data is placed in a buffer.  When
+// _read(n) is called, it transforms the queued up data, calling the
+// buffered _write cb's as it consumes chunks.  If consuming a single
+// written chunk would result in multiple output chunks, then the first
+// outputted bit calls the readcb, and subsequent chunks just go into
+// the read buffer, and will cause it to emit 'readable' if necessary.
+//
+// This way, back-pressure is actually determined by the reading side,
+// since _read has to be called to start processing a new chunk.  However,
+// a pathological inflate type of transform can cause excessive buffering
+// here.  For example, imagine a stream where every byte of input is
+// interpreted as an integer from 0-255, and then results in that many
+// bytes of output.  Writing the 4 bytes {ff,ff,ff,ff} would result in
+// 1kb of data being output.  In this case, you could write a very small
+// amount of input, and end up with a very large amount of output.  In
+// such a pathological inflating mechanism, there'd be no way to tell
+// the system to stop doing the transform.  A single 4MB write could
+// cause the system to run out of memory.
+//
+// However, even in such a pathological case, only a single written chunk
+// would be consumed, and then the rest would wait (un-transformed) until
+// the results of the previous transformed chunk were consumed.
+
+module.exports = Transform;
+
+var Duplex = require('./_stream_duplex');
+var util = require('util');
+if (!util.isUndefined) {
+  var utilIs = require('core-util-is');
+  for (var f in utilIs) {
+    util[f] = utilIs[f];
+  }
+}
+util.inherits(Transform, Duplex);
+
+
+function TransformState(options, stream) {
+  this.afterTransform = function(er, data) {
+    return afterTransform(stream, er, data);
+  };
+
+  this.needTransform = false;
+  this.transforming = false;
+  this.writecb = null;
+  this.writechunk = null;
+}
+
+function afterTransform(stream, er, data) {
+  var ts = stream._transformState;
+  ts.transforming = false;
+
+  var cb = ts.writecb;
+
+  if (!cb)
+    return stream.emit('error', new Error('no writecb in Transform class'));
+
+  ts.writechunk = null;
+  ts.writecb = null;
+
+  if (!util.isNullOrUndefined(data))
+    stream.push(data);
+
+  if (cb)
+    cb(er);
+
+  var rs = stream._readableState;
+  rs.reading = false;
+  if (rs.needReadable || rs.length < rs.highWaterMark) {
+    stream._read(rs.highWaterMark);
+  }
+}
+
+
+function Transform(options) {
+  if (!(this instanceof Transform))
+    return new Transform(options);
+
+  Duplex.call(this, options);
+
+  this._transformState = new TransformState(options, this);
+
+  // when the writable side finishes, then flush out anything remaining.
+  var stream = this;
+
+  // start out asking for a readable event once data is transformed.
+  this._readableState.needReadable = true;
+
+  // we have implemented the _read method, and done the other things
+  // that Readable wants before the first _read call, so unset the
+  // sync guard flag.
+  this._readableState.sync = false;
+
+  this.once('prefinish', function() {
+    if (util.isFunction(this._flush))
+      this._flush(function(er) {
+        done(stream, er);
+      });
+    else
+      done(stream);
+  });
+}
+
+Transform.prototype.push = function(chunk, encoding) {
+  this._transformState.needTransform = false;
+  return Duplex.prototype.push.call(this, chunk, encoding);
+};
+
+// This is the part where you do stuff!
+// override this function in implementation classes.
+// 'chunk' is an input chunk.
+//
+// Call `push(newChunk)` to pass along transformed output
+// to the readable side.  You may call 'push' zero or more times.
+//
+// Call `cb(err)` when you are done with this chunk.  If you pass
+// an error, then that'll put the hurt on the whole operation.  If you
+// never call cb(), then you'll never get another chunk.
+Transform.prototype._transform = function(chunk, encoding, cb) {
+  throw new Error('not implemented');
+};
+
+Transform.prototype._write = function(chunk, encoding, cb) {
+  var ts = this._transformState;
+  ts.writecb = cb;
+  ts.writechunk = chunk;
+  ts.writeencoding = encoding;
+  if (!ts.transforming) {
+    var rs = this._readableState;
+    if (ts.needTransform ||
+        rs.needReadable ||
+        rs.length < rs.highWaterMark)
+      this._read(rs.highWaterMark);
+  }
+};
+
+// Doesn't matter what the args are here.
+// _transform does all the work.
+// That we got here means that the readable side wants more data.
+Transform.prototype._read = function(n) {
+  var ts = this._transformState;
+
+  if (!util.isNull(ts.writechunk) && ts.writecb && !ts.transforming) {
+    ts.transforming = true;
+    this._transform(ts.writechunk, ts.writeencoding, ts.afterTransform);
+  } else {
+    // mark that we need a transform, so that any data that comes in
+    // will get processed, now that we've asked for it.
+    ts.needTransform = true;
+  }
+};
+
+
+function done(stream, er) {
+  if (er)
+    return stream.emit('error', er);
+
+  // if there's nothing in the write buffer, then that means
+  // that nothing more will ever be provided
+  var ws = stream._writableState;
+  var ts = stream._transformState;
+
+  if (ws.length)
+    throw new Error('calling transform done when ws.length != 0');
+
+  if (ts.transforming)
+    throw new Error('calling transform done when still transforming');
+
+  return stream.push(null);
+}
+
+},{"./_stream_duplex":225,"core-util-is":288,"util":667}],229:[function(require,module,exports){
+(function (process,Buffer){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// A bit simpler than readable streams.
+// Implement an async ._write(chunk, cb), and it'll handle all
+// the drain event emission and buffering.
+
+module.exports = Writable;
+Writable.WritableState = WritableState;
+
+var util = require('util');
+if (!util.isUndefined) {
+  var utilIs = require('core-util-is');
+  for (var f in utilIs) {
+    util[f] = utilIs[f];
+  }
+}
+var Stream = require('stream');
+
+util.inherits(Writable, Stream);
+
+function WriteReq(chunk, encoding, cb) {
+  this.chunk = chunk;
+  this.encoding = encoding;
+  this.callback = cb;
+}
+
+function WritableState(options, stream) {
+  options = options || {};
+
+  // the point at which write() starts returning false
+  // Note: 0 is a valid value, means that we always return false if
+  // the entire buffer is not flushed immediately on write()
+  var hwm = options.highWaterMark;
+  var defaultHwm = options.objectMode ? 16 : 16 * 1024;
+  this.highWaterMark = (hwm || hwm === 0) ? hwm : defaultHwm;
+
+  // object stream flag to indicate whether or not this stream
+  // contains buffers or objects.
+  this.objectMode = !!options.objectMode;
+
+  // cast to ints.
+  this.highWaterMark = ~~this.highWaterMark;
+
+  this.needDrain = false;
+  // at the start of calling end()
+  this.ending = false;
+  // when end() has been called, and returned
+  this.ended = false;
+  // when 'finish' is emitted
+  this.finished = false;
+
+  // should we decode strings into buffers before passing to _write?
+  // this is here so that some node-core streams can optimize string
+  // handling at a lower level.
+  var noDecode = options.decodeStrings === false;
+  this.decodeStrings = !noDecode;
+
+  // Crypto is kind of old and crusty.  Historically, its default string
+  // encoding is 'binary' so we have to make this configurable.
+  // Everything else in the universe uses 'utf8', though.
+  this.defaultEncoding = options.defaultEncoding || 'utf8';
+
+  // not an actual buffer we keep track of, but a measurement
+  // of how much we're waiting to get pushed to some underlying
+  // socket or file.
+  this.length = 0;
+
+  // a flag to see when we're in the middle of a write.
+  this.writing = false;
+
+  // when true all writes will be buffered until .uncork() call
+  this.corked = 0;
+
+  // a flag to be able to tell if the onwrite cb is called immediately,
+  // or on a later tick.  We set this to true at first, because any
+  // actions that shouldn't happen until "later" should generally also
+  // not happen before the first write call.
+  this.sync = true;
+
+  // a flag to know if we're processing previously buffered items, which
+  // may call the _write() callback in the same tick, so that we don't
+  // end up in an overlapped onwrite situation.
+  this.bufferProcessing = false;
+
+  // the callback that's passed to _write(chunk,cb)
+  this.onwrite = function(er) {
+    onwrite(stream, er);
+  };
+
+  // the callback that the user supplies to write(chunk,encoding,cb)
+  this.writecb = null;
+
+  // the amount that is being written when _write is called.
+  this.writelen = 0;
+
+  this.buffer = [];
+
+  // number of pending user-supplied write callbacks
+  // this must be 0 before 'finish' can be emitted
+  this.pendingcb = 0;
+
+  // emit prefinish if the only thing we're waiting for is _write cbs
+  // This is relevant for synchronous Transform streams
+  this.prefinished = false;
+}
+
+function Writable(options) {
+  // Writable ctor is applied to Duplexes, though they're not
+  // instanceof Writable, they're instanceof Readable.
+  if (!(this instanceof Writable) && !(this instanceof require('./_stream_duplex')))
+    return new Writable(options);
+
+  this._writableState = new WritableState(options, this);
+
+  // legacy.
+  this.writable = true;
+
+  Stream.call(this);
+}
+
+// Otherwise people can pipe Writable streams, which is just wrong.
+Writable.prototype.pipe = function() {
+  this.emit('error', new Error('Cannot pipe. Not readable.'));
+};
+
+
+function writeAfterEnd(stream, state, cb) {
+  var er = new Error('write after end');
+  // TODO: defer error events consistently everywhere, not just the cb
+  stream.emit('error', er);
+  process.nextTick(function() {
+    cb(er);
+  });
+}
+
+// If we get something that is not a buffer, string, null, or undefined,
+// and we're not in objectMode, then that's an error.
+// Otherwise stream chunks are all considered to be of length=1, and the
+// watermarks determine how many objects to keep in the buffer, rather than
+// how many bytes or characters.
+function validChunk(stream, state, chunk, cb) {
+  var valid = true;
+  if (!util.isBuffer(chunk) &&
+      !util.isString(chunk) &&
+      !util.isNullOrUndefined(chunk) &&
+      !state.objectMode) {
+    var er = new TypeError('Invalid non-string/buffer chunk');
+    stream.emit('error', er);
+    process.nextTick(function() {
+      cb(er);
+    });
+    valid = false;
+  }
+  return valid;
+}
+
+Writable.prototype.write = function(chunk, encoding, cb) {
+  var state = this._writableState;
+  var ret = false;
+
+  if (util.isFunction(encoding)) {
+    cb = encoding;
+    encoding = null;
+  }
+
+  if (util.isBuffer(chunk))
+    encoding = 'buffer';
+  else if (!encoding)
+    encoding = state.defaultEncoding;
+
+  if (!util.isFunction(cb))
+    cb = function() {};
+
+  if (state.ended)
+    writeAfterEnd(this, state, cb);
+  else if (validChunk(this, state, chunk, cb)) {
+    state.pendingcb++;
+    ret = writeOrBuffer(this, state, chunk, encoding, cb);
+  }
+
+  return ret;
+};
+
+Writable.prototype.cork = function() {
+  var state = this._writableState;
+
+  state.corked++;
+};
+
+Writable.prototype.uncork = function() {
+  var state = this._writableState;
+
+  if (state.corked) {
+    state.corked--;
+
+    if (!state.writing &&
+        !state.corked &&
+        !state.finished &&
+        !state.bufferProcessing &&
+        state.buffer.length)
+      clearBuffer(this, state);
+  }
+};
+
+function decodeChunk(state, chunk, encoding) {
+  if (!state.objectMode &&
+      state.decodeStrings !== false &&
+      util.isString(chunk)) {
+    chunk = new Buffer(chunk, encoding);
+  }
+  return chunk;
+}
+
+// if we're already writing something, then just put this
+// in the queue, and wait our turn.  Otherwise, call _write
+// If we return false, then we need a drain event, so set that flag.
+function writeOrBuffer(stream, state, chunk, encoding, cb) {
+  chunk = decodeChunk(state, chunk, encoding);
+  if (util.isBuffer(chunk))
+    encoding = 'buffer';
+  var len = state.objectMode ? 1 : chunk.length;
+
+  state.length += len;
+
+  var ret = state.length < state.highWaterMark;
+  state.needDrain = !ret;
+
+  if (state.writing || state.corked)
+    state.buffer.push(new WriteReq(chunk, encoding, cb));
+  else
+    doWrite(stream, state, false, len, chunk, encoding, cb);
+
+  return ret;
+}
+
+function doWrite(stream, state, writev, len, chunk, encoding, cb) {
+  state.writelen = len;
+  state.writecb = cb;
+  state.writing = true;
+  state.sync = true;
+  if (writev)
+    stream._writev(chunk, state.onwrite);
+  else
+    stream._write(chunk, encoding, state.onwrite);
+  state.sync = false;
+}
+
+function onwriteError(stream, state, sync, er, cb) {
+  if (sync)
+    process.nextTick(function() {
+      state.pendingcb--;
+      cb(er);
+    });
+  else {
+    state.pendingcb--;
+    cb(er);
+  }
+
+  stream.emit('error', er);
+}
+
+function onwriteStateUpdate(state) {
+  state.writing = false;
+  state.writecb = null;
+  state.length -= state.writelen;
+  state.writelen = 0;
+}
+
+function onwrite(stream, er) {
+  var state = stream._writableState;
+  var sync = state.sync;
+  var cb = state.writecb;
+
+  onwriteStateUpdate(state);
+
+  if (er)
+    onwriteError(stream, state, sync, er, cb);
+  else {
+    // Check if we're actually ready to finish, but don't emit yet
+    var finished = needFinish(stream, state);
+
+    if (!finished &&
+        !state.corked &&
+        !state.bufferProcessing &&
+        state.buffer.length) {
+      clearBuffer(stream, state);
+    }
+
+    if (sync) {
+      process.nextTick(function() {
+        afterWrite(stream, state, finished, cb);
+      });
+    } else {
+      afterWrite(stream, state, finished, cb);
+    }
+  }
+}
+
+function afterWrite(stream, state, finished, cb) {
+  if (!finished)
+    onwriteDrain(stream, state);
+  state.pendingcb--;
+  cb();
+  finishMaybe(stream, state);
+}
+
+// Must force callback to be called on nextTick, so that we don't
+// emit 'drain' before the write() consumer gets the 'false' return
+// value, and has a chance to attach a 'drain' listener.
+function onwriteDrain(stream, state) {
+  if (state.length === 0 && state.needDrain) {
+    state.needDrain = false;
+    stream.emit('drain');
+  }
+}
+
+
+// if there's something in the buffer waiting, then process it
+function clearBuffer(stream, state) {
+  state.bufferProcessing = true;
+
+  if (stream._writev && state.buffer.length > 1) {
+    // Fast case, write everything using _writev()
+    var cbs = [];
+    for (var c = 0; c < state.buffer.length; c++)
+      cbs.push(state.buffer[c].callback);
+
+    // count the one we are adding, as well.
+    // TODO(isaacs) clean this up
+    state.pendingcb++;
+    doWrite(stream, state, true, state.length, state.buffer, '', function(err) {
+      for (var i = 0; i < cbs.length; i++) {
+        state.pendingcb--;
+        cbs[i](err);
+      }
+    });
+
+    // Clear buffer
+    state.buffer = [];
+  } else {
+    // Slow case, write chunks one-by-one
+    for (var c = 0; c < state.buffer.length; c++) {
+      var entry = state.buffer[c];
+      var chunk = entry.chunk;
+      var encoding = entry.encoding;
+      var cb = entry.callback;
+      var len = state.objectMode ? 1 : chunk.length;
+
+      doWrite(stream, state, false, len, chunk, encoding, cb);
+
+      // if we didn't call the onwrite immediately, then
+      // it means that we need to wait until it does.
+      // also, that means that the chunk and cb are currently
+      // being processed, so move the buffer counter past them.
+      if (state.writing) {
+        c++;
+        break;
+      }
+    }
+
+    if (c < state.buffer.length)
+      state.buffer = state.buffer.slice(c);
+    else
+      state.buffer.length = 0;
+  }
+
+  state.bufferProcessing = false;
+}
+
+Writable.prototype._write = function(chunk, encoding, cb) {
+  cb(new Error('not implemented'));
+
+};
+
+Writable.prototype._writev = null;
+
+Writable.prototype.end = function(chunk, encoding, cb) {
+  var state = this._writableState;
+
+  if (util.isFunction(chunk)) {
+    cb = chunk;
+    chunk = null;
+    encoding = null;
+  } else if (util.isFunction(encoding)) {
+    cb = encoding;
+    encoding = null;
+  }
+
+  if (!util.isNullOrUndefined(chunk))
+    this.write(chunk, encoding);
+
+  // .end() fully uncorks
+  if (state.corked) {
+    state.corked = 1;
+    this.uncork();
+  }
+
+  // ignore unnecessary end() calls.
+  if (!state.ending && !state.finished)
+    endWritable(this, state, cb);
+};
+
+
+function needFinish(stream, state) {
+  return (state.ending &&
+          state.length === 0 &&
+          !state.finished &&
+          !state.writing);
+}
+
+function prefinish(stream, state) {
+  if (!state.prefinished) {
+    state.prefinished = true;
+    stream.emit('prefinish');
+  }
+}
+
+function finishMaybe(stream, state) {
+  var need = needFinish(stream, state);
+  if (need) {
+    if (state.pendingcb === 0) {
+      prefinish(stream, state);
+      state.finished = true;
+      stream.emit('finish');
+    } else
+      prefinish(stream, state);
+  }
+  return need;
+}
+
+function endWritable(stream, state, cb) {
+  state.ending = true;
+  finishMaybe(stream, state);
+  if (cb) {
+    if (state.finished)
+      process.nextTick(cb);
+    else
+      stream.once('finish', cb);
+  }
+  state.ended = true;
+}
+
+}).call(this,require('_process'),require("buffer").Buffer)
+},{"./_stream_duplex":225,"_process":443,"buffer":284,"core-util-is":288,"stream":620,"util":667}],230:[function(require,module,exports){
+exports = module.exports = require('./lib/_stream_readable.js');
+exports.Stream = require('stream');
+exports.Readable = exports;
+exports.Writable = require('./lib/_stream_writable.js');
+exports.Duplex = require('./lib/_stream_duplex.js');
+exports.Transform = require('./lib/_stream_transform.js');
+exports.PassThrough = require('./lib/_stream_passthrough.js');
+
+},{"./lib/_stream_duplex.js":225,"./lib/_stream_passthrough.js":226,"./lib/_stream_readable.js":227,"./lib/_stream_transform.js":228,"./lib/_stream_writable.js":229,"stream":620}],231:[function(require,module,exports){
+(function (process){
+exports = module.exports = SemVer;
+
+// The debug function is excluded entirely from the minified version.
+/* nomin */ var debug;
+/* nomin */ if (typeof process === 'object' &&
+    /* nomin */ process.env &&
+    /* nomin */ process.env.NODE_DEBUG &&
+    /* nomin */ /\bsemver\b/i.test(process.env.NODE_DEBUG))
+  /* nomin */ debug = function() {
+    /* nomin */ var args = Array.prototype.slice.call(arguments, 0);
+    /* nomin */ args.unshift('SEMVER');
+    /* nomin */ console.log.apply(console, args);
+    /* nomin */ };
+/* nomin */ else
+  /* nomin */ debug = function() {};
+
+// Note: this is the semver.org version of the spec that it implements
+// Not necessarily the package version of this code.
+exports.SEMVER_SPEC_VERSION = '2.0.0';
+
+var MAX_LENGTH = 256;
+var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991;
+
+// The actual regexps go on exports.re
+var re = exports.re = [];
+var src = exports.src = [];
+var R = 0;
+
+// The following Regular Expressions can be used for tokenizing,
+// validating, and parsing SemVer version strings.
+
+// ## Numeric Identifier
+// A single `0`, or a non-zero digit followed by zero or more digits.
+
+var NUMERICIDENTIFIER = R++;
+src[NUMERICIDENTIFIER] = '0|[1-9]\\d*';
+var NUMERICIDENTIFIERLOOSE = R++;
+src[NUMERICIDENTIFIERLOOSE] = '[0-9]+';
+
+
+// ## Non-numeric Identifier
+// Zero or more digits, followed by a letter or hyphen, and then zero or
+// more letters, digits, or hyphens.
+
+var NONNUMERICIDENTIFIER = R++;
+src[NONNUMERICIDENTIFIER] = '\\d*[a-zA-Z-][a-zA-Z0-9-]*';
+
+
+// ## Main Version
+// Three dot-separated numeric identifiers.
+
+var MAINVERSION = R++;
+src[MAINVERSION] = '(' + src[NUMERICIDENTIFIER] + ')\\.' +
+                   '(' + src[NUMERICIDENTIFIER] + ')\\.' +
+                   '(' + src[NUMERICIDENTIFIER] + ')';
+
+var MAINVERSIONLOOSE = R++;
+src[MAINVERSIONLOOSE] = '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
+                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
+                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')';
+
+// ## Pre-release Version Identifier
+// A numeric identifier, or a non-numeric identifier.
+
+var PRERELEASEIDENTIFIER = R++;
+src[PRERELEASEIDENTIFIER] = '(?:' + src[NUMERICIDENTIFIER] +
+                            '|' + src[NONNUMERICIDENTIFIER] + ')';
+
+var PRERELEASEIDENTIFIERLOOSE = R++;
+src[PRERELEASEIDENTIFIERLOOSE] = '(?:' + src[NUMERICIDENTIFIERLOOSE] +
+                                 '|' + src[NONNUMERICIDENTIFIER] + ')';
+
+
+// ## Pre-release Version
+// Hyphen, followed by one or more dot-separated pre-release version
+// identifiers.
+
+var PRERELEASE = R++;
+src[PRERELEASE] = '(?:-(' + src[PRERELEASEIDENTIFIER] +
+                  '(?:\\.' + src[PRERELEASEIDENTIFIER] + ')*))';
+
+var PRERELEASELOOSE = R++;
+src[PRERELEASELOOSE] = '(?:-?(' + src[PRERELEASEIDENTIFIERLOOSE] +
+                       '(?:\\.' + src[PRERELEASEIDENTIFIERLOOSE] + ')*))';
+
+// ## Build Metadata Identifier
+// Any combination of digits, letters, or hyphens.
+
+var BUILDIDENTIFIER = R++;
+src[BUILDIDENTIFIER] = '[0-9A-Za-z-]+';
+
+// ## Build Metadata
+// Plus sign, followed by one or more period-separated build metadata
+// identifiers.
+
+var BUILD = R++;
+src[BUILD] = '(?:\\+(' + src[BUILDIDENTIFIER] +
+             '(?:\\.' + src[BUILDIDENTIFIER] + ')*))';
+
+
+// ## Full Version String
+// A main version, followed optionally by a pre-release version and
+// build metadata.
+
+// Note that the only major, minor, patch, and pre-release sections of
+// the version string are capturing groups.  The build metadata is not a
+// capturing group, because it should not ever be used in version
+// comparison.
+
+var FULL = R++;
+var FULLPLAIN = 'v?' + src[MAINVERSION] +
+                src[PRERELEASE] + '?' +
+                src[BUILD] + '?';
+
+src[FULL] = '^' + FULLPLAIN + '$';
+
+// like full, but allows v1.2.3 and =1.2.3, which people do sometimes.
+// also, 1.0.0alpha1 (prerelease without the hyphen) which is pretty
+// common in the npm registry.
+var LOOSEPLAIN = '[v=\\s]*' + src[MAINVERSIONLOOSE] +
+                 src[PRERELEASELOOSE] + '?' +
+                 src[BUILD] + '?';
+
+var LOOSE = R++;
+src[LOOSE] = '^' + LOOSEPLAIN + '$';
+
+var GTLT = R++;
+src[GTLT] = '((?:<|>)?=?)';
+
+// Something like "2.*" or "1.2.x".
+// Note that "x.x" is a valid xRange identifer, meaning "any version"
+// Only the first item is strictly required.
+var XRANGEIDENTIFIERLOOSE = R++;
+src[XRANGEIDENTIFIERLOOSE] = src[NUMERICIDENTIFIERLOOSE] + '|x|X|\\*';
+var XRANGEIDENTIFIER = R++;
+src[XRANGEIDENTIFIER] = src[NUMERICIDENTIFIER] + '|x|X|\\*';
+
+var XRANGEPLAIN = R++;
+src[XRANGEPLAIN] = '[v=\\s]*(' + src[XRANGEIDENTIFIER] + ')' +
+                   '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
+                   '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
+                   '(?:' + src[PRERELEASE] + ')?' +
+                   src[BUILD] + '?' +
+                   ')?)?';
+
+var XRANGEPLAINLOOSE = R++;
+src[XRANGEPLAINLOOSE] = '[v=\\s]*(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
+                        '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
+                        '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
+                        '(?:' + src[PRERELEASELOOSE] + ')?' +
+                        src[BUILD] + '?' +
+                        ')?)?';
+
+var XRANGE = R++;
+src[XRANGE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAIN] + '$';
+var XRANGELOOSE = R++;
+src[XRANGELOOSE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAINLOOSE] + '$';
+
+// Tilde ranges.
+// Meaning is "reasonably at or greater than"
+var LONETILDE = R++;
+src[LONETILDE] = '(?:~>?)';
+
+var TILDETRIM = R++;
+src[TILDETRIM] = '(\\s*)' + src[LONETILDE] + '\\s+';
+re[TILDETRIM] = new RegExp(src[TILDETRIM], 'g');
+var tildeTrimReplace = '$1~';
+
+var TILDE = R++;
+src[TILDE] = '^' + src[LONETILDE] + src[XRANGEPLAIN] + '$';
+var TILDELOOSE = R++;
+src[TILDELOOSE] = '^' + src[LONETILDE] + src[XRANGEPLAINLOOSE] + '$';
+
+// Caret ranges.
+// Meaning is "at least and backwards compatible with"
+var LONECARET = R++;
+src[LONECARET] = '(?:\\^)';
+
+var CARETTRIM = R++;
+src[CARETTRIM] = '(\\s*)' + src[LONECARET] + '\\s+';
+re[CARETTRIM] = new RegExp(src[CARETTRIM], 'g');
+var caretTrimReplace = '$1^';
+
+var CARET = R++;
+src[CARET] = '^' + src[LONECARET] + src[XRANGEPLAIN] + '$';
+var CARETLOOSE = R++;
+src[CARETLOOSE] = '^' + src[LONECARET] + src[XRANGEPLAINLOOSE] + '$';
+
+// A simple gt/lt/eq thing, or just "" to indicate "any version"
+var COMPARATORLOOSE = R++;
+src[COMPARATORLOOSE] = '^' + src[GTLT] + '\\s*(' + LOOSEPLAIN + ')$|^$';
+var COMPARATOR = R++;
+src[COMPARATOR] = '^' + src[GTLT] + '\\s*(' + FULLPLAIN + ')$|^$';
+
+
+// An expression to strip any whitespace between the gtlt and the thing
+// it modifies, so that `> 1.2.3` ==> `>1.2.3`
+var COMPARATORTRIM = R++;
+src[COMPARATORTRIM] = '(\\s*)' + src[GTLT] +
+                      '\\s*(' + LOOSEPLAIN + '|' + src[XRANGEPLAIN] + ')';
+
+// this one has to use the /g flag
+re[COMPARATORTRIM] = new RegExp(src[COMPARATORTRIM], 'g');
+var comparatorTrimReplace = '$1$2$3';
+
+
+// Something like `1.2.3 - 1.2.4`
+// Note that these all use the loose form, because they'll be
+// checked against either the strict or loose comparator form
+// later.
+var HYPHENRANGE = R++;
+src[HYPHENRANGE] = '^\\s*(' + src[XRANGEPLAIN] + ')' +
+                   '\\s+-\\s+' +
+                   '(' + src[XRANGEPLAIN] + ')' +
+                   '\\s*$';
+
+var HYPHENRANGELOOSE = R++;
+src[HYPHENRANGELOOSE] = '^\\s*(' + src[XRANGEPLAINLOOSE] + ')' +
+                        '\\s+-\\s+' +
+                        '(' + src[XRANGEPLAINLOOSE] + ')' +
+                        '\\s*$';
+
+// Star ranges basically just allow anything at all.
+var STAR = R++;
+src[STAR] = '(<|>)?=?\\s*\\*';
+
+// Compile to actual regexp objects.
+// All are flag-free, unless they were created above with a flag.
+for (var i = 0; i < R; i++) {
+  debug(i, src[i]);
+  if (!re[i])
+    re[i] = new RegExp(src[i]);
+}
+
+exports.parse = parse;
+function parse(version, loose) {
+  if (version instanceof SemVer)
+    return version;
+
+  if (typeof version !== 'string')
+    return null;
+
+  if (version.length > MAX_LENGTH)
+    return null;
+
+  var r = loose ? re[LOOSE] : re[FULL];
+  if (!r.test(version))
+    return null;
+
+  try {
+    return new SemVer(version, loose);
+  } catch (er) {
+    return null;
+  }
+}
+
+exports.valid = valid;
+function valid(version, loose) {
+  var v = parse(version, loose);
+  return v ? v.version : null;
+}
+
+
+exports.clean = clean;
+function clean(version, loose) {
+  var s = parse(version.trim().replace(/^[=v]+/, ''), loose);
+  return s ? s.version : null;
+}
+
+exports.SemVer = SemVer;
+
+function SemVer(version, loose) {
+  if (version instanceof SemVer) {
+    if (version.loose === loose)
+      return version;
+    else
+      version = version.version;
+  } else if (typeof version !== 'string') {
+    throw new TypeError('Invalid Version: ' + version);
+  }
+
+  if (version.length > MAX_LENGTH)
+    throw new TypeError('version is longer than ' + MAX_LENGTH + ' characters')
+
+  if (!(this instanceof SemVer))
+    return new SemVer(version, loose);
+
+  debug('SemVer', version, loose);
+  this.loose = loose;
+  var m = version.trim().match(loose ? re[LOOSE] : re[FULL]);
+
+  if (!m)
+    throw new TypeError('Invalid Version: ' + version);
+
+  this.raw = version;
+
+  // these are actually numbers
+  this.major = +m[1];
+  this.minor = +m[2];
+  this.patch = +m[3];
+
+  if (this.major > MAX_SAFE_INTEGER || this.major < 0)
+    throw new TypeError('Invalid major version')
+
+  if (this.minor > MAX_SAFE_INTEGER || this.minor < 0)
+    throw new TypeError('Invalid minor version')
+
+  if (this.patch > MAX_SAFE_INTEGER || this.patch < 0)
+    throw new TypeError('Invalid patch version')
+
+  // numberify any prerelease numeric ids
+  if (!m[4])
+    this.prerelease = [];
+  else
+    this.prerelease = m[4].split('.').map(function(id) {
+      if (/^[0-9]+$/.test(id)) {
+        var num = +id
+        if (num >= 0 && num < MAX_SAFE_INTEGER)
+          return num
+      }
+      return id;
+    });
+
+  this.build = m[5] ? m[5].split('.') : [];
+  this.format();
+}
+
+SemVer.prototype.format = function() {
+  this.version = this.major + '.' + this.minor + '.' + this.patch;
+  if (this.prerelease.length)
+    this.version += '-' + this.prerelease.join('.');
+  return this.version;
+};
+
+SemVer.prototype.toString = function() {
+  return this.version;
+};
+
+SemVer.prototype.compare = function(other) {
+  debug('SemVer.compare', this.version, this.loose, other);
+  if (!(other instanceof SemVer))
+    other = new SemVer(other, this.loose);
+
+  return this.compareMain(other) || this.comparePre(other);
+};
+
+SemVer.prototype.compareMain = function(other) {
+  if (!(other instanceof SemVer))
+    other = new SemVer(other, this.loose);
+
+  return compareIdentifiers(this.major, other.major) ||
+         compareIdentifiers(this.minor, other.minor) ||
+         compareIdentifiers(this.patch, other.patch);
+};
+
+SemVer.prototype.comparePre = function(other) {
+  if (!(other instanceof SemVer))
+    other = new SemVer(other, this.loose);
+
+  // NOT having a prerelease is > having one
+  if (this.prerelease.length && !other.prerelease.length)
+    return -1;
+  else if (!this.prerelease.length && other.prerelease.length)
+    return 1;
+  else if (!this.prerelease.length && !other.prerelease.length)
+    return 0;
+
+  var i = 0;
+  do {
+    var a = this.prerelease[i];
+    var b = other.prerelease[i];
+    debug('prerelease compare', i, a, b);
+    if (a === undefined && b === undefined)
+      return 0;
+    else if (b === undefined)
+      return 1;
+    else if (a === undefined)
+      return -1;
+    else if (a === b)
+      continue;
+    else
+      return compareIdentifiers(a, b);
+  } while (++i);
+};
+
+// preminor will bump the version up to the next minor release, and immediately
+// down to pre-release. premajor and prepatch work the same way.
+SemVer.prototype.inc = function(release, identifier) {
+  switch (release) {
+    case 'premajor':
+      this.prerelease.length = 0;
+      this.patch = 0;
+      this.minor = 0;
+      this.major++;
+      this.inc('pre', identifier);
+      break;
+    case 'preminor':
+      this.prerelease.length = 0;
+      this.patch = 0;
+      this.minor++;
+      this.inc('pre', identifier);
+      break;
+    case 'prepatch':
+      // If this is already a prerelease, it will bump to the next version
+      // drop any prereleases that might already exist, since they are not
+      // relevant at this point.
+      this.prerelease.length = 0;
+      this.inc('patch', identifier);
+      this.inc('pre', identifier);
+      break;
+    // If the input is a non-prerelease version, this acts the same as
+    // prepatch.
+    case 'prerelease':
+      if (this.prerelease.length === 0)
+        this.inc('patch', identifier);
+      this.inc('pre', identifier);
+      break;
+
+    case 'major':
+      // If this is a pre-major version, bump up to the same major version.
+      // Otherwise increment major.
+      // 1.0.0-5 bumps to 1.0.0
+      // 1.1.0 bumps to 2.0.0
+      if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0)
+        this.major++;
+      this.minor = 0;
+      this.patch = 0;
+      this.prerelease = [];
+      break;
+    case 'minor':
+      // If this is a pre-minor version, bump up to the same minor version.
+      // Otherwise increment minor.
+      // 1.2.0-5 bumps to 1.2.0
+      // 1.2.1 bumps to 1.3.0
+      if (this.patch !== 0 || this.prerelease.length === 0)
+        this.minor++;
+      this.patch = 0;
+      this.prerelease = [];
+      break;
+    case 'patch':
+      // If this is not a pre-release version, it will increment the patch.
+      // If it is a pre-release it will bump up to the same patch version.
+      // 1.2.0-5 patches to 1.2.0
+      // 1.2.0 patches to 1.2.1
+      if (this.prerelease.length === 0)
+        this.patch++;
+      this.prerelease = [];
+      break;
+    // This probably shouldn't be used publicly.
+    // 1.0.0 "pre" would become 1.0.0-0 which is the wrong direction.
+    case 'pre':
+      if (this.prerelease.length === 0)
+        this.prerelease = [0];
+      else {
+        var i = this.prerelease.length;
+        while (--i >= 0) {
+          if (typeof this.prerelease[i] === 'number') {
+            this.prerelease[i]++;
+            i = -2;
+          }
+        }
+        if (i === -1) // didn't increment anything
+          this.prerelease.push(0);
+      }
+      if (identifier) {
+        // 1.2.0-beta.1 bumps to 1.2.0-beta.2,
+        // 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
+        if (this.prerelease[0] === identifier) {
+          if (isNaN(this.prerelease[1]))
+            this.prerelease = [identifier, 0];
+        } else
+          this.prerelease = [identifier, 0];
+      }
+      break;
+
+    default:
+      throw new Error('invalid increment argument: ' + release);
+  }
+  this.format();
+  this.raw = this.version;
+  return this;
+};
+
+exports.inc = inc;
+function inc(version, release, loose, identifier) {
+  if (typeof(loose) === 'string') {
+    identifier = loose;
+    loose = undefined;
+  }
+
+  try {
+    return new SemVer(version, loose).inc(release, identifier).version;
+  } catch (er) {
+    return null;
+  }
+}
+
+exports.diff = diff;
+function diff(version1, version2) {
+  if (eq(version1, version2)) {
+    return null;
+  } else {
+    var v1 = parse(version1);
+    var v2 = parse(version2);
+    if (v1.prerelease.length || v2.prerelease.length) {
+      for (var key in v1) {
+        if (key === 'major' || key === 'minor' || key === 'patch') {
+          if (v1[key] !== v2[key]) {
+            return 'pre'+key;
+          }
+        }
+      }
+      return 'prerelease';
+    }
+    for (var key in v1) {
+      if (key === 'major' || key === 'minor' || key === 'patch') {
+        if (v1[key] !== v2[key]) {
+          return key;
+        }
+      }
+    }
+  }
+}
+
+exports.compareIdentifiers = compareIdentifiers;
+
+var numeric = /^[0-9]+$/;
+function compareIdentifiers(a, b) {
+  var anum = numeric.test(a);
+  var bnum = numeric.test(b);
+
+  if (anum && bnum) {
+    a = +a;
+    b = +b;
+  }
+
+  return (anum && !bnum) ? -1 :
+         (bnum && !anum) ? 1 :
+         a < b ? -1 :
+         a > b ? 1 :
+         0;
+}
+
+exports.rcompareIdentifiers = rcompareIdentifiers;
+function rcompareIdentifiers(a, b) {
+  return compareIdentifiers(b, a);
+}
+
+exports.major = major;
+function major(a, loose) {
+  return new SemVer(a, loose).major;
+}
+
+exports.minor = minor;
+function minor(a, loose) {
+  return new SemVer(a, loose).minor;
+}
+
+exports.patch = patch;
+function patch(a, loose) {
+  return new SemVer(a, loose).patch;
+}
+
+exports.compare = compare;
+function compare(a, b, loose) {
+  return new SemVer(a, loose).compare(b);
+}
+
+exports.compareLoose = compareLoose;
+function compareLoose(a, b) {
+  return compare(a, b, true);
+}
+
+exports.rcompare = rcompare;
+function rcompare(a, b, loose) {
+  return compare(b, a, loose);
+}
+
+exports.sort = sort;
+function sort(list, loose) {
+  return list.sort(function(a, b) {
+    return exports.compare(a, b, loose);
+  });
+}
+
+exports.rsort = rsort;
+function rsort(list, loose) {
+  return list.sort(function(a, b) {
+    return exports.rcompare(a, b, loose);
+  });
+}
+
+exports.gt = gt;
+function gt(a, b, loose) {
+  return compare(a, b, loose) > 0;
+}
+
+exports.lt = lt;
+function lt(a, b, loose) {
+  return compare(a, b, loose) < 0;
+}
+
+exports.eq = eq;
+function eq(a, b, loose) {
+  return compare(a, b, loose) === 0;
+}
+
+exports.neq = neq;
+function neq(a, b, loose) {
+  return compare(a, b, loose) !== 0;
+}
+
+exports.gte = gte;
+function gte(a, b, loose) {
+  return compare(a, b, loose) >= 0;
+}
+
+exports.lte = lte;
+function lte(a, b, loose) {
+  return compare(a, b, loose) <= 0;
+}
+
+exports.cmp = cmp;
+function cmp(a, op, b, loose) {
+  var ret;
+  switch (op) {
+    case '===':
+      if (typeof a === 'object') a = a.version;
+      if (typeof b === 'object') b = b.version;
+      ret = a === b;
+      break;
+    case '!==':
+      if (typeof a === 'object') a = a.version;
+      if (typeof b === 'object') b = b.version;
+      ret = a !== b;
+      break;
+    case '': case '=': case '==': ret = eq(a, b, loose); break;
+    case '!=': ret = neq(a, b, loose); break;
+    case '>': ret = gt(a, b, loose); break;
+    case '>=': ret = gte(a, b, loose); break;
+    case '<': ret = lt(a, b, loose); break;
+    case '<=': ret = lte(a, b, loose); break;
+    default: throw new TypeError('Invalid operator: ' + op);
+  }
+  return ret;
+}
+
+exports.Comparator = Comparator;
+function Comparator(comp, loose) {
+  if (comp instanceof Comparator) {
+    if (comp.loose === loose)
+      return comp;
+    else
+      comp = comp.value;
+  }
+
+  if (!(this instanceof Comparator))
+    return new Comparator(comp, loose);
+
+  debug('comparator', comp, loose);
+  this.loose = loose;
+  this.parse(comp);
+
+  if (this.semver === ANY)
+    this.value = '';
+  else
+    this.value = this.operator + this.semver.version;
+
+  debug('comp', this);
+}
+
+var ANY = {};
+Comparator.prototype.parse = function(comp) {
+  var r = this.loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
+  var m = comp.match(r);
+
+  if (!m)
+    throw new TypeError('Invalid comparator: ' + comp);
+
+  this.operator = m[1];
+  if (this.operator === '=')
+    this.operator = '';
+
+  // if it literally is just '>' or '' then allow anything.
+  if (!m[2])
+    this.semver = ANY;
+  else
+    this.semver = new SemVer(m[2], this.loose);
+};
+
+Comparator.prototype.toString = function() {
+  return this.value;
+};
+
+Comparator.prototype.test = function(version) {
+  debug('Comparator.test', version, this.loose);
+
+  if (this.semver === ANY)
+    return true;
+
+  if (typeof version === 'string')
+    version = new SemVer(version, this.loose);
+
+  return cmp(version, this.operator, this.semver, this.loose);
+};
+
+
+exports.Range = Range;
+function Range(range, loose) {
+  if ((range instanceof Range) && range.loose === loose)
+    return range;
+
+  if (!(this instanceof Range))
+    return new Range(range, loose);
+
+  this.loose = loose;
+
+  // First, split based on boolean or ||
+  this.raw = range;
+  this.set = range.split(/\s*\|\|\s*/).map(function(range) {
+    return this.parseRange(range.trim());
+  }, this).filter(function(c) {
+    // throw out any that are not relevant for whatever reason
+    return c.length;
+  });
+
+  if (!this.set.length) {
+    throw new TypeError('Invalid SemVer Range: ' + range);
+  }
+
+  this.format();
+}
+
+Range.prototype.format = function() {
+  this.range = this.set.map(function(comps) {
+    return comps.join(' ').trim();
+  }).join('||').trim();
+  return this.range;
+};
+
+Range.prototype.toString = function() {
+  return this.range;
+};
+
+Range.prototype.parseRange = function(range) {
+  var loose = this.loose;
+  range = range.trim();
+  debug('range', range, loose);
+  // `1.2.3 - 1.2.4` => `>=1.2.3 <=1.2.4`
+  var hr = loose ? re[HYPHENRANGELOOSE] : re[HYPHENRANGE];
+  range = range.replace(hr, hyphenReplace);
+  debug('hyphen replace', range);
+  // `> 1.2.3 < 1.2.5` => `>1.2.3 <1.2.5`
+  range = range.replace(re[COMPARATORTRIM], comparatorTrimReplace);
+  debug('comparator trim', range, re[COMPARATORTRIM]);
+
+  // `~ 1.2.3` => `~1.2.3`
+  range = range.replace(re[TILDETRIM], tildeTrimReplace);
+
+  // `^ 1.2.3` => `^1.2.3`
+  range = range.replace(re[CARETTRIM], caretTrimReplace);
+
+  // normalize spaces
+  range = range.split(/\s+/).join(' ');
+
+  // At this point, the range is completely trimmed and
+  // ready to be split into comparators.
+
+  var compRe = loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
+  var set = range.split(' ').map(function(comp) {
+    return parseComparator(comp, loose);
+  }).join(' ').split(/\s+/);
+  if (this.loose) {
+    // in loose mode, throw out any that are not valid comparators
+    set = set.filter(function(comp) {
+      return !!comp.match(compRe);
+    });
+  }
+  set = set.map(function(comp) {
+    return new Comparator(comp, loose);
+  });
+
+  return set;
+};
+
+// Mostly just for testing and legacy API reasons
+exports.toComparators = toComparators;
+function toComparators(range, loose) {
+  return new Range(range, loose).set.map(function(comp) {
+    return comp.map(function(c) {
+      return c.value;
+    }).join(' ').trim().split(' ');
+  });
+}
+
+// comprised of xranges, tildes, stars, and gtlt's at this point.
+// already replaced the hyphen ranges
+// turn into a set of JUST comparators.
+function parseComparator(comp, loose) {
+  debug('comp', comp);
+  comp = replaceCarets(comp, loose);
+  debug('caret', comp);
+  comp = replaceTildes(comp, loose);
+  debug('tildes', comp);
+  comp = replaceXRanges(comp, loose);
+  debug('xrange', comp);
+  comp = replaceStars(comp, loose);
+  debug('stars', comp);
+  return comp;
+}
+
+function isX(id) {
+  return !id || id.toLowerCase() === 'x' || id === '*';
+}
+
+// ~, ~> --> * (any, kinda silly)
+// ~2, ~2.x, ~2.x.x, ~>2, ~>2.x ~>2.x.x --> >=2.0.0 <3.0.0
+// ~2.0, ~2.0.x, ~>2.0, ~>2.0.x --> >=2.0.0 <2.1.0
+// ~1.2, ~1.2.x, ~>1.2, ~>1.2.x --> >=1.2.0 <1.3.0
+// ~1.2.3, ~>1.2.3 --> >=1.2.3 <1.3.0
+// ~1.2.0, ~>1.2.0 --> >=1.2.0 <1.3.0
+function replaceTildes(comp, loose) {
+  return comp.trim().split(/\s+/).map(function(comp) {
+    return replaceTilde(comp, loose);
+  }).join(' ');
+}
+
+function replaceTilde(comp, loose) {
+  var r = loose ? re[TILDELOOSE] : re[TILDE];
+  return comp.replace(r, function(_, M, m, p, pr) {
+    debug('tilde', comp, _, M, m, p, pr);
+    var ret;
+
+    if (isX(M))
+      ret = '';
+    else if (isX(m))
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
+    else if (isX(p))
+      // ~1.2 == >=1.2.0- <1.3.0-
+      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
+    else if (pr) {
+      debug('replaceTilde pr', pr);
+      if (pr.charAt(0) !== '-')
+        pr = '-' + pr;
+      ret = '>=' + M + '.' + m + '.' + p + pr +
+            ' <' + M + '.' + (+m + 1) + '.0';
+    } else
+      // ~1.2.3 == >=1.2.3 <1.3.0
+      ret = '>=' + M + '.' + m + '.' + p +
+            ' <' + M + '.' + (+m + 1) + '.0';
+
+    debug('tilde return', ret);
+    return ret;
+  });
+}
+
+// ^ --> * (any, kinda silly)
+// ^2, ^2.x, ^2.x.x --> >=2.0.0 <3.0.0
+// ^2.0, ^2.0.x --> >=2.0.0 <3.0.0
+// ^1.2, ^1.2.x --> >=1.2.0 <2.0.0
+// ^1.2.3 --> >=1.2.3 <2.0.0
+// ^1.2.0 --> >=1.2.0 <2.0.0
+function replaceCarets(comp, loose) {
+  return comp.trim().split(/\s+/).map(function(comp) {
+    return replaceCaret(comp, loose);
+  }).join(' ');
+}
+
+function replaceCaret(comp, loose) {
+  debug('caret', comp, loose);
+  var r = loose ? re[CARETLOOSE] : re[CARET];
+  return comp.replace(r, function(_, M, m, p, pr) {
+    debug('caret', comp, _, M, m, p, pr);
+    var ret;
+
+    if (isX(M))
+      ret = '';
+    else if (isX(m))
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
+    else if (isX(p)) {
+      if (M === '0')
+        ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
+      else
+        ret = '>=' + M + '.' + m + '.0 <' + (+M + 1) + '.0.0';
+    } else if (pr) {
+      debug('replaceCaret pr', pr);
+      if (pr.charAt(0) !== '-')
+        pr = '-' + pr;
+      if (M === '0') {
+        if (m === '0')
+          ret = '>=' + M + '.' + m + '.' + p + pr +
+                ' <' + M + '.' + m + '.' + (+p + 1);
+        else
+          ret = '>=' + M + '.' + m + '.' + p + pr +
+                ' <' + M + '.' + (+m + 1) + '.0';
+      } else
+        ret = '>=' + M + '.' + m + '.' + p + pr +
+              ' <' + (+M + 1) + '.0.0';
+    } else {
+      debug('no pr');
+      if (M === '0') {
+        if (m === '0')
+          ret = '>=' + M + '.' + m + '.' + p +
+                ' <' + M + '.' + m + '.' + (+p + 1);
+        else
+          ret = '>=' + M + '.' + m + '.' + p +
+                ' <' + M + '.' + (+m + 1) + '.0';
+      } else
+        ret = '>=' + M + '.' + m + '.' + p +
+              ' <' + (+M + 1) + '.0.0';
+    }
+
+    debug('caret return', ret);
+    return ret;
+  });
+}
+
+function replaceXRanges(comp, loose) {
+  debug('replaceXRanges', comp, loose);
+  return comp.split(/\s+/).map(function(comp) {
+    return replaceXRange(comp, loose);
+  }).join(' ');
+}
+
+function replaceXRange(comp, loose) {
+  comp = comp.trim();
+  var r = loose ? re[XRANGELOOSE] : re[XRANGE];
+  return comp.replace(r, function(ret, gtlt, M, m, p, pr) {
+    debug('xRange', comp, ret, gtlt, M, m, p, pr);
+    var xM = isX(M);
+    var xm = xM || isX(m);
+    var xp = xm || isX(p);
+    var anyX = xp;
+
+    if (gtlt === '=' && anyX)
+      gtlt = '';
+
+    if (xM) {
+      if (gtlt === '>' || gtlt === '<') {
+        // nothing is allowed
+        ret = '<0.0.0';
+      } else {
+        // nothing is forbidden
+        ret = '*';
+      }
+    } else if (gtlt && anyX) {
+      // replace X with 0
+      if (xm)
+        m = 0;
+      if (xp)
+        p = 0;
+
+      if (gtlt === '>') {
+        // >1 => >=2.0.0
+        // >1.2 => >=1.3.0
+        // >1.2.3 => >= 1.2.4
+        gtlt = '>=';
+        if (xm) {
+          M = +M + 1;
+          m = 0;
+          p = 0;
+        } else if (xp) {
+          m = +m + 1;
+          p = 0;
+        }
+      } else if (gtlt === '<=') {
+        // <=0.7.x is actually <0.8.0, since any 0.7.x should
+        // pass.  Similarly, <=7.x is actually <8.0.0, etc.
+        gtlt = '<'
+        if (xm)
+          M = +M + 1
+        else
+          m = +m + 1
+      }
+
+      ret = gtlt + M + '.' + m + '.' + p;
+    } else if (xm) {
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
+    } else if (xp) {
+      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
+    }
+
+    debug('xRange return', ret);
+
+    return ret;
+  });
+}
+
+// Because * is AND-ed with everything else in the comparator,
+// and '' means "any version", just remove the *s entirely.
+function replaceStars(comp, loose) {
+  debug('replaceStars', comp, loose);
+  // Looseness is ignored here.  star is always as loose as it gets!
+  return comp.trim().replace(re[STAR], '');
+}
+
+// This function is passed to string.replace(re[HYPHENRANGE])
+// M, m, patch, prerelease, build
+// 1.2 - 3.4.5 => >=1.2.0 <=3.4.5
+// 1.2.3 - 3.4 => >=1.2.0 <3.5.0 Any 3.4.x will do
+// 1.2 - 3.4 => >=1.2.0 <3.5.0
+function hyphenReplace($0,
+                       from, fM, fm, fp, fpr, fb,
+                       to, tM, tm, tp, tpr, tb) {
+
+  if (isX(fM))
+    from = '';
+  else if (isX(fm))
+    from = '>=' + fM + '.0.0';
+  else if (isX(fp))
+    from = '>=' + fM + '.' + fm + '.0';
+  else
+    from = '>=' + from;
+
+  if (isX(tM))
+    to = '';
+  else if (isX(tm))
+    to = '<' + (+tM + 1) + '.0.0';
+  else if (isX(tp))
+    to = '<' + tM + '.' + (+tm + 1) + '.0';
+  else if (tpr)
+    to = '<=' + tM + '.' + tm + '.' + tp + '-' + tpr;
+  else
+    to = '<=' + to;
+
+  return (from + ' ' + to).trim();
+}
+
+
+// if ANY of the sets match ALL of its comparators, then pass
+Range.prototype.test = function(version) {
+  if (!version)
+    return false;
+
+  if (typeof version === 'string')
+    version = new SemVer(version, this.loose);
+
+  for (var i = 0; i < this.set.length; i++) {
+    if (testSet(this.set[i], version))
+      return true;
+  }
+  return false;
+};
+
+function testSet(set, version) {
+  for (var i = 0; i < set.length; i++) {
+    if (!set[i].test(version))
+      return false;
+  }
+
+  if (version.prerelease.length) {
+    // Find the set of versions that are allowed to have prereleases
+    // For example, ^1.2.3-pr.1 desugars to >=1.2.3-pr.1 <2.0.0
+    // That should allow `1.2.3-pr.2` to pass.
+    // However, `1.2.4-alpha.notready` should NOT be allowed,
+    // even though it's within the range set by the comparators.
+    for (var i = 0; i < set.length; i++) {
+      debug(set[i].semver);
+      if (set[i].semver === ANY)
+        continue;
+
+      if (set[i].semver.prerelease.length > 0) {
+        var allowed = set[i].semver;
+        if (allowed.major === version.major &&
+            allowed.minor === version.minor &&
+            allowed.patch === version.patch)
+          return true;
+      }
+    }
+
+    // Version has a -pre, but it's not one of the ones we like.
+    return false;
+  }
+
+  return true;
+}
+
+exports.satisfies = satisfies;
+function satisfies(version, range, loose) {
+  try {
+    range = new Range(range, loose);
+  } catch (er) {
+    return false;
+  }
+  return range.test(version);
+}
+
+exports.maxSatisfying = maxSatisfying;
+function maxSatisfying(versions, range, loose) {
+  return versions.filter(function(version) {
+    return satisfies(version, range, loose);
+  }).sort(function(a, b) {
+    return rcompare(a, b, loose);
+  })[0] || null;
+}
+
+exports.validRange = validRange;
+function validRange(range, loose) {
+  try {
+    // Return '*' instead of '' so that truthiness works.
+    // This will throw if it's invalid anyway
+    return new Range(range, loose).range || '*';
+  } catch (er) {
+    return null;
+  }
+}
+
+// Determine if version is less than all the versions possible in the range
+exports.ltr = ltr;
+function ltr(version, range, loose) {
+  return outside(version, range, '<', loose);
+}
+
+// Determine if version is greater than all the versions possible in the range.
+exports.gtr = gtr;
+function gtr(version, range, loose) {
+  return outside(version, range, '>', loose);
+}
+
+exports.outside = outside;
+function outside(version, range, hilo, loose) {
+  version = new SemVer(version, loose);
+  range = new Range(range, loose);
+
+  var gtfn, ltefn, ltfn, comp, ecomp;
+  switch (hilo) {
+    case '>':
+      gtfn = gt;
+      ltefn = lte;
+      ltfn = lt;
+      comp = '>';
+      ecomp = '>=';
+      break;
+    case '<':
+      gtfn = lt;
+      ltefn = gte;
+      ltfn = gt;
+      comp = '<';
+      ecomp = '<=';
+      break;
+    default:
+      throw new TypeError('Must provide a hilo val of "<" or ">"');
+  }
+
+  // If it satisifes the range it is not outside
+  if (satisfies(version, range, loose)) {
+    return false;
+  }
+
+  // From now on, variable terms are as if we're in "gtr" mode.
+  // but note that everything is flipped for the "ltr" function.
+
+  for (var i = 0; i < range.set.length; ++i) {
+    var comparators = range.set[i];
+
+    var high = null;
+    var low = null;
+
+    comparators.forEach(function(comparator) {
+      if (comparator.semver === ANY) {
+        comparator = new Comparator('>=0.0.0')
+      }
+      high = high || comparator;
+      low = low || comparator;
+      if (gtfn(comparator.semver, high.semver, loose)) {
+        high = comparator;
+      } else if (ltfn(comparator.semver, low.semver, loose)) {
+        low = comparator;
+      }
+    });
+
+    // If the edge version comparator has a operator then our version
+    // isn't outside it
+    if (high.operator === comp || high.operator === ecomp) {
+      return false;
+    }
+
+    // If the lowest version comparator has an operator and our version
+    // is less than it then it isn't higher than the range
+    if ((!low.operator || low.operator === comp) &&
+        ltefn(version, low.semver)) {
+      return false;
+    } else if (low.operator === ecomp && ltfn(version, low.semver)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+}).call(this,require('_process'))
+},{"_process":443}],232:[function(require,module,exports){
+//     Underscore.js 1.8.3
+//     http://underscorejs.org
+//     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     Underscore may be freely distributed under the MIT license.
+
+(function() {
+
+  // Baseline setup
+  // --------------
+
+  // Establish the root object, `window` in the browser, or `exports` on the server.
+  var root = this;
+
+  // Save the previous value of the `_` variable.
+  var previousUnderscore = root._;
+
+  // Save bytes in the minified (but not gzipped) version:
+  var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
+
+  // Create quick reference variables for speed access to core prototypes.
+  var
+    push             = ArrayProto.push,
+    slice            = ArrayProto.slice,
+    toString         = ObjProto.toString,
+    hasOwnProperty   = ObjProto.hasOwnProperty;
+
+  // All **ECMAScript 5** native function implementations that we hope to use
+  // are declared here.
+  var
+    nativeIsArray      = Array.isArray,
+    nativeKeys         = Object.keys,
+    nativeBind         = FuncProto.bind,
+    nativeCreate       = Object.create;
+
+  // Naked function reference for surrogate-prototype-swapping.
+  var Ctor = function(){};
+
+  // Create a safe reference to the Underscore object for use below.
+  var _ = function(obj) {
+    if (obj instanceof _) return obj;
+    if (!(this instanceof _)) return new _(obj);
+    this._wrapped = obj;
+  };
+
+  // Export the Underscore object for **Node.js**, with
+  // backwards-compatibility for the old `require()` API. If we're in
+  // the browser, add `_` as a global object.
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+      exports = module.exports = _;
+    }
+    exports._ = _;
+  } else {
+    root._ = _;
+  }
+
+  // Current version.
+  _.VERSION = '1.8.3';
+
+  // Internal function that returns an efficient (for current engines) version
+  // of the passed-in callback, to be repeatedly applied in other Underscore
+  // functions.
+  var optimizeCb = function(func, context, argCount) {
+    if (context === void 0) return func;
+    switch (argCount == null ? 3 : argCount) {
+      case 1: return function(value) {
+        return func.call(context, value);
+      };
+      case 2: return function(value, other) {
+        return func.call(context, value, other);
+      };
+      case 3: return function(value, index, collection) {
+        return func.call(context, value, index, collection);
+      };
+      case 4: return function(accumulator, value, index, collection) {
+        return func.call(context, accumulator, value, index, collection);
+      };
+    }
+    return function() {
+      return func.apply(context, arguments);
+    };
+  };
+
+  // A mostly-internal function to generate callbacks that can be applied
+  // to each element in a collection, returning the desired result — either
+  // identity, an arbitrary callback, a property matcher, or a property accessor.
+  var cb = function(value, context, argCount) {
+    if (value == null) return _.identity;
+    if (_.isFunction(value)) return optimizeCb(value, context, argCount);
+    if (_.isObject(value)) return _.matcher(value);
+    return _.property(value);
+  };
+  _.iteratee = function(value, context) {
+    return cb(value, context, Infinity);
+  };
+
+  // An internal function for creating assigner functions.
+  var createAssigner = function(keysFunc, undefinedOnly) {
+    return function(obj) {
+      var length = arguments.length;
+      if (length < 2 || obj == null) return obj;
+      for (var index = 1; index < length; index++) {
+        var source = arguments[index],
+            keys = keysFunc(source),
+            l = keys.length;
+        for (var i = 0; i < l; i++) {
+          var key = keys[i];
+          if (!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
+        }
+      }
+      return obj;
+    };
+  };
+
+  // An internal function for creating a new object that inherits from another.
+  var baseCreate = function(prototype) {
+    if (!_.isObject(prototype)) return {};
+    if (nativeCreate) return nativeCreate(prototype);
+    Ctor.prototype = prototype;
+    var result = new Ctor;
+    Ctor.prototype = null;
+    return result;
+  };
+
+  var property = function(key) {
+    return function(obj) {
+      return obj == null ? void 0 : obj[key];
+    };
+  };
+
+  // Helper for collection methods to determine whether a collection
+  // should be iterated as an array or as an object
+  // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
+  // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
+  var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+  var getLength = property('length');
+  var isArrayLike = function(collection) {
+    var length = getLength(collection);
+    return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
+  };
+
+  // Collection Functions
+  // --------------------
+
+  // The cornerstone, an `each` implementation, aka `forEach`.
+  // Handles raw objects in addition to array-likes. Treats all
+  // sparse array-likes as if they were dense.
+  _.each = _.forEach = function(obj, iteratee, context) {
+    iteratee = optimizeCb(iteratee, context);
+    var i, length;
+    if (isArrayLike(obj)) {
+      for (i = 0, length = obj.length; i < length; i++) {
+        iteratee(obj[i], i, obj);
+      }
+    } else {
+      var keys = _.keys(obj);
+      for (i = 0, length = keys.length; i < length; i++) {
+        iteratee(obj[keys[i]], keys[i], obj);
+      }
+    }
+    return obj;
+  };
+
+  // Return the results of applying the iteratee to each element.
+  _.map = _.collect = function(obj, iteratee, context) {
+    iteratee = cb(iteratee, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length,
+        results = Array(length);
+    for (var index = 0; index < length; index++) {
+      var currentKey = keys ? keys[index] : index;
+      results[index] = iteratee(obj[currentKey], currentKey, obj);
+    }
+    return results;
+  };
+
+  // Create a reducing function iterating left or right.
+  function createReduce(dir) {
+    // Optimized iterator function as using arguments.length
+    // in the main function will deoptimize the, see #1991.
+    function iterator(obj, iteratee, memo, keys, index, length) {
+      for (; index >= 0 && index < length; index += dir) {
+        var currentKey = keys ? keys[index] : index;
+        memo = iteratee(memo, obj[currentKey], currentKey, obj);
+      }
+      return memo;
+    }
+
+    return function(obj, iteratee, memo, context) {
+      iteratee = optimizeCb(iteratee, context, 4);
+      var keys = !isArrayLike(obj) && _.keys(obj),
+          length = (keys || obj).length,
+          index = dir > 0 ? 0 : length - 1;
+      // Determine the initial value if none is provided.
+      if (arguments.length < 3) {
+        memo = obj[keys ? keys[index] : index];
+        index += dir;
+      }
+      return iterator(obj, iteratee, memo, keys, index, length);
+    };
+  }
+
+  // **Reduce** builds up a single result from a list of values, aka `inject`,
+  // or `foldl`.
+  _.reduce = _.foldl = _.inject = createReduce(1);
+
+  // The right-associative version of reduce, also known as `foldr`.
+  _.reduceRight = _.foldr = createReduce(-1);
+
+  // Return the first value which passes a truth test. Aliased as `detect`.
+  _.find = _.detect = function(obj, predicate, context) {
+    var key;
+    if (isArrayLike(obj)) {
+      key = _.findIndex(obj, predicate, context);
+    } else {
+      key = _.findKey(obj, predicate, context);
+    }
+    if (key !== void 0 && key !== -1) return obj[key];
+  };
+
+  // Return all the elements that pass a truth test.
+  // Aliased as `select`.
+  _.filter = _.select = function(obj, predicate, context) {
+    var results = [];
+    predicate = cb(predicate, context);
+    _.each(obj, function(value, index, list) {
+      if (predicate(value, index, list)) results.push(value);
+    });
+    return results;
+  };
+
+  // Return all the elements for which a truth test fails.
+  _.reject = function(obj, predicate, context) {
+    return _.filter(obj, _.negate(cb(predicate)), context);
+  };
+
+  // Determine whether all of the elements match a truth test.
+  // Aliased as `all`.
+  _.every = _.all = function(obj, predicate, context) {
+    predicate = cb(predicate, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length;
+    for (var index = 0; index < length; index++) {
+      var currentKey = keys ? keys[index] : index;
+      if (!predicate(obj[currentKey], currentKey, obj)) return false;
+    }
+    return true;
+  };
+
+  // Determine if at least one element in the object matches a truth test.
+  // Aliased as `any`.
+  _.some = _.any = function(obj, predicate, context) {
+    predicate = cb(predicate, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length;
+    for (var index = 0; index < length; index++) {
+      var currentKey = keys ? keys[index] : index;
+      if (predicate(obj[currentKey], currentKey, obj)) return true;
+    }
+    return false;
+  };
+
+  // Determine if the array or object contains a given item (using `===`).
+  // Aliased as `includes` and `include`.
+  _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
+    if (!isArrayLike(obj)) obj = _.values(obj);
+    if (typeof fromIndex != 'number' || guard) fromIndex = 0;
+    return _.indexOf(obj, item, fromIndex) >= 0;
+  };
+
+  // Invoke a method (with arguments) on every item in a collection.
+  _.invoke = function(obj, method) {
+    var args = slice.call(arguments, 2);
+    var isFunc = _.isFunction(method);
+    return _.map(obj, function(value) {
+      var func = isFunc ? method : value[method];
+      return func == null ? func : func.apply(value, args);
+    });
+  };
+
+  // Convenience version of a common use case of `map`: fetching a property.
+  _.pluck = function(obj, key) {
+    return _.map(obj, _.property(key));
+  };
+
+  // Convenience version of a common use case of `filter`: selecting only objects
+  // containing specific `key:value` pairs.
+  _.where = function(obj, attrs) {
+    return _.filter(obj, _.matcher(attrs));
+  };
+
+  // Convenience version of a common use case of `find`: getting the first object
+  // containing specific `key:value` pairs.
+  _.findWhere = function(obj, attrs) {
+    return _.find(obj, _.matcher(attrs));
+  };
+
+  // Return the maximum element (or element-based computation).
+  _.max = function(obj, iteratee, context) {
+    var result = -Infinity, lastComputed = -Infinity,
+        value, computed;
+    if (iteratee == null && obj != null) {
+      obj = isArrayLike(obj) ? obj : _.values(obj);
+      for (var i = 0, length = obj.length; i < length; i++) {
+        value = obj[i];
+        if (value > result) {
+          result = value;
+        }
+      }
+    } else {
+      iteratee = cb(iteratee, context);
+      _.each(obj, function(value, index, list) {
+        computed = iteratee(value, index, list);
+        if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
+          result = value;
+          lastComputed = computed;
+        }
+      });
+    }
+    return result;
+  };
+
+  // Return the minimum element (or element-based computation).
+  _.min = function(obj, iteratee, context) {
+    var result = Infinity, lastComputed = Infinity,
+        value, computed;
+    if (iteratee == null && obj != null) {
+      obj = isArrayLike(obj) ? obj : _.values(obj);
+      for (var i = 0, length = obj.length; i < length; i++) {
+        value = obj[i];
+        if (value < result) {
+          result = value;
+        }
+      }
+    } else {
+      iteratee = cb(iteratee, context);
+      _.each(obj, function(value, index, list) {
+        computed = iteratee(value, index, list);
+        if (computed < lastComputed || computed === Infinity && result === Infinity) {
+          result = value;
+          lastComputed = computed;
+        }
+      });
+    }
+    return result;
+  };
+
+  // Shuffle a collection, using the modern version of the
+  // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
+  _.shuffle = function(obj) {
+    var set = isArrayLike(obj) ? obj : _.values(obj);
+    var length = set.length;
+    var shuffled = Array(length);
+    for (var index = 0, rand; index < length; index++) {
+      rand = _.random(0, index);
+      if (rand !== index) shuffled[index] = shuffled[rand];
+      shuffled[rand] = set[index];
+    }
+    return shuffled;
+  };
+
+  // Sample **n** random values from a collection.
+  // If **n** is not specified, returns a single random element.
+  // The internal `guard` argument allows it to work with `map`.
+  _.sample = function(obj, n, guard) {
+    if (n == null || guard) {
+      if (!isArrayLike(obj)) obj = _.values(obj);
+      return obj[_.random(obj.length - 1)];
+    }
+    return _.shuffle(obj).slice(0, Math.max(0, n));
+  };
+
+  // Sort the object's values by a criterion produced by an iteratee.
+  _.sortBy = function(obj, iteratee, context) {
+    iteratee = cb(iteratee, context);
+    return _.pluck(_.map(obj, function(value, index, list) {
+      return {
+        value: value,
+        index: index,
+        criteria: iteratee(value, index, list)
+      };
+    }).sort(function(left, right) {
+      var a = left.criteria;
+      var b = right.criteria;
+      if (a !== b) {
+        if (a > b || a === void 0) return 1;
+        if (a < b || b === void 0) return -1;
+      }
+      return left.index - right.index;
+    }), 'value');
+  };
+
+  // An internal function used for aggregate "group by" operations.
+  var group = function(behavior) {
+    return function(obj, iteratee, context) {
+      var result = {};
+      iteratee = cb(iteratee, context);
+      _.each(obj, function(value, index) {
+        var key = iteratee(value, index, obj);
+        behavior(result, value, key);
+      });
+      return result;
+    };
+  };
+
+  // Groups the object's values by a criterion. Pass either a string attribute
+  // to group by, or a function that returns the criterion.
+  _.groupBy = group(function(result, value, key) {
+    if (_.has(result, key)) result[key].push(value); else result[key] = [value];
+  });
+
+  // Indexes the object's values by a criterion, similar to `groupBy`, but for
+  // when you know that your index values will be unique.
+  _.indexBy = group(function(result, value, key) {
+    result[key] = value;
+  });
+
+  // Counts instances of an object that group by a certain criterion. Pass
+  // either a string attribute to count by, or a function that returns the
+  // criterion.
+  _.countBy = group(function(result, value, key) {
+    if (_.has(result, key)) result[key]++; else result[key] = 1;
+  });
+
+  // Safely create a real, live array from anything iterable.
+  _.toArray = function(obj) {
+    if (!obj) return [];
+    if (_.isArray(obj)) return slice.call(obj);
+    if (isArrayLike(obj)) return _.map(obj, _.identity);
+    return _.values(obj);
+  };
+
+  // Return the number of elements in an object.
+  _.size = function(obj) {
+    if (obj == null) return 0;
+    return isArrayLike(obj) ? obj.length : _.keys(obj).length;
+  };
+
+  // Split a collection into two arrays: one whose elements all satisfy the given
+  // predicate, and one whose elements all do not satisfy the predicate.
+  _.partition = function(obj, predicate, context) {
+    predicate = cb(predicate, context);
+    var pass = [], fail = [];
+    _.each(obj, function(value, key, obj) {
+      (predicate(value, key, obj) ? pass : fail).push(value);
+    });
+    return [pass, fail];
+  };
+
+  // Array Functions
+  // ---------------
+
+  // Get the first element of an array. Passing **n** will return the first N
+  // values in the array. Aliased as `head` and `take`. The **guard** check
+  // allows it to work with `_.map`.
+  _.first = _.head = _.take = function(array, n, guard) {
+    if (array == null) return void 0;
+    if (n == null || guard) return array[0];
+    return _.initial(array, array.length - n);
+  };
+
+  // Returns everything but the last entry of the array. Especially useful on
+  // the arguments object. Passing **n** will return all the values in
+  // the array, excluding the last N.
+  _.initial = function(array, n, guard) {
+    return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
+  };
+
+  // Get the last element of an array. Passing **n** will return the last N
+  // values in the array.
+  _.last = function(array, n, guard) {
+    if (array == null) return void 0;
+    if (n == null || guard) return array[array.length - 1];
+    return _.rest(array, Math.max(0, array.length - n));
+  };
+
+  // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
+  // Especially useful on the arguments object. Passing an **n** will return
+  // the rest N values in the array.
+  _.rest = _.tail = _.drop = function(array, n, guard) {
+    return slice.call(array, n == null || guard ? 1 : n);
+  };
+
+  // Trim out all falsy values from an array.
+  _.compact = function(array) {
+    return _.filter(array, _.identity);
+  };
+
+  // Internal implementation of a recursive `flatten` function.
+  var flatten = function(input, shallow, strict, startIndex) {
+    var output = [], idx = 0;
+    for (var i = startIndex || 0, length = getLength(input); i < length; i++) {
+      var value = input[i];
+      if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+        //flatten current level of array or arguments object
+        if (!shallow) value = flatten(value, shallow, strict);
+        var j = 0, len = value.length;
+        output.length += len;
+        while (j < len) {
+          output[idx++] = value[j++];
+        }
+      } else if (!strict) {
+        output[idx++] = value;
+      }
+    }
+    return output;
+  };
+
+  // Flatten out an array, either recursively (by default), or just one level.
+  _.flatten = function(array, shallow) {
+    return flatten(array, shallow, false);
+  };
+
+  // Return a version of the array that does not contain the specified value(s).
+  _.without = function(array) {
+    return _.difference(array, slice.call(arguments, 1));
+  };
+
+  // Produce a duplicate-free version of the array. If the array has already
+  // been sorted, you have the option of using a faster algorithm.
+  // Aliased as `unique`.
+  _.uniq = _.unique = function(array, isSorted, iteratee, context) {
+    if (!_.isBoolean(isSorted)) {
+      context = iteratee;
+      iteratee = isSorted;
+      isSorted = false;
+    }
+    if (iteratee != null) iteratee = cb(iteratee, context);
+    var result = [];
+    var seen = [];
+    for (var i = 0, length = getLength(array); i < length; i++) {
+      var value = array[i],
+          computed = iteratee ? iteratee(value, i, array) : value;
+      if (isSorted) {
+        if (!i || seen !== computed) result.push(value);
+        seen = computed;
+      } else if (iteratee) {
+        if (!_.contains(seen, computed)) {
+          seen.push(computed);
+          result.push(value);
+        }
+      } else if (!_.contains(result, value)) {
+        result.push(value);
+      }
+    }
+    return result;
+  };
+
+  // Produce an array that contains the union: each distinct element from all of
+  // the passed-in arrays.
+  _.union = function() {
+    return _.uniq(flatten(arguments, true, true));
+  };
+
+  // Produce an array that contains every item shared between all the
+  // passed-in arrays.
+  _.intersection = function(array) {
+    var result = [];
+    var argsLength = arguments.length;
+    for (var i = 0, length = getLength(array); i < length; i++) {
+      var item = array[i];
+      if (_.contains(result, item)) continue;
+      for (var j = 1; j < argsLength; j++) {
+        if (!_.contains(arguments[j], item)) break;
+      }
+      if (j === argsLength) result.push(item);
+    }
+    return result;
+  };
+
+  // Take the difference between one array and a number of other arrays.
+  // Only the elements present in just the first array will remain.
+  _.difference = function(array) {
+    var rest = flatten(arguments, true, true, 1);
+    return _.filter(array, function(value){
+      return !_.contains(rest, value);
+    });
+  };
+
+  // Zip together multiple lists into a single array -- elements that share
+  // an index go together.
+  _.zip = function() {
+    return _.unzip(arguments);
+  };
+
+  // Complement of _.zip. Unzip accepts an array of arrays and groups
+  // each array's elements on shared indices
+  _.unzip = function(array) {
+    var length = array && _.max(array, getLength).length || 0;
+    var result = Array(length);
+
+    for (var index = 0; index < length; index++) {
+      result[index] = _.pluck(array, index);
+    }
+    return result;
+  };
+
+  // Converts lists into objects. Pass either a single array of `[key, value]`
+  // pairs, or two parallel arrays of the same length -- one of keys, and one of
+  // the corresponding values.
+  _.object = function(list, values) {
+    var result = {};
+    for (var i = 0, length = getLength(list); i < length; i++) {
+      if (values) {
+        result[list[i]] = values[i];
+      } else {
+        result[list[i][0]] = list[i][1];
+      }
+    }
+    return result;
+  };
+
+  // Generator function to create the findIndex and findLastIndex functions
+  function createPredicateIndexFinder(dir) {
+    return function(array, predicate, context) {
+      predicate = cb(predicate, context);
+      var length = getLength(array);
+      var index = dir > 0 ? 0 : length - 1;
+      for (; index >= 0 && index < length; index += dir) {
+        if (predicate(array[index], index, array)) return index;
+      }
+      return -1;
+    };
+  }
+
+  // Returns the first index on an array-like that passes a predicate test
+  _.findIndex = createPredicateIndexFinder(1);
+  _.findLastIndex = createPredicateIndexFinder(-1);
+
+  // Use a comparator function to figure out the smallest index at which
+  // an object should be inserted so as to maintain order. Uses binary search.
+  _.sortedIndex = function(array, obj, iteratee, context) {
+    iteratee = cb(iteratee, context, 1);
+    var value = iteratee(obj);
+    var low = 0, high = getLength(array);
+    while (low < high) {
+      var mid = Math.floor((low + high) / 2);
+      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
+    }
+    return low;
+  };
+
+  // Generator function to create the indexOf and lastIndexOf functions
+  function createIndexFinder(dir, predicateFind, sortedIndex) {
+    return function(array, item, idx) {
+      var i = 0, length = getLength(array);
+      if (typeof idx == 'number') {
+        if (dir > 0) {
+            i = idx >= 0 ? idx : Math.max(idx + length, i);
+        } else {
+            length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
+        }
+      } else if (sortedIndex && idx && length) {
+        idx = sortedIndex(array, item);
+        return array[idx] === item ? idx : -1;
+      }
+      if (item !== item) {
+        idx = predicateFind(slice.call(array, i, length), _.isNaN);
+        return idx >= 0 ? idx + i : -1;
+      }
+      for (idx = dir > 0 ? i : length - 1; idx >= 0 && idx < length; idx += dir) {
+        if (array[idx] === item) return idx;
+      }
+      return -1;
+    };
+  }
+
+  // Return the position of the first occurrence of an item in an array,
+  // or -1 if the item is not included in the array.
+  // If the array is large and already in sort order, pass `true`
+  // for **isSorted** to use binary search.
+  _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
+  _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
+
+  // Generate an integer Array containing an arithmetic progression. A port of
+  // the native Python `range()` function. See
+  // [the Python documentation](http://docs.python.org/library/functions.html#range).
+  _.range = function(start, stop, step) {
+    if (stop == null) {
+      stop = start || 0;
+      start = 0;
+    }
+    step = step || 1;
+
+    var length = Math.max(Math.ceil((stop - start) / step), 0);
+    var range = Array(length);
+
+    for (var idx = 0; idx < length; idx++, start += step) {
+      range[idx] = start;
+    }
+
+    return range;
+  };
+
+  // Function (ahem) Functions
+  // ------------------
+
+  // Determines whether to execute a function as a constructor
+  // or a normal function with the provided arguments
+  var executeBound = function(sourceFunc, boundFunc, context, callingContext, args) {
+    if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args);
+    var self = baseCreate(sourceFunc.prototype);
+    var result = sourceFunc.apply(self, args);
+    if (_.isObject(result)) return result;
+    return self;
+  };
+
+  // Create a function bound to a given object (assigning `this`, and arguments,
+  // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
+  // available.
+  _.bind = function(func, context) {
+    if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
+    if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
+    var args = slice.call(arguments, 2);
+    var bound = function() {
+      return executeBound(func, bound, context, this, args.concat(slice.call(arguments)));
+    };
+    return bound;
+  };
+
+  // Partially apply a function by creating a version that has had some of its
+  // arguments pre-filled, without changing its dynamic `this` context. _ acts
+  // as a placeholder, allowing any combination of arguments to be pre-filled.
+  _.partial = function(func) {
+    var boundArgs = slice.call(arguments, 1);
+    var bound = function() {
+      var position = 0, length = boundArgs.length;
+      var args = Array(length);
+      for (var i = 0; i < length; i++) {
+        args[i] = boundArgs[i] === _ ? arguments[position++] : boundArgs[i];
+      }
+      while (position < arguments.length) args.push(arguments[position++]);
+      return executeBound(func, bound, this, this, args);
+    };
+    return bound;
+  };
+
+  // Bind a number of an object's methods to that object. Remaining arguments
+  // are the method names to be bound. Useful for ensuring that all callbacks
+  // defined on an object belong to it.
+  _.bindAll = function(obj) {
+    var i, length = arguments.length, key;
+    if (length <= 1) throw new Error('bindAll must be passed function names');
+    for (i = 1; i < length; i++) {
+      key = arguments[i];
+      obj[key] = _.bind(obj[key], obj);
+    }
+    return obj;
+  };
+
+  // Memoize an expensive function by storing its results.
+  _.memoize = function(func, hasher) {
+    var memoize = function(key) {
+      var cache = memoize.cache;
+      var address = '' + (hasher ? hasher.apply(this, arguments) : key);
+      if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
+      return cache[address];
+    };
+    memoize.cache = {};
+    return memoize;
+  };
+
+  // Delays a function for the given number of milliseconds, and then calls
+  // it with the arguments supplied.
+  _.delay = function(func, wait) {
+    var args = slice.call(arguments, 2);
+    return setTimeout(function(){
+      return func.apply(null, args);
+    }, wait);
+  };
+
+  // Defers a function, scheduling it to run after the current call stack has
+  // cleared.
+  _.defer = _.partial(_.delay, _, 1);
+
+  // Returns a function, that, when invoked, will only be triggered at most once
+  // during a given window of time. Normally, the throttled function will run
+  // as much as it can, without ever going more than once per `wait` duration;
+  // but if you'd like to disable the execution on the leading edge, pass
+  // `{leading: false}`. To disable execution on the trailing edge, ditto.
+  _.throttle = function(func, wait, options) {
+    var context, args, result;
+    var timeout = null;
+    var previous = 0;
+    if (!options) options = {};
+    var later = function() {
+      previous = options.leading === false ? 0 : _.now();
+      timeout = null;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    };
+    return function() {
+      var now = _.now();
+      if (!previous && options.leading === false) previous = now;
+      var remaining = wait - (now - previous);
+      context = this;
+      args = arguments;
+      if (remaining <= 0 || remaining > wait) {
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+        previous = now;
+        result = func.apply(context, args);
+        if (!timeout) context = args = null;
+      } else if (!timeout && options.trailing !== false) {
+        timeout = setTimeout(later, remaining);
+      }
+      return result;
+    };
+  };
+
+  // Returns a function, that, as long as it continues to be invoked, will not
+  // be triggered. The function will be called after it stops being called for
+  // N milliseconds. If `immediate` is passed, trigger the function on the
+  // leading edge, instead of the trailing.
+  _.debounce = function(func, wait, immediate) {
+    var timeout, args, context, timestamp, result;
+
+    var later = function() {
+      var last = _.now() - timestamp;
+
+      if (last < wait && last >= 0) {
+        timeout = setTimeout(later, wait - last);
+      } else {
+        timeout = null;
+        if (!immediate) {
+          result = func.apply(context, args);
+          if (!timeout) context = args = null;
+        }
+      }
+    };
+
+    return function() {
+      context = this;
+      args = arguments;
+      timestamp = _.now();
+      var callNow = immediate && !timeout;
+      if (!timeout) timeout = setTimeout(later, wait);
+      if (callNow) {
+        result = func.apply(context, args);
+        context = args = null;
+      }
+
+      return result;
+    };
+  };
+
+  // Returns the first function passed as an argument to the second,
+  // allowing you to adjust arguments, run code before and after, and
+  // conditionally execute the original function.
+  _.wrap = function(func, wrapper) {
+    return _.partial(wrapper, func);
+  };
+
+  // Returns a negated version of the passed-in predicate.
+  _.negate = function(predicate) {
+    return function() {
+      return !predicate.apply(this, arguments);
+    };
+  };
+
+  // Returns a function that is the composition of a list of functions, each
+  // consuming the return value of the function that follows.
+  _.compose = function() {
+    var args = arguments;
+    var start = args.length - 1;
+    return function() {
+      var i = start;
+      var result = args[start].apply(this, arguments);
+      while (i--) result = args[i].call(this, result);
+      return result;
+    };
+  };
+
+  // Returns a function that will only be executed on and after the Nth call.
+  _.after = function(times, func) {
+    return function() {
+      if (--times < 1) {
+        return func.apply(this, arguments);
+      }
+    };
+  };
+
+  // Returns a function that will only be executed up to (but not including) the Nth call.
+  _.before = function(times, func) {
+    var memo;
+    return function() {
+      if (--times > 0) {
+        memo = func.apply(this, arguments);
+      }
+      if (times <= 1) func = null;
+      return memo;
+    };
+  };
+
+  // Returns a function that will be executed at most one time, no matter how
+  // often you call it. Useful for lazy initialization.
+  _.once = _.partial(_.before, 2);
+
+  // Object Functions
+  // ----------------
+
+  // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
+  var hasEnumBug = !{toString: null}.propertyIsEnumerable('toString');
+  var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
+                      'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
+
+  function collectNonEnumProps(obj, keys) {
+    var nonEnumIdx = nonEnumerableProps.length;
+    var constructor = obj.constructor;
+    var proto = (_.isFunction(constructor) && constructor.prototype) || ObjProto;
+
+    // Constructor is a special case.
+    var prop = 'constructor';
+    if (_.has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
+
+    while (nonEnumIdx--) {
+      prop = nonEnumerableProps[nonEnumIdx];
+      if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) {
+        keys.push(prop);
+      }
+    }
+  }
+
+  // Retrieve the names of an object's own properties.
+  // Delegates to **ECMAScript 5**'s native `Object.keys`
+  _.keys = function(obj) {
+    if (!_.isObject(obj)) return [];
+    if (nativeKeys) return nativeKeys(obj);
+    var keys = [];
+    for (var key in obj) if (_.has(obj, key)) keys.push(key);
+    // Ahem, IE < 9.
+    if (hasEnumBug) collectNonEnumProps(obj, keys);
+    return keys;
+  };
+
+  // Retrieve all the property names of an object.
+  _.allKeys = function(obj) {
+    if (!_.isObject(obj)) return [];
+    var keys = [];
+    for (var key in obj) keys.push(key);
+    // Ahem, IE < 9.
+    if (hasEnumBug) collectNonEnumProps(obj, keys);
+    return keys;
+  };
+
+  // Retrieve the values of an object's properties.
+  _.values = function(obj) {
+    var keys = _.keys(obj);
+    var length = keys.length;
+    var values = Array(length);
+    for (var i = 0; i < length; i++) {
+      values[i] = obj[keys[i]];
+    }
+    return values;
+  };
+
+  // Returns the results of applying the iteratee to each element of the object
+  // In contrast to _.map it returns an object
+  _.mapObject = function(obj, iteratee, context) {
+    iteratee = cb(iteratee, context);
+    var keys =  _.keys(obj),
+          length = keys.length,
+          results = {},
+          currentKey;
+      for (var index = 0; index < length; index++) {
+        currentKey = keys[index];
+        results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
+      }
+      return results;
+  };
+
+  // Convert an object into a list of `[key, value]` pairs.
+  _.pairs = function(obj) {
+    var keys = _.keys(obj);
+    var length = keys.length;
+    var pairs = Array(length);
+    for (var i = 0; i < length; i++) {
+      pairs[i] = [keys[i], obj[keys[i]]];
+    }
+    return pairs;
+  };
+
+  // Invert the keys and values of an object. The values must be serializable.
+  _.invert = function(obj) {
+    var result = {};
+    var keys = _.keys(obj);
+    for (var i = 0, length = keys.length; i < length; i++) {
+      result[obj[keys[i]]] = keys[i];
+    }
+    return result;
+  };
+
+  // Return a sorted list of the function names available on the object.
+  // Aliased as `methods`
+  _.functions = _.methods = function(obj) {
+    var names = [];
+    for (var key in obj) {
+      if (_.isFunction(obj[key])) names.push(key);
+    }
+    return names.sort();
+  };
+
+  // Extend a given object with all the properties in passed-in object(s).
+  _.extend = createAssigner(_.allKeys);
+
+  // Assigns a given object with all the own properties in the passed-in object(s)
+  // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
+  _.extendOwn = _.assign = createAssigner(_.keys);
+
+  // Returns the first key on an object that passes a predicate test
+  _.findKey = function(obj, predicate, context) {
+    predicate = cb(predicate, context);
+    var keys = _.keys(obj), key;
+    for (var i = 0, length = keys.length; i < length; i++) {
+      key = keys[i];
+      if (predicate(obj[key], key, obj)) return key;
+    }
+  };
+
+  // Return a copy of the object only containing the whitelisted properties.
+  _.pick = function(object, oiteratee, context) {
+    var result = {}, obj = object, iteratee, keys;
+    if (obj == null) return result;
+    if (_.isFunction(oiteratee)) {
+      keys = _.allKeys(obj);
+      iteratee = optimizeCb(oiteratee, context);
+    } else {
+      keys = flatten(arguments, false, false, 1);
+      iteratee = function(value, key, obj) { return key in obj; };
+      obj = Object(obj);
+    }
+    for (var i = 0, length = keys.length; i < length; i++) {
+      var key = keys[i];
+      var value = obj[key];
+      if (iteratee(value, key, obj)) result[key] = value;
+    }
+    return result;
+  };
+
+   // Return a copy of the object without the blacklisted properties.
+  _.omit = function(obj, iteratee, context) {
+    if (_.isFunction(iteratee)) {
+      iteratee = _.negate(iteratee);
+    } else {
+      var keys = _.map(flatten(arguments, false, false, 1), String);
+      iteratee = function(value, key) {
+        return !_.contains(keys, key);
+      };
+    }
+    return _.pick(obj, iteratee, context);
+  };
+
+  // Fill in a given object with default properties.
+  _.defaults = createAssigner(_.allKeys, true);
+
+  // Creates an object that inherits from the given prototype object.
+  // If additional properties are provided then they will be added to the
+  // created object.
+  _.create = function(prototype, props) {
+    var result = baseCreate(prototype);
+    if (props) _.extendOwn(result, props);
+    return result;
+  };
+
+  // Create a (shallow-cloned) duplicate of an object.
+  _.clone = function(obj) {
+    if (!_.isObject(obj)) return obj;
+    return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
+  };
+
+  // Invokes interceptor with the obj, and then returns obj.
+  // The primary purpose of this method is to "tap into" a method chain, in
+  // order to perform operations on intermediate results within the chain.
+  _.tap = function(obj, interceptor) {
+    interceptor(obj);
+    return obj;
+  };
+
+  // Returns whether an object has a given set of `key:value` pairs.
+  _.isMatch = function(object, attrs) {
+    var keys = _.keys(attrs), length = keys.length;
+    if (object == null) return !length;
+    var obj = Object(object);
+    for (var i = 0; i < length; i++) {
+      var key = keys[i];
+      if (attrs[key] !== obj[key] || !(key in obj)) return false;
+    }
+    return true;
+  };
+
+
+  // Internal recursive comparison function for `isEqual`.
+  var eq = function(a, b, aStack, bStack) {
+    // Identical objects are equal. `0 === -0`, but they aren't identical.
+    // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
+    if (a === b) return a !== 0 || 1 / a === 1 / b;
+    // A strict comparison is necessary because `null == undefined`.
+    if (a == null || b == null) return a === b;
+    // Unwrap any wrapped objects.
+    if (a instanceof _) a = a._wrapped;
+    if (b instanceof _) b = b._wrapped;
+    // Compare `[[Class]]` names.
+    var className = toString.call(a);
+    if (className !== toString.call(b)) return false;
+    switch (className) {
+      // Strings, numbers, regular expressions, dates, and booleans are compared by value.
+      case '[object RegExp]':
+      // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
+      case '[object String]':
+        // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
+        // equivalent to `new String("5")`.
+        return '' + a === '' + b;
+      case '[object Number]':
+        // `NaN`s are equivalent, but non-reflexive.
+        // Object(NaN) is equivalent to NaN
+        if (+a !== +a) return +b !== +b;
+        // An `egal` comparison is performed for other numeric values.
+        return +a === 0 ? 1 / +a === 1 / b : +a === +b;
+      case '[object Date]':
+      case '[object Boolean]':
+        // Coerce dates and booleans to numeric primitive values. Dates are compared by their
+        // millisecond representations. Note that invalid dates with millisecond representations
+        // of `NaN` are not equivalent.
+        return +a === +b;
+    }
+
+    var areArrays = className === '[object Array]';
+    if (!areArrays) {
+      if (typeof a != 'object' || typeof b != 'object') return false;
+
+      // Objects with different constructors are not equivalent, but `Object`s or `Array`s
+      // from different frames are.
+      var aCtor = a.constructor, bCtor = b.constructor;
+      if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
+                               _.isFunction(bCtor) && bCtor instanceof bCtor)
+                          && ('constructor' in a && 'constructor' in b)) {
+        return false;
+      }
+    }
+    // Assume equality for cyclic structures. The algorithm for detecting cyclic
+    // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+
+    // Initializing stack of traversed objects.
+    // It's done here since we only need them for objects and arrays comparison.
+    aStack = aStack || [];
+    bStack = bStack || [];
+    var length = aStack.length;
+    while (length--) {
+      // Linear search. Performance is inversely proportional to the number of
+      // unique nested structures.
+      if (aStack[length] === a) return bStack[length] === b;
+    }
+
+    // Add the first object to the stack of traversed objects.
+    aStack.push(a);
+    bStack.push(b);
+
+    // Recursively compare objects and arrays.
+    if (areArrays) {
+      // Compare array lengths to determine if a deep comparison is necessary.
+      length = a.length;
+      if (length !== b.length) return false;
+      // Deep compare the contents, ignoring non-numeric properties.
+      while (length--) {
+        if (!eq(a[length], b[length], aStack, bStack)) return false;
+      }
+    } else {
+      // Deep compare objects.
+      var keys = _.keys(a), key;
+      length = keys.length;
+      // Ensure that both objects contain the same number of properties before comparing deep equality.
+      if (_.keys(b).length !== length) return false;
+      while (length--) {
+        // Deep compare each member
+        key = keys[length];
+        if (!(_.has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
+      }
+    }
+    // Remove the first object from the stack of traversed objects.
+    aStack.pop();
+    bStack.pop();
+    return true;
+  };
+
+  // Perform a deep comparison to check if two objects are equal.
+  _.isEqual = function(a, b) {
+    return eq(a, b);
+  };
+
+  // Is a given array, string, or object empty?
+  // An "empty" object has no enumerable own-properties.
+  _.isEmpty = function(obj) {
+    if (obj == null) return true;
+    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
+    return _.keys(obj).length === 0;
+  };
+
+  // Is a given value a DOM element?
+  _.isElement = function(obj) {
+    return !!(obj && obj.nodeType === 1);
+  };
+
+  // Is a given value an array?
+  // Delegates to ECMA5's native Array.isArray
+  _.isArray = nativeIsArray || function(obj) {
+    return toString.call(obj) === '[object Array]';
+  };
+
+  // Is a given variable an object?
+  _.isObject = function(obj) {
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
+  };
+
+  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
+  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function(name) {
+    _['is' + name] = function(obj) {
+      return toString.call(obj) === '[object ' + name + ']';
+    };
+  });
+
+  // Define a fallback version of the method in browsers (ahem, IE < 9), where
+  // there isn't any inspectable "Arguments" type.
+  if (!_.isArguments(arguments)) {
+    _.isArguments = function(obj) {
+      return _.has(obj, 'callee');
+    };
+  }
+
+  // Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
+  // IE 11 (#1621), and in Safari 8 (#1929).
+  if (typeof /./ != 'function' && typeof Int8Array != 'object') {
+    _.isFunction = function(obj) {
+      return typeof obj == 'function' || false;
+    };
+  }
+
+  // Is a given object a finite number?
+  _.isFinite = function(obj) {
+    return isFinite(obj) && !isNaN(parseFloat(obj));
+  };
+
+  // Is the given value `NaN`? (NaN is the only number which does not equal itself).
+  _.isNaN = function(obj) {
+    return _.isNumber(obj) && obj !== +obj;
+  };
+
+  // Is a given value a boolean?
+  _.isBoolean = function(obj) {
+    return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
+  };
+
+  // Is a given value equal to null?
+  _.isNull = function(obj) {
+    return obj === null;
+  };
+
+  // Is a given variable undefined?
+  _.isUndefined = function(obj) {
+    return obj === void 0;
+  };
+
+  // Shortcut function for checking if an object has a given property directly
+  // on itself (in other words, not on a prototype).
+  _.has = function(obj, key) {
+    return obj != null && hasOwnProperty.call(obj, key);
+  };
+
+  // Utility Functions
+  // -----------------
+
+  // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
+  // previous owner. Returns a reference to the Underscore object.
+  _.noConflict = function() {
+    root._ = previousUnderscore;
+    return this;
+  };
+
+  // Keep the identity function around for default iteratees.
+  _.identity = function(value) {
+    return value;
+  };
+
+  // Predicate-generating functions. Often useful outside of Underscore.
+  _.constant = function(value) {
+    return function() {
+      return value;
+    };
+  };
+
+  _.noop = function(){};
+
+  _.property = property;
+
+  // Generates a function for a given object that returns a given property.
+  _.propertyOf = function(obj) {
+    return obj == null ? function(){} : function(key) {
+      return obj[key];
+    };
+  };
+
+  // Returns a predicate for checking whether an object has a given set of
+  // `key:value` pairs.
+  _.matcher = _.matches = function(attrs) {
+    attrs = _.extendOwn({}, attrs);
+    return function(obj) {
+      return _.isMatch(obj, attrs);
+    };
+  };
+
+  // Run a function **n** times.
+  _.times = function(n, iteratee, context) {
+    var accum = Array(Math.max(0, n));
+    iteratee = optimizeCb(iteratee, context, 1);
+    for (var i = 0; i < n; i++) accum[i] = iteratee(i);
+    return accum;
+  };
+
+  // Return a random integer between min and max (inclusive).
+  _.random = function(min, max) {
+    if (max == null) {
+      max = min;
+      min = 0;
+    }
+    return min + Math.floor(Math.random() * (max - min + 1));
+  };
+
+  // A (possibly faster) way to get the current timestamp as an integer.
+  _.now = Date.now || function() {
+    return new Date().getTime();
+  };
+
+   // List of HTML entities for escaping.
+  var escapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '`': '&#x60;'
+  };
+  var unescapeMap = _.invert(escapeMap);
+
+  // Functions for escaping and unescaping strings to/from HTML interpolation.
+  var createEscaper = function(map) {
+    var escaper = function(match) {
+      return map[match];
+    };
+    // Regexes for identifying a key that needs to be escaped
+    var source = '(?:' + _.keys(map).join('|') + ')';
+    var testRegexp = RegExp(source);
+    var replaceRegexp = RegExp(source, 'g');
+    return function(string) {
+      string = string == null ? '' : '' + string;
+      return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+    };
+  };
+  _.escape = createEscaper(escapeMap);
+  _.unescape = createEscaper(unescapeMap);
+
+  // If the value of the named `property` is a function then invoke it with the
+  // `object` as context; otherwise, return it.
+  _.result = function(object, property, fallback) {
+    var value = object == null ? void 0 : object[property];
+    if (value === void 0) {
+      value = fallback;
+    }
+    return _.isFunction(value) ? value.call(object) : value;
+  };
+
+  // Generate a unique integer id (unique within the entire client session).
+  // Useful for temporary DOM ids.
+  var idCounter = 0;
+  _.uniqueId = function(prefix) {
+    var id = ++idCounter + '';
+    return prefix ? prefix + id : id;
+  };
+
+  // By default, Underscore uses ERB-style template delimiters, change the
+  // following template settings to use alternative delimiters.
+  _.templateSettings = {
+    evaluate    : /<%([\s\S]+?)%>/g,
+    interpolate : /<%=([\s\S]+?)%>/g,
+    escape      : /<%-([\s\S]+?)%>/g
+  };
+
+  // When customizing `templateSettings`, if you don't want to define an
+  // interpolation, evaluation or escaping regex, we need one that is
+  // guaranteed not to match.
+  var noMatch = /(.)^/;
+
+  // Certain characters need to be escaped so that they can be put into a
+  // string literal.
+  var escapes = {
+    "'":      "'",
+    '\\':     '\\',
+    '\r':     'r',
+    '\n':     'n',
+    '\u2028': 'u2028',
+    '\u2029': 'u2029'
+  };
+
+  var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
+
+  var escapeChar = function(match) {
+    return '\\' + escapes[match];
+  };
+
+  // JavaScript micro-templating, similar to John Resig's implementation.
+  // Underscore templating handles arbitrary delimiters, preserves whitespace,
+  // and correctly escapes quotes within interpolated code.
+  // NB: `oldSettings` only exists for backwards compatibility.
+  _.template = function(text, settings, oldSettings) {
+    if (!settings && oldSettings) settings = oldSettings;
+    settings = _.defaults({}, settings, _.templateSettings);
+
+    // Combine delimiters into one regular expression via alternation.
+    var matcher = RegExp([
+      (settings.escape || noMatch).source,
+      (settings.interpolate || noMatch).source,
+      (settings.evaluate || noMatch).source
+    ].join('|') + '|$', 'g');
+
+    // Compile the template source, escaping string literals appropriately.
+    var index = 0;
+    var source = "__p+='";
+    text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
+      source += text.slice(index, offset).replace(escaper, escapeChar);
+      index = offset + match.length;
+
+      if (escape) {
+        source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
+      } else if (interpolate) {
+        source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
+      } else if (evaluate) {
+        source += "';\n" + evaluate + "\n__p+='";
+      }
+
+      // Adobe VMs need the match returned to produce the correct offest.
+      return match;
+    });
+    source += "';\n";
+
+    // If a variable is not specified, place data values in local scope.
+    if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
+
+    source = "var __t,__p='',__j=Array.prototype.join," +
+      "print=function(){__p+=__j.call(arguments,'');};\n" +
+      source + 'return __p;\n';
+
+    try {
+      var render = new Function(settings.variable || 'obj', '_', source);
+    } catch (e) {
+      e.source = source;
+      throw e;
+    }
+
+    var template = function(data) {
+      return render.call(this, data, _);
+    };
+
+    // Provide the compiled source as a convenience for precompilation.
+    var argument = settings.variable || 'obj';
+    template.source = 'function(' + argument + '){\n' + source + '}';
+
+    return template;
+  };
+
+  // Add a "chain" function. Start chaining a wrapped Underscore object.
+  _.chain = function(obj) {
+    var instance = _(obj);
+    instance._chain = true;
+    return instance;
+  };
+
+  // OOP
+  // ---------------
+  // If Underscore is called as a function, it returns a wrapped object that
+  // can be used OO-style. This wrapper holds altered versions of all the
+  // underscore functions. Wrapped objects may be chained.
+
+  // Helper function to continue chaining intermediate results.
+  var result = function(instance, obj) {
+    return instance._chain ? _(obj).chain() : obj;
+  };
+
+  // Add your own custom functions to the Underscore object.
+  _.mixin = function(obj) {
+    _.each(_.functions(obj), function(name) {
+      var func = _[name] = obj[name];
+      _.prototype[name] = function() {
+        var args = [this._wrapped];
+        push.apply(args, arguments);
+        return result(this, func.apply(_, args));
+      };
+    });
+  };
+
+  // Add all of the Underscore functions to the wrapper object.
+  _.mixin(_);
+
+  // Add all mutator Array functions to the wrapper.
+  _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+    var method = ArrayProto[name];
+    _.prototype[name] = function() {
+      var obj = this._wrapped;
+      method.apply(obj, arguments);
+      if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
+      return result(this, obj);
+    };
+  });
+
+  // Add all accessor Array functions to the wrapper.
+  _.each(['concat', 'join', 'slice'], function(name) {
+    var method = ArrayProto[name];
+    _.prototype[name] = function() {
+      return result(this, method.apply(this._wrapped, arguments));
+    };
+  });
+
+  // Extracts the result from a wrapped and chained object.
+  _.prototype.value = function() {
+    return this._wrapped;
+  };
+
+  // Provide unwrapping proxy for some methods used in engine operations
+  // such as arithmetic and JSON stringification.
+  _.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
+
+  _.prototype.toString = function() {
+    return '' + this._wrapped;
+  };
+
+  // AMD registration happens at the end for compatibility with AMD loaders
+  // that may not enforce next-turn semantics on modules. Even though general
+  // practice for AMD registration is to be anonymous, underscore registers
+  // as a named module because, like jQuery, it is a base library that is
+  // popular enough to be bundled in a third party lib, but not be part of
+  // an AMD load request. Those cases could generate an error when an
+  // anonymous define() is called outside of a loader request.
+  if (typeof define === 'function' && define.amd) {
+    define('underscore', [], function() {
+      return _;
+    });
+  }
+}.call(this));
+
+},{}],233:[function(require,module,exports){
+(function() {
+  var events, isEmpty, sax;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  sax = require('sax');
+
+  events = require('events');
+
+  isEmpty = function(thing) {
+    return typeof thing === "object" && (thing != null) && Object.keys(thing).length === 0;
+  };
+
+  exports.Parser = (function() {
+
+    __extends(Parser, events.EventEmitter);
+
+    function Parser(opts) {
+      this.parseString = __bind(this.parseString, this);
+      this.reset = __bind(this.reset, this);
+      var key, value;
+      this.options = {
+        explicitCharkey: false,
+        trim: true,
+        normalize: true,
+        attrkey: "@",
+        charkey: "#",
+        explicitArray: false,
+        ignoreAttrs: false,
+        mergeAttrs: false
+      };
+      for (key in opts) {
+        if (!__hasProp.call(opts, key)) continue;
+        value = opts[key];
+        this.options[key] = value;
+      }
+      this.reset();
+    }
+
+    Parser.prototype.reset = function() {
+      var attrkey, charkey, err, stack;
+      var _this = this;
+      this.removeAllListeners();
+      this.saxParser = sax.parser(true, {
+        trim: false,
+        normalize: false
+      });
+      err = false;
+      this.saxParser.onerror = function(error) {
+        if (!err) {
+          err = true;
+          return _this.emit("error", error);
+        }
+      };
+      this.EXPLICIT_CHARKEY = this.options.explicitCharkey;
+      this.resultObject = null;
+      stack = [];
+      attrkey = this.options.attrkey;
+      charkey = this.options.charkey;
+      this.saxParser.onopentag = function(node) {
+        var key, obj, _ref;
+        obj = {};
+        obj[charkey] = "";
+        if (!_this.options.ignoreAttrs) {
+          _ref = node.attributes;
+          for (key in _ref) {
+            if (!__hasProp.call(_ref, key)) continue;
+            if (!(attrkey in obj) && !_this.options.mergeAttrs) obj[attrkey] = {};
+            if (_this.options.mergeAttrs) {
+              obj[key] = node.attributes[key];
+            } else {
+              obj[attrkey][key] = node.attributes[key];
+            }
+          }
+        }
+        obj["#name"] = node.name;
+        return stack.push(obj);
+      };
+      this.saxParser.onclosetag = function() {
+        var nodeName, obj, old, s;
+        obj = stack.pop();
+        nodeName = obj["#name"];
+        delete obj["#name"];
+        s = stack[stack.length - 1];
+        if (obj[charkey].match(/^\s*$/)) {
+          delete obj[charkey];
+        } else {
+          if (_this.options.trim) obj[charkey] = obj[charkey].trim();
+          if (_this.options.normalize) {
+            obj[charkey] = obj[charkey].replace(/\s{2,}/g, " ").trim();
+          }
+          if (Object.keys(obj).length === 1 && charkey in obj && !_this.EXPLICIT_CHARKEY) {
+            obj = obj[charkey];
+          }
+        }
+        if (_this.options.emptyTag !== void 0 && isEmpty(obj)) {
+          obj = _this.options.emptyTag;
+        }
+        if (stack.length > 0) {
+          if (!_this.options.explicitArray) {
+            if (!(nodeName in s)) {
+              return s[nodeName] = obj;
+            } else if (s[nodeName] instanceof Array) {
+              return s[nodeName].push(obj);
+            } else {
+              old = s[nodeName];
+              s[nodeName] = [old];
+              return s[nodeName].push(obj);
+            }
+          } else {
+            if (!(s[nodeName] instanceof Array)) s[nodeName] = [];
+            return s[nodeName].push(obj);
+          }
+        } else {
+          if (_this.options.explicitRoot) {
+            old = obj;
+            obj = {};
+            obj[nodeName] = old;
+          }
+          _this.resultObject = obj;
+          return _this.emit("end", _this.resultObject);
+        }
+      };
+      return this.saxParser.ontext = this.saxParser.oncdata = function(text) {
+        var s;
+        s = stack[stack.length - 1];
+        if (s) return s[charkey] += text;
+      };
+    };
+
+    Parser.prototype.parseString = function(str, cb) {
+      if ((cb != null) && typeof cb === "function") {
+        this.on("end", function(result) {
+          this.reset();
+          return cb(null, result);
+        });
+        this.on("error", function(err) {
+          this.reset();
+          return cb(err);
+        });
+      }
+      if (str.toString().trim() === '') {
+        this.emit("end", null);
+        return true;
+      }
+      return this.saxParser.write(str.toString());
+    };
+
+    return Parser;
+
+  })();
+
+}).call(this);
+
+},{"events":332,"sax":609}],234:[function(require,module,exports){
+module.exports={
+  "_args": [
+    [
+      {
+        "raw": "braintree",
+        "scope": null,
+        "escapedName": "braintree",
+        "name": "braintree",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/home/default/bowanddrape/couture"
+    ]
+  ],
+  "_from": "braintree@latest",
+  "_id": "braintree@2.1.1",
+  "_inCache": true,
+  "_location": "/braintree",
+  "_nodeVersion": "4.3.1",
+  "_npmOperationalInternal": {
+    "host": "packages-18-east.internal.npmjs.com",
+    "tmp": "tmp/braintree-2.1.1.tgz_1494522353619_0.8290060732979327"
+  },
+  "_npmUser": {
+    "name": "braintree",
+    "email": "devs@getbraintree.com"
+  },
+  "_npmVersion": "2.14.12",
+  "_phantomChildren": {
+    "core-util-is": "1.0.2",
+    "debuglog": "0.0.2",
+    "sax": "1.1.5",
+    "string_decoder": "0.10.31"
+  },
+  "_requested": {
+    "raw": "braintree",
+    "scope": null,
+    "escapedName": "braintree",
+    "name": "braintree",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/braintree/-/braintree-2.1.1.tgz",
+  "_shasum": "c8ecfad3914f1c42ed66e614455fe72f19d60b89",
+  "_shrinkwrap": null,
+  "_spec": "braintree",
+  "_where": "/home/default/bowanddrape/couture",
+  "author": {
+    "name": "Braintree",
+    "email": "code@braintreepayments.com",
+    "url": "http://www.braintreepayments.com"
+  },
+  "bugs": {
+    "url": "https://github.com/braintree/braintree_node/issues"
+  },
+  "dependencies": {
+    "dateformat": "1.0.1-1.2.3",
+    "depd": "~1.1.0",
+    "readable-stream": "1.1.10",
+    "semver": "5.1.0",
+    "underscore": "1.8.3",
+    "wrap-promise": "github:braintree/wrap-promise#1.1.0",
+    "xml2js": "0.1.13"
+  },
+  "description": "A library for integrating with Braintree.",
+  "devDependencies": {
+    "chai": "1.5.0",
+    "eslint": "^2.7.0",
+    "eslint-config-braintree": "^1.0.2",
+    "mocha": "3.2.0"
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "dist": {
+    "shasum": "c8ecfad3914f1c42ed66e614455fe72f19d60b89",
+    "tarball": "https://registry.npmjs.org/braintree/-/braintree-2.1.1.tgz"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "gitHead": "d0cbfe0cb92dfc64749ea326d1853024ef194cc4",
+  "homepage": "http://github.com/braintree/braintree_node",
+  "keywords": [
+    "braintree",
+    "payments"
+  ],
+  "license": "MIT",
+  "main": "index",
+  "maintainers": [
+    {
+      "name": "braintree",
+      "email": "devs@getbraintree.com"
+    }
+  ],
+  "name": "braintree",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/braintree/braintree_node.git"
+  },
+  "scripts": {
+    "lint": "eslint lib/ spec/",
+    "pretest": "npm run lint",
+    "test": "npm run test:unit",
+    "test:integration": "mocha --timeout 60000 --slow 2000 spec/integration --recursive -r spec/spec_helper",
+    "test:unit": "mocha spec/unit --recursive -r spec/spec_helper"
+  },
+  "version": "2.1.1"
+}
+
+},{}],235:[function(require,module,exports){
+/* eslint-disable */
+/*
+ * querystring-parse.js
+ *  - node.js module providing "parse" method to turn query strings into js objects
+ *
+ * Chad Etzel
+ *
+ * Based on YUI "querystring-parse.js" module
+ * http://github.com/isaacs/yui3/tree/master/src/querystring/js
+ *
+ * Copyright (c) 2009, Yahoo! Inc. and Chad Etzel
+ * BSD License (see LICENSE.md for info)
+ */
+
+
+var util = require("util"),
+  braintree_util = require("./util");
+
+exports.parse = querystring_parse;
+
+/**
+ * <p>The querystring module adds support for serializing JavaScript objects into
+ * query strings and parsing JavaScript objects from query strings format.</p>
+ *
+ * <p>The <code>querystring</code> module is a rollup of <code>querystring-parse</code> and
+ * <code>querystring-stringify</code>.</p>
+ *
+ * <p>As their names suggest, <code>querystring-parse</code> adds support for parsing
+ * Query String data (querystring.parse) and <code>querystring-stringify</code> for serializing
+ * JavaScript data into Query Strings (querystring.stringify).  You may choose to
+ * include either of the submodules individually if you don't need the
+ * complementary functionality, or include the rollup for both.</p>
+ *
+ * @module querystring
+ */
+
+/**
+ * Provides parse method to accept Query Strings and return native
+ * JavaScript objects.
+ *
+ * @module querystring
+ * @submodule querystring-parse
+ * @for querystring
+ * @static
+ */
+function querystring_parse (qs, sep, eq, unesc) {
+  return qs.split(sep || "&")
+    .map(pieceParser(eq || "=", unesc || unescape))
+    .reduce(mergeParams, {});
+};
+
+function unescape (s) {
+    return decodeURIComponent(s.replace(/\+/g, ' '));
+};
+
+
+// Parse a key=val string.
+// These can get pretty hairy
+// example flow:
+// parse(foo[bar][][bla]=baz)
+// return parse(foo[bar][][bla],"baz")
+// return parse(foo[bar][], {bla : "baz"})
+// return parse(foo[bar], [{bla:"baz"}])
+// return parse(foo, {bar:[{bla:"baz"}]})
+// return {foo:{bar:[{bla:"baz"}]}}
+function pieceParser (eq, unesc) {
+  return function parsePiece (key, val) {
+    if (arguments.length !== 2) {
+      // key=val, called from the map/reduce
+      key = key.split(eq);
+      return parsePiece(
+        unesc(key.shift()),
+        unesc(key.join(eq))
+      );
+    }
+    key = key.replace(/^\s+|\s+$/g, '');
+    if (braintree_util.isString(val)) {
+      val = val.replace(/^\s+|\s+$/g, '');
+      // convert numerals to numbers
+      if (!isNaN(val)) {
+        var numVal = +val;
+        if (val === numVal.toString(10)) val = numVal;
+      }
+    }
+    var sliced = /(.*)\[([^\]]*)\]$/.exec(key);
+    if (!sliced) {
+      var ret = {};
+      if (key) ret[key] = val;
+      return ret;
+    }
+    // ["foo[][bar][][baz]", "foo[][bar][]", "baz"]
+    var tail = sliced[2],
+      head = sliced[1];
+
+    // array: key[]=val
+    if (!tail) return parsePiece(head, [val]);
+
+    // obj: key[subkey]=val
+    var ret = {};
+    ret[tail] = val;
+    return parsePiece(head, ret);
+  };
+};
+
+// the reducer function that merges each query piece together into one set of params
+function mergeParams (params, addition) {
+	var ret;
+
+	if (!params){
+		// if it's uncontested, then just return the addition.
+		ret = addition;
+	} else if (braintree_util.isArray(params)) {
+		// if the existing value is an array, then concat it.
+		ret = params.concat(addition);
+	} else if (!braintree_util.isObject(params) || !braintree_util.isObject(addition)) {
+		// if the existing value is not an array, and either are not objects, arrayify it.
+		ret = [params].concat(addition);
+	} else {
+		// else merge them as objects, which is a little more complex
+		ret = mergeObjects(params, addition);
+	}
+	return ret;
+};
+
+
+// Merge two *objects* together. If this is called, we've already ruled
+// out the simple cases, and need to do the for-in business.
+function mergeObjects (params, addition) {
+  for (var i in addition) if (i && addition.hasOwnProperty(i)) {
+    params[i] = mergeParams(params[i], addition[i]);
+  }
+  return params;
+};
+
+},{"./util":238,"util":667}],236:[function(require,module,exports){
+/* eslint-disable */
+/*
+ * querystring-stringify.js
+ *   - node.js module providing 'stringify' method for converting objects to query strings.
+ *
+ * Chad Etzel
+ *
+ * Based on YUI "querystring-stringify.js" module
+ * http://github.com/isaacs/yui3/tree/master/src/querystring/js
+ *
+ * Copyright (c) 2009, Yahoo! Inc. and Chad Etzel
+ * BSD License (see LICENSE.md for info)
+ *
+ */
+
+var util = require("./util");
+
+exports.stringify = querystring_stringify;
+
+var stack = [];
+/**
+ * <p>Converts an arbitrary value to a Query String representation.</p>
+ *
+ * <p>Objects with cyclical references will trigger an exception.</p>
+ *
+ * @method stringify
+ * @param obj {Variant} any arbitrary value to convert to query string
+ * @param sep {String} (optional) Character that should join param k=v pairs together. Default: "&"
+ * @param eq  {String} (optional) Character that should join keys to their values. Default: "="
+ * @param name {String} (optional) Name of the current key, for handling children recursively.
+ * @param escape {Function} (optional) Function for escaping. Default: encodeURIComponent
+ */
+function querystring_stringify (obj, sep, eq, name, escape) {
+  sep = sep || "&";
+  eq = eq || "=";
+  escape = escape || encodeURIComponent;
+
+  if (util.isNull(obj) || util.isUndefined(obj) || typeof(obj) === 'function') {
+    return name ? escape(name) + eq : '';
+  }
+
+  if (util.isBoolean(obj)) obj = +obj;
+  if (util.isNumber(obj) || util.isString(obj)) {
+    return escape(name) + eq + escape(obj);
+  }
+  if (util.isArray(obj)) {
+    var s = [];
+    name = name+'[]';
+    for (var i = 0, l = obj.length; i < l; i ++) {
+      s.push( querystring_stringify(obj[i], sep, eq, name, escape) );
+    }
+    return s.join(sep);
+  }
+
+  // Check for cyclical references in nested objects
+  for (var i = stack.length - 1; i >= 0; --i) if (stack[i] === obj) {
+    throw new Error("querystring_stringify. Cyclical reference");
+  }
+
+  stack.push(obj);
+
+  var s = [];
+  var begin = name ? name + '[' : '';
+  var end = name ? ']' : '';
+  for (var i in obj) if (obj.hasOwnProperty(i)) {
+    var n = begin + i + end;
+    s.push(querystring_stringify(obj[i], sep, eq, n, escape));
+  }
+
+  stack.pop();
+
+  s = s.join(sep);
+  if (!s && name) return name + "=";
+  return s;
+};
+
+
+},{"./util":238}],237:[function(require,module,exports){
+/* eslint-disable */
+/*
+ * querystring.js
+ *  - node.js module providing "parse" and "stringify" methods
+ *    to turn query strings into objects and to turn objects
+ *    into query string, respectively
+ *
+ *  This module is basically a stub loader. It will load both
+ *  sub-modules and put the respective exports under the same
+ *  namespace.  You may choose to load the sub-modules
+ *  individually if you only need the functionality of one.
+ *
+ * Chad Etzel
+ *
+ * Based on YUI "querystring-parse.js" module
+ * http://github.com/isaacs/yui3/tree/master/src/querystring/js
+ *
+ * Copyright (c) 2009, Yahoo! Inc. and Chad Etzel
+ * BSD License (see LICENSE.md for info)
+ *
+ */
+
+[
+  require("./querystring-parse"),
+  require("./querystring-stringify")
+].forEach(function (q) {
+  for (var i in q) if (q.hasOwnProperty(i)) exports[i] = q[i];
+});
+
+},{"./querystring-parse":235,"./querystring-stringify":236}],238:[function(require,module,exports){
+/* eslint-disable */
+/*
+ * util.js
+ *  - utility helper functions for querystring module
+ *
+ * Chad Etzel
+ *
+ * Copyright (c) 2009, Yahoo! Inc. and Chad Etzel
+ * BSD License (see LICENSE.md for info)
+ *
+ */
+exports.is = is;
+exports.isNull = isNull;
+exports.isUndefined = isUndefined;
+exports.isString = isString;
+exports.isNumber = isNumber;
+exports.isBoolean = isBoolean;
+exports.isArray = isArray;
+exports.isObject = isObject;
+
+
+function is (type, obj) {
+  return Object.prototype.toString.call(obj) === '[object '+type+']';
+}
+
+function isArray (obj) {
+  return is("Array", obj);
+}
+
+function isObject (obj) {
+  return is("Object", obj);
+}
+
+function isString (obj) {
+  return is("String", obj);
+}
+
+function isNumber (obj) {
+  return is("Number", obj);
+}
+
+function isBoolean (obj) {
+  return is("Boolean", obj);
+}
+
+function isNull (obj) {
+  return typeof obj === "object" && !obj;
+}
+
+function isUndefined (obj) {
+  return typeof obj === "undefined";
+}
+
+},{}],239:[function(require,module,exports){
 var r;
 
 module.exports = function rand(len) {
@@ -8887,9 +28356,123 @@ if (typeof window === 'object') {
   }
 }
 
-},{"crypto":25}],25:[function(require,module,exports){
+},{"crypto":246}],240:[function(require,module,exports){
+'use strict';
 
-},{}],26:[function(require,module,exports){
+var isAndroid = require('./is-android');
+var isChrome = require('./is-chrome');
+var isIe9 = require('./is-ie9');
+var isIos = require('./is-ios');
+var supportsPopups = require('./supports-popups');
+
+module.exports = {
+  isAndroid: isAndroid,
+  isChrome: isChrome,
+  isIe9: isIe9,
+  isIos: isIos,
+  supportsPopups: supportsPopups
+};
+
+},{"./is-android":241,"./is-chrome":242,"./is-ie9":243,"./is-ios":244,"./supports-popups":245}],241:[function(require,module,exports){
+(function (global){
+'use strict';
+
+module.exports = function isAndroid(ua) {
+  ua = ua || global.navigator.userAgent;
+  return /Android/.test(ua);
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],242:[function(require,module,exports){
+'use strict';
+
+module.exports = function isChrome(ua) {
+  ua = ua || navigator.userAgent;
+  return ua.indexOf('Chrome') !== -1 || ua.indexOf('CriOS') !== -1;
+};
+
+},{}],243:[function(require,module,exports){
+'use strict';
+
+module.exports = function isIe9(ua) {
+  ua = ua || navigator.userAgent;
+  return ua.indexOf('MSIE 9') !== -1;
+};
+
+},{}],244:[function(require,module,exports){
+(function (global){
+'use strict';
+
+module.exports = function isIos(ua) {
+  ua = ua || global.navigator.userAgent;
+  return /iPhone|iPod|iPad/i.test(ua);
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],245:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var MINIMUM_SUPPORTED_CHROME_IOS_VERSION = 48;
+
+var isAndroid = require('./is-android');
+var isIos = require('./is-ios');
+
+function isUnsupportedIosChrome(ua) {
+  var match, version;
+
+  ua = ua || global.navigator.userAgent;
+  match = ua.match(/CriOS\/(\d+)\./);
+
+  if (!match) {
+    return false;
+  }
+
+  version = parseInt(match[1], 10);
+
+  return version < MINIMUM_SUPPORTED_CHROME_IOS_VERSION;
+}
+
+function isOperaMini(ua) {
+  ua = ua || global.navigator.userAgent;
+  return ua.indexOf('Opera Mini') > -1;
+}
+
+// The Google Search iOS app is technically a webview and doesn't support popups.
+function isGoogleSearchApp(ua) {
+  return /\bGSA\b/.test(ua);
+}
+
+function isIosWebview(ua) {
+  ua = ua || global.navigator.userAgent;
+  if (isIos(ua)) {
+    if (isGoogleSearchApp(ua)) {
+      return true;
+    }
+    return /.+AppleWebKit(?!.*Safari)/.test(ua);
+  }
+  return false;
+}
+
+function isAndroidWebview(ua) {
+  var androidWebviewRegExp = /Version\/[\d\.]+/;
+
+  ua = ua || global.navigator.userAgent;
+  if (isAndroid(ua)) {
+    return androidWebviewRegExp.test(ua) && !isOperaMini(ua);
+  }
+  return false;
+}
+
+module.exports = function supportsPopups(ua) {
+  ua = ua || global.navigator.userAgent;
+  return !(isIosWebview(ua) || isAndroidWebview(ua) || isOperaMini(ua) || isUnsupportedIosChrome(ua));
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./is-android":241,"./is-ios":244}],246:[function(require,module,exports){
+
+},{}],247:[function(require,module,exports){
 (function (Buffer){
 // based on the aes implimentation in triple sec
 // https://github.com/keybase/triplesec
@@ -9070,7 +28653,7 @@ AES.prototype._doCryptBlock = function (M, keySchedule, SUB_MIX, SBOX) {
 exports.AES = AES
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],27:[function(require,module,exports){
+},{"buffer":284}],248:[function(require,module,exports){
 (function (Buffer){
 var aes = require('./aes')
 var Transform = require('cipher-base')
@@ -9171,7 +28754,7 @@ function xorTest (a, b) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./aes":26,"./ghash":31,"buffer":63,"buffer-xor":62,"cipher-base":66,"inherits":147}],28:[function(require,module,exports){
+},{"./aes":247,"./ghash":252,"buffer":284,"buffer-xor":283,"cipher-base":287,"inherits":376}],249:[function(require,module,exports){
 var ciphers = require('./encrypter')
 exports.createCipher = exports.Cipher = ciphers.createCipher
 exports.createCipheriv = exports.Cipheriv = ciphers.createCipheriv
@@ -9184,7 +28767,7 @@ function getCiphers () {
 }
 exports.listCiphers = exports.getCiphers = getCiphers
 
-},{"./decrypter":29,"./encrypter":30,"./modes":32}],29:[function(require,module,exports){
+},{"./decrypter":250,"./encrypter":251,"./modes":253}],250:[function(require,module,exports){
 (function (Buffer){
 var aes = require('./aes')
 var Transform = require('cipher-base')
@@ -9325,7 +28908,7 @@ exports.createDecipher = createDecipher
 exports.createDecipheriv = createDecipheriv
 
 }).call(this,require("buffer").Buffer)
-},{"./aes":26,"./authCipher":27,"./modes":32,"./modes/cbc":33,"./modes/cfb":34,"./modes/cfb1":35,"./modes/cfb8":36,"./modes/ctr":37,"./modes/ecb":38,"./modes/ofb":39,"./streamCipher":40,"buffer":63,"cipher-base":66,"evp_bytestokey":109,"inherits":147}],30:[function(require,module,exports){
+},{"./aes":247,"./authCipher":248,"./modes":253,"./modes/cbc":254,"./modes/cfb":255,"./modes/cfb1":256,"./modes/cfb8":257,"./modes/ctr":258,"./modes/ecb":259,"./modes/ofb":260,"./streamCipher":261,"buffer":284,"cipher-base":287,"evp_bytestokey":333,"inherits":376}],251:[function(require,module,exports){
 (function (Buffer){
 var aes = require('./aes')
 var Transform = require('cipher-base')
@@ -9451,7 +29034,7 @@ exports.createCipheriv = createCipheriv
 exports.createCipher = createCipher
 
 }).call(this,require("buffer").Buffer)
-},{"./aes":26,"./authCipher":27,"./modes":32,"./modes/cbc":33,"./modes/cfb":34,"./modes/cfb1":35,"./modes/cfb8":36,"./modes/ctr":37,"./modes/ecb":38,"./modes/ofb":39,"./streamCipher":40,"buffer":63,"cipher-base":66,"evp_bytestokey":109,"inherits":147}],31:[function(require,module,exports){
+},{"./aes":247,"./authCipher":248,"./modes":253,"./modes/cbc":254,"./modes/cfb":255,"./modes/cfb1":256,"./modes/cfb8":257,"./modes/ctr":258,"./modes/ecb":259,"./modes/ofb":260,"./streamCipher":261,"buffer":284,"cipher-base":287,"evp_bytestokey":333,"inherits":376}],252:[function(require,module,exports){
 (function (Buffer){
 var zeros = new Buffer(16)
 zeros.fill(0)
@@ -9553,7 +29136,7 @@ function xor (a, b) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],32:[function(require,module,exports){
+},{"buffer":284}],253:[function(require,module,exports){
 exports['aes-128-ecb'] = {
   cipher: 'AES',
   key: 128,
@@ -9726,7 +29309,7 @@ exports['aes-256-gcm'] = {
   type: 'auth'
 }
 
-},{}],33:[function(require,module,exports){
+},{}],254:[function(require,module,exports){
 var xor = require('buffer-xor')
 
 exports.encrypt = function (self, block) {
@@ -9745,7 +29328,7 @@ exports.decrypt = function (self, block) {
   return xor(out, pad)
 }
 
-},{"buffer-xor":62}],34:[function(require,module,exports){
+},{"buffer-xor":283}],255:[function(require,module,exports){
 (function (Buffer){
 var xor = require('buffer-xor')
 
@@ -9780,7 +29363,7 @@ function encryptStart (self, data, decrypt) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"buffer-xor":62}],35:[function(require,module,exports){
+},{"buffer":284,"buffer-xor":283}],256:[function(require,module,exports){
 (function (Buffer){
 function encryptByte (self, byteParam, decrypt) {
   var pad
@@ -9818,7 +29401,7 @@ function shiftIn (buffer, value) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],36:[function(require,module,exports){
+},{"buffer":284}],257:[function(require,module,exports){
 (function (Buffer){
 function encryptByte (self, byteParam, decrypt) {
   var pad = self._cipher.encryptBlock(self._prev)
@@ -9837,7 +29420,7 @@ exports.encrypt = function (self, chunk, decrypt) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],37:[function(require,module,exports){
+},{"buffer":284}],258:[function(require,module,exports){
 (function (Buffer){
 var xor = require('buffer-xor')
 
@@ -9872,7 +29455,7 @@ exports.encrypt = function (self, chunk) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"buffer-xor":62}],38:[function(require,module,exports){
+},{"buffer":284,"buffer-xor":283}],259:[function(require,module,exports){
 exports.encrypt = function (self, block) {
   return self._cipher.encryptBlock(block)
 }
@@ -9880,7 +29463,7 @@ exports.decrypt = function (self, block) {
   return self._cipher.decryptBlock(block)
 }
 
-},{}],39:[function(require,module,exports){
+},{}],260:[function(require,module,exports){
 (function (Buffer){
 var xor = require('buffer-xor')
 
@@ -9900,7 +29483,7 @@ exports.encrypt = function (self, chunk) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"buffer-xor":62}],40:[function(require,module,exports){
+},{"buffer":284,"buffer-xor":283}],261:[function(require,module,exports){
 (function (Buffer){
 var aes = require('./aes')
 var Transform = require('cipher-base')
@@ -9929,7 +29512,7 @@ StreamCipher.prototype._final = function () {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./aes":26,"buffer":63,"cipher-base":66,"inherits":147}],41:[function(require,module,exports){
+},{"./aes":247,"buffer":284,"cipher-base":287,"inherits":376}],262:[function(require,module,exports){
 var ebtk = require('evp_bytestokey')
 var aes = require('browserify-aes/browser')
 var DES = require('browserify-des')
@@ -10004,7 +29587,7 @@ function getCiphers () {
 }
 exports.listCiphers = exports.getCiphers = getCiphers
 
-},{"browserify-aes/browser":28,"browserify-aes/modes":32,"browserify-des":42,"browserify-des/modes":43,"evp_bytestokey":109}],42:[function(require,module,exports){
+},{"browserify-aes/browser":249,"browserify-aes/modes":253,"browserify-des":263,"browserify-des/modes":264,"evp_bytestokey":333}],263:[function(require,module,exports){
 (function (Buffer){
 var CipherBase = require('cipher-base')
 var des = require('des.js')
@@ -10051,7 +29634,7 @@ DES.prototype._final = function () {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"cipher-base":66,"des.js":78,"inherits":147}],43:[function(require,module,exports){
+},{"buffer":284,"cipher-base":287,"des.js":302,"inherits":376}],264:[function(require,module,exports){
 exports['des-ecb'] = {
   key: 8,
   iv: 0
@@ -10077,7 +29660,7 @@ exports['des-ede'] = {
   iv: 0
 }
 
-},{}],44:[function(require,module,exports){
+},{}],265:[function(require,module,exports){
 (function (Buffer){
 var bn = require('bn.js');
 var randomBytes = require('randombytes');
@@ -10121,7 +29704,7 @@ function getr(priv) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bn.js":23,"buffer":63,"randombytes":225}],45:[function(require,module,exports){
+},{"bn.js":24,"buffer":284,"randombytes":455}],266:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 exports['RSA-SHA224'] = exports.sha224WithRSAEncryption = {
@@ -10197,7 +29780,7 @@ exports['RSA-MD5'] = exports.md5WithRSAEncryption = {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],46:[function(require,module,exports){
+},{"buffer":284}],267:[function(require,module,exports){
 (function (Buffer){
 var _algos = require('./algos')
 var createHash = require('create-hash')
@@ -10304,7 +29887,7 @@ module.exports = {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./algos":45,"./sign":48,"./verify":49,"buffer":63,"create-hash":69,"inherits":147,"stream":387}],47:[function(require,module,exports){
+},{"./algos":266,"./sign":269,"./verify":270,"buffer":284,"create-hash":290,"inherits":376,"stream":620}],268:[function(require,module,exports){
 'use strict'
 exports['1.3.132.0.10'] = 'secp256k1'
 
@@ -10318,7 +29901,7 @@ exports['1.3.132.0.34'] = 'p384'
 
 exports['1.3.132.0.35'] = 'p521'
 
-},{}],48:[function(require,module,exports){
+},{}],269:[function(require,module,exports){
 (function (Buffer){
 // much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var createHmac = require('create-hmac')
@@ -10507,7 +30090,7 @@ module.exports.getKey = getKey
 module.exports.makeKey = makeKey
 
 }).call(this,require("buffer").Buffer)
-},{"./curves":47,"bn.js":23,"browserify-rsa":44,"buffer":63,"create-hmac":72,"elliptic":91,"parse-asn1":176}],49:[function(require,module,exports){
+},{"./curves":268,"bn.js":24,"browserify-rsa":265,"buffer":284,"create-hmac":293,"elliptic":315,"parse-asn1":405}],270:[function(require,module,exports){
 (function (Buffer){
 // much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var curves = require('./curves')
@@ -10614,7 +30197,7 @@ function checkValue (b, q) {
 module.exports = verify
 
 }).call(this,require("buffer").Buffer)
-},{"./curves":47,"bn.js":23,"buffer":63,"elliptic":91,"parse-asn1":176}],50:[function(require,module,exports){
+},{"./curves":268,"bn.js":24,"buffer":284,"elliptic":315,"parse-asn1":405}],271:[function(require,module,exports){
 (function (process,Buffer){
 var msg = require('pako/lib/zlib/messages');
 var zstream = require('pako/lib/zlib/zstream');
@@ -10854,7 +30437,7 @@ Zlib.prototype._error = function(status) {
 exports.Zlib = Zlib;
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":214,"buffer":63,"pako/lib/zlib/constants":164,"pako/lib/zlib/deflate.js":166,"pako/lib/zlib/inflate.js":168,"pako/lib/zlib/messages":170,"pako/lib/zlib/zstream":172}],51:[function(require,module,exports){
+},{"_process":443,"buffer":284,"pako/lib/zlib/constants":393,"pako/lib/zlib/deflate.js":395,"pako/lib/zlib/inflate.js":397,"pako/lib/zlib/messages":399,"pako/lib/zlib/zstream":401}],272:[function(require,module,exports){
 (function (process,Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -11468,16 +31051,16 @@ util.inherits(InflateRaw, Zlib);
 util.inherits(Unzip, Zlib);
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"./binding":50,"_process":214,"_stream_transform":59,"assert":18,"buffer":63,"util":434}],52:[function(require,module,exports){
-arguments[4][25][0].apply(exports,arguments)
-},{"dup":25}],53:[function(require,module,exports){
+},{"./binding":271,"_process":443,"_stream_transform":280,"assert":19,"buffer":284,"util":667}],273:[function(require,module,exports){
+arguments[4][246][0].apply(exports,arguments)
+},{"dup":246}],274:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],54:[function(require,module,exports){
+},{}],275:[function(require,module,exports){
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -11553,7 +31136,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":55,"./_stream_writable":57,"core-util-is":67,"inherits":147,"process-nextick-args":213}],55:[function(require,module,exports){
+},{"./_stream_readable":276,"./_stream_writable":278,"core-util-is":288,"inherits":376,"process-nextick-args":442}],276:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -12493,7 +32076,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":54,"./internal/streams/BufferList":58,"_process":214,"buffer":63,"buffer-shims":60,"core-util-is":67,"events":108,"inherits":147,"isarray":53,"process-nextick-args":213,"string_decoder/":412,"util":25}],56:[function(require,module,exports){
+},{"./_stream_duplex":275,"./internal/streams/BufferList":279,"_process":443,"buffer":284,"buffer-shims":281,"core-util-is":288,"events":332,"inherits":376,"isarray":274,"process-nextick-args":442,"string_decoder/":645,"util":246}],277:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -12674,7 +32257,7 @@ function done(stream, er) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":54,"core-util-is":67,"inherits":147}],57:[function(require,module,exports){
+},{"./_stream_duplex":275,"core-util-is":288,"inherits":376}],278:[function(require,module,exports){
 (function (process){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
@@ -13203,7 +32786,7 @@ function CorkedRequest(state) {
   };
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":54,"_process":214,"buffer":63,"buffer-shims":60,"core-util-is":67,"events":108,"inherits":147,"process-nextick-args":213,"util-deprecate":431}],58:[function(require,module,exports){
+},{"./_stream_duplex":275,"_process":443,"buffer":284,"buffer-shims":281,"core-util-is":288,"events":332,"inherits":376,"process-nextick-args":442,"util-deprecate":664}],279:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('buffer').Buffer;
@@ -13268,10 +32851,10 @@ BufferList.prototype.concat = function (n) {
   }
   return ret;
 };
-},{"buffer":63,"buffer-shims":60}],59:[function(require,module,exports){
+},{"buffer":284,"buffer-shims":281}],280:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":56}],60:[function(require,module,exports){
+},{"./lib/_stream_transform.js":277}],281:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -13383,7 +32966,7 @@ exports.allocUnsafeSlow = function allocUnsafeSlow(size) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"buffer":63}],61:[function(require,module,exports){
+},{"buffer":284}],282:[function(require,module,exports){
 (function (Buffer){
 //binary data writer tuned for creating
 //postgres message packets as effeciently as possible by reusing the
@@ -13516,7 +33099,7 @@ Writer.prototype.flush = function(code) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],62:[function(require,module,exports){
+},{"buffer":284}],283:[function(require,module,exports){
 (function (Buffer){
 module.exports = function xor (a, b) {
   var length = Math.min(a.length, b.length)
@@ -13530,7 +33113,7 @@ module.exports = function xor (a, b) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],63:[function(require,module,exports){
+},{"buffer":284}],284:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -15323,9 +34906,9 @@ function isnan (val) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":20,"ieee754":145,"isarray":64}],64:[function(require,module,exports){
-arguments[4][53][0].apply(exports,arguments)
-},{"dup":53}],65:[function(require,module,exports){
+},{"base64-js":21,"ieee754":370,"isarray":285}],285:[function(require,module,exports){
+arguments[4][274][0].apply(exports,arguments)
+},{"dup":274}],286:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -15390,7 +34973,7 @@ module.exports = {
   "511": "Network Authentication Required"
 }
 
-},{}],66:[function(require,module,exports){
+},{}],287:[function(require,module,exports){
 (function (Buffer){
 var Transform = require('stream').Transform
 var inherits = require('inherits')
@@ -15484,7 +35067,7 @@ CipherBase.prototype._toString = function (value, enc, fin) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"inherits":147,"stream":387,"string_decoder":412}],67:[function(require,module,exports){
+},{"buffer":284,"inherits":376,"stream":620,"string_decoder":645}],288:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -15595,7 +35178,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":149}],68:[function(require,module,exports){
+},{"../../is-buffer/index.js":378}],289:[function(require,module,exports){
 (function (Buffer){
 var elliptic = require('elliptic');
 var BN = require('bn.js');
@@ -15721,7 +35304,7 @@ function formatReturnValue(bn, enc, len) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bn.js":23,"buffer":63,"elliptic":91}],69:[function(require,module,exports){
+},{"bn.js":24,"buffer":284,"elliptic":315}],290:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 var inherits = require('inherits')
@@ -15777,7 +35360,7 @@ module.exports = function createHash (alg) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./md5":71,"buffer":63,"cipher-base":66,"inherits":147,"ripemd160":376,"sha.js":379}],70:[function(require,module,exports){
+},{"./md5":292,"buffer":284,"cipher-base":287,"inherits":376,"ripemd160":608,"sha.js":612}],291:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 var intSize = 4;
@@ -15814,7 +35397,7 @@ function hash(buf, fn, hashSize, bigEndian) {
 }
 exports.hash = hash;
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],71:[function(require,module,exports){
+},{"buffer":284}],292:[function(require,module,exports){
 'use strict';
 /*
  * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
@@ -15971,7 +35554,7 @@ function bit_rol(num, cnt)
 module.exports = function md5(buf) {
   return helpers.hash(buf, core_md5, 16);
 };
-},{"./helpers":70}],72:[function(require,module,exports){
+},{"./helpers":291}],293:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 var createHash = require('create-hash/browser');
@@ -16043,7 +35626,198 @@ module.exports = function createHmac(alg, key) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"create-hash/browser":69,"inherits":147,"stream":387}],73:[function(require,module,exports){
+},{"buffer":284,"create-hash/browser":290,"inherits":376,"stream":620}],294:[function(require,module,exports){
+'use strict';
+
+var types = {};
+var VISA = 'visa';
+var MASTERCARD = 'master-card';
+var AMERICAN_EXPRESS = 'american-express';
+var DINERS_CLUB = 'diners-club';
+var DISCOVER = 'discover';
+var JCB = 'jcb';
+var UNIONPAY = 'unionpay';
+var MAESTRO = 'maestro';
+var CVV = 'CVV';
+var CID = 'CID';
+var CVC = 'CVC';
+var CVN = 'CVN';
+var testOrder = [
+  VISA,
+  MASTERCARD,
+  AMERICAN_EXPRESS,
+  DINERS_CLUB,
+  DISCOVER,
+  JCB,
+  UNIONPAY,
+  MAESTRO
+];
+
+function clone(x) {
+  var prefixPattern, exactPattern, dupe;
+
+  if (!x) { return null; }
+
+  prefixPattern = x.prefixPattern.source;
+  exactPattern = x.exactPattern.source;
+  dupe = JSON.parse(JSON.stringify(x));
+  dupe.prefixPattern = prefixPattern;
+  dupe.exactPattern = exactPattern;
+
+  return dupe;
+}
+
+types[VISA] = {
+  niceType: 'Visa',
+  type: VISA,
+  prefixPattern: /^4$/,
+  exactPattern: /^4\d*$/,
+  gaps: [4, 8, 12],
+  lengths: [16, 18, 19],
+  code: {
+    name: CVV,
+    size: 3
+  }
+};
+
+types[MASTERCARD] = {
+  niceType: 'MasterCard',
+  type: MASTERCARD,
+  prefixPattern: /^(5|5[1-5]|2|22|222|222[1-9]|2[3-6]|27[0-1]|2720)$/,
+  exactPattern: /^(5[1-5]|222[1-9]|2[3-6]|27[0-1]|2720)\d*$/,
+  gaps: [4, 8, 12],
+  lengths: [16],
+  code: {
+    name: CVC,
+    size: 3
+  }
+};
+
+types[AMERICAN_EXPRESS] = {
+  niceType: 'American Express',
+  type: AMERICAN_EXPRESS,
+  prefixPattern: /^(3|34|37)$/,
+  exactPattern: /^3[47]\d*$/,
+  isAmex: true,
+  gaps: [4, 10],
+  lengths: [15],
+  code: {
+    name: CID,
+    size: 4
+  }
+};
+
+types[DINERS_CLUB] = {
+  niceType: 'Diners Club',
+  type: DINERS_CLUB,
+  prefixPattern: /^(3|3[0689]|30[0-5])$/,
+  exactPattern: /^3(0[0-5]|[689])\d*$/,
+  gaps: [4, 10],
+  lengths: [14],
+  code: {
+    name: CVV,
+    size: 3
+  }
+};
+
+types[DISCOVER] = {
+  niceType: 'Discover',
+  type: DISCOVER,
+  prefixPattern: /^(6|60|601|6011|65|64|64[4-9])$/,
+  exactPattern: /^(6011|65|64[4-9])\d*$/,
+  gaps: [4, 8, 12],
+  lengths: [16, 19],
+  code: {
+    name: CID,
+    size: 3
+  }
+};
+
+types[JCB] = {
+  niceType: 'JCB',
+  type: JCB,
+  prefixPattern: /^(2|21|213|2131|1|18|180|1800|3|35)$/,
+  exactPattern: /^(2131|1800|35)\d*$/,
+  gaps: [4, 8, 12],
+  lengths: [16],
+  code: {
+    name: CVV,
+    size: 3
+  }
+};
+
+types[UNIONPAY] = {
+  niceType: 'UnionPay',
+  type: UNIONPAY,
+  prefixPattern: /^(6|62)$/,
+  exactPattern: /^62\d*$/,
+  gaps: [4, 8, 12],
+  lengths: [16, 17, 18, 19],
+  code: {
+    name: CVN,
+    size: 3
+  }
+};
+
+types[MAESTRO] = {
+  niceType: 'Maestro',
+  type: MAESTRO,
+  prefixPattern: /^(5|5[06-9]|6\d*)$/,
+  exactPattern: /^5[06-9]\d*$/,
+  gaps: [4, 8, 12],
+  lengths: [12, 13, 14, 15, 16, 17, 18, 19],
+  code: {
+    name: CVC,
+    size: 3
+  }
+};
+
+function creditCardType(cardNumber) {
+  var type, value, i;
+  var prefixResults = [];
+  var exactResults = [];
+
+  if (!(typeof cardNumber === 'string' || cardNumber instanceof String)) {
+    return [];
+  }
+
+  for (i = 0; i < testOrder.length; i++) {
+    type = testOrder[i];
+    value = types[type];
+
+    if (cardNumber.length === 0) {
+      prefixResults.push(clone(value));
+      continue;
+    }
+
+    if (value.exactPattern.test(cardNumber)) {
+      exactResults.push(clone(value));
+    } else if (value.prefixPattern.test(cardNumber)) {
+      prefixResults.push(clone(value));
+    }
+  }
+
+  return exactResults.length ? exactResults : prefixResults;
+}
+
+creditCardType.getTypeInfo = function (type) {
+  return clone(types[type]);
+};
+
+creditCardType.types = {
+  VISA: VISA,
+  MASTERCARD: MASTERCARD,
+  AMERICAN_EXPRESS: AMERICAN_EXPRESS,
+  DINERS_CLUB: DINERS_CLUB,
+  DISCOVER: DISCOVER,
+  JCB: JCB,
+  UNIONPAY: UNIONPAY,
+  MAESTRO: MAESTRO
+};
+
+module.exports = creditCardType;
+
+},{}],295:[function(require,module,exports){
 'use strict'
 
 exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = require('randombytes')
@@ -16122,7 +35896,7 @@ var publicEncrypt = require('public-encrypt')
   }
 })
 
-},{"browserify-cipher":41,"browserify-sign":46,"browserify-sign/algos":45,"create-ecdh":68,"create-hash":69,"create-hmac":72,"diffie-hellman":84,"pbkdf2":178,"public-encrypt":215,"randombytes":225}],74:[function(require,module,exports){
+},{"browserify-cipher":262,"browserify-sign":267,"browserify-sign/algos":266,"create-ecdh":289,"create-hash":290,"create-hmac":293,"diffie-hellman":308,"pbkdf2":407,"public-encrypt":445,"randombytes":455}],296:[function(require,module,exports){
 "use strict"
 
 var createThunk = require("./lib/thunk.js")
@@ -16233,7 +36007,7 @@ function compileCwise(user_args) {
 
 module.exports = compileCwise
 
-},{"./lib/thunk.js":76}],75:[function(require,module,exports){
+},{"./lib/thunk.js":298}],297:[function(require,module,exports){
 "use strict"
 
 var uniq = require("uniq")
@@ -16589,7 +36363,7 @@ function generateCWiseOp(proc, typesig) {
 }
 module.exports = generateCWiseOp
 
-},{"uniq":428}],76:[function(require,module,exports){
+},{"uniq":661}],298:[function(require,module,exports){
 "use strict"
 
 // The function below is called when constructing a cwise function object, and does the following:
@@ -16677,7 +36451,7 @@ function createThunk(proc) {
 
 module.exports = createThunk
 
-},{"./compile.js":75}],77:[function(require,module,exports){
+},{"./compile.js":297}],299:[function(require,module,exports){
 (function (Buffer){
 
 /**
@@ -16735,7 +36509,170 @@ function dataUriToBuffer (uri) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],78:[function(require,module,exports){
+},{"buffer":284}],300:[function(require,module,exports){
+/*
+ * Date Format 1.2.3
+ * (c) 2007-2009 Steven Levithan <stevenlevithan.com>
+ * MIT license
+ *
+ * Includes enhancements by Scott Trenda <scott.trenda.net>
+ * and Kris Kowal <cixar.com/~kris.kowal/>
+ *
+ * Accepts a date, a mask, or a date and a mask.
+ * Returns a formatted version of the given date.
+ * The date defaults to the current date/time.
+ * The mask defaults to dateFormat.masks.default.
+ */
+
+var dateFormat = function () {
+	var	token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
+		timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
+		timezoneClip = /[^-+\dA-Z]/g,
+		pad = function (val, len) {
+			val = String(val);
+			len = len || 2;
+			while (val.length < len) val = "0" + val;
+			return val;
+		};
+
+	// Regexes and supporting functions are cached through closure
+	return function (date, mask, utc) {
+		var dF = dateFormat;
+
+		// You can't provide utc if you skip other args (use the "UTC:" mask prefix)
+		if (arguments.length == 1 && Object.prototype.toString.call(date) == "[object String]" && !/\d/.test(date)) {
+			mask = date;
+			date = undefined;
+		}
+
+		date = date || new Date;
+
+    if(!(date instanceof Date)) {
+      date = new Date(date);
+    }
+
+    if (isNaN(date)) {
+      throw TypeError("Invalid date");
+    }
+
+		mask = String(dF.masks[mask] || mask || dF.masks["default"]);
+
+		// Allow setting the utc argument via the mask
+		if (mask.slice(0, 4) == "UTC:") {
+			mask = mask.slice(4);
+			utc = true;
+		}
+
+		var	_ = utc ? "getUTC" : "get",
+			d = date[_ + "Date"](),
+			D = date[_ + "Day"](),
+			m = date[_ + "Month"](),
+			y = date[_ + "FullYear"](),
+			H = date[_ + "Hours"](),
+			M = date[_ + "Minutes"](),
+			s = date[_ + "Seconds"](),
+			L = date[_ + "Milliseconds"](),
+			o = utc ? 0 : date.getTimezoneOffset(),
+			flags = {
+				d:    d,
+				dd:   pad(d),
+				ddd:  dF.i18n.dayNames[D],
+				dddd: dF.i18n.dayNames[D + 7],
+				m:    m + 1,
+				mm:   pad(m + 1),
+				mmm:  dF.i18n.monthNames[m],
+				mmmm: dF.i18n.monthNames[m + 12],
+				yy:   String(y).slice(2),
+				yyyy: y,
+				h:    H % 12 || 12,
+				hh:   pad(H % 12 || 12),
+				H:    H,
+				HH:   pad(H),
+				M:    M,
+				MM:   pad(M),
+				s:    s,
+				ss:   pad(s),
+				l:    pad(L, 3),
+				L:    pad(L > 99 ? Math.round(L / 10) : L),
+				t:    H < 12 ? "a"  : "p",
+				tt:   H < 12 ? "am" : "pm",
+				T:    H < 12 ? "A"  : "P",
+				TT:   H < 12 ? "AM" : "PM",
+				Z:    utc ? "UTC" : (String(date).match(timezone) || [""]).pop().replace(timezoneClip, ""),
+				o:    (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
+				S:    ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10]
+			};
+
+		return mask.replace(token, function ($0) {
+			return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
+		});
+	};
+}();
+
+// Some common format strings
+dateFormat.masks = {
+	"default":      "ddd mmm dd yyyy HH:MM:ss",
+	shortDate:      "m/d/yy",
+	mediumDate:     "mmm d, yyyy",
+	longDate:       "mmmm d, yyyy",
+	fullDate:       "dddd, mmmm d, yyyy",
+	shortTime:      "h:MM TT",
+	mediumTime:     "h:MM:ss TT",
+	longTime:       "h:MM:ss TT Z",
+	isoDate:        "yyyy-mm-dd",
+	isoTime:        "HH:MM:ss",
+	isoDateTime:    "yyyy-mm-dd'T'HH:MM:ss",
+	isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
+};
+
+// Internationalization strings
+dateFormat.i18n = {
+	dayNames: [
+		"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
+		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+	],
+	monthNames: [
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+		"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+	]
+};
+
+/*
+// For convenience...
+Date.prototype.format = function (mask, utc) {
+	return dateFormat(this, mask, utc);
+};
+*/
+
+module.exports = dateFormat;
+
+},{}],301:[function(require,module,exports){
+(function (process){
+var util = require('util');
+
+module.exports = util.debuglog || debuglog;
+
+var debugs = {};
+var debugEnviron = process.env.NODE_DEBUG || '';
+
+function debuglog(set) {
+  set = set.toUpperCase();
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+      debugs[set] = function() {
+        var msg = util.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function() {};
+    }
+  }
+  return debugs[set];
+};
+
+}).call(this,require('_process'))
+},{"_process":443,"util":667}],302:[function(require,module,exports){
 'use strict';
 
 exports.utils = require('./des/utils');
@@ -16744,7 +36681,7 @@ exports.DES = require('./des/des');
 exports.CBC = require('./des/cbc');
 exports.EDE = require('./des/ede');
 
-},{"./des/cbc":79,"./des/cipher":80,"./des/des":81,"./des/ede":82,"./des/utils":83}],79:[function(require,module,exports){
+},{"./des/cbc":303,"./des/cipher":304,"./des/des":305,"./des/ede":306,"./des/utils":307}],303:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -16811,7 +36748,7 @@ proto._update = function _update(inp, inOff, out, outOff) {
   }
 };
 
-},{"inherits":147,"minimalistic-assert":155}],80:[function(require,module,exports){
+},{"inherits":376,"minimalistic-assert":384}],304:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -16954,7 +36891,7 @@ Cipher.prototype._finalDecrypt = function _finalDecrypt() {
   return this._unpad(out);
 };
 
-},{"minimalistic-assert":155}],81:[function(require,module,exports){
+},{"minimalistic-assert":384}],305:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -17099,7 +37036,7 @@ DES.prototype._decrypt = function _decrypt(state, lStart, rStart, out, off) {
   utils.rip(l, r, out, off);
 };
 
-},{"../des":78,"inherits":147,"minimalistic-assert":155}],82:[function(require,module,exports){
+},{"../des":302,"inherits":376,"minimalistic-assert":384}],306:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -17156,7 +37093,7 @@ EDE.prototype._update = function _update(inp, inOff, out, outOff) {
 EDE.prototype._pad = DES.prototype._pad;
 EDE.prototype._unpad = DES.prototype._unpad;
 
-},{"../des":78,"inherits":147,"minimalistic-assert":155}],83:[function(require,module,exports){
+},{"../des":302,"inherits":376,"minimalistic-assert":384}],307:[function(require,module,exports){
 'use strict';
 
 exports.readUInt32BE = function readUInt32BE(bytes, off) {
@@ -17414,7 +37351,7 @@ exports.padSplit = function padSplit(num, size, group) {
   return out.join(' ');
 };
 
-},{}],84:[function(require,module,exports){
+},{}],308:[function(require,module,exports){
 (function (Buffer){
 var generatePrime = require('./lib/generatePrime')
 var primes = require('./lib/primes.json')
@@ -17460,7 +37397,7 @@ exports.DiffieHellmanGroup = exports.createDiffieHellmanGroup = exports.getDiffi
 exports.createDiffieHellman = exports.DiffieHellman = createDiffieHellman
 
 }).call(this,require("buffer").Buffer)
-},{"./lib/dh":85,"./lib/generatePrime":86,"./lib/primes.json":87,"buffer":63}],85:[function(require,module,exports){
+},{"./lib/dh":309,"./lib/generatePrime":310,"./lib/primes.json":311,"buffer":284}],309:[function(require,module,exports){
 (function (Buffer){
 var BN = require('bn.js');
 var MillerRabin = require('miller-rabin');
@@ -17628,7 +37565,7 @@ function formatReturnValue(bn, enc) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./generatePrime":86,"bn.js":23,"buffer":63,"miller-rabin":154,"randombytes":225}],86:[function(require,module,exports){
+},{"./generatePrime":310,"bn.js":24,"buffer":284,"miller-rabin":383,"randombytes":455}],310:[function(require,module,exports){
 var randomBytes = require('randombytes');
 module.exports = findPrime;
 findPrime.simpleSieve = simpleSieve;
@@ -17735,7 +37672,7 @@ function findPrime(bits, gen) {
 
 }
 
-},{"bn.js":23,"miller-rabin":154,"randombytes":225}],87:[function(require,module,exports){
+},{"bn.js":24,"miller-rabin":383,"randombytes":455}],311:[function(require,module,exports){
 module.exports={
     "modp1": {
         "gen": "02",
@@ -17770,10 +37707,10 @@ module.exports={
         "prime": "ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aaac42dad33170d04507a33a85521abdf1cba64ecfb850458dbef0a8aea71575d060c7db3970f85a6e1e4c7abf5ae8cdb0933d71e8c94e04a25619dcee3d2261ad2ee6bf12ffa06d98a0864d87602733ec86a64521f2b18177b200cbbe117577a615d6c770988c0bad946e208e24fa074e5ab3143db5bfce0fd108e4b82d120a92108011a723c12a787e6d788719a10bdba5b2699c327186af4e23c1a946834b6150bda2583e9ca2ad44ce8dbbbc2db04de8ef92e8efc141fbecaa6287c59474e6bc05d99b2964fa090c3a2233ba186515be7ed1f612970cee2d7afb81bdd762170481cd0069127d5b05aa993b4ea988d8fddc186ffb7dc90a6c08f4df435c93402849236c3fab4d27c7026c1d4dcb2602646dec9751e763dba37bdf8ff9406ad9e530ee5db382f413001aeb06a53ed9027d831179727b0865a8918da3edbebcf9b14ed44ce6cbaced4bb1bdb7f1447e6cc254b332051512bd7af426fb8f401378cd2bf5983ca01c64b92ecf032ea15d1721d03f482d7ce6e74fef6d55e702f46980c82b5a84031900b1c9e59e7c97fbec7e8f323a97a7e36cc88be0f1d45b7ff585ac54bd407b22b4154aacc8f6d7ebf48e1d814cc5ed20f8037e0a79715eef29be32806a1d58bb7c5da76f550aa3d8a1fbff0eb19ccb1a313d55cda56c9ec2ef29632387fe8d76e3c0468043e8f663f4860ee12bf2d5b0b7474d6e694f91e6dbe115974a3926f12fee5e438777cb6a932df8cd8bec4d073b931ba3bc832b68d9dd300741fa7bf8afc47ed2576f6936ba424663aab639c5ae4f5683423b4742bf1c978238f16cbe39d652de3fdb8befc848ad922222e04a4037c0713eb57a81a23f0c73473fc646cea306b4bcbc8862f8385ddfa9d4b7fa2c087e879683303ed5bdd3a062b3cf5b3a278a66d2a13f83f44f82ddf310ee074ab6a364597e899a0255dc164f31cc50846851df9ab48195ded7ea1b1d510bd7ee74d73faf36bc31ecfa268359046f4eb879f924009438b481c6cd7889a002ed5ee382bc9190da6fc026e479558e4475677e9aa9e3050e2765694dfc81f56e880b96e7160c980dd98edd3dfffffffffffffffff"
     }
 }
-},{}],88:[function(require,module,exports){
+},{}],312:[function(require,module,exports){
 module.exports = require('./lib/dom-scroll-into-view');
 
-},{"./lib/dom-scroll-into-view":89}],89:[function(require,module,exports){
+},{"./lib/dom-scroll-into-view":313}],313:[function(require,module,exports){
 var util = require('./util');
 
 function scrollIntoView(elem, container, config) {
@@ -17897,7 +37834,7 @@ function scrollIntoView(elem, container, config) {
 
 module.exports = scrollIntoView;
 
-},{"./util":90}],90:[function(require,module,exports){
+},{"./util":314}],314:[function(require,module,exports){
 var RE_NUM = /[\-+]?(?:\d*\.|)\d+(?:[eE][\-+]?\d+|)/.source;
 
 function getClientPosition(elem) {
@@ -18330,7 +38267,7 @@ var utils = module.exports = {
 
 mix(utils, domUtils);
 
-},{}],91:[function(require,module,exports){
+},{}],315:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -18346,7 +38283,7 @@ elliptic.curves = require('./elliptic/curves');
 elliptic.ec = require('./elliptic/ec');
 elliptic.eddsa = require('./elliptic/eddsa');
 
-},{"../package.json":107,"./elliptic/curve":94,"./elliptic/curves":97,"./elliptic/ec":98,"./elliptic/eddsa":101,"./elliptic/hmac-drbg":104,"./elliptic/utils":106,"brorand":24}],92:[function(require,module,exports){
+},{"../package.json":331,"./elliptic/curve":318,"./elliptic/curves":321,"./elliptic/ec":322,"./elliptic/eddsa":325,"./elliptic/hmac-drbg":328,"./elliptic/utils":330,"brorand":239}],316:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -18723,7 +38660,7 @@ BasePoint.prototype.dblp = function dblp(k) {
   return r;
 };
 
-},{"../../elliptic":91,"bn.js":23}],93:[function(require,module,exports){
+},{"../../elliptic":315,"bn.js":24}],317:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -19158,7 +39095,7 @@ Point.prototype.eqXToP = function eqXToP(x) {
 Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
-},{"../../elliptic":91,"../curve":94,"bn.js":23,"inherits":147}],94:[function(require,module,exports){
+},{"../../elliptic":315,"../curve":318,"bn.js":24,"inherits":376}],318:[function(require,module,exports){
 'use strict';
 
 var curve = exports;
@@ -19168,7 +39105,7 @@ curve.short = require('./short');
 curve.mont = require('./mont');
 curve.edwards = require('./edwards');
 
-},{"./base":92,"./edwards":93,"./mont":95,"./short":96}],95:[function(require,module,exports){
+},{"./base":316,"./edwards":317,"./mont":319,"./short":320}],319:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -19350,7 +39287,7 @@ Point.prototype.getX = function getX() {
   return this.x.fromRed();
 };
 
-},{"../../elliptic":91,"../curve":94,"bn.js":23,"inherits":147}],96:[function(require,module,exports){
+},{"../../elliptic":315,"../curve":318,"bn.js":24,"inherits":376}],320:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -20290,7 +40227,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
   return this.z.cmpn(0) === 0;
 };
 
-},{"../../elliptic":91,"../curve":94,"bn.js":23,"inherits":147}],97:[function(require,module,exports){
+},{"../../elliptic":315,"../curve":318,"bn.js":24,"inherits":376}],321:[function(require,module,exports){
 'use strict';
 
 var curves = exports;
@@ -20497,7 +40434,7 @@ defineCurve('secp256k1', {
   ]
 });
 
-},{"../elliptic":91,"./precomputed/secp256k1":105,"hash.js":138}],98:[function(require,module,exports){
+},{"../elliptic":315,"./precomputed/secp256k1":329,"hash.js":363}],322:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -20736,7 +40673,7 @@ EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
   throw new Error('Unable to find valid recovery factor');
 };
 
-},{"../../elliptic":91,"./key":99,"./signature":100,"bn.js":23}],99:[function(require,module,exports){
+},{"../../elliptic":315,"./key":323,"./signature":324,"bn.js":24}],323:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -20845,7 +40782,7 @@ KeyPair.prototype.inspect = function inspect() {
          ' pub: ' + (this.pub && this.pub.inspect()) + ' >';
 };
 
-},{"bn.js":23}],100:[function(require,module,exports){
+},{"bn.js":24}],324:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -20982,7 +40919,7 @@ Signature.prototype.toDER = function toDER(enc) {
   return utils.encode(res, enc);
 };
 
-},{"../../elliptic":91,"bn.js":23}],101:[function(require,module,exports){
+},{"../../elliptic":315,"bn.js":24}],325:[function(require,module,exports){
 'use strict';
 
 var hash = require('hash.js');
@@ -21102,7 +41039,7 @@ EDDSA.prototype.isPoint = function isPoint(val) {
   return val instanceof this.pointClass;
 };
 
-},{"../../elliptic":91,"./key":102,"./signature":103,"hash.js":138}],102:[function(require,module,exports){
+},{"../../elliptic":315,"./key":326,"./signature":327,"hash.js":363}],326:[function(require,module,exports){
 'use strict';
 
 var elliptic = require('../../elliptic');
@@ -21200,7 +41137,7 @@ KeyPair.prototype.getPublic = function getPublic(enc) {
 
 module.exports = KeyPair;
 
-},{"../../elliptic":91}],103:[function(require,module,exports){
+},{"../../elliptic":315}],327:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -21268,7 +41205,7 @@ Signature.prototype.toHex = function toHex() {
 
 module.exports = Signature;
 
-},{"../../elliptic":91,"bn.js":23}],104:[function(require,module,exports){
+},{"../../elliptic":315,"bn.js":24}],328:[function(require,module,exports){
 'use strict';
 
 var hash = require('hash.js');
@@ -21384,7 +41321,7 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
   return utils.encode(res, enc);
 };
 
-},{"../elliptic":91,"hash.js":138}],105:[function(require,module,exports){
+},{"../elliptic":315,"hash.js":363}],329:[function(require,module,exports){
 module.exports = {
   doubles: {
     step: 4,
@@ -22166,7 +42103,7 @@ module.exports = {
   }
 };
 
-},{}],106:[function(require,module,exports){
+},{}],330:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -22340,7 +42277,7 @@ function intFromLE(bytes) {
 utils.intFromLE = intFromLE;
 
 
-},{"bn.js":23}],107:[function(require,module,exports){
+},{"bn.js":24}],331:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -22460,7 +42397,7 @@ module.exports={
   "version": "6.3.2"
 }
 
-},{}],108:[function(require,module,exports){
+},{}],332:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -22764,7 +42701,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],109:[function(require,module,exports){
+},{}],333:[function(require,module,exports){
 (function (Buffer){
 var md5 = require('create-hash/md5')
 module.exports = EVP_BytesToKey
@@ -22836,7 +42773,7 @@ function EVP_BytesToKey (password, salt, keyLen, ivLen) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"create-hash/md5":71}],110:[function(require,module,exports){
+},{"buffer":284,"create-hash/md5":292}],334:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -22922,7 +42859,7 @@ var EventListener = {
 
 module.exports = EventListener;
 }).call(this,require('_process'))
-},{"./emptyFunction":117,"_process":214}],111:[function(require,module,exports){
+},{"./emptyFunction":341,"_process":443}],335:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -22958,7 +42895,7 @@ var ExecutionEnvironment = {
 };
 
 module.exports = ExecutionEnvironment;
-},{}],112:[function(require,module,exports){
+},{}],336:[function(require,module,exports){
 "use strict";
 
 /**
@@ -22990,7 +42927,7 @@ function camelize(string) {
 }
 
 module.exports = camelize;
-},{}],113:[function(require,module,exports){
+},{}],337:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23030,7 +42967,7 @@ function camelizeStyleName(string) {
 }
 
 module.exports = camelizeStyleName;
-},{"./camelize":112}],114:[function(require,module,exports){
+},{"./camelize":336}],338:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23070,7 +43007,7 @@ function containsNode(outerNode, innerNode) {
 }
 
 module.exports = containsNode;
-},{"./isTextNode":127}],115:[function(require,module,exports){
+},{"./isTextNode":351}],339:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -23199,7 +43136,7 @@ function createArrayFromMixed(obj) {
 
 module.exports = createArrayFromMixed;
 }).call(this,require('_process'))
-},{"./invariant":125,"_process":214}],116:[function(require,module,exports){
+},{"./invariant":349,"_process":443}],340:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -23285,7 +43222,7 @@ function createNodesFromMarkup(markup, handleScript) {
 
 module.exports = createNodesFromMarkup;
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":111,"./createArrayFromMixed":115,"./getMarkupWrap":121,"./invariant":125,"_process":214}],117:[function(require,module,exports){
+},{"./ExecutionEnvironment":335,"./createArrayFromMixed":339,"./getMarkupWrap":345,"./invariant":349,"_process":443}],341:[function(require,module,exports){
 "use strict";
 
 /**
@@ -23324,7 +43261,7 @@ emptyFunction.thatReturnsArgument = function (arg) {
 };
 
 module.exports = emptyFunction;
-},{}],118:[function(require,module,exports){
+},{}],342:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -23346,7 +43283,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = emptyObject;
 }).call(this,require('_process'))
-},{"_process":214}],119:[function(require,module,exports){
+},{"_process":443}],343:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23373,7 +43310,7 @@ function focusNode(node) {
 }
 
 module.exports = focusNode;
-},{}],120:[function(require,module,exports){
+},{}],344:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23408,7 +43345,7 @@ function getActiveElement() /*?DOMElement*/{
 }
 
 module.exports = getActiveElement;
-},{}],121:[function(require,module,exports){
+},{}],345:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -23505,7 +43442,7 @@ function getMarkupWrap(nodeName) {
 
 module.exports = getMarkupWrap;
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":111,"./invariant":125,"_process":214}],122:[function(require,module,exports){
+},{"./ExecutionEnvironment":335,"./invariant":349,"_process":443}],346:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23544,7 +43481,7 @@ function getUnboundedScrollPosition(scrollable) {
 }
 
 module.exports = getUnboundedScrollPosition;
-},{}],123:[function(require,module,exports){
+},{}],347:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23577,7 +43514,7 @@ function hyphenate(string) {
 }
 
 module.exports = hyphenate;
-},{}],124:[function(require,module,exports){
+},{}],348:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23616,7 +43553,7 @@ function hyphenateStyleName(string) {
 }
 
 module.exports = hyphenateStyleName;
-},{"./hyphenate":123}],125:[function(require,module,exports){
+},{"./hyphenate":347}],349:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -23668,7 +43605,7 @@ function invariant(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 }).call(this,require('_process'))
-},{"_process":214}],126:[function(require,module,exports){
+},{"_process":443}],350:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23691,7 +43628,7 @@ function isNode(object) {
 }
 
 module.exports = isNode;
-},{}],127:[function(require,module,exports){
+},{}],351:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23716,7 +43653,7 @@ function isTextNode(object) {
 }
 
 module.exports = isTextNode;
-},{"./isNode":126}],128:[function(require,module,exports){
+},{"./isNode":350}],352:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -23766,7 +43703,7 @@ var keyMirror = function keyMirror(obj) {
 
 module.exports = keyMirror;
 }).call(this,require('_process'))
-},{"./invariant":125,"_process":214}],129:[function(require,module,exports){
+},{"./invariant":349,"_process":443}],353:[function(require,module,exports){
 "use strict";
 
 /**
@@ -23801,7 +43738,7 @@ var keyOf = function keyOf(oneKeyObj) {
 };
 
 module.exports = keyOf;
-},{}],130:[function(require,module,exports){
+},{}],354:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23831,7 +43768,7 @@ function memoizeStringOnly(callback) {
 }
 
 module.exports = memoizeStringOnly;
-},{}],131:[function(require,module,exports){
+},{}],355:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23854,7 +43791,7 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 module.exports = performance || {};
-},{"./ExecutionEnvironment":111}],132:[function(require,module,exports){
+},{"./ExecutionEnvironment":335}],356:[function(require,module,exports){
 'use strict';
 
 /**
@@ -23888,7 +43825,7 @@ if (performance.now) {
 }
 
 module.exports = performanceNow;
-},{"./performance":131}],133:[function(require,module,exports){
+},{"./performance":355}],357:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -23956,7 +43893,7 @@ function shallowEqual(objA, objB) {
 }
 
 module.exports = shallowEqual;
-},{}],134:[function(require,module,exports){
+},{}],358:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -24025,7 +43962,285 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = warning;
 }).call(this,require('_process'))
-},{"./emptyFunction":117,"_process":214}],135:[function(require,module,exports){
+},{"./emptyFunction":341,"_process":443}],359:[function(require,module,exports){
+(function (global){
+'use strict';
+(function (root, factory) {
+  if (typeof exports === 'object' && typeof module !== 'undefined') {
+    module.exports = factory(typeof global === 'undefined' ? root : global);
+  } else if (typeof define === 'function' && define.amd) {
+    define([], function () { return factory(root); });
+  } else {
+    root.framebus = factory(root);
+  }
+})(this, function (root) { // eslint-disable-line no-invalid-this
+  var win, framebus;
+  var popups = [];
+  var subscribers = {};
+  var prefix = '/*framebus*/';
+
+  function include(popup) {
+    if (popup == null) { return false; }
+    if (popup.Window == null) { return false; }
+    if (popup.constructor !== popup.Window) { return false; }
+
+    popups.push(popup);
+    return true;
+  }
+
+  function target(origin) {
+    var key;
+    var targetedFramebus = {};
+
+    for (key in framebus) {
+      if (!framebus.hasOwnProperty(key)) { continue; }
+
+      targetedFramebus[key] = framebus[key];
+    }
+
+    targetedFramebus._origin = origin || '*';
+
+    return targetedFramebus;
+  }
+
+  function publish(event) {
+    var payload, args;
+    var origin = _getOrigin(this); // eslint-disable-line no-invalid-this
+
+    if (_isntString(event)) { return false; }
+    if (_isntString(origin)) { return false; }
+
+    args = Array.prototype.slice.call(arguments, 1);
+
+    payload = _packagePayload(event, args, origin);
+    if (payload === false) { return false; }
+
+    _broadcast(win.top || win.self, payload, origin);
+
+    return true;
+  }
+
+  function subscribe(event, fn) {
+    var origin = _getOrigin(this); // eslint-disable-line no-invalid-this
+
+    if (_subscriptionArgsInvalid(event, fn, origin)) { return false; }
+
+    subscribers[origin] = subscribers[origin] || {};
+    subscribers[origin][event] = subscribers[origin][event] || [];
+    subscribers[origin][event].push(fn);
+
+    return true;
+  }
+
+  function unsubscribe(event, fn) {
+    var i, subscriberList;
+    var origin = _getOrigin(this); // eslint-disable-line no-invalid-this
+
+    if (_subscriptionArgsInvalid(event, fn, origin)) { return false; }
+
+    subscriberList = subscribers[origin] && subscribers[origin][event];
+    if (!subscriberList) { return false; }
+
+    for (i = 0; i < subscriberList.length; i++) {
+      if (subscriberList[i] === fn) {
+        subscriberList.splice(i, 1);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function _getOrigin(scope) {
+    return scope && scope._origin || '*';
+  }
+
+  function _isntString(string) {
+    return typeof string !== 'string';
+  }
+
+  function _packagePayload(event, args, origin) {
+    var packaged = false;
+    var payload = {
+      event: event,
+      origin: origin
+    };
+    var reply = args[args.length - 1];
+
+    if (typeof reply === 'function') {
+      payload.reply = _subscribeReplier(reply, origin);
+      args = args.slice(0, -1);
+    }
+
+    payload.args = args;
+
+    try {
+      packaged = prefix + JSON.stringify(payload);
+    } catch (e) {
+      throw new Error('Could not stringify event: ' + e.message);
+    }
+    return packaged;
+  }
+
+  function _unpackPayload(e) {
+    var payload, replyOrigin, replySource, replyEvent;
+
+    if (e.data.slice(0, prefix.length) !== prefix) { return false; }
+
+    try {
+      payload = JSON.parse(e.data.slice(prefix.length));
+    } catch (err) {
+      return false;
+    }
+
+    if (payload.reply != null) {
+      replyOrigin = e.origin;
+      replySource = e.source;
+      replyEvent = payload.reply;
+
+      payload.reply = function reply(data) { // eslint-disable-line consistent-return
+        var replyPayload = _packagePayload(replyEvent, [data], replyOrigin);
+
+        if (replyPayload === false) { return false; }
+
+        replySource.postMessage(replyPayload, replyOrigin);
+      };
+
+      payload.args.push(payload.reply);
+    }
+
+    return payload;
+  }
+
+  function _attach(w) {
+    if (win) { return; }
+    win = w || root;
+
+    if (win.addEventListener) {
+      win.addEventListener('message', _onmessage, false);
+    } else if (win.attachEvent) {
+      win.attachEvent('onmessage', _onmessage);
+    } else if (win.onmessage === null) {
+      win.onmessage = _onmessage;
+    } else {
+      win = null;
+    }
+  }
+
+  function _uuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0;
+      var v = c === 'x' ? r : r & 0x3 | 0x8;
+
+      return v.toString(16);
+    });
+  }
+
+  function _onmessage(e) {
+    var payload;
+
+    if (_isntString(e.data)) { return; }
+
+    payload = _unpackPayload(e);
+    if (!payload) { return; }
+
+    _dispatch('*', payload.event, payload.args, e);
+    _dispatch(e.origin, payload.event, payload.args, e);
+    _broadcastPopups(e.data, payload.origin, e.source);
+  }
+
+  function _dispatch(origin, event, args, e) {
+    var i;
+
+    if (!subscribers[origin]) { return; }
+    if (!subscribers[origin][event]) { return; }
+
+    for (i = 0; i < subscribers[origin][event].length; i++) {
+      subscribers[origin][event][i].apply(e, args);
+    }
+  }
+
+  function _hasOpener(frame) {
+    if (frame.top !== frame) { return false; }
+    if (frame.opener == null) { return false; }
+    if (frame.opener === frame) { return false; }
+    if (frame.opener.closed === true) { return false; }
+
+    return true;
+  }
+
+  function _broadcast(frame, payload, origin) {
+    var i;
+
+    try {
+      frame.postMessage(payload, origin);
+
+      if (_hasOpener(frame)) {
+        _broadcast(frame.opener.top, payload, origin);
+      }
+
+      for (i = 0; i < frame.frames.length; i++) {
+        _broadcast(frame.frames[i], payload, origin);
+      }
+    } catch (_) { /* ignored */ }
+  }
+
+  function _broadcastPopups(payload, origin, source) {
+    var i, popup;
+
+    for (i = popups.length - 1; i >= 0; i--) {
+      popup = popups[i];
+
+      if (popup.closed === true) {
+        popups = popups.slice(i, 1);
+      } else if (source !== popup) {
+        _broadcast(popup.top, payload, origin);
+      }
+    }
+  }
+
+  function _subscribeReplier(fn, origin) {
+    var uuid = _uuid();
+
+    function replier(d, o) {
+      fn(d, o);
+      framebus.target(origin).unsubscribe(uuid, replier);
+    }
+
+    framebus.target(origin).subscribe(uuid, replier);
+    return uuid;
+  }
+
+  function _subscriptionArgsInvalid(event, fn, origin) {
+    if (_isntString(event)) { return true; }
+    if (typeof fn !== 'function') { return true; }
+    if (_isntString(origin)) { return true; }
+
+    return false;
+  }
+
+  _attach();
+
+  framebus = {
+    target: target,
+    include: include,
+    publish: publish,
+    pub: publish,
+    trigger: publish,
+    emit: publish,
+    subscribe: subscribe,
+    sub: subscribe,
+    on: subscribe,
+    unsubscribe: unsubscribe,
+    unsub: unsubscribe,
+    off: unsubscribe
+  };
+
+  return framebus;
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],360:[function(require,module,exports){
 (function (process){
 /**
  * @class
@@ -24594,7 +44809,7 @@ Pool.prototype.getMinPoolSize = function getMinPoolSize () {
 exports.Pool = Pool
 
 }).call(this,require('_process'))
-},{"_process":214}],136:[function(require,module,exports){
+},{"_process":443}],361:[function(require,module,exports){
 (function (Buffer,process){
 'use strict'
 
@@ -24732,7 +44947,7 @@ module.exports = function getPixels(url, type, cb) {
   }
 }
 }).call(this,{"isBuffer":require("../is-buffer/index.js")},require('_process'))
-},{"../is-buffer/index.js":149,"_process":214,"data-uri-to-buffer":77,"ndarray":158,"ndarray-pack":156,"omggif":160,"path":177,"through":426}],137:[function(require,module,exports){
+},{"../is-buffer/index.js":378,"_process":443,"data-uri-to-buffer":299,"ndarray":387,"ndarray-pack":385,"omggif":389,"path":406,"through":659}],362:[function(require,module,exports){
 'use strict'
 
 function createContext (width, height, options) {
@@ -24807,7 +45022,7 @@ function createContext (width, height, options) {
 
 module.exports = createContext
 
-},{}],138:[function(require,module,exports){
+},{}],363:[function(require,module,exports){
 var hash = exports;
 
 hash.utils = require('./hash/utils');
@@ -24824,7 +45039,7 @@ hash.sha384 = hash.sha.sha384;
 hash.sha512 = hash.sha.sha512;
 hash.ripemd160 = hash.ripemd.ripemd160;
 
-},{"./hash/common":139,"./hash/hmac":140,"./hash/ripemd":141,"./hash/sha":142,"./hash/utils":143}],139:[function(require,module,exports){
+},{"./hash/common":364,"./hash/hmac":365,"./hash/ripemd":366,"./hash/sha":367,"./hash/utils":368}],364:[function(require,module,exports){
 var hash = require('../hash');
 var utils = hash.utils;
 var assert = utils.assert;
@@ -24917,7 +45132,7 @@ BlockHash.prototype._pad = function pad() {
   return res;
 };
 
-},{"../hash":138}],140:[function(require,module,exports){
+},{"../hash":363}],365:[function(require,module,exports){
 var hmac = exports;
 
 var hash = require('../hash');
@@ -24967,7 +45182,7 @@ Hmac.prototype.digest = function digest(enc) {
   return this.outer.digest(enc);
 };
 
-},{"../hash":138}],141:[function(require,module,exports){
+},{"../hash":363}],366:[function(require,module,exports){
 var hash = require('../hash');
 var utils = hash.utils;
 
@@ -25113,7 +45328,7 @@ var sh = [
   8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11
 ];
 
-},{"../hash":138}],142:[function(require,module,exports){
+},{"../hash":363}],367:[function(require,module,exports){
 var hash = require('../hash');
 var utils = hash.utils;
 var assert = utils.assert;
@@ -25679,7 +45894,7 @@ function g1_512_lo(xh, xl) {
   return r;
 }
 
-},{"../hash":138}],143:[function(require,module,exports){
+},{"../hash":363}],368:[function(require,module,exports){
 var utils = exports;
 var inherits = require('inherits');
 
@@ -25938,7 +46153,7 @@ function shr64_lo(ah, al, num) {
 };
 exports.shr64_lo = shr64_lo;
 
-},{"inherits":147}],144:[function(require,module,exports){
+},{"inherits":376}],369:[function(require,module,exports){
 var http = require('http');
 
 var https = module.exports;
@@ -25954,7 +46169,7 @@ https.request = function (params, cb) {
     return http.request.call(this, params, cb);
 }
 
-},{"http":400}],145:[function(require,module,exports){
+},{"http":633}],370:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -26040,7 +46255,78 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],146:[function(require,module,exports){
+},{}],371:[function(require,module,exports){
+'use strict';
+
+var setAttributes = require('./lib/set-attributes');
+var defaultAttributes = require('./lib/default-attributes');
+var assign = require('./lib/assign');
+
+module.exports = function createFrame(options) {
+  var iframe = document.createElement('iframe');
+  var config = assign({}, defaultAttributes, options);
+
+  if (config.style && typeof config.style !== 'string') {
+    assign(iframe.style, config.style);
+    delete config.style;
+  }
+
+  setAttributes(iframe, config);
+
+  if (!iframe.getAttribute('id')) {
+    iframe.id = iframe.name;
+  }
+
+  return iframe;
+};
+
+},{"./lib/assign":372,"./lib/default-attributes":373,"./lib/set-attributes":374}],372:[function(require,module,exports){
+'use strict';
+
+module.exports = function assign(target) {
+  var objs = Array.prototype.slice.call(arguments, 1);
+
+  objs.forEach(function (obj) {
+    if (typeof obj !== 'object') { return; }
+
+    Object.keys(obj).forEach(function (key) {
+      target[key] = obj[key];
+    });
+  });
+
+  return target;
+}
+
+},{}],373:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  src: 'about:blank',
+  frameBorder: 0,
+  allowtransparency: true,
+  scrolling: 'no'
+};
+
+},{}],374:[function(require,module,exports){
+'use strict';
+
+module.exports = function setAttributes(element, attributes) {
+  var value;
+
+  for (var key in attributes) {
+    if (attributes.hasOwnProperty(key)) {
+      value = attributes[key];
+
+      if (value == null) {
+        element.removeAttribute(key);
+      } else {
+        element.setAttribute(key, value);
+      }
+    }
+  }
+};
+
+},{}],375:[function(require,module,exports){
 
 var indexOf = [].indexOf;
 
@@ -26051,7 +46337,7 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],147:[function(require,module,exports){
+},{}],376:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -26076,7 +46362,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],148:[function(require,module,exports){
+},{}],377:[function(require,module,exports){
 "use strict"
 
 function iota(n) {
@@ -26088,7 +46374,7 @@ function iota(n) {
 }
 
 module.exports = iota
-},{}],149:[function(require,module,exports){
+},{}],378:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -26111,7 +46397,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],150:[function(require,module,exports){
+},{}],379:[function(require,module,exports){
 /**
  * The code was extracted from:
  * https://github.com/davidchambers/Base64.js
@@ -26151,7 +46437,7 @@ function polyfill (input) {
 
 module.exports = typeof window !== 'undefined' && window.atob && window.atob.bind(window) || polyfill;
 
-},{}],151:[function(require,module,exports){
+},{}],380:[function(require,module,exports){
 var atob = require('./atob');
 
 function b64DecodeUnicode(str) {
@@ -26186,7 +46472,7 @@ module.exports = function(str) {
   }
 };
 
-},{"./atob":150}],152:[function(require,module,exports){
+},{"./atob":379}],381:[function(require,module,exports){
 'use strict';
 
 var base64_url_decode = require('./base64_url_decode');
@@ -26214,7 +46500,7 @@ module.exports = function (token,options) {
 
 module.exports.InvalidTokenError = InvalidTokenError;
 
-},{"./base64_url_decode":151}],153:[function(require,module,exports){
+},{"./base64_url_decode":380}],382:[function(require,module,exports){
 (function (process,Buffer,__dirname){
 var PQ = module.exports = require('bindings')('addon.node').PQ;
 
@@ -26577,7 +46863,7 @@ PQ.prototype.cancel = function() {
 };
 
 }).call(this,require('_process'),require("buffer").Buffer,"/node_modules/libpq")
-},{"_process":214,"assert":18,"bindings":22,"buffer":63,"events":108,"path":177}],154:[function(require,module,exports){
+},{"_process":443,"assert":19,"bindings":23,"buffer":284,"events":332,"path":406}],383:[function(require,module,exports){
 var bn = require('bn.js');
 var brorand = require('brorand');
 
@@ -26692,7 +46978,7 @@ MillerRabin.prototype.getDivisor = function getDivisor(n, k) {
   return false;
 };
 
-},{"bn.js":23,"brorand":24}],155:[function(require,module,exports){
+},{"bn.js":24,"brorand":239}],384:[function(require,module,exports){
 module.exports = assert;
 
 function assert(val, msg) {
@@ -26705,7 +46991,7 @@ assert.equal = function assertEqual(l, r, msg) {
     throw new Error(msg || ('Assertion failed: ' + l + ' != ' + r));
 };
 
-},{}],156:[function(require,module,exports){
+},{}],385:[function(require,module,exports){
 "use strict"
 
 var ndarray = require("ndarray")
@@ -26728,10 +47014,10 @@ module.exports = function convert(arr, result) {
   return result
 }
 
-},{"./doConvert.js":157,"ndarray":158}],157:[function(require,module,exports){
+},{"./doConvert.js":386,"ndarray":387}],386:[function(require,module,exports){
 module.exports=require('cwise-compiler')({"args":["array","scalar","index"],"pre":{"body":"{}","args":[],"thisVars":[],"localVars":[]},"body":{"body":"{\nvar _inline_1_v=_inline_1_arg1_,_inline_1_i\nfor(_inline_1_i=0;_inline_1_i<_inline_1_arg2_.length-1;++_inline_1_i) {\n_inline_1_v=_inline_1_v[_inline_1_arg2_[_inline_1_i]]\n}\n_inline_1_arg0_=_inline_1_v[_inline_1_arg2_[_inline_1_arg2_.length-1]]\n}","args":[{"name":"_inline_1_arg0_","lvalue":true,"rvalue":false,"count":1},{"name":"_inline_1_arg1_","lvalue":false,"rvalue":true,"count":1},{"name":"_inline_1_arg2_","lvalue":false,"rvalue":true,"count":4}],"thisVars":[],"localVars":["_inline_1_i","_inline_1_v"]},"post":{"body":"{}","args":[],"thisVars":[],"localVars":[]},"funcName":"convert","blockSize":64})
 
-},{"cwise-compiler":74}],158:[function(require,module,exports){
+},{"cwise-compiler":296}],387:[function(require,module,exports){
 var iota = require("iota-array")
 var isBuffer = require("is-buffer")
 
@@ -27076,7 +47362,7 @@ function wrappedNDArrayCtor(data, shape, stride, offset) {
 
 module.exports = wrappedNDArrayCtor
 
-},{"iota-array":148,"is-buffer":149}],159:[function(require,module,exports){
+},{"iota-array":377,"is-buffer":378}],388:[function(require,module,exports){
 'use strict';
 /* eslint-disable no-unused-vars */
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -27161,7 +47447,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],160:[function(require,module,exports){
+},{}],389:[function(require,module,exports){
 // (c) Dean McNamee <dean@gmail.com>, 2013.
 //
 // https://github.com/deanm/omggif
@@ -27945,7 +48231,7 @@ function GifReaderLZWOutputIndexStream(code_stream, p, output, output_length) {
 
 try { exports.GifWriter = GifWriter; exports.GifReader = GifReader } catch(e) { }  // CommonJS.
 
-},{}],161:[function(require,module,exports){
+},{}],390:[function(require,module,exports){
 (function (Buffer){
 var assert = require('assert')
 
@@ -28006,7 +48292,7 @@ Reader.prototype.read = function() {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"assert":18,"buffer":63}],162:[function(require,module,exports){
+},{"assert":19,"buffer":284}],391:[function(require,module,exports){
 'use strict';
 
 
@@ -28110,7 +48396,7 @@ exports.setTyped = function (on) {
 
 exports.setTyped(TYPED_OK);
 
-},{}],163:[function(require,module,exports){
+},{}],392:[function(require,module,exports){
 'use strict';
 
 // Note: adler32 takes 12% for level 0 and 2% for level 6.
@@ -28144,7 +48430,7 @@ function adler32(adler, buf, len, pos) {
 
 module.exports = adler32;
 
-},{}],164:[function(require,module,exports){
+},{}],393:[function(require,module,exports){
 'use strict';
 
 
@@ -28196,7 +48482,7 @@ module.exports = {
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
 
-},{}],165:[function(require,module,exports){
+},{}],394:[function(require,module,exports){
 'use strict';
 
 // Note: we can't get significant speed boost here.
@@ -28239,7 +48525,7 @@ function crc32(crc, buf, len, pos) {
 
 module.exports = crc32;
 
-},{}],166:[function(require,module,exports){
+},{}],395:[function(require,module,exports){
 'use strict';
 
 var utils   = require('../utils/common');
@@ -30096,7 +50382,7 @@ exports.deflatePrime = deflatePrime;
 exports.deflateTune = deflateTune;
 */
 
-},{"../utils/common":162,"./adler32":163,"./crc32":165,"./messages":170,"./trees":171}],167:[function(require,module,exports){
+},{"../utils/common":391,"./adler32":392,"./crc32":394,"./messages":399,"./trees":400}],396:[function(require,module,exports){
 'use strict';
 
 // See state defs from inflate.js
@@ -30424,7 +50710,7 @@ module.exports = function inflate_fast(strm, start) {
   return;
 };
 
-},{}],168:[function(require,module,exports){
+},{}],397:[function(require,module,exports){
 'use strict';
 
 
@@ -31964,7 +52250,7 @@ exports.inflateSyncPoint = inflateSyncPoint;
 exports.inflateUndermine = inflateUndermine;
 */
 
-},{"../utils/common":162,"./adler32":163,"./crc32":165,"./inffast":167,"./inftrees":169}],169:[function(require,module,exports){
+},{"../utils/common":391,"./adler32":392,"./crc32":394,"./inffast":396,"./inftrees":398}],398:[function(require,module,exports){
 'use strict';
 
 
@@ -32293,7 +52579,7 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   return 0;
 };
 
-},{"../utils/common":162}],170:[function(require,module,exports){
+},{"../utils/common":391}],399:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -32308,7 +52594,7 @@ module.exports = {
   '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
 };
 
-},{}],171:[function(require,module,exports){
+},{}],400:[function(require,module,exports){
 'use strict';
 
 
@@ -33512,7 +53798,7 @@ exports._tr_flush_block  = _tr_flush_block;
 exports._tr_tally = _tr_tally;
 exports._tr_align = _tr_align;
 
-},{"../utils/common":162}],172:[function(require,module,exports){
+},{"../utils/common":391}],401:[function(require,module,exports){
 'use strict';
 
 
@@ -33543,7 +53829,7 @@ function ZStream() {
 
 module.exports = ZStream;
 
-},{}],173:[function(require,module,exports){
+},{}],402:[function(require,module,exports){
 module.exports={"2.16.840.1.101.3.4.1.1": "aes-128-ecb",
 "2.16.840.1.101.3.4.1.2": "aes-128-cbc",
 "2.16.840.1.101.3.4.1.3": "aes-128-ofb",
@@ -33557,7 +53843,7 @@ module.exports={"2.16.840.1.101.3.4.1.1": "aes-128-ecb",
 "2.16.840.1.101.3.4.1.43": "aes-256-ofb",
 "2.16.840.1.101.3.4.1.44": "aes-256-cfb"
 }
-},{}],174:[function(require,module,exports){
+},{}],403:[function(require,module,exports){
 // from https://github.com/indutny/self-signed/blob/gh-pages/lib/asn1.js
 // Fedor, you are amazing.
 
@@ -33676,7 +53962,7 @@ exports.signature = asn1.define('signature', function () {
   )
 })
 
-},{"asn1.js":4}],175:[function(require,module,exports){
+},{"asn1.js":5}],404:[function(require,module,exports){
 (function (Buffer){
 // adapted from https://github.com/apatil/pemstrip
 var findProc = /Proc-Type: 4,ENCRYPTED\r?\nDEK-Info: AES-((?:128)|(?:192)|(?:256))-CBC,([0-9A-H]+)\r?\n\r?\n([0-9A-z\n\r\+\/\=]+)\r?\n/m
@@ -33710,7 +53996,7 @@ module.exports = function (okey, password) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"browserify-aes":28,"buffer":63,"evp_bytestokey":109}],176:[function(require,module,exports){
+},{"browserify-aes":249,"buffer":284,"evp_bytestokey":333}],405:[function(require,module,exports){
 (function (Buffer){
 var asn1 = require('./asn1')
 var aesid = require('./aesid.json')
@@ -33815,7 +54101,7 @@ function decrypt (data, password) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./aesid.json":173,"./asn1":174,"./fixProc":175,"browserify-aes":28,"buffer":63,"pbkdf2":178}],177:[function(require,module,exports){
+},{"./aesid.json":402,"./asn1":403,"./fixProc":404,"browserify-aes":249,"buffer":284,"pbkdf2":407}],406:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -34043,7 +54329,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":214}],178:[function(require,module,exports){
+},{"_process":443}],407:[function(require,module,exports){
 (function (process,Buffer){
 var createHmac = require('create-hmac')
 var checkParameters = require('./precondition')
@@ -34115,7 +54401,7 @@ exports.pbkdf2Sync = function (password, salt, iterations, keylen, digest) {
 }
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"./precondition":179,"_process":214,"buffer":63,"create-hmac":72}],179:[function(require,module,exports){
+},{"./precondition":408,"_process":443,"buffer":284,"create-hmac":293}],408:[function(require,module,exports){
 var MAX_ALLOC = Math.pow(2, 30) - 1 // default in iojs
 module.exports = function (iterations, keylen) {
   if (typeof iterations !== 'number') {
@@ -34135,7 +54421,7 @@ module.exports = function (iterations, keylen) {
   }
 }
 
-},{}],180:[function(require,module,exports){
+},{}],409:[function(require,module,exports){
 'use strict';
 
 var url = require('url');
@@ -34199,7 +54485,7 @@ module.exports = {
   parse: parse
 };
 
-},{"url":429}],181:[function(require,module,exports){
+},{"url":662}],410:[function(require,module,exports){
 var Libpq = require('libpq');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
@@ -34492,7 +54778,7 @@ Client.prototype.escapeIdentifier = function(value) {
 //export the version number so we can check it in node-postgres
 module.exports.version = require('./package.json').version
 
-},{"./lib/copy-stream":182,"./package.json":187,"assert":18,"events":108,"libpq":153,"pg-types":183,"util":434}],182:[function(require,module,exports){
+},{"./lib/copy-stream":411,"./package.json":416,"assert":19,"events":332,"libpq":382,"pg-types":412,"util":667}],411:[function(require,module,exports){
 (function (Buffer){
 var Duplex = require('stream').Duplex;
 var Writable = require('stream').Writable;
@@ -34654,7 +54940,7 @@ var consumeResults = function(pq, cb) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"stream":387,"util":434}],183:[function(require,module,exports){
+},{"buffer":284,"stream":620,"util":667}],412:[function(require,module,exports){
 var textParsers = require('./lib/textParsers');
 var binaryParsers = require('./lib/binaryParsers');
 var arrayParser = require('./lib/arrayParser');
@@ -34703,7 +54989,7 @@ module.exports = {
   arrayParser: arrayParser
 };
 
-},{"./lib/arrayParser":184,"./lib/binaryParsers":185,"./lib/textParsers":186}],184:[function(require,module,exports){
+},{"./lib/arrayParser":413,"./lib/binaryParsers":414,"./lib/textParsers":415}],413:[function(require,module,exports){
 function ArrayParser(source, converter) {
   this.source = source;
   this.converter = converter;
@@ -34802,7 +55088,7 @@ module.exports = {
   }
 };
 
-},{}],185:[function(require,module,exports){
+},{}],414:[function(require,module,exports){
 var parseBits = function(data, bits, offset, invert, callback) {
   offset = offset || 0;
   invert = invert || false;
@@ -35058,7 +55344,7 @@ module.exports = {
   init: init
 };
 
-},{}],186:[function(require,module,exports){
+},{}],415:[function(require,module,exports){
 (function (Buffer,__dirname){
 var arrayParser = require(__dirname + "/arrayParser.js");
 
@@ -35334,7 +55620,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer,"/node_modules/pg-native/node_modules/pg-types/lib")
-},{"buffer":63}],187:[function(require,module,exports){
+},{"buffer":284}],416:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -35438,7 +55724,7 @@ module.exports={
   "version": "1.10.0"
 }
 
-},{}],188:[function(require,module,exports){
+},{}],417:[function(require,module,exports){
 var genericPool = require('generic-pool')
 var util = require('util')
 var EventEmitter = require('events').EventEmitter
@@ -35570,7 +55856,7 @@ Pool.prototype.end = function (cb) {
   }.bind(this))
 }
 
-},{"events":108,"generic-pool":135,"object-assign":159,"pg":197,"util":434}],189:[function(require,module,exports){
+},{"events":332,"generic-pool":360,"object-assign":388,"pg":426,"util":667}],418:[function(require,module,exports){
 var textParsers = require('./lib/textParsers');
 var binaryParsers = require('./lib/binaryParsers');
 var arrayParser = require('./lib/arrayParser');
@@ -35617,7 +55903,7 @@ binaryParsers.init(function(oid, converter) {
   typeParsers.binary[oid] = converter;
 });
 
-},{"./lib/arrayParser":190,"./lib/binaryParsers":191,"./lib/textParsers":192}],190:[function(require,module,exports){
+},{"./lib/arrayParser":419,"./lib/binaryParsers":420,"./lib/textParsers":421}],419:[function(require,module,exports){
 var array = require('postgres-array');
 
 module.exports = {
@@ -35630,9 +55916,9 @@ module.exports = {
   }
 };
 
-},{"postgres-array":209}],191:[function(require,module,exports){
-arguments[4][185][0].apply(exports,arguments)
-},{"dup":185}],192:[function(require,module,exports){
+},{"postgres-array":438}],420:[function(require,module,exports){
+arguments[4][414][0].apply(exports,arguments)
+},{"dup":414}],421:[function(require,module,exports){
 var array = require('postgres-array')
 var ap = require('ap')
 var arrayParser = require('./arrayParser');
@@ -35815,7 +56101,7 @@ module.exports = {
   init: init
 };
 
-},{"./arrayParser":190,"ap":3,"postgres-array":209,"postgres-bytea":210,"postgres-date":211,"postgres-interval":212}],193:[function(require,module,exports){
+},{"./arrayParser":419,"ap":4,"postgres-array":438,"postgres-bytea":439,"postgres-date":440,"postgres-interval":441}],422:[function(require,module,exports){
 (function (Buffer){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -36172,7 +56458,7 @@ Client.Query = Query;
 module.exports = Client;
 
 }).call(this,require("buffer").Buffer)
-},{"./connection":195,"./connection-parameters":194,"./defaults":196,"./query":202,"./type-overrides":204,"buffer":63,"crypto":73,"events":108,"pgpass":208,"util":434}],194:[function(require,module,exports){
+},{"./connection":424,"./connection-parameters":423,"./defaults":425,"./query":431,"./type-overrides":433,"buffer":284,"crypto":295,"events":332,"pgpass":437,"util":667}],423:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -36277,7 +56563,7 @@ ConnectionParameters.prototype.getLibpqConnectionString = function(cb) {
 module.exports = ConnectionParameters;
 
 }).call(this,require('_process'))
-},{"./defaults":196,"_process":214,"dns":52,"pg-connection-string":180,"url":429}],195:[function(require,module,exports){
+},{"./defaults":425,"_process":443,"dns":273,"pg-connection-string":409,"url":662}],424:[function(require,module,exports){
 (function (Buffer){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -36935,7 +57221,7 @@ Connection.prototype.parseCString = function(buffer) {
 module.exports = Connection;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"buffer-writer":61,"events":108,"net":52,"packet-reader":161,"tls":52,"util":434}],196:[function(require,module,exports){
+},{"buffer":284,"buffer-writer":282,"events":332,"net":273,"packet-reader":390,"tls":273,"util":667}],425:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -37007,7 +57293,7 @@ module.exports.__defineSetter__("parseInt8", function(val) {
 });
 
 }).call(this,require('_process'))
-},{"_process":214,"pg-types":189}],197:[function(require,module,exports){
+},{"_process":443,"pg-types":418}],426:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -37125,7 +57411,7 @@ if(typeof process.env.NODE_PG_FORCE_NATIVE != 'undefined') {
 }
 
 }).call(this,require('_process'))
-},{"./client":193,"./connection":195,"./connection-parameters":194,"./defaults":196,"./native":198,"./pool-factory":201,"_process":214,"events":108,"pg-types":189,"util":434}],198:[function(require,module,exports){
+},{"./client":422,"./connection":424,"./connection-parameters":423,"./defaults":425,"./native":427,"./pool-factory":430,"_process":443,"events":332,"pg-types":418,"util":667}],427:[function(require,module,exports){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
  * All rights reserved.
@@ -37328,7 +57614,7 @@ Client.prototype.getTypeParser = function(oid, format) {
   return this._types.getTypeParser(oid, format);
 };
 
-},{"../../package.json":206,"../connection-parameters":194,"../type-overrides":204,"./query":199,"assert":18,"events":108,"pg-native":181,"semver":377,"util":434}],199:[function(require,module,exports){
+},{"../../package.json":435,"../connection-parameters":423,"../type-overrides":433,"./query":428,"assert":19,"events":332,"pg-native":410,"semver":610,"util":667}],428:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -37470,7 +57756,7 @@ NativeQuery.prototype.submit = function(client) {
 };
 
 }).call(this,require('_process'))
-},{"../utils":205,"./result":200,"_process":214,"events":108,"util":434}],200:[function(require,module,exports){
+},{"../utils":434,"./result":429,"_process":443,"events":332,"util":667}],429:[function(require,module,exports){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
  * All rights reserved.
@@ -37508,7 +57794,7 @@ NativeResult.prototype.addRow = function(row) {
   // to pg-native.
 };
 
-},{}],201:[function(require,module,exports){
+},{}],430:[function(require,module,exports){
 var Client = require('./client');
 var util = require('util');
 var Pool = require('pg-pool');
@@ -37528,7 +57814,7 @@ module.exports = function(Client) {
   return BoundPool;
 };
 
-},{"./client":193,"pg-pool":188,"util":434}],202:[function(require,module,exports){
+},{"./client":422,"pg-pool":417,"util":667}],431:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -37740,7 +58026,7 @@ Query.prototype.handleCopyData = function (msg, connection) {
 module.exports = Query;
 
 }).call(this,require('_process'))
-},{"./result":203,"./utils":205,"_process":214,"events":108,"util":434}],203:[function(require,module,exports){
+},{"./result":432,"./utils":434,"_process":443,"events":332,"util":667}],432:[function(require,module,exports){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
  * All rights reserved.
@@ -37857,7 +58143,7 @@ Result.prototype._getTypeParser = types.getTypeParser;
 
 module.exports = Result;
 
-},{"pg-types":189}],204:[function(require,module,exports){
+},{"pg-types":418}],433:[function(require,module,exports){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
  * All rights reserved.
@@ -37897,7 +58183,7 @@ TypeOverrides.prototype.getTypeParser = function(oid, format) {
 
 module.exports = TypeOverrides;
 
-},{"pg-types":189}],205:[function(require,module,exports){
+},{"pg-types":418}],434:[function(require,module,exports){
 (function (Buffer){
 /**
  * Copyright (c) 2010-2016 Brian Carlson (brian.m.carlson@gmail.com)
@@ -38043,7 +58329,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./defaults":196,"buffer":63}],206:[function(require,module,exports){
+},{"./defaults":425,"buffer":284}],435:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -38158,7 +58444,7 @@ module.exports={
   "version": "6.1.0"
 }
 
-},{}],207:[function(require,module,exports){
+},{}],436:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -38395,7 +58681,7 @@ var isValidEntry = module.exports.isValidEntry = function(entry){
 
 
 }).call(this,require('_process'))
-},{"_process":214,"path":177,"split":386,"stream":387,"util":434}],208:[function(require,module,exports){
+},{"_process":443,"path":406,"split":619,"stream":620,"util":667}],437:[function(require,module,exports){
 'use strict';
 
 var path = require('path')
@@ -38420,7 +58706,7 @@ module.exports = function(connInfo, cb) {
 
 module.exports.warnTo = helper.warnTo;
 
-},{"./helper.js":207,"fs":52,"path":177}],209:[function(require,module,exports){
+},{"./helper.js":436,"fs":273,"path":406}],438:[function(require,module,exports){
 'use strict'
 
 exports.parse = function (source, transform) {
@@ -38507,7 +58793,7 @@ function identity (value) {
   return value
 }
 
-},{}],210:[function(require,module,exports){
+},{}],439:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 
@@ -38542,7 +58828,7 @@ module.exports = function parseBytea (input) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],211:[function(require,module,exports){
+},{"buffer":284}],440:[function(require,module,exports){
 'use strict'
 
 var DATE_TIME = /(\d{1,})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})(\.\d{1,})?/
@@ -38626,7 +58912,7 @@ function timeZoneOffset (isoDate) {
   return offset * sign * 1000
 }
 
-},{}],212:[function(require,module,exports){
+},{}],441:[function(require,module,exports){
 'use strict'
 
 var extend = require('xtend/mutable')
@@ -38694,7 +58980,7 @@ function parse (interval) {
     }, {})
 }
 
-},{"xtend/mutable":437}],213:[function(require,module,exports){
+},{"xtend/mutable":674}],442:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -38741,7 +59027,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":214}],214:[function(require,module,exports){
+},{"_process":443}],443:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -38923,7 +59209,242 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],215:[function(require,module,exports){
+},{}],444:[function(require,module,exports){
+(function (root) {
+
+  // Store setTimeout reference so promise-polyfill will be unaffected by
+  // other code modifying setTimeout (like sinon.useFakeTimers())
+  var setTimeoutFunc = setTimeout;
+
+  function noop() {}
+  
+  // Polyfill for Function.prototype.bind
+  function bind(fn, thisArg) {
+    return function () {
+      fn.apply(thisArg, arguments);
+    };
+  }
+
+  function Promise(fn) {
+    if (typeof this !== 'object') throw new TypeError('Promises must be constructed via new');
+    if (typeof fn !== 'function') throw new TypeError('not a function');
+    this._state = 0;
+    this._handled = false;
+    this._value = undefined;
+    this._deferreds = [];
+
+    doResolve(fn, this);
+  }
+
+  function handle(self, deferred) {
+    while (self._state === 3) {
+      self = self._value;
+    }
+    if (self._state === 0) {
+      self._deferreds.push(deferred);
+      return;
+    }
+    self._handled = true;
+    Promise._immediateFn(function () {
+      var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+      if (cb === null) {
+        (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+        return;
+      }
+      var ret;
+      try {
+        ret = cb(self._value);
+      } catch (e) {
+        reject(deferred.promise, e);
+        return;
+      }
+      resolve(deferred.promise, ret);
+    });
+  }
+
+  function resolve(self, newValue) {
+    try {
+      // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+      if (newValue === self) throw new TypeError('A promise cannot be resolved with itself.');
+      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+        var then = newValue.then;
+        if (newValue instanceof Promise) {
+          self._state = 3;
+          self._value = newValue;
+          finale(self);
+          return;
+        } else if (typeof then === 'function') {
+          doResolve(bind(then, newValue), self);
+          return;
+        }
+      }
+      self._state = 1;
+      self._value = newValue;
+      finale(self);
+    } catch (e) {
+      reject(self, e);
+    }
+  }
+
+  function reject(self, newValue) {
+    self._state = 2;
+    self._value = newValue;
+    finale(self);
+  }
+
+  function finale(self) {
+    if (self._state === 2 && self._deferreds.length === 0) {
+      Promise._immediateFn(function() {
+        if (!self._handled) {
+          Promise._unhandledRejectionFn(self._value);
+        }
+      });
+    }
+
+    for (var i = 0, len = self._deferreds.length; i < len; i++) {
+      handle(self, self._deferreds[i]);
+    }
+    self._deferreds = null;
+  }
+
+  function Handler(onFulfilled, onRejected, promise) {
+    this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+    this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+    this.promise = promise;
+  }
+
+  /**
+   * Take a potentially misbehaving resolver function and make sure
+   * onFulfilled and onRejected are only called once.
+   *
+   * Makes no guarantees about asynchrony.
+   */
+  function doResolve(fn, self) {
+    var done = false;
+    try {
+      fn(function (value) {
+        if (done) return;
+        done = true;
+        resolve(self, value);
+      }, function (reason) {
+        if (done) return;
+        done = true;
+        reject(self, reason);
+      });
+    } catch (ex) {
+      if (done) return;
+      done = true;
+      reject(self, ex);
+    }
+  }
+
+  Promise.prototype['catch'] = function (onRejected) {
+    return this.then(null, onRejected);
+  };
+
+  Promise.prototype.then = function (onFulfilled, onRejected) {
+    var prom = new (this.constructor)(noop);
+
+    handle(this, new Handler(onFulfilled, onRejected, prom));
+    return prom;
+  };
+
+  Promise.all = function (arr) {
+    var args = Array.prototype.slice.call(arr);
+
+    return new Promise(function (resolve, reject) {
+      if (args.length === 0) return resolve([]);
+      var remaining = args.length;
+
+      function res(i, val) {
+        try {
+          if (val && (typeof val === 'object' || typeof val === 'function')) {
+            var then = val.then;
+            if (typeof then === 'function') {
+              then.call(val, function (val) {
+                res(i, val);
+              }, reject);
+              return;
+            }
+          }
+          args[i] = val;
+          if (--remaining === 0) {
+            resolve(args);
+          }
+        } catch (ex) {
+          reject(ex);
+        }
+      }
+
+      for (var i = 0; i < args.length; i++) {
+        res(i, args[i]);
+      }
+    });
+  };
+
+  Promise.resolve = function (value) {
+    if (value && typeof value === 'object' && value.constructor === Promise) {
+      return value;
+    }
+
+    return new Promise(function (resolve) {
+      resolve(value);
+    });
+  };
+
+  Promise.reject = function (value) {
+    return new Promise(function (resolve, reject) {
+      reject(value);
+    });
+  };
+
+  Promise.race = function (values) {
+    return new Promise(function (resolve, reject) {
+      for (var i = 0, len = values.length; i < len; i++) {
+        values[i].then(resolve, reject);
+      }
+    });
+  };
+
+  // Use polyfill for setImmediate for performance gains
+  Promise._immediateFn = (typeof setImmediate === 'function' && function (fn) { setImmediate(fn); }) ||
+    function (fn) {
+      setTimeoutFunc(fn, 0);
+    };
+
+  Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+    if (typeof console !== 'undefined' && console) {
+      console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
+    }
+  };
+
+  /**
+   * Set the immediate function to execute callbacks
+   * @param fn {function} Function to execute
+   * @deprecated
+   */
+  Promise._setImmediateFn = function _setImmediateFn(fn) {
+    Promise._immediateFn = fn;
+  };
+
+  /**
+   * Change the function to execute on unhandled rejection
+   * @param {function} fn Function to execute on unhandled rejection
+   * @deprecated
+   */
+  Promise._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
+    Promise._unhandledRejectionFn = fn;
+  };
+  
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Promise;
+  } else if (!root.Promise) {
+    root.Promise = Promise;
+  }
+
+})(this);
+
+},{}],445:[function(require,module,exports){
 exports.publicEncrypt = require('./publicEncrypt');
 exports.privateDecrypt = require('./privateDecrypt');
 
@@ -38934,7 +59455,7 @@ exports.privateEncrypt = function privateEncrypt(key, buf) {
 exports.publicDecrypt = function publicDecrypt(key, buf) {
   return exports.privateDecrypt(key, buf, true);
 };
-},{"./privateDecrypt":217,"./publicEncrypt":218}],216:[function(require,module,exports){
+},{"./privateDecrypt":447,"./publicEncrypt":448}],446:[function(require,module,exports){
 (function (Buffer){
 var createHash = require('create-hash');
 module.exports = function (seed, len) {
@@ -38953,7 +59474,7 @@ function i2ops(c) {
   return out;
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"create-hash":69}],217:[function(require,module,exports){
+},{"buffer":284,"create-hash":290}],447:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var mgf = require('./mgf');
@@ -39064,7 +59585,7 @@ function compare(a, b){
   return dif;
 }
 }).call(this,require("buffer").Buffer)
-},{"./mgf":216,"./withPublic":219,"./xor":220,"bn.js":23,"browserify-rsa":44,"buffer":63,"create-hash":69,"parse-asn1":176}],218:[function(require,module,exports){
+},{"./mgf":446,"./withPublic":449,"./xor":450,"bn.js":24,"browserify-rsa":265,"buffer":284,"create-hash":290,"parse-asn1":405}],448:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var randomBytes = require('randombytes');
@@ -39162,7 +59683,7 @@ function nonZero(len, crypto) {
   return out;
 }
 }).call(this,require("buffer").Buffer)
-},{"./mgf":216,"./withPublic":219,"./xor":220,"bn.js":23,"browserify-rsa":44,"buffer":63,"create-hash":69,"parse-asn1":176,"randombytes":225}],219:[function(require,module,exports){
+},{"./mgf":446,"./withPublic":449,"./xor":450,"bn.js":24,"browserify-rsa":265,"buffer":284,"create-hash":290,"parse-asn1":405,"randombytes":455}],449:[function(require,module,exports){
 (function (Buffer){
 var bn = require('bn.js');
 function withPublic(paddedMsg, key) {
@@ -39175,7 +59696,7 @@ function withPublic(paddedMsg, key) {
 
 module.exports = withPublic;
 }).call(this,require("buffer").Buffer)
-},{"bn.js":23,"buffer":63}],220:[function(require,module,exports){
+},{"bn.js":24,"buffer":284}],450:[function(require,module,exports){
 module.exports = function xor(a, b) {
   var len = a.length;
   var i = -1;
@@ -39184,7 +59705,7 @@ module.exports = function xor(a, b) {
   }
   return a
 };
-},{}],221:[function(require,module,exports){
+},{}],451:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -39721,7 +60242,7 @@ module.exports = function xor(a, b) {
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],222:[function(require,module,exports){
+},{}],452:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -39807,7 +60328,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],223:[function(require,module,exports){
+},{}],453:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -39894,13 +60415,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],224:[function(require,module,exports){
+},{}],454:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":222,"./encode":223}],225:[function(require,module,exports){
+},{"./decode":452,"./encode":453}],455:[function(require,module,exports){
 (function (process,global,Buffer){
 'use strict'
 
@@ -39940,7 +60461,7 @@ function randomBytes (size, cb) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"_process":214,"buffer":63}],226:[function(require,module,exports){
+},{"_process":443,"buffer":284}],456:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -40379,17 +60900,17 @@ var Autocomplete = React.createClass({
 
 module.exports = Autocomplete;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"dom-scroll-into-view":88,"react":375,"react-dom":227}],227:[function(require,module,exports){
+},{"dom-scroll-into-view":312,"react":605,"react-dom":457}],457:[function(require,module,exports){
 'use strict';
 
 module.exports = require('react/lib/ReactDOM');
 
-},{"react/lib/ReactDOM":267}],228:[function(require,module,exports){
+},{"react/lib/ReactDOM":497}],458:[function(require,module,exports){
 'use strict';
 
 module.exports = require('react/lib/ReactDOMServer');
 
-},{"react/lib/ReactDOMServer":282}],229:[function(require,module,exports){
+},{"react/lib/ReactDOMServer":512}],459:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -40618,7 +61139,7 @@ var Swipeable = React.createClass({
 
 module.exports = Swipeable;
 
-},{"react":375}],230:[function(require,module,exports){
+},{"react":605}],460:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -40643,7 +61164,7 @@ var AutoFocusUtils = {
 };
 
 module.exports = AutoFocusUtils;
-},{"./ReactDOMComponentTree":271,"fbjs/lib/focusNode":119}],231:[function(require,module,exports){
+},{"./ReactDOMComponentTree":501,"fbjs/lib/focusNode":343}],461:[function(require,module,exports){
 /**
  * Copyright 2013-present Facebook, Inc.
  * All rights reserved.
@@ -41034,7 +61555,7 @@ var BeforeInputEventPlugin = {
 };
 
 module.exports = BeforeInputEventPlugin;
-},{"./EventConstants":245,"./EventPropagators":249,"./FallbackCompositionState":250,"./SyntheticCompositionEvent":331,"./SyntheticInputEvent":335,"fbjs/lib/ExecutionEnvironment":111,"fbjs/lib/keyOf":129}],232:[function(require,module,exports){
+},{"./EventConstants":475,"./EventPropagators":479,"./FallbackCompositionState":480,"./SyntheticCompositionEvent":561,"./SyntheticInputEvent":565,"fbjs/lib/ExecutionEnvironment":335,"fbjs/lib/keyOf":353}],462:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -41183,7 +61704,7 @@ var CSSProperty = {
 };
 
 module.exports = CSSProperty;
-},{}],233:[function(require,module,exports){
+},{}],463:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -41391,7 +61912,7 @@ var CSSPropertyOperations = {
 
 module.exports = CSSPropertyOperations;
 }).call(this,require('_process'))
-},{"./CSSProperty":232,"./ReactInstrumentation":302,"./dangerousStyleValue":349,"_process":214,"fbjs/lib/ExecutionEnvironment":111,"fbjs/lib/camelizeStyleName":113,"fbjs/lib/hyphenateStyleName":124,"fbjs/lib/memoizeStringOnly":130,"fbjs/lib/warning":134}],234:[function(require,module,exports){
+},{"./CSSProperty":462,"./ReactInstrumentation":532,"./dangerousStyleValue":579,"_process":443,"fbjs/lib/ExecutionEnvironment":335,"fbjs/lib/camelizeStyleName":337,"fbjs/lib/hyphenateStyleName":348,"fbjs/lib/memoizeStringOnly":354,"fbjs/lib/warning":358}],464:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -41500,7 +62021,7 @@ PooledClass.addPoolingTo(CallbackQueue);
 
 module.exports = CallbackQueue;
 }).call(this,require('_process'))
-},{"./PooledClass":254,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"object-assign":159}],235:[function(require,module,exports){
+},{"./PooledClass":484,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"object-assign":388}],465:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -41826,7 +62347,7 @@ var ChangeEventPlugin = {
 };
 
 module.exports = ChangeEventPlugin;
-},{"./EventConstants":245,"./EventPluginHub":246,"./EventPropagators":249,"./ReactDOMComponentTree":271,"./ReactUpdates":324,"./SyntheticEvent":333,"./getEventTarget":357,"./isEventSupported":364,"./isTextInputElement":365,"fbjs/lib/ExecutionEnvironment":111,"fbjs/lib/keyOf":129}],236:[function(require,module,exports){
+},{"./EventConstants":475,"./EventPluginHub":476,"./EventPropagators":479,"./ReactDOMComponentTree":501,"./ReactUpdates":554,"./SyntheticEvent":563,"./getEventTarget":587,"./isEventSupported":594,"./isTextInputElement":595,"fbjs/lib/ExecutionEnvironment":335,"fbjs/lib/keyOf":353}],466:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -42023,7 +62544,7 @@ var DOMChildrenOperations = {
 
 module.exports = DOMChildrenOperations;
 }).call(this,require('_process'))
-},{"./DOMLazyTree":237,"./Danger":241,"./ReactDOMComponentTree":271,"./ReactInstrumentation":302,"./ReactMultiChildUpdateTypes":307,"./createMicrosoftUnsafeLocalFunction":348,"./setInnerHTML":370,"./setTextContent":371,"_process":214}],237:[function(require,module,exports){
+},{"./DOMLazyTree":467,"./Danger":471,"./ReactDOMComponentTree":501,"./ReactInstrumentation":532,"./ReactMultiChildUpdateTypes":537,"./createMicrosoftUnsafeLocalFunction":578,"./setInnerHTML":600,"./setTextContent":601,"_process":443}],467:[function(require,module,exports){
 /**
  * Copyright 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -42142,7 +62663,7 @@ DOMLazyTree.queueHTML = queueHTML;
 DOMLazyTree.queueText = queueText;
 
 module.exports = DOMLazyTree;
-},{"./DOMNamespaces":238,"./createMicrosoftUnsafeLocalFunction":348,"./setInnerHTML":370,"./setTextContent":371}],238:[function(require,module,exports){
+},{"./DOMNamespaces":468,"./createMicrosoftUnsafeLocalFunction":578,"./setInnerHTML":600,"./setTextContent":601}],468:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -42163,7 +62684,7 @@ var DOMNamespaces = {
 };
 
 module.exports = DOMNamespaces;
-},{}],239:[function(require,module,exports){
+},{}],469:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -42372,7 +62893,7 @@ var DOMProperty = {
 
 module.exports = DOMProperty;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],240:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],470:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -42596,7 +63117,7 @@ var DOMPropertyOperations = {
 
 module.exports = DOMPropertyOperations;
 }).call(this,require('_process'))
-},{"./DOMProperty":239,"./ReactDOMComponentTree":271,"./ReactInstrumentation":302,"./quoteAttributeValueForBrowser":367,"_process":214,"fbjs/lib/warning":134}],241:[function(require,module,exports){
+},{"./DOMProperty":469,"./ReactDOMComponentTree":501,"./ReactInstrumentation":532,"./quoteAttributeValueForBrowser":597,"_process":443,"fbjs/lib/warning":358}],471:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -42647,7 +63168,7 @@ var Danger = {
 
 module.exports = Danger;
 }).call(this,require('_process'))
-},{"./DOMLazyTree":237,"./reactProdInvariant":368,"_process":214,"fbjs/lib/ExecutionEnvironment":111,"fbjs/lib/createNodesFromMarkup":116,"fbjs/lib/emptyFunction":117,"fbjs/lib/invariant":125}],242:[function(require,module,exports){
+},{"./DOMLazyTree":467,"./reactProdInvariant":598,"_process":443,"fbjs/lib/ExecutionEnvironment":335,"fbjs/lib/createNodesFromMarkup":340,"fbjs/lib/emptyFunction":341,"fbjs/lib/invariant":349}],472:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -42675,7 +63196,7 @@ var keyOf = require('fbjs/lib/keyOf');
 var DefaultEventPluginOrder = [keyOf({ ResponderEventPlugin: null }), keyOf({ SimpleEventPlugin: null }), keyOf({ TapEventPlugin: null }), keyOf({ EnterLeaveEventPlugin: null }), keyOf({ ChangeEventPlugin: null }), keyOf({ SelectEventPlugin: null }), keyOf({ BeforeInputEventPlugin: null })];
 
 module.exports = DefaultEventPluginOrder;
-},{"fbjs/lib/keyOf":129}],243:[function(require,module,exports){
+},{"fbjs/lib/keyOf":353}],473:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -42726,7 +63247,7 @@ var DisabledInputUtils = {
 };
 
 module.exports = DisabledInputUtils;
-},{}],244:[function(require,module,exports){
+},{}],474:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -42832,7 +63353,7 @@ var EnterLeaveEventPlugin = {
 };
 
 module.exports = EnterLeaveEventPlugin;
-},{"./EventConstants":245,"./EventPropagators":249,"./ReactDOMComponentTree":271,"./SyntheticMouseEvent":337,"fbjs/lib/keyOf":129}],245:[function(require,module,exports){
+},{"./EventConstants":475,"./EventPropagators":479,"./ReactDOMComponentTree":501,"./SyntheticMouseEvent":567,"fbjs/lib/keyOf":353}],475:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -42930,7 +63451,7 @@ var EventConstants = {
 };
 
 module.exports = EventConstants;
-},{"fbjs/lib/keyMirror":128}],246:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":352}],476:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -43184,7 +63705,7 @@ var EventPluginHub = {
 
 module.exports = EventPluginHub;
 }).call(this,require('_process'))
-},{"./EventPluginRegistry":247,"./EventPluginUtils":248,"./ReactErrorUtils":293,"./accumulateInto":344,"./forEachAccumulated":353,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],247:[function(require,module,exports){
+},{"./EventPluginRegistry":477,"./EventPluginUtils":478,"./ReactErrorUtils":523,"./accumulateInto":574,"./forEachAccumulated":583,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],477:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -43434,7 +63955,7 @@ var EventPluginRegistry = {
 
 module.exports = EventPluginRegistry;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],248:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],478:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -43666,7 +64187,7 @@ var EventPluginUtils = {
 
 module.exports = EventPluginUtils;
 }).call(this,require('_process'))
-},{"./EventConstants":245,"./ReactErrorUtils":293,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],249:[function(require,module,exports){
+},{"./EventConstants":475,"./ReactErrorUtils":523,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],479:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -43806,7 +64327,7 @@ var EventPropagators = {
 
 module.exports = EventPropagators;
 }).call(this,require('_process'))
-},{"./EventConstants":245,"./EventPluginHub":246,"./EventPluginUtils":248,"./accumulateInto":344,"./forEachAccumulated":353,"_process":214,"fbjs/lib/warning":134}],250:[function(require,module,exports){
+},{"./EventConstants":475,"./EventPluginHub":476,"./EventPluginUtils":478,"./accumulateInto":574,"./forEachAccumulated":583,"_process":443,"fbjs/lib/warning":358}],480:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -43902,7 +64423,7 @@ _assign(FallbackCompositionState.prototype, {
 PooledClass.addPoolingTo(FallbackCompositionState);
 
 module.exports = FallbackCompositionState;
-},{"./PooledClass":254,"./getTextContentAccessor":361,"object-assign":159}],251:[function(require,module,exports){
+},{"./PooledClass":484,"./getTextContentAccessor":591,"object-assign":388}],481:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -44115,7 +64636,7 @@ var HTMLDOMPropertyConfig = {
 };
 
 module.exports = HTMLDOMPropertyConfig;
-},{"./DOMProperty":239}],252:[function(require,module,exports){
+},{"./DOMProperty":469}],482:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -44175,7 +64696,7 @@ var KeyEscapeUtils = {
 };
 
 module.exports = KeyEscapeUtils;
-},{}],253:[function(require,module,exports){
+},{}],483:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -44314,7 +64835,7 @@ var LinkedValueUtils = {
 
 module.exports = LinkedValueUtils;
 }).call(this,require('_process'))
-},{"./ReactPropTypeLocations":312,"./ReactPropTypes":313,"./ReactPropTypesSecret":314,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],254:[function(require,module,exports){
+},{"./ReactPropTypeLocations":542,"./ReactPropTypes":543,"./ReactPropTypesSecret":544,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],484:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -44438,7 +64959,7 @@ var PooledClass = {
 
 module.exports = PooledClass;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],255:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],485:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -44530,7 +65051,7 @@ var React = {
 
 module.exports = React;
 }).call(this,require('_process'))
-},{"./ReactChildren":258,"./ReactClass":260,"./ReactComponent":261,"./ReactDOMFactories":274,"./ReactElement":290,"./ReactElementValidator":291,"./ReactPropTypes":313,"./ReactPureComponent":315,"./ReactVersion":325,"./onlyChild":366,"_process":214,"fbjs/lib/warning":134,"object-assign":159}],256:[function(require,module,exports){
+},{"./ReactChildren":488,"./ReactClass":490,"./ReactComponent":491,"./ReactDOMFactories":504,"./ReactElement":520,"./ReactElementValidator":521,"./ReactPropTypes":543,"./ReactPureComponent":545,"./ReactVersion":555,"./onlyChild":596,"_process":443,"fbjs/lib/warning":358,"object-assign":388}],486:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -44861,7 +65382,7 @@ var ReactBrowserEventEmitter = _assign({}, ReactEventEmitterMixin, {
 });
 
 module.exports = ReactBrowserEventEmitter;
-},{"./EventConstants":245,"./EventPluginRegistry":247,"./ReactEventEmitterMixin":294,"./ViewportMetrics":343,"./getVendorPrefixedEventName":362,"./isEventSupported":364,"object-assign":159}],257:[function(require,module,exports){
+},{"./EventConstants":475,"./EventPluginRegistry":477,"./ReactEventEmitterMixin":524,"./ViewportMetrics":573,"./getVendorPrefixedEventName":592,"./isEventSupported":594,"object-assign":388}],487:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -45018,7 +65539,7 @@ var ReactChildReconciler = {
 
 module.exports = ReactChildReconciler;
 }).call(this,require('_process'))
-},{"./KeyEscapeUtils":252,"./ReactComponentTreeHook":264,"./ReactReconciler":317,"./instantiateReactComponent":363,"./shouldUpdateReactComponent":372,"./traverseAllChildren":373,"_process":214,"fbjs/lib/warning":134}],258:[function(require,module,exports){
+},{"./KeyEscapeUtils":482,"./ReactComponentTreeHook":494,"./ReactReconciler":547,"./instantiateReactComponent":593,"./shouldUpdateReactComponent":602,"./traverseAllChildren":603,"_process":443,"fbjs/lib/warning":358}],488:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -45210,7 +65731,7 @@ var ReactChildren = {
 };
 
 module.exports = ReactChildren;
-},{"./PooledClass":254,"./ReactElement":290,"./traverseAllChildren":373,"fbjs/lib/emptyFunction":117}],259:[function(require,module,exports){
+},{"./PooledClass":484,"./ReactElement":520,"./traverseAllChildren":603,"fbjs/lib/emptyFunction":341}],489:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -45267,7 +65788,7 @@ var ReactChildrenMutationWarningHook = {
 
 module.exports = ReactChildrenMutationWarningHook;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":264,"_process":214,"fbjs/lib/warning":134}],260:[function(require,module,exports){
+},{"./ReactComponentTreeHook":494,"_process":443,"fbjs/lib/warning":358}],490:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -46002,7 +66523,7 @@ var ReactClass = {
 
 module.exports = ReactClass;
 }).call(this,require('_process'))
-},{"./ReactComponent":261,"./ReactElement":290,"./ReactNoopUpdateQueue":309,"./ReactPropTypeLocationNames":311,"./ReactPropTypeLocations":312,"./reactProdInvariant":368,"_process":214,"fbjs/lib/emptyObject":118,"fbjs/lib/invariant":125,"fbjs/lib/keyMirror":128,"fbjs/lib/keyOf":129,"fbjs/lib/warning":134,"object-assign":159}],261:[function(require,module,exports){
+},{"./ReactComponent":491,"./ReactElement":520,"./ReactNoopUpdateQueue":539,"./ReactPropTypeLocationNames":541,"./ReactPropTypeLocations":542,"./reactProdInvariant":598,"_process":443,"fbjs/lib/emptyObject":342,"fbjs/lib/invariant":349,"fbjs/lib/keyMirror":352,"fbjs/lib/keyOf":353,"fbjs/lib/warning":358,"object-assign":388}],491:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -46123,7 +66644,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactComponent;
 }).call(this,require('_process'))
-},{"./ReactNoopUpdateQueue":309,"./canDefineProperty":346,"./reactProdInvariant":368,"_process":214,"fbjs/lib/emptyObject":118,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],262:[function(require,module,exports){
+},{"./ReactNoopUpdateQueue":539,"./canDefineProperty":576,"./reactProdInvariant":598,"_process":443,"fbjs/lib/emptyObject":342,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],492:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -46154,7 +66675,7 @@ var ReactComponentBrowserEnvironment = {
 };
 
 module.exports = ReactComponentBrowserEnvironment;
-},{"./DOMChildrenOperations":236,"./ReactDOMIDOperations":276}],263:[function(require,module,exports){
+},{"./DOMChildrenOperations":466,"./ReactDOMIDOperations":506}],493:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -46202,7 +66723,7 @@ var ReactComponentEnvironment = {
 
 module.exports = ReactComponentEnvironment;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],264:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],494:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2016-present, Facebook, Inc.
@@ -46547,7 +67068,7 @@ var ReactComponentTreeHook = {
 
 module.exports = ReactComponentTreeHook;
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":266,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],265:[function(require,module,exports){
+},{"./ReactCurrentOwner":496,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],495:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -47454,7 +67975,7 @@ var ReactCompositeComponent = {
 
 module.exports = ReactCompositeComponent;
 }).call(this,require('_process'))
-},{"./ReactComponentEnvironment":263,"./ReactCurrentOwner":266,"./ReactElement":290,"./ReactErrorUtils":293,"./ReactInstanceMap":301,"./ReactInstrumentation":302,"./ReactNodeTypes":308,"./ReactPropTypeLocations":312,"./ReactReconciler":317,"./checkReactTypeSpec":347,"./reactProdInvariant":368,"./shouldUpdateReactComponent":372,"_process":214,"fbjs/lib/emptyObject":118,"fbjs/lib/invariant":125,"fbjs/lib/shallowEqual":133,"fbjs/lib/warning":134,"object-assign":159}],266:[function(require,module,exports){
+},{"./ReactComponentEnvironment":493,"./ReactCurrentOwner":496,"./ReactElement":520,"./ReactErrorUtils":523,"./ReactInstanceMap":531,"./ReactInstrumentation":532,"./ReactNodeTypes":538,"./ReactPropTypeLocations":542,"./ReactReconciler":547,"./checkReactTypeSpec":577,"./reactProdInvariant":598,"./shouldUpdateReactComponent":602,"_process":443,"fbjs/lib/emptyObject":342,"fbjs/lib/invariant":349,"fbjs/lib/shallowEqual":357,"fbjs/lib/warning":358,"object-assign":388}],496:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -47486,7 +68007,7 @@ var ReactCurrentOwner = {
 };
 
 module.exports = ReactCurrentOwner;
-},{}],267:[function(require,module,exports){
+},{}],497:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -47599,7 +68120,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactDOM;
 }).call(this,require('_process'))
-},{"./ReactDOMComponentTree":271,"./ReactDOMNullInputValuePropHook":278,"./ReactDOMUnknownPropertyHook":286,"./ReactDefaultInjection":289,"./ReactInstrumentation":302,"./ReactMount":305,"./ReactReconciler":317,"./ReactUpdates":324,"./ReactVersion":325,"./findDOMNode":351,"./getHostComponentFromComposite":358,"./renderSubtreeIntoContainer":369,"_process":214,"fbjs/lib/ExecutionEnvironment":111,"fbjs/lib/warning":134}],268:[function(require,module,exports){
+},{"./ReactDOMComponentTree":501,"./ReactDOMNullInputValuePropHook":508,"./ReactDOMUnknownPropertyHook":516,"./ReactDefaultInjection":519,"./ReactInstrumentation":532,"./ReactMount":535,"./ReactReconciler":547,"./ReactUpdates":554,"./ReactVersion":555,"./findDOMNode":581,"./getHostComponentFromComposite":588,"./renderSubtreeIntoContainer":599,"_process":443,"fbjs/lib/ExecutionEnvironment":335,"fbjs/lib/warning":358}],498:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -47624,7 +68145,7 @@ var ReactDOMButton = {
 };
 
 module.exports = ReactDOMButton;
-},{"./DisabledInputUtils":243}],269:[function(require,module,exports){
+},{"./DisabledInputUtils":473}],499:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -48633,7 +69154,7 @@ _assign(ReactDOMComponent.prototype, ReactDOMComponent.Mixin, ReactMultiChild.Mi
 
 module.exports = ReactDOMComponent;
 }).call(this,require('_process'))
-},{"./AutoFocusUtils":230,"./CSSPropertyOperations":233,"./DOMLazyTree":237,"./DOMNamespaces":238,"./DOMProperty":239,"./DOMPropertyOperations":240,"./EventConstants":245,"./EventPluginHub":246,"./EventPluginRegistry":247,"./ReactBrowserEventEmitter":256,"./ReactDOMButton":268,"./ReactDOMComponentFlags":270,"./ReactDOMComponentTree":271,"./ReactDOMInput":277,"./ReactDOMOption":279,"./ReactDOMSelect":280,"./ReactDOMTextarea":284,"./ReactInstrumentation":302,"./ReactMultiChild":306,"./ReactServerRenderingTransaction":321,"./escapeTextContentForBrowser":350,"./isEventSupported":364,"./reactProdInvariant":368,"./validateDOMNesting":374,"_process":214,"fbjs/lib/emptyFunction":117,"fbjs/lib/invariant":125,"fbjs/lib/keyOf":129,"fbjs/lib/shallowEqual":133,"fbjs/lib/warning":134,"object-assign":159}],270:[function(require,module,exports){
+},{"./AutoFocusUtils":460,"./CSSPropertyOperations":463,"./DOMLazyTree":467,"./DOMNamespaces":468,"./DOMProperty":469,"./DOMPropertyOperations":470,"./EventConstants":475,"./EventPluginHub":476,"./EventPluginRegistry":477,"./ReactBrowserEventEmitter":486,"./ReactDOMButton":498,"./ReactDOMComponentFlags":500,"./ReactDOMComponentTree":501,"./ReactDOMInput":507,"./ReactDOMOption":509,"./ReactDOMSelect":510,"./ReactDOMTextarea":514,"./ReactInstrumentation":532,"./ReactMultiChild":536,"./ReactServerRenderingTransaction":551,"./escapeTextContentForBrowser":580,"./isEventSupported":594,"./reactProdInvariant":598,"./validateDOMNesting":604,"_process":443,"fbjs/lib/emptyFunction":341,"fbjs/lib/invariant":349,"fbjs/lib/keyOf":353,"fbjs/lib/shallowEqual":357,"fbjs/lib/warning":358,"object-assign":388}],500:[function(require,module,exports){
 /**
  * Copyright 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -48652,7 +69173,7 @@ var ReactDOMComponentFlags = {
 };
 
 module.exports = ReactDOMComponentFlags;
-},{}],271:[function(require,module,exports){
+},{}],501:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -48843,7 +69364,7 @@ var ReactDOMComponentTree = {
 
 module.exports = ReactDOMComponentTree;
 }).call(this,require('_process'))
-},{"./DOMProperty":239,"./ReactDOMComponentFlags":270,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],272:[function(require,module,exports){
+},{"./DOMProperty":469,"./ReactDOMComponentFlags":500,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],502:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -48879,7 +69400,7 @@ function ReactDOMContainerInfo(topLevelWrapper, node) {
 
 module.exports = ReactDOMContainerInfo;
 }).call(this,require('_process'))
-},{"./validateDOMNesting":374,"_process":214}],273:[function(require,module,exports){
+},{"./validateDOMNesting":604,"_process":443}],503:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -48940,7 +69461,7 @@ _assign(ReactDOMEmptyComponent.prototype, {
 });
 
 module.exports = ReactDOMEmptyComponent;
-},{"./DOMLazyTree":237,"./ReactDOMComponentTree":271,"object-assign":159}],274:[function(require,module,exports){
+},{"./DOMLazyTree":467,"./ReactDOMComponentTree":501,"object-assign":388}],504:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -49113,7 +69634,7 @@ var ReactDOMFactories = {
 
 module.exports = ReactDOMFactories;
 }).call(this,require('_process'))
-},{"./ReactElement":290,"./ReactElementValidator":291,"_process":214}],275:[function(require,module,exports){
+},{"./ReactElement":520,"./ReactElementValidator":521,"_process":443}],505:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -49132,7 +69653,7 @@ var ReactDOMFeatureFlags = {
 };
 
 module.exports = ReactDOMFeatureFlags;
-},{}],276:[function(require,module,exports){
+},{}],506:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -49167,7 +69688,7 @@ var ReactDOMIDOperations = {
 };
 
 module.exports = ReactDOMIDOperations;
-},{"./DOMChildrenOperations":236,"./ReactDOMComponentTree":271}],277:[function(require,module,exports){
+},{"./DOMChildrenOperations":466,"./ReactDOMComponentTree":501}],507:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -49439,7 +69960,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMInput;
 }).call(this,require('_process'))
-},{"./DOMPropertyOperations":240,"./DisabledInputUtils":243,"./LinkedValueUtils":253,"./ReactDOMComponentTree":271,"./ReactUpdates":324,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134,"object-assign":159}],278:[function(require,module,exports){
+},{"./DOMPropertyOperations":470,"./DisabledInputUtils":473,"./LinkedValueUtils":483,"./ReactDOMComponentTree":501,"./ReactUpdates":554,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358,"object-assign":388}],508:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -49485,7 +70006,7 @@ var ReactDOMNullInputValuePropHook = {
 
 module.exports = ReactDOMNullInputValuePropHook;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":264,"_process":214,"fbjs/lib/warning":134}],279:[function(require,module,exports){
+},{"./ReactComponentTreeHook":494,"_process":443,"fbjs/lib/warning":358}],509:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -49611,7 +70132,7 @@ var ReactDOMOption = {
 
 module.exports = ReactDOMOption;
 }).call(this,require('_process'))
-},{"./ReactChildren":258,"./ReactDOMComponentTree":271,"./ReactDOMSelect":280,"_process":214,"fbjs/lib/warning":134,"object-assign":159}],280:[function(require,module,exports){
+},{"./ReactChildren":488,"./ReactDOMComponentTree":501,"./ReactDOMSelect":510,"_process":443,"fbjs/lib/warning":358,"object-assign":388}],510:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -49815,7 +70336,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMSelect;
 }).call(this,require('_process'))
-},{"./DisabledInputUtils":243,"./LinkedValueUtils":253,"./ReactDOMComponentTree":271,"./ReactUpdates":324,"_process":214,"fbjs/lib/warning":134,"object-assign":159}],281:[function(require,module,exports){
+},{"./DisabledInputUtils":473,"./LinkedValueUtils":483,"./ReactDOMComponentTree":501,"./ReactUpdates":554,"_process":443,"fbjs/lib/warning":358,"object-assign":388}],511:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -50028,7 +70549,7 @@ var ReactDOMSelection = {
 };
 
 module.exports = ReactDOMSelection;
-},{"./getNodeForCharacterOffset":360,"./getTextContentAccessor":361,"fbjs/lib/ExecutionEnvironment":111}],282:[function(require,module,exports){
+},{"./getNodeForCharacterOffset":590,"./getTextContentAccessor":591,"fbjs/lib/ExecutionEnvironment":335}],512:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -50055,7 +70576,7 @@ var ReactDOMServer = {
 };
 
 module.exports = ReactDOMServer;
-},{"./ReactDefaultInjection":289,"./ReactServerRendering":320,"./ReactVersion":325}],283:[function(require,module,exports){
+},{"./ReactDefaultInjection":519,"./ReactServerRendering":550,"./ReactVersion":555}],513:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -50222,7 +70743,7 @@ _assign(ReactDOMTextComponent.prototype, {
 
 module.exports = ReactDOMTextComponent;
 }).call(this,require('_process'))
-},{"./DOMChildrenOperations":236,"./DOMLazyTree":237,"./ReactDOMComponentTree":271,"./escapeTextContentForBrowser":350,"./reactProdInvariant":368,"./validateDOMNesting":374,"_process":214,"fbjs/lib/invariant":125,"object-assign":159}],284:[function(require,module,exports){
+},{"./DOMChildrenOperations":466,"./DOMLazyTree":467,"./ReactDOMComponentTree":501,"./escapeTextContentForBrowser":580,"./reactProdInvariant":598,"./validateDOMNesting":604,"_process":443,"fbjs/lib/invariant":349,"object-assign":388}],514:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -50380,7 +70901,7 @@ function _handleChange(event) {
 
 module.exports = ReactDOMTextarea;
 }).call(this,require('_process'))
-},{"./DisabledInputUtils":243,"./LinkedValueUtils":253,"./ReactDOMComponentTree":271,"./ReactUpdates":324,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134,"object-assign":159}],285:[function(require,module,exports){
+},{"./DisabledInputUtils":473,"./LinkedValueUtils":483,"./ReactDOMComponentTree":501,"./ReactUpdates":554,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358,"object-assign":388}],515:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -50519,7 +71040,7 @@ module.exports = {
   traverseEnterLeave: traverseEnterLeave
 };
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],286:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],516:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -50634,7 +71155,7 @@ var ReactDOMUnknownPropertyHook = {
 
 module.exports = ReactDOMUnknownPropertyHook;
 }).call(this,require('_process'))
-},{"./DOMProperty":239,"./EventPluginRegistry":247,"./ReactComponentTreeHook":264,"_process":214,"fbjs/lib/warning":134}],287:[function(require,module,exports){
+},{"./DOMProperty":469,"./EventPluginRegistry":477,"./ReactComponentTreeHook":494,"_process":443,"fbjs/lib/warning":358}],517:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2016-present, Facebook, Inc.
@@ -50938,7 +71459,7 @@ if (/[?&]react_perf\b/.test(url)) {
 
 module.exports = ReactDebugTool;
 }).call(this,require('_process'))
-},{"./ReactChildrenMutationWarningHook":259,"./ReactComponentTreeHook":264,"./ReactHostOperationHistoryHook":298,"./ReactInvalidSetStateWarningHook":303,"_process":214,"fbjs/lib/ExecutionEnvironment":111,"fbjs/lib/performanceNow":132,"fbjs/lib/warning":134}],288:[function(require,module,exports){
+},{"./ReactChildrenMutationWarningHook":489,"./ReactComponentTreeHook":494,"./ReactHostOperationHistoryHook":528,"./ReactInvalidSetStateWarningHook":533,"_process":443,"fbjs/lib/ExecutionEnvironment":335,"fbjs/lib/performanceNow":356,"fbjs/lib/warning":358}],518:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -51007,7 +71528,7 @@ var ReactDefaultBatchingStrategy = {
 };
 
 module.exports = ReactDefaultBatchingStrategy;
-},{"./ReactUpdates":324,"./Transaction":342,"fbjs/lib/emptyFunction":117,"object-assign":159}],289:[function(require,module,exports){
+},{"./ReactUpdates":554,"./Transaction":572,"fbjs/lib/emptyFunction":341,"object-assign":388}],519:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -51092,7 +71613,7 @@ function inject() {
 module.exports = {
   inject: inject
 };
-},{"./BeforeInputEventPlugin":231,"./ChangeEventPlugin":235,"./DefaultEventPluginOrder":242,"./EnterLeaveEventPlugin":244,"./HTMLDOMPropertyConfig":251,"./ReactComponentBrowserEnvironment":262,"./ReactDOMComponent":269,"./ReactDOMComponentTree":271,"./ReactDOMEmptyComponent":273,"./ReactDOMTextComponent":283,"./ReactDOMTreeTraversal":285,"./ReactDefaultBatchingStrategy":288,"./ReactEventListener":295,"./ReactInjection":299,"./ReactReconcileTransaction":316,"./SVGDOMPropertyConfig":326,"./SelectEventPlugin":327,"./SimpleEventPlugin":328}],290:[function(require,module,exports){
+},{"./BeforeInputEventPlugin":461,"./ChangeEventPlugin":465,"./DefaultEventPluginOrder":472,"./EnterLeaveEventPlugin":474,"./HTMLDOMPropertyConfig":481,"./ReactComponentBrowserEnvironment":492,"./ReactDOMComponent":499,"./ReactDOMComponentTree":501,"./ReactDOMEmptyComponent":503,"./ReactDOMTextComponent":513,"./ReactDOMTreeTraversal":515,"./ReactDefaultBatchingStrategy":518,"./ReactEventListener":525,"./ReactInjection":529,"./ReactReconcileTransaction":546,"./SVGDOMPropertyConfig":556,"./SelectEventPlugin":557,"./SimpleEventPlugin":558}],520:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -51443,7 +71964,7 @@ ReactElement.REACT_ELEMENT_TYPE = REACT_ELEMENT_TYPE;
 
 module.exports = ReactElement;
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":266,"./canDefineProperty":346,"_process":214,"fbjs/lib/warning":134,"object-assign":159}],291:[function(require,module,exports){
+},{"./ReactCurrentOwner":496,"./canDefineProperty":576,"_process":443,"fbjs/lib/warning":358,"object-assign":388}],521:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -51674,7 +72195,7 @@ var ReactElementValidator = {
 
 module.exports = ReactElementValidator;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":264,"./ReactCurrentOwner":266,"./ReactElement":290,"./ReactPropTypeLocations":312,"./canDefineProperty":346,"./checkReactTypeSpec":347,"./getIteratorFn":359,"_process":214,"fbjs/lib/warning":134}],292:[function(require,module,exports){
+},{"./ReactComponentTreeHook":494,"./ReactCurrentOwner":496,"./ReactElement":520,"./ReactPropTypeLocations":542,"./canDefineProperty":576,"./checkReactTypeSpec":577,"./getIteratorFn":589,"_process":443,"fbjs/lib/warning":358}],522:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -51705,7 +72226,7 @@ var ReactEmptyComponent = {
 ReactEmptyComponent.injection = ReactEmptyComponentInjection;
 
 module.exports = ReactEmptyComponent;
-},{}],293:[function(require,module,exports){
+},{}],523:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -51784,7 +72305,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactErrorUtils;
 }).call(this,require('_process'))
-},{"_process":214}],294:[function(require,module,exports){
+},{"_process":443}],524:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -51818,7 +72339,7 @@ var ReactEventEmitterMixin = {
 };
 
 module.exports = ReactEventEmitterMixin;
-},{"./EventPluginHub":246}],295:[function(require,module,exports){
+},{"./EventPluginHub":476}],525:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -51976,7 +72497,7 @@ var ReactEventListener = {
 };
 
 module.exports = ReactEventListener;
-},{"./PooledClass":254,"./ReactDOMComponentTree":271,"./ReactUpdates":324,"./getEventTarget":357,"fbjs/lib/EventListener":110,"fbjs/lib/ExecutionEnvironment":111,"fbjs/lib/getUnboundedScrollPosition":122,"object-assign":159}],296:[function(require,module,exports){
+},{"./PooledClass":484,"./ReactDOMComponentTree":501,"./ReactUpdates":554,"./getEventTarget":587,"fbjs/lib/EventListener":334,"fbjs/lib/ExecutionEnvironment":335,"fbjs/lib/getUnboundedScrollPosition":346,"object-assign":388}],526:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -51999,7 +72520,7 @@ var ReactFeatureFlags = {
 };
 
 module.exports = ReactFeatureFlags;
-},{}],297:[function(require,module,exports){
+},{}],527:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -52078,7 +72599,7 @@ var ReactHostComponent = {
 
 module.exports = ReactHostComponent;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"object-assign":159}],298:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"object-assign":388}],528:[function(require,module,exports){
 /**
  * Copyright 2016-present, Facebook, Inc.
  * All rights reserved.
@@ -52116,7 +72637,7 @@ var ReactHostOperationHistoryHook = {
 };
 
 module.exports = ReactHostOperationHistoryHook;
-},{}],299:[function(require,module,exports){
+},{}],529:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -52153,7 +72674,7 @@ var ReactInjection = {
 };
 
 module.exports = ReactInjection;
-},{"./DOMProperty":239,"./EventPluginHub":246,"./EventPluginUtils":248,"./ReactBrowserEventEmitter":256,"./ReactClass":260,"./ReactComponentEnvironment":263,"./ReactEmptyComponent":292,"./ReactHostComponent":297,"./ReactUpdates":324}],300:[function(require,module,exports){
+},{"./DOMProperty":469,"./EventPluginHub":476,"./EventPluginUtils":478,"./ReactBrowserEventEmitter":486,"./ReactClass":490,"./ReactComponentEnvironment":493,"./ReactEmptyComponent":522,"./ReactHostComponent":527,"./ReactUpdates":554}],530:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -52278,7 +72799,7 @@ var ReactInputSelection = {
 };
 
 module.exports = ReactInputSelection;
-},{"./ReactDOMSelection":281,"fbjs/lib/containsNode":114,"fbjs/lib/focusNode":119,"fbjs/lib/getActiveElement":120}],301:[function(require,module,exports){
+},{"./ReactDOMSelection":511,"fbjs/lib/containsNode":338,"fbjs/lib/focusNode":343,"fbjs/lib/getActiveElement":344}],531:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -52327,7 +72848,7 @@ var ReactInstanceMap = {
 };
 
 module.exports = ReactInstanceMap;
-},{}],302:[function(require,module,exports){
+},{}],532:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2016-present, Facebook, Inc.
@@ -52351,7 +72872,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = { debugTool: debugTool };
 }).call(this,require('_process'))
-},{"./ReactDebugTool":287,"_process":214}],303:[function(require,module,exports){
+},{"./ReactDebugTool":517,"_process":443}],533:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2016-present, Facebook, Inc.
@@ -52390,7 +72911,7 @@ var ReactInvalidSetStateWarningHook = {
 
 module.exports = ReactInvalidSetStateWarningHook;
 }).call(this,require('_process'))
-},{"_process":214,"fbjs/lib/warning":134}],304:[function(require,module,exports){
+},{"_process":443,"fbjs/lib/warning":358}],534:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -52441,7 +72962,7 @@ var ReactMarkupChecksum = {
 };
 
 module.exports = ReactMarkupChecksum;
-},{"./adler32":345}],305:[function(require,module,exports){
+},{"./adler32":575}],535:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -52978,7 +73499,7 @@ var ReactMount = {
 
 module.exports = ReactMount;
 }).call(this,require('_process'))
-},{"./DOMLazyTree":237,"./DOMProperty":239,"./ReactBrowserEventEmitter":256,"./ReactCurrentOwner":266,"./ReactDOMComponentTree":271,"./ReactDOMContainerInfo":272,"./ReactDOMFeatureFlags":275,"./ReactElement":290,"./ReactFeatureFlags":296,"./ReactInstanceMap":301,"./ReactInstrumentation":302,"./ReactMarkupChecksum":304,"./ReactReconciler":317,"./ReactUpdateQueue":323,"./ReactUpdates":324,"./instantiateReactComponent":363,"./reactProdInvariant":368,"./setInnerHTML":370,"./shouldUpdateReactComponent":372,"_process":214,"fbjs/lib/emptyObject":118,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],306:[function(require,module,exports){
+},{"./DOMLazyTree":467,"./DOMProperty":469,"./ReactBrowserEventEmitter":486,"./ReactCurrentOwner":496,"./ReactDOMComponentTree":501,"./ReactDOMContainerInfo":502,"./ReactDOMFeatureFlags":505,"./ReactElement":520,"./ReactFeatureFlags":526,"./ReactInstanceMap":531,"./ReactInstrumentation":532,"./ReactMarkupChecksum":534,"./ReactReconciler":547,"./ReactUpdateQueue":553,"./ReactUpdates":554,"./instantiateReactComponent":593,"./reactProdInvariant":598,"./setInnerHTML":600,"./shouldUpdateReactComponent":602,"_process":443,"fbjs/lib/emptyObject":342,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],536:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -53432,7 +73953,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 }).call(this,require('_process'))
-},{"./ReactChildReconciler":257,"./ReactComponentEnvironment":263,"./ReactCurrentOwner":266,"./ReactInstanceMap":301,"./ReactInstrumentation":302,"./ReactMultiChildUpdateTypes":307,"./ReactReconciler":317,"./flattenChildren":352,"./reactProdInvariant":368,"_process":214,"fbjs/lib/emptyFunction":117,"fbjs/lib/invariant":125}],307:[function(require,module,exports){
+},{"./ReactChildReconciler":487,"./ReactComponentEnvironment":493,"./ReactCurrentOwner":496,"./ReactInstanceMap":531,"./ReactInstrumentation":532,"./ReactMultiChildUpdateTypes":537,"./ReactReconciler":547,"./flattenChildren":582,"./reactProdInvariant":598,"_process":443,"fbjs/lib/emptyFunction":341,"fbjs/lib/invariant":349}],537:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -53465,7 +73986,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 });
 
 module.exports = ReactMultiChildUpdateTypes;
-},{"fbjs/lib/keyMirror":128}],308:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":352}],538:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -53508,7 +74029,7 @@ var ReactNodeTypes = {
 
 module.exports = ReactNodeTypes;
 }).call(this,require('_process'))
-},{"./ReactElement":290,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],309:[function(require,module,exports){
+},{"./ReactElement":520,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],539:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -53607,7 +74128,7 @@ var ReactNoopUpdateQueue = {
 
 module.exports = ReactNoopUpdateQueue;
 }).call(this,require('_process'))
-},{"_process":214,"fbjs/lib/warning":134}],310:[function(require,module,exports){
+},{"_process":443,"fbjs/lib/warning":358}],540:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -53704,7 +74225,7 @@ var ReactOwner = {
 
 module.exports = ReactOwner;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],311:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],541:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -53731,7 +74252,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = ReactPropTypeLocationNames;
 }).call(this,require('_process'))
-},{"_process":214}],312:[function(require,module,exports){
+},{"_process":443}],542:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -53754,7 +74275,7 @@ var ReactPropTypeLocations = keyMirror({
 });
 
 module.exports = ReactPropTypeLocations;
-},{"fbjs/lib/keyMirror":128}],313:[function(require,module,exports){
+},{"fbjs/lib/keyMirror":352}],543:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -54188,7 +74709,7 @@ function getClassName(propValue) {
 
 module.exports = ReactPropTypes;
 }).call(this,require('_process'))
-},{"./ReactElement":290,"./ReactPropTypeLocationNames":311,"./ReactPropTypesSecret":314,"./getIteratorFn":359,"_process":214,"fbjs/lib/emptyFunction":117,"fbjs/lib/warning":134}],314:[function(require,module,exports){
+},{"./ReactElement":520,"./ReactPropTypeLocationNames":541,"./ReactPropTypesSecret":544,"./getIteratorFn":589,"_process":443,"fbjs/lib/emptyFunction":341,"fbjs/lib/warning":358}],544:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -54205,7 +74726,7 @@ module.exports = ReactPropTypes;
 var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 
 module.exports = ReactPropTypesSecret;
-},{}],315:[function(require,module,exports){
+},{}],545:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -54248,7 +74769,7 @@ _assign(ReactPureComponent.prototype, ReactComponent.prototype);
 ReactPureComponent.prototype.isPureReactComponent = true;
 
 module.exports = ReactPureComponent;
-},{"./ReactComponent":261,"./ReactNoopUpdateQueue":309,"fbjs/lib/emptyObject":118,"object-assign":159}],316:[function(require,module,exports){
+},{"./ReactComponent":491,"./ReactNoopUpdateQueue":539,"fbjs/lib/emptyObject":342,"object-assign":388}],546:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -54429,7 +74950,7 @@ PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
 }).call(this,require('_process'))
-},{"./CallbackQueue":234,"./PooledClass":254,"./ReactBrowserEventEmitter":256,"./ReactInputSelection":300,"./ReactInstrumentation":302,"./ReactUpdateQueue":323,"./Transaction":342,"_process":214,"object-assign":159}],317:[function(require,module,exports){
+},{"./CallbackQueue":464,"./PooledClass":484,"./ReactBrowserEventEmitter":486,"./ReactInputSelection":530,"./ReactInstrumentation":532,"./ReactUpdateQueue":553,"./Transaction":572,"_process":443,"object-assign":388}],547:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -54600,7 +75121,7 @@ var ReactReconciler = {
 
 module.exports = ReactReconciler;
 }).call(this,require('_process'))
-},{"./ReactInstrumentation":302,"./ReactRef":318,"_process":214,"fbjs/lib/warning":134}],318:[function(require,module,exports){
+},{"./ReactInstrumentation":532,"./ReactRef":548,"_process":443,"fbjs/lib/warning":358}],548:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -54681,7 +75202,7 @@ ReactRef.detachRefs = function (instance, element) {
 };
 
 module.exports = ReactRef;
-},{"./ReactOwner":310}],319:[function(require,module,exports){
+},{"./ReactOwner":540}],549:[function(require,module,exports){
 /**
  * Copyright 2014-present, Facebook, Inc.
  * All rights reserved.
@@ -54704,7 +75225,7 @@ var ReactServerBatchingStrategy = {
 };
 
 module.exports = ReactServerBatchingStrategy;
-},{}],320:[function(require,module,exports){
+},{}],550:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -54797,7 +75318,7 @@ module.exports = {
   renderToStaticMarkup: renderToStaticMarkup
 };
 }).call(this,require('_process'))
-},{"./ReactDOMContainerInfo":272,"./ReactDefaultBatchingStrategy":288,"./ReactElement":290,"./ReactInstrumentation":302,"./ReactMarkupChecksum":304,"./ReactReconciler":317,"./ReactServerBatchingStrategy":319,"./ReactServerRenderingTransaction":321,"./ReactUpdates":324,"./instantiateReactComponent":363,"./reactProdInvariant":368,"_process":214,"fbjs/lib/emptyObject":118,"fbjs/lib/invariant":125}],321:[function(require,module,exports){
+},{"./ReactDOMContainerInfo":502,"./ReactDefaultBatchingStrategy":518,"./ReactElement":520,"./ReactInstrumentation":532,"./ReactMarkupChecksum":534,"./ReactReconciler":547,"./ReactServerBatchingStrategy":549,"./ReactServerRenderingTransaction":551,"./ReactUpdates":554,"./instantiateReactComponent":593,"./reactProdInvariant":598,"_process":443,"fbjs/lib/emptyObject":342,"fbjs/lib/invariant":349}],551:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -54890,7 +75411,7 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 }).call(this,require('_process'))
-},{"./PooledClass":254,"./ReactInstrumentation":302,"./ReactServerUpdateQueue":322,"./Transaction":342,"_process":214,"object-assign":159}],322:[function(require,module,exports){
+},{"./PooledClass":484,"./ReactInstrumentation":532,"./ReactServerUpdateQueue":552,"./Transaction":572,"_process":443,"object-assign":388}],552:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -55034,7 +75555,7 @@ var ReactServerUpdateQueue = function () {
 
 module.exports = ReactServerUpdateQueue;
 }).call(this,require('_process'))
-},{"./ReactUpdateQueue":323,"./Transaction":342,"_process":214,"fbjs/lib/warning":134}],323:[function(require,module,exports){
+},{"./ReactUpdateQueue":553,"./Transaction":572,"_process":443,"fbjs/lib/warning":358}],553:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -55263,7 +75784,7 @@ var ReactUpdateQueue = {
 
 module.exports = ReactUpdateQueue;
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":266,"./ReactInstanceMap":301,"./ReactInstrumentation":302,"./ReactUpdates":324,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],324:[function(require,module,exports){
+},{"./ReactCurrentOwner":496,"./ReactInstanceMap":531,"./ReactInstrumentation":532,"./ReactUpdates":554,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],554:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -55517,7 +76038,7 @@ var ReactUpdates = {
 
 module.exports = ReactUpdates;
 }).call(this,require('_process'))
-},{"./CallbackQueue":234,"./PooledClass":254,"./ReactFeatureFlags":296,"./ReactReconciler":317,"./Transaction":342,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"object-assign":159}],325:[function(require,module,exports){
+},{"./CallbackQueue":464,"./PooledClass":484,"./ReactFeatureFlags":526,"./ReactReconciler":547,"./Transaction":572,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"object-assign":388}],555:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55532,7 +76053,7 @@ module.exports = ReactUpdates;
 'use strict';
 
 module.exports = '15.3.2';
-},{}],326:[function(require,module,exports){
+},{}],556:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -55835,7 +76356,7 @@ Object.keys(ATTRS).forEach(function (key) {
 });
 
 module.exports = SVGDOMPropertyConfig;
-},{}],327:[function(require,module,exports){
+},{}],557:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56032,7 +76553,7 @@ var SelectEventPlugin = {
 };
 
 module.exports = SelectEventPlugin;
-},{"./EventConstants":245,"./EventPropagators":249,"./ReactDOMComponentTree":271,"./ReactInputSelection":300,"./SyntheticEvent":333,"./isTextInputElement":365,"fbjs/lib/ExecutionEnvironment":111,"fbjs/lib/getActiveElement":120,"fbjs/lib/keyOf":129,"fbjs/lib/shallowEqual":133}],328:[function(require,module,exports){
+},{"./EventConstants":475,"./EventPropagators":479,"./ReactDOMComponentTree":501,"./ReactInputSelection":530,"./SyntheticEvent":563,"./isTextInputElement":595,"fbjs/lib/ExecutionEnvironment":335,"fbjs/lib/getActiveElement":344,"fbjs/lib/keyOf":353,"fbjs/lib/shallowEqual":357}],558:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -56670,7 +77191,7 @@ var SimpleEventPlugin = {
 
 module.exports = SimpleEventPlugin;
 }).call(this,require('_process'))
-},{"./EventConstants":245,"./EventPropagators":249,"./ReactDOMComponentTree":271,"./SyntheticAnimationEvent":329,"./SyntheticClipboardEvent":330,"./SyntheticDragEvent":332,"./SyntheticEvent":333,"./SyntheticFocusEvent":334,"./SyntheticKeyboardEvent":336,"./SyntheticMouseEvent":337,"./SyntheticTouchEvent":338,"./SyntheticTransitionEvent":339,"./SyntheticUIEvent":340,"./SyntheticWheelEvent":341,"./getEventCharCode":354,"./reactProdInvariant":368,"_process":214,"fbjs/lib/EventListener":110,"fbjs/lib/emptyFunction":117,"fbjs/lib/invariant":125,"fbjs/lib/keyOf":129}],329:[function(require,module,exports){
+},{"./EventConstants":475,"./EventPropagators":479,"./ReactDOMComponentTree":501,"./SyntheticAnimationEvent":559,"./SyntheticClipboardEvent":560,"./SyntheticDragEvent":562,"./SyntheticEvent":563,"./SyntheticFocusEvent":564,"./SyntheticKeyboardEvent":566,"./SyntheticMouseEvent":567,"./SyntheticTouchEvent":568,"./SyntheticTransitionEvent":569,"./SyntheticUIEvent":570,"./SyntheticWheelEvent":571,"./getEventCharCode":584,"./reactProdInvariant":598,"_process":443,"fbjs/lib/EventListener":334,"fbjs/lib/emptyFunction":341,"fbjs/lib/invariant":349,"fbjs/lib/keyOf":353}],559:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56710,7 +77231,7 @@ function SyntheticAnimationEvent(dispatchConfig, dispatchMarker, nativeEvent, na
 SyntheticEvent.augmentClass(SyntheticAnimationEvent, AnimationEventInterface);
 
 module.exports = SyntheticAnimationEvent;
-},{"./SyntheticEvent":333}],330:[function(require,module,exports){
+},{"./SyntheticEvent":563}],560:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56749,7 +77270,7 @@ function SyntheticClipboardEvent(dispatchConfig, dispatchMarker, nativeEvent, na
 SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 
 module.exports = SyntheticClipboardEvent;
-},{"./SyntheticEvent":333}],331:[function(require,module,exports){
+},{"./SyntheticEvent":563}],561:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56786,7 +77307,7 @@ function SyntheticCompositionEvent(dispatchConfig, dispatchMarker, nativeEvent, 
 SyntheticEvent.augmentClass(SyntheticCompositionEvent, CompositionEventInterface);
 
 module.exports = SyntheticCompositionEvent;
-},{"./SyntheticEvent":333}],332:[function(require,module,exports){
+},{"./SyntheticEvent":563}],562:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -56823,7 +77344,7 @@ function SyntheticDragEvent(dispatchConfig, dispatchMarker, nativeEvent, nativeE
 SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
-},{"./SyntheticMouseEvent":337}],333:[function(require,module,exports){
+},{"./SyntheticMouseEvent":567}],563:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -57094,7 +77615,7 @@ function getPooledWarningPropertyDefinition(propName, getVal) {
   }
 }
 }).call(this,require('_process'))
-},{"./PooledClass":254,"_process":214,"fbjs/lib/emptyFunction":117,"fbjs/lib/warning":134,"object-assign":159}],334:[function(require,module,exports){
+},{"./PooledClass":484,"_process":443,"fbjs/lib/emptyFunction":341,"fbjs/lib/warning":358,"object-assign":388}],564:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57131,7 +77652,7 @@ function SyntheticFocusEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
-},{"./SyntheticUIEvent":340}],335:[function(require,module,exports){
+},{"./SyntheticUIEvent":570}],565:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57169,7 +77690,7 @@ function SyntheticInputEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticEvent.augmentClass(SyntheticInputEvent, InputEventInterface);
 
 module.exports = SyntheticInputEvent;
-},{"./SyntheticEvent":333}],336:[function(require,module,exports){
+},{"./SyntheticEvent":563}],566:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57254,7 +77775,7 @@ function SyntheticKeyboardEvent(dispatchConfig, dispatchMarker, nativeEvent, nat
 SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
-},{"./SyntheticUIEvent":340,"./getEventCharCode":354,"./getEventKey":355,"./getEventModifierState":356}],337:[function(require,module,exports){
+},{"./SyntheticUIEvent":570,"./getEventCharCode":584,"./getEventKey":585,"./getEventModifierState":586}],567:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57327,7 +77848,7 @@ function SyntheticMouseEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
-},{"./SyntheticUIEvent":340,"./ViewportMetrics":343,"./getEventModifierState":356}],338:[function(require,module,exports){
+},{"./SyntheticUIEvent":570,"./ViewportMetrics":573,"./getEventModifierState":586}],568:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57373,7 +77894,7 @@ function SyntheticTouchEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
-},{"./SyntheticUIEvent":340,"./getEventModifierState":356}],339:[function(require,module,exports){
+},{"./SyntheticUIEvent":570,"./getEventModifierState":586}],569:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57413,7 +77934,7 @@ function SyntheticTransitionEvent(dispatchConfig, dispatchMarker, nativeEvent, n
 SyntheticEvent.augmentClass(SyntheticTransitionEvent, TransitionEventInterface);
 
 module.exports = SyntheticTransitionEvent;
-},{"./SyntheticEvent":333}],340:[function(require,module,exports){
+},{"./SyntheticEvent":563}],570:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57473,7 +77994,7 @@ function SyntheticUIEvent(dispatchConfig, dispatchMarker, nativeEvent, nativeEve
 SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
-},{"./SyntheticEvent":333,"./getEventTarget":357}],341:[function(require,module,exports){
+},{"./SyntheticEvent":563,"./getEventTarget":587}],571:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57528,7 +78049,7 @@ function SyntheticWheelEvent(dispatchConfig, dispatchMarker, nativeEvent, native
 SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
-},{"./SyntheticMouseEvent":337}],342:[function(require,module,exports){
+},{"./SyntheticMouseEvent":567}],572:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -57764,7 +78285,7 @@ var Transaction = {
 
 module.exports = Transaction;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],343:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],573:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57792,7 +78313,7 @@ var ViewportMetrics = {
 };
 
 module.exports = ViewportMetrics;
-},{}],344:[function(require,module,exports){
+},{}],574:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-present, Facebook, Inc.
@@ -57853,7 +78374,7 @@ function accumulateInto(current, next) {
 
 module.exports = accumulateInto;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],345:[function(require,module,exports){
+},{"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],575:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -57898,7 +78419,7 @@ function adler32(data) {
 }
 
 module.exports = adler32;
-},{}],346:[function(require,module,exports){
+},{}],576:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -57925,7 +78446,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = canDefineProperty;
 }).call(this,require('_process'))
-},{"_process":214}],347:[function(require,module,exports){
+},{"_process":443}],577:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -58015,7 +78536,7 @@ function checkReactTypeSpec(typeSpecs, values, location, componentName, element,
 
 module.exports = checkReactTypeSpec;
 }).call(this,require('_process'))
-},{"./ReactComponentTreeHook":264,"./ReactPropTypeLocationNames":311,"./ReactPropTypesSecret":314,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],348:[function(require,module,exports){
+},{"./ReactComponentTreeHook":494,"./ReactPropTypeLocationNames":541,"./ReactPropTypesSecret":544,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],578:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58048,7 +78569,7 @@ var createMicrosoftUnsafeLocalFunction = function (func) {
 };
 
 module.exports = createMicrosoftUnsafeLocalFunction;
-},{}],349:[function(require,module,exports){
+},{}],579:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -58130,7 +78651,7 @@ function dangerousStyleValue(name, value, component) {
 
 module.exports = dangerousStyleValue;
 }).call(this,require('_process'))
-},{"./CSSProperty":232,"_process":214,"fbjs/lib/warning":134}],350:[function(require,module,exports){
+},{"./CSSProperty":462,"_process":443,"fbjs/lib/warning":358}],580:[function(require,module,exports){
 /**
  * Copyright 2016-present, Facebook, Inc.
  * All rights reserved.
@@ -58254,7 +78775,7 @@ function escapeTextContentForBrowser(text) {
 }
 
 module.exports = escapeTextContentForBrowser;
-},{}],351:[function(require,module,exports){
+},{}],581:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -58317,7 +78838,7 @@ function findDOMNode(componentOrElement) {
 
 module.exports = findDOMNode;
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":266,"./ReactDOMComponentTree":271,"./ReactInstanceMap":301,"./getHostComponentFromComposite":358,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],352:[function(require,module,exports){
+},{"./ReactCurrentOwner":496,"./ReactDOMComponentTree":501,"./ReactInstanceMap":531,"./getHostComponentFromComposite":588,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],582:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -58396,7 +78917,7 @@ function flattenChildren(children, selfDebugID) {
 
 module.exports = flattenChildren;
 }).call(this,require('_process'))
-},{"./KeyEscapeUtils":252,"./ReactComponentTreeHook":264,"./traverseAllChildren":373,"_process":214,"fbjs/lib/warning":134}],353:[function(require,module,exports){
+},{"./KeyEscapeUtils":482,"./ReactComponentTreeHook":494,"./traverseAllChildren":603,"_process":443,"fbjs/lib/warning":358}],583:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58428,7 +78949,7 @@ function forEachAccumulated(arr, cb, scope) {
 }
 
 module.exports = forEachAccumulated;
-},{}],354:[function(require,module,exports){
+},{}],584:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58479,7 +79000,7 @@ function getEventCharCode(nativeEvent) {
 }
 
 module.exports = getEventCharCode;
-},{}],355:[function(require,module,exports){
+},{}],585:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58582,7 +79103,7 @@ function getEventKey(nativeEvent) {
 }
 
 module.exports = getEventKey;
-},{"./getEventCharCode":354}],356:[function(require,module,exports){
+},{"./getEventCharCode":584}],586:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58626,7 +79147,7 @@ function getEventModifierState(nativeEvent) {
 }
 
 module.exports = getEventModifierState;
-},{}],357:[function(require,module,exports){
+},{}],587:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58662,7 +79183,7 @@ function getEventTarget(nativeEvent) {
 }
 
 module.exports = getEventTarget;
-},{}],358:[function(require,module,exports){
+},{}],588:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58693,7 +79214,7 @@ function getHostComponentFromComposite(inst) {
 }
 
 module.exports = getHostComponentFromComposite;
-},{"./ReactNodeTypes":308}],359:[function(require,module,exports){
+},{"./ReactNodeTypes":538}],589:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58735,7 +79256,7 @@ function getIteratorFn(maybeIterable) {
 }
 
 module.exports = getIteratorFn;
-},{}],360:[function(require,module,exports){
+},{}],590:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58810,7 +79331,7 @@ function getNodeForCharacterOffset(root, offset) {
 }
 
 module.exports = getNodeForCharacterOffset;
-},{}],361:[function(require,module,exports){
+},{}],591:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58844,7 +79365,7 @@ function getTextContentAccessor() {
 }
 
 module.exports = getTextContentAccessor;
-},{"fbjs/lib/ExecutionEnvironment":111}],362:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":335}],592:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -58946,7 +79467,7 @@ function getVendorPrefixedEventName(eventName) {
 }
 
 module.exports = getVendorPrefixedEventName;
-},{"fbjs/lib/ExecutionEnvironment":111}],363:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":335}],593:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -59068,7 +79589,7 @@ function instantiateReactComponent(node, shouldHaveDebugID) {
 
 module.exports = instantiateReactComponent;
 }).call(this,require('_process'))
-},{"./ReactCompositeComponent":265,"./ReactEmptyComponent":292,"./ReactHostComponent":297,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134,"object-assign":159}],364:[function(require,module,exports){
+},{"./ReactCompositeComponent":495,"./ReactEmptyComponent":522,"./ReactHostComponent":527,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358,"object-assign":388}],594:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -59129,7 +79650,7 @@ function isEventSupported(eventNameSuffix, capture) {
 }
 
 module.exports = isEventSupported;
-},{"fbjs/lib/ExecutionEnvironment":111}],365:[function(require,module,exports){
+},{"fbjs/lib/ExecutionEnvironment":335}],595:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -59181,7 +79702,7 @@ function isTextInputElement(elem) {
 }
 
 module.exports = isTextInputElement;
-},{}],366:[function(require,module,exports){
+},{}],596:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -59222,7 +79743,7 @@ function onlyChild(children) {
 
 module.exports = onlyChild;
 }).call(this,require('_process'))
-},{"./ReactElement":290,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125}],367:[function(require,module,exports){
+},{"./ReactElement":520,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349}],597:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -59249,7 +79770,7 @@ function quoteAttributeValueForBrowser(value) {
 }
 
 module.exports = quoteAttributeValueForBrowser;
-},{"./escapeTextContentForBrowser":350}],368:[function(require,module,exports){
+},{"./escapeTextContentForBrowser":580}],598:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -59289,7 +79810,7 @@ function reactProdInvariant(code) {
 }
 
 module.exports = reactProdInvariant;
-},{}],369:[function(require,module,exports){
+},{}],599:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -59306,7 +79827,7 @@ module.exports = reactProdInvariant;
 var ReactMount = require('./ReactMount');
 
 module.exports = ReactMount.renderSubtreeIntoContainer;
-},{"./ReactMount":305}],370:[function(require,module,exports){
+},{"./ReactMount":535}],600:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -59405,7 +79926,7 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 module.exports = setInnerHTML;
-},{"./DOMNamespaces":238,"./createMicrosoftUnsafeLocalFunction":348,"fbjs/lib/ExecutionEnvironment":111}],371:[function(require,module,exports){
+},{"./DOMNamespaces":468,"./createMicrosoftUnsafeLocalFunction":578,"fbjs/lib/ExecutionEnvironment":335}],601:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -59454,7 +79975,7 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 module.exports = setTextContent;
-},{"./escapeTextContentForBrowser":350,"./setInnerHTML":370,"fbjs/lib/ExecutionEnvironment":111}],372:[function(require,module,exports){
+},{"./escapeTextContentForBrowser":580,"./setInnerHTML":600,"fbjs/lib/ExecutionEnvironment":335}],602:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -59497,7 +80018,7 @@ function shouldUpdateReactComponent(prevElement, nextElement) {
 }
 
 module.exports = shouldUpdateReactComponent;
-},{}],373:[function(require,module,exports){
+},{}],603:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -59667,7 +80188,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 
 module.exports = traverseAllChildren;
 }).call(this,require('_process'))
-},{"./KeyEscapeUtils":252,"./ReactCurrentOwner":266,"./ReactElement":290,"./getIteratorFn":359,"./reactProdInvariant":368,"_process":214,"fbjs/lib/invariant":125,"fbjs/lib/warning":134}],374:[function(require,module,exports){
+},{"./KeyEscapeUtils":482,"./ReactCurrentOwner":496,"./ReactElement":520,"./getIteratorFn":589,"./reactProdInvariant":598,"_process":443,"fbjs/lib/invariant":349,"fbjs/lib/warning":358}],604:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015-present, Facebook, Inc.
@@ -60052,12 +80573,67 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = validateDOMNesting;
 }).call(this,require('_process'))
-},{"_process":214,"fbjs/lib/emptyFunction":117,"fbjs/lib/warning":134,"object-assign":159}],375:[function(require,module,exports){
+},{"_process":443,"fbjs/lib/emptyFunction":341,"fbjs/lib/warning":358,"object-assign":388}],605:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/React');
 
-},{"./lib/React":255}],376:[function(require,module,exports){
+},{"./lib/React":485}],606:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var UA = global.navigator && global.navigator.userAgent;
+
+var isAndroid = require('browser-detection/is-android');
+var isChrome = require('browser-detection/is-chrome');
+var isIos = require('browser-detection/is-ios');
+var isIE9 = require('browser-detection/is-ie9');
+
+// Old Android Webviews used specific versions of Chrome with 0.0.0 as their version suffix
+// https://developer.chrome.com/multidevice/user-agent#webview_user_agent
+var KITKAT_WEBVIEW_REGEX = /Version\/\d\.\d* Chrome\/\d*\.0\.0\.0/;
+
+function _isOldSamsungBrowserOrSamsungWebview(ua) {
+  return !isChrome(ua) && ua.indexOf('Samsung') > -1;
+}
+
+function isKitKatWebview(uaArg) {
+  var ua = uaArg || UA;
+
+  return isAndroid(ua) && KITKAT_WEBVIEW_REGEX.test(ua);
+}
+
+function isAndroidChrome(uaArg) {
+  var ua = uaArg || UA;
+
+  return isAndroid(ua) && isChrome(ua);
+}
+
+function isSamsungBrowser(ua) {
+  ua = ua || UA;
+  return /SamsungBrowser/.test(ua) || _isOldSamsungBrowserOrSamsungWebview(ua);
+}
+
+module.exports = {
+  isIE9: isIE9,
+  isAndroidChrome: isAndroidChrome,
+  isIos: isIos,
+  isKitKatWebview: isKitKatWebview,
+  isSamsungBrowser: isSamsungBrowser
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"browser-detection/is-android":241,"browser-detection/is-chrome":242,"browser-detection/is-ie9":243,"browser-detection/is-ios":244}],607:[function(require,module,exports){
+'use strict';
+
+var device = require('./lib/device');
+
+module.exports = function () {
+  // Digits get dropped in samsung browser
+  return !device.isSamsungBrowser();
+};
+
+},{"./lib/device":606}],608:[function(require,module,exports){
 (function (Buffer){
 /*
 CryptoJS v3.1.2
@@ -60271,7 +80847,1582 @@ function ripemd160 (message) {
 module.exports = ripemd160
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],377:[function(require,module,exports){
+},{"buffer":284}],609:[function(require,module,exports){
+(function (Buffer){
+;(function (sax) { // wrapper for non-node envs
+  sax.parser = function (strict, opt) { return new SAXParser(strict, opt) }
+  sax.SAXParser = SAXParser
+  sax.SAXStream = SAXStream
+  sax.createStream = createStream
+
+  // When we pass the MAX_BUFFER_LENGTH position, start checking for buffer overruns.
+  // When we check, schedule the next check for MAX_BUFFER_LENGTH - (max(buffer lengths)),
+  // since that's the earliest that a buffer overrun could occur.  This way, checks are
+  // as rare as required, but as often as necessary to ensure never crossing this bound.
+  // Furthermore, buffers are only tested at most once per write(), so passing a very
+  // large string into write() might have undesirable effects, but this is manageable by
+  // the caller, so it is assumed to be safe.  Thus, a call to write() may, in the extreme
+  // edge case, result in creating at most one complete copy of the string passed in.
+  // Set to Infinity to have unlimited buffers.
+  sax.MAX_BUFFER_LENGTH = 64 * 1024
+
+  var buffers = [
+    'comment', 'sgmlDecl', 'textNode', 'tagName', 'doctype',
+    'procInstName', 'procInstBody', 'entity', 'attribName',
+    'attribValue', 'cdata', 'script'
+  ]
+
+  sax.EVENTS = [
+    'text',
+    'processinginstruction',
+    'sgmldeclaration',
+    'doctype',
+    'comment',
+    'attribute',
+    'opentag',
+    'closetag',
+    'opencdata',
+    'cdata',
+    'closecdata',
+    'error',
+    'end',
+    'ready',
+    'script',
+    'opennamespace',
+    'closenamespace'
+  ]
+
+  function SAXParser (strict, opt) {
+    if (!(this instanceof SAXParser)) {
+      return new SAXParser(strict, opt)
+    }
+
+    var parser = this
+    clearBuffers(parser)
+    parser.q = parser.c = ''
+    parser.bufferCheckPosition = sax.MAX_BUFFER_LENGTH
+    parser.opt = opt || {}
+    parser.opt.lowercase = parser.opt.lowercase || parser.opt.lowercasetags
+    parser.looseCase = parser.opt.lowercase ? 'toLowerCase' : 'toUpperCase'
+    parser.tags = []
+    parser.closed = parser.closedRoot = parser.sawRoot = false
+    parser.tag = parser.error = null
+    parser.strict = !!strict
+    parser.noscript = !!(strict || parser.opt.noscript)
+    parser.state = S.BEGIN
+    parser.strictEntities = parser.opt.strictEntities
+    parser.ENTITIES = parser.strictEntities ? Object.create(sax.XML_ENTITIES) : Object.create(sax.ENTITIES)
+    parser.attribList = []
+
+    // namespaces form a prototype chain.
+    // it always points at the current tag,
+    // which protos to its parent tag.
+    if (parser.opt.xmlns) {
+      parser.ns = Object.create(rootNS)
+    }
+
+    // mostly just for error reporting
+    parser.trackPosition = parser.opt.position !== false
+    if (parser.trackPosition) {
+      parser.position = parser.line = parser.column = 0
+    }
+    emit(parser, 'onready')
+  }
+
+  if (!Object.create) {
+    Object.create = function (o) {
+      function F () {}
+      F.prototype = o
+      var newf = new F()
+      return newf
+    }
+  }
+
+  if (!Object.keys) {
+    Object.keys = function (o) {
+      var a = []
+      for (var i in o) if (o.hasOwnProperty(i)) a.push(i)
+      return a
+    }
+  }
+
+  function checkBufferLength (parser) {
+    var maxAllowed = Math.max(sax.MAX_BUFFER_LENGTH, 10)
+    var maxActual = 0
+    for (var i = 0, l = buffers.length; i < l; i++) {
+      var len = parser[buffers[i]].length
+      if (len > maxAllowed) {
+        // Text/cdata nodes can get big, and since they're buffered,
+        // we can get here under normal conditions.
+        // Avoid issues by emitting the text node now,
+        // so at least it won't get any bigger.
+        switch (buffers[i]) {
+          case 'textNode':
+            closeText(parser)
+            break
+
+          case 'cdata':
+            emitNode(parser, 'oncdata', parser.cdata)
+            parser.cdata = ''
+            break
+
+          case 'script':
+            emitNode(parser, 'onscript', parser.script)
+            parser.script = ''
+            break
+
+          default:
+            error(parser, 'Max buffer length exceeded: ' + buffers[i])
+        }
+      }
+      maxActual = Math.max(maxActual, len)
+    }
+    // schedule the next check for the earliest possible buffer overrun.
+    var m = sax.MAX_BUFFER_LENGTH - maxActual
+    parser.bufferCheckPosition = m + parser.position
+  }
+
+  function clearBuffers (parser) {
+    for (var i = 0, l = buffers.length; i < l; i++) {
+      parser[buffers[i]] = ''
+    }
+  }
+
+  function flushBuffers (parser) {
+    closeText(parser)
+    if (parser.cdata !== '') {
+      emitNode(parser, 'oncdata', parser.cdata)
+      parser.cdata = ''
+    }
+    if (parser.script !== '') {
+      emitNode(parser, 'onscript', parser.script)
+      parser.script = ''
+    }
+  }
+
+  SAXParser.prototype = {
+    end: function () { end(this) },
+    write: write,
+    resume: function () { this.error = null; return this },
+    close: function () { return this.write(null) },
+    flush: function () { flushBuffers(this) }
+  }
+
+  var Stream
+  try {
+    Stream = require('stream').Stream
+  } catch (ex) {
+    Stream = function () {}
+  }
+
+  var streamWraps = sax.EVENTS.filter(function (ev) {
+    return ev !== 'error' && ev !== 'end'
+  })
+
+  function createStream (strict, opt) {
+    return new SAXStream(strict, opt)
+  }
+
+  function SAXStream (strict, opt) {
+    if (!(this instanceof SAXStream)) {
+      return new SAXStream(strict, opt)
+    }
+
+    Stream.apply(this)
+
+    this._parser = new SAXParser(strict, opt)
+    this.writable = true
+    this.readable = true
+
+    var me = this
+
+    this._parser.onend = function () {
+      me.emit('end')
+    }
+
+    this._parser.onerror = function (er) {
+      me.emit('error', er)
+
+      // if didn't throw, then means error was handled.
+      // go ahead and clear error, so we can write again.
+      me._parser.error = null
+    }
+
+    this._decoder = null
+
+    streamWraps.forEach(function (ev) {
+      Object.defineProperty(me, 'on' + ev, {
+        get: function () {
+          return me._parser['on' + ev]
+        },
+        set: function (h) {
+          if (!h) {
+            me.removeAllListeners(ev)
+            me._parser['on' + ev] = h
+            return h
+          }
+          me.on(ev, h)
+        },
+        enumerable: true,
+        configurable: false
+      })
+    })
+  }
+
+  SAXStream.prototype = Object.create(Stream.prototype, {
+    constructor: {
+      value: SAXStream
+    }
+  })
+
+  SAXStream.prototype.write = function (data) {
+    if (typeof Buffer === 'function' &&
+      typeof Buffer.isBuffer === 'function' &&
+      Buffer.isBuffer(data)) {
+      if (!this._decoder) {
+        var SD = require('string_decoder').StringDecoder
+        this._decoder = new SD('utf8')
+      }
+      data = this._decoder.write(data)
+    }
+
+    this._parser.write(data.toString())
+    this.emit('data', data)
+    return true
+  }
+
+  SAXStream.prototype.end = function (chunk) {
+    if (chunk && chunk.length) {
+      this.write(chunk)
+    }
+    this._parser.end()
+    return true
+  }
+
+  SAXStream.prototype.on = function (ev, handler) {
+    var me = this
+    if (!me._parser['on' + ev] && streamWraps.indexOf(ev) !== -1) {
+      me._parser['on' + ev] = function () {
+        var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
+        args.splice(0, 0, ev)
+        me.emit.apply(me, args)
+      }
+    }
+
+    return Stream.prototype.on.call(me, ev, handler)
+  }
+
+  // character classes and tokens
+  var whitespace = '\r\n\t '
+
+  // this really needs to be replaced with character classes.
+  // XML allows all manner of ridiculous numbers and digits.
+  var number = '0124356789'
+  var letter = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+  // (Letter | "_" | ":")
+  var quote = '\'"'
+  var attribEnd = whitespace + '>'
+  var CDATA = '[CDATA['
+  var DOCTYPE = 'DOCTYPE'
+  var XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace'
+  var XMLNS_NAMESPACE = 'http://www.w3.org/2000/xmlns/'
+  var rootNS = { xml: XML_NAMESPACE, xmlns: XMLNS_NAMESPACE }
+
+  // turn all the string character sets into character class objects.
+  whitespace = charClass(whitespace)
+  number = charClass(number)
+  letter = charClass(letter)
+
+  // http://www.w3.org/TR/REC-xml/#NT-NameStartChar
+  // This implementation works on strings, a single character at a time
+  // as such, it cannot ever support astral-plane characters (10000-EFFFF)
+  // without a significant breaking change to either this  parser, or the
+  // JavaScript language.  Implementation of an emoji-capable xml parser
+  // is left as an exercise for the reader.
+  var nameStart = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
+
+  var nameBody = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040\.\d-]/
+
+  var entityStart = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
+  var entityBody = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040\.\d-]/
+
+  quote = charClass(quote)
+  attribEnd = charClass(attribEnd)
+
+  function charClass (str) {
+    return str.split('').reduce(function (s, c) {
+      s[c] = true
+      return s
+    }, {})
+  }
+
+  function isRegExp (c) {
+    return Object.prototype.toString.call(c) === '[object RegExp]'
+  }
+
+  function is (charclass, c) {
+    return isRegExp(charclass) ? !!c.match(charclass) : charclass[c]
+  }
+
+  function not (charclass, c) {
+    return !is(charclass, c)
+  }
+
+  var S = 0
+  sax.STATE = {
+    BEGIN: S++, // leading byte order mark or whitespace
+    BEGIN_WHITESPACE: S++, // leading whitespace
+    TEXT: S++, // general stuff
+    TEXT_ENTITY: S++, // &amp and such.
+    OPEN_WAKA: S++, // <
+    SGML_DECL: S++, // <!BLARG
+    SGML_DECL_QUOTED: S++, // <!BLARG foo "bar
+    DOCTYPE: S++, // <!DOCTYPE
+    DOCTYPE_QUOTED: S++, // <!DOCTYPE "//blah
+    DOCTYPE_DTD: S++, // <!DOCTYPE "//blah" [ ...
+    DOCTYPE_DTD_QUOTED: S++, // <!DOCTYPE "//blah" [ "foo
+    COMMENT_STARTING: S++, // <!-
+    COMMENT: S++, // <!--
+    COMMENT_ENDING: S++, // <!-- blah -
+    COMMENT_ENDED: S++, // <!-- blah --
+    CDATA: S++, // <![CDATA[ something
+    CDATA_ENDING: S++, // ]
+    CDATA_ENDING_2: S++, // ]]
+    PROC_INST: S++, // <?hi
+    PROC_INST_BODY: S++, // <?hi there
+    PROC_INST_ENDING: S++, // <?hi "there" ?
+    OPEN_TAG: S++, // <strong
+    OPEN_TAG_SLASH: S++, // <strong /
+    ATTRIB: S++, // <a
+    ATTRIB_NAME: S++, // <a foo
+    ATTRIB_NAME_SAW_WHITE: S++, // <a foo _
+    ATTRIB_VALUE: S++, // <a foo=
+    ATTRIB_VALUE_QUOTED: S++, // <a foo="bar
+    ATTRIB_VALUE_CLOSED: S++, // <a foo="bar"
+    ATTRIB_VALUE_UNQUOTED: S++, // <a foo=bar
+    ATTRIB_VALUE_ENTITY_Q: S++, // <foo bar="&quot;"
+    ATTRIB_VALUE_ENTITY_U: S++, // <foo bar=&quot
+    CLOSE_TAG: S++, // </a
+    CLOSE_TAG_SAW_WHITE: S++, // </a   >
+    SCRIPT: S++, // <script> ...
+    SCRIPT_ENDING: S++ // <script> ... <
+  }
+
+  sax.XML_ENTITIES = {
+    'amp': '&',
+    'gt': '>',
+    'lt': '<',
+    'quot': '"',
+    'apos': "'"
+  }
+
+  sax.ENTITIES = {
+    'amp': '&',
+    'gt': '>',
+    'lt': '<',
+    'quot': '"',
+    'apos': "'",
+    'AElig': 198,
+    'Aacute': 193,
+    'Acirc': 194,
+    'Agrave': 192,
+    'Aring': 197,
+    'Atilde': 195,
+    'Auml': 196,
+    'Ccedil': 199,
+    'ETH': 208,
+    'Eacute': 201,
+    'Ecirc': 202,
+    'Egrave': 200,
+    'Euml': 203,
+    'Iacute': 205,
+    'Icirc': 206,
+    'Igrave': 204,
+    'Iuml': 207,
+    'Ntilde': 209,
+    'Oacute': 211,
+    'Ocirc': 212,
+    'Ograve': 210,
+    'Oslash': 216,
+    'Otilde': 213,
+    'Ouml': 214,
+    'THORN': 222,
+    'Uacute': 218,
+    'Ucirc': 219,
+    'Ugrave': 217,
+    'Uuml': 220,
+    'Yacute': 221,
+    'aacute': 225,
+    'acirc': 226,
+    'aelig': 230,
+    'agrave': 224,
+    'aring': 229,
+    'atilde': 227,
+    'auml': 228,
+    'ccedil': 231,
+    'eacute': 233,
+    'ecirc': 234,
+    'egrave': 232,
+    'eth': 240,
+    'euml': 235,
+    'iacute': 237,
+    'icirc': 238,
+    'igrave': 236,
+    'iuml': 239,
+    'ntilde': 241,
+    'oacute': 243,
+    'ocirc': 244,
+    'ograve': 242,
+    'oslash': 248,
+    'otilde': 245,
+    'ouml': 246,
+    'szlig': 223,
+    'thorn': 254,
+    'uacute': 250,
+    'ucirc': 251,
+    'ugrave': 249,
+    'uuml': 252,
+    'yacute': 253,
+    'yuml': 255,
+    'copy': 169,
+    'reg': 174,
+    'nbsp': 160,
+    'iexcl': 161,
+    'cent': 162,
+    'pound': 163,
+    'curren': 164,
+    'yen': 165,
+    'brvbar': 166,
+    'sect': 167,
+    'uml': 168,
+    'ordf': 170,
+    'laquo': 171,
+    'not': 172,
+    'shy': 173,
+    'macr': 175,
+    'deg': 176,
+    'plusmn': 177,
+    'sup1': 185,
+    'sup2': 178,
+    'sup3': 179,
+    'acute': 180,
+    'micro': 181,
+    'para': 182,
+    'middot': 183,
+    'cedil': 184,
+    'ordm': 186,
+    'raquo': 187,
+    'frac14': 188,
+    'frac12': 189,
+    'frac34': 190,
+    'iquest': 191,
+    'times': 215,
+    'divide': 247,
+    'OElig': 338,
+    'oelig': 339,
+    'Scaron': 352,
+    'scaron': 353,
+    'Yuml': 376,
+    'fnof': 402,
+    'circ': 710,
+    'tilde': 732,
+    'Alpha': 913,
+    'Beta': 914,
+    'Gamma': 915,
+    'Delta': 916,
+    'Epsilon': 917,
+    'Zeta': 918,
+    'Eta': 919,
+    'Theta': 920,
+    'Iota': 921,
+    'Kappa': 922,
+    'Lambda': 923,
+    'Mu': 924,
+    'Nu': 925,
+    'Xi': 926,
+    'Omicron': 927,
+    'Pi': 928,
+    'Rho': 929,
+    'Sigma': 931,
+    'Tau': 932,
+    'Upsilon': 933,
+    'Phi': 934,
+    'Chi': 935,
+    'Psi': 936,
+    'Omega': 937,
+    'alpha': 945,
+    'beta': 946,
+    'gamma': 947,
+    'delta': 948,
+    'epsilon': 949,
+    'zeta': 950,
+    'eta': 951,
+    'theta': 952,
+    'iota': 953,
+    'kappa': 954,
+    'lambda': 955,
+    'mu': 956,
+    'nu': 957,
+    'xi': 958,
+    'omicron': 959,
+    'pi': 960,
+    'rho': 961,
+    'sigmaf': 962,
+    'sigma': 963,
+    'tau': 964,
+    'upsilon': 965,
+    'phi': 966,
+    'chi': 967,
+    'psi': 968,
+    'omega': 969,
+    'thetasym': 977,
+    'upsih': 978,
+    'piv': 982,
+    'ensp': 8194,
+    'emsp': 8195,
+    'thinsp': 8201,
+    'zwnj': 8204,
+    'zwj': 8205,
+    'lrm': 8206,
+    'rlm': 8207,
+    'ndash': 8211,
+    'mdash': 8212,
+    'lsquo': 8216,
+    'rsquo': 8217,
+    'sbquo': 8218,
+    'ldquo': 8220,
+    'rdquo': 8221,
+    'bdquo': 8222,
+    'dagger': 8224,
+    'Dagger': 8225,
+    'bull': 8226,
+    'hellip': 8230,
+    'permil': 8240,
+    'prime': 8242,
+    'Prime': 8243,
+    'lsaquo': 8249,
+    'rsaquo': 8250,
+    'oline': 8254,
+    'frasl': 8260,
+    'euro': 8364,
+    'image': 8465,
+    'weierp': 8472,
+    'real': 8476,
+    'trade': 8482,
+    'alefsym': 8501,
+    'larr': 8592,
+    'uarr': 8593,
+    'rarr': 8594,
+    'darr': 8595,
+    'harr': 8596,
+    'crarr': 8629,
+    'lArr': 8656,
+    'uArr': 8657,
+    'rArr': 8658,
+    'dArr': 8659,
+    'hArr': 8660,
+    'forall': 8704,
+    'part': 8706,
+    'exist': 8707,
+    'empty': 8709,
+    'nabla': 8711,
+    'isin': 8712,
+    'notin': 8713,
+    'ni': 8715,
+    'prod': 8719,
+    'sum': 8721,
+    'minus': 8722,
+    'lowast': 8727,
+    'radic': 8730,
+    'prop': 8733,
+    'infin': 8734,
+    'ang': 8736,
+    'and': 8743,
+    'or': 8744,
+    'cap': 8745,
+    'cup': 8746,
+    'int': 8747,
+    'there4': 8756,
+    'sim': 8764,
+    'cong': 8773,
+    'asymp': 8776,
+    'ne': 8800,
+    'equiv': 8801,
+    'le': 8804,
+    'ge': 8805,
+    'sub': 8834,
+    'sup': 8835,
+    'nsub': 8836,
+    'sube': 8838,
+    'supe': 8839,
+    'oplus': 8853,
+    'otimes': 8855,
+    'perp': 8869,
+    'sdot': 8901,
+    'lceil': 8968,
+    'rceil': 8969,
+    'lfloor': 8970,
+    'rfloor': 8971,
+    'lang': 9001,
+    'rang': 9002,
+    'loz': 9674,
+    'spades': 9824,
+    'clubs': 9827,
+    'hearts': 9829,
+    'diams': 9830
+  }
+
+  Object.keys(sax.ENTITIES).forEach(function (key) {
+    var e = sax.ENTITIES[key]
+    var s = typeof e === 'number' ? String.fromCharCode(e) : e
+    sax.ENTITIES[key] = s
+  })
+
+  for (var s in sax.STATE) {
+    sax.STATE[sax.STATE[s]] = s
+  }
+
+  // shorthand
+  S = sax.STATE
+
+  function emit (parser, event, data) {
+    parser[event] && parser[event](data)
+  }
+
+  function emitNode (parser, nodeType, data) {
+    if (parser.textNode) closeText(parser)
+    emit(parser, nodeType, data)
+  }
+
+  function closeText (parser) {
+    parser.textNode = textopts(parser.opt, parser.textNode)
+    if (parser.textNode) emit(parser, 'ontext', parser.textNode)
+    parser.textNode = ''
+  }
+
+  function textopts (opt, text) {
+    if (opt.trim) text = text.trim()
+    if (opt.normalize) text = text.replace(/\s+/g, ' ')
+    return text
+  }
+
+  function error (parser, er) {
+    closeText(parser)
+    if (parser.trackPosition) {
+      er += '\nLine: ' + parser.line +
+        '\nColumn: ' + parser.column +
+        '\nChar: ' + parser.c
+    }
+    er = new Error(er)
+    parser.error = er
+    emit(parser, 'onerror', er)
+    return parser
+  }
+
+  function end (parser) {
+    if (parser.sawRoot && !parser.closedRoot) strictFail(parser, 'Unclosed root tag')
+    if ((parser.state !== S.BEGIN) &&
+      (parser.state !== S.BEGIN_WHITESPACE) &&
+      (parser.state !== S.TEXT)) {
+      error(parser, 'Unexpected end')
+    }
+    closeText(parser)
+    parser.c = ''
+    parser.closed = true
+    emit(parser, 'onend')
+    SAXParser.call(parser, parser.strict, parser.opt)
+    return parser
+  }
+
+  function strictFail (parser, message) {
+    if (typeof parser !== 'object' || !(parser instanceof SAXParser)) {
+      throw new Error('bad call to strictFail')
+    }
+    if (parser.strict) {
+      error(parser, message)
+    }
+  }
+
+  function newTag (parser) {
+    if (!parser.strict) parser.tagName = parser.tagName[parser.looseCase]()
+    var parent = parser.tags[parser.tags.length - 1] || parser
+    var tag = parser.tag = { name: parser.tagName, attributes: {} }
+
+    // will be overridden if tag contails an xmlns="foo" or xmlns:foo="bar"
+    if (parser.opt.xmlns) {
+      tag.ns = parent.ns
+    }
+    parser.attribList.length = 0
+  }
+
+  function qname (name, attribute) {
+    var i = name.indexOf(':')
+    var qualName = i < 0 ? [ '', name ] : name.split(':')
+    var prefix = qualName[0]
+    var local = qualName[1]
+
+    // <x "xmlns"="http://foo">
+    if (attribute && name === 'xmlns') {
+      prefix = 'xmlns'
+      local = ''
+    }
+
+    return { prefix: prefix, local: local }
+  }
+
+  function attrib (parser) {
+    if (!parser.strict) {
+      parser.attribName = parser.attribName[parser.looseCase]()
+    }
+
+    if (parser.attribList.indexOf(parser.attribName) !== -1 ||
+      parser.tag.attributes.hasOwnProperty(parser.attribName)) {
+      parser.attribName = parser.attribValue = ''
+      return
+    }
+
+    if (parser.opt.xmlns) {
+      var qn = qname(parser.attribName, true)
+      var prefix = qn.prefix
+      var local = qn.local
+
+      if (prefix === 'xmlns') {
+        // namespace binding attribute. push the binding into scope
+        if (local === 'xml' && parser.attribValue !== XML_NAMESPACE) {
+          strictFail(parser,
+            'xml: prefix must be bound to ' + XML_NAMESPACE + '\n' +
+            'Actual: ' + parser.attribValue)
+        } else if (local === 'xmlns' && parser.attribValue !== XMLNS_NAMESPACE) {
+          strictFail(parser,
+            'xmlns: prefix must be bound to ' + XMLNS_NAMESPACE + '\n' +
+            'Actual: ' + parser.attribValue)
+        } else {
+          var tag = parser.tag
+          var parent = parser.tags[parser.tags.length - 1] || parser
+          if (tag.ns === parent.ns) {
+            tag.ns = Object.create(parent.ns)
+          }
+          tag.ns[local] = parser.attribValue
+        }
+      }
+
+      // defer onattribute events until all attributes have been seen
+      // so any new bindings can take effect. preserve attribute order
+      // so deferred events can be emitted in document order
+      parser.attribList.push([parser.attribName, parser.attribValue])
+    } else {
+      // in non-xmlns mode, we can emit the event right away
+      parser.tag.attributes[parser.attribName] = parser.attribValue
+      emitNode(parser, 'onattribute', {
+        name: parser.attribName,
+        value: parser.attribValue
+      })
+    }
+
+    parser.attribName = parser.attribValue = ''
+  }
+
+  function openTag (parser, selfClosing) {
+    if (parser.opt.xmlns) {
+      // emit namespace binding events
+      var tag = parser.tag
+
+      // add namespace info to tag
+      var qn = qname(parser.tagName)
+      tag.prefix = qn.prefix
+      tag.local = qn.local
+      tag.uri = tag.ns[qn.prefix] || ''
+
+      if (tag.prefix && !tag.uri) {
+        strictFail(parser, 'Unbound namespace prefix: ' +
+          JSON.stringify(parser.tagName))
+        tag.uri = qn.prefix
+      }
+
+      var parent = parser.tags[parser.tags.length - 1] || parser
+      if (tag.ns && parent.ns !== tag.ns) {
+        Object.keys(tag.ns).forEach(function (p) {
+          emitNode(parser, 'onopennamespace', {
+            prefix: p,
+            uri: tag.ns[p]
+          })
+        })
+      }
+
+      // handle deferred onattribute events
+      // Note: do not apply default ns to attributes:
+      //   http://www.w3.org/TR/REC-xml-names/#defaulting
+      for (var i = 0, l = parser.attribList.length; i < l; i++) {
+        var nv = parser.attribList[i]
+        var name = nv[0]
+        var value = nv[1]
+        var qualName = qname(name, true)
+        var prefix = qualName.prefix
+        var local = qualName.local
+        var uri = prefix === '' ? '' : (tag.ns[prefix] || '')
+        var a = {
+          name: name,
+          value: value,
+          prefix: prefix,
+          local: local,
+          uri: uri
+        }
+
+        // if there's any attributes with an undefined namespace,
+        // then fail on them now.
+        if (prefix && prefix !== 'xmlns' && !uri) {
+          strictFail(parser, 'Unbound namespace prefix: ' +
+            JSON.stringify(prefix))
+          a.uri = prefix
+        }
+        parser.tag.attributes[name] = a
+        emitNode(parser, 'onattribute', a)
+      }
+      parser.attribList.length = 0
+    }
+
+    parser.tag.isSelfClosing = !!selfClosing
+
+    // process the tag
+    parser.sawRoot = true
+    parser.tags.push(parser.tag)
+    emitNode(parser, 'onopentag', parser.tag)
+    if (!selfClosing) {
+      // special case for <script> in non-strict mode.
+      if (!parser.noscript && parser.tagName.toLowerCase() === 'script') {
+        parser.state = S.SCRIPT
+      } else {
+        parser.state = S.TEXT
+      }
+      parser.tag = null
+      parser.tagName = ''
+    }
+    parser.attribName = parser.attribValue = ''
+    parser.attribList.length = 0
+  }
+
+  function closeTag (parser) {
+    if (!parser.tagName) {
+      strictFail(parser, 'Weird empty close tag.')
+      parser.textNode += '</>'
+      parser.state = S.TEXT
+      return
+    }
+
+    if (parser.script) {
+      if (parser.tagName !== 'script') {
+        parser.script += '</' + parser.tagName + '>'
+        parser.tagName = ''
+        parser.state = S.SCRIPT
+        return
+      }
+      emitNode(parser, 'onscript', parser.script)
+      parser.script = ''
+    }
+
+    // first make sure that the closing tag actually exists.
+    // <a><b></c></b></a> will close everything, otherwise.
+    var t = parser.tags.length
+    var tagName = parser.tagName
+    if (!parser.strict) {
+      tagName = tagName[parser.looseCase]()
+    }
+    var closeTo = tagName
+    while (t--) {
+      var close = parser.tags[t]
+      if (close.name !== closeTo) {
+        // fail the first time in strict mode
+        strictFail(parser, 'Unexpected close tag')
+      } else {
+        break
+      }
+    }
+
+    // didn't find it.  we already failed for strict, so just abort.
+    if (t < 0) {
+      strictFail(parser, 'Unmatched closing tag: ' + parser.tagName)
+      parser.textNode += '</' + parser.tagName + '>'
+      parser.state = S.TEXT
+      return
+    }
+    parser.tagName = tagName
+    var s = parser.tags.length
+    while (s-- > t) {
+      var tag = parser.tag = parser.tags.pop()
+      parser.tagName = parser.tag.name
+      emitNode(parser, 'onclosetag', parser.tagName)
+
+      var x = {}
+      for (var i in tag.ns) {
+        x[i] = tag.ns[i]
+      }
+
+      var parent = parser.tags[parser.tags.length - 1] || parser
+      if (parser.opt.xmlns && tag.ns !== parent.ns) {
+        // remove namespace bindings introduced by tag
+        Object.keys(tag.ns).forEach(function (p) {
+          var n = tag.ns[p]
+          emitNode(parser, 'onclosenamespace', { prefix: p, uri: n })
+        })
+      }
+    }
+    if (t === 0) parser.closedRoot = true
+    parser.tagName = parser.attribValue = parser.attribName = ''
+    parser.attribList.length = 0
+    parser.state = S.TEXT
+  }
+
+  function parseEntity (parser) {
+    var entity = parser.entity
+    var entityLC = entity.toLowerCase()
+    var num
+    var numStr = ''
+
+    if (parser.ENTITIES[entity]) {
+      return parser.ENTITIES[entity]
+    }
+    if (parser.ENTITIES[entityLC]) {
+      return parser.ENTITIES[entityLC]
+    }
+    entity = entityLC
+    if (entity.charAt(0) === '#') {
+      if (entity.charAt(1) === 'x') {
+        entity = entity.slice(2)
+        num = parseInt(entity, 16)
+        numStr = num.toString(16)
+      } else {
+        entity = entity.slice(1)
+        num = parseInt(entity, 10)
+        numStr = num.toString(10)
+      }
+    }
+    entity = entity.replace(/^0+/, '')
+    if (numStr.toLowerCase() !== entity) {
+      strictFail(parser, 'Invalid character entity')
+      return '&' + parser.entity + ';'
+    }
+
+    return String.fromCodePoint(num)
+  }
+
+  function beginWhiteSpace (parser, c) {
+    if (c === '<') {
+      parser.state = S.OPEN_WAKA
+      parser.startTagPosition = parser.position
+    } else if (not(whitespace, c)) {
+      // have to process this as a text node.
+      // weird, but happens.
+      strictFail(parser, 'Non-whitespace before first tag.')
+      parser.textNode = c
+      parser.state = S.TEXT
+    }
+  }
+
+  function charAt (chunk, i) {
+    var result = ''
+    if (i < chunk.length) {
+      result = chunk.charAt(i)
+    }
+    return result
+  }
+
+  function write (chunk) {
+    var parser = this
+    if (this.error) {
+      throw this.error
+    }
+    if (parser.closed) {
+      return error(parser,
+        'Cannot write after close. Assign an onready handler.')
+    }
+    if (chunk === null) {
+      return end(parser)
+    }
+    var i = 0
+    var c = ''
+    while (true) {
+      c = charAt(chunk, i++)
+      parser.c = c
+      if (!c) {
+        break
+      }
+      if (parser.trackPosition) {
+        parser.position++
+        if (c === '\n') {
+          parser.line++
+          parser.column = 0
+        } else {
+          parser.column++
+        }
+      }
+      switch (parser.state) {
+        case S.BEGIN:
+          parser.state = S.BEGIN_WHITESPACE
+          if (c === '\uFEFF') {
+            continue
+          }
+          beginWhiteSpace(parser, c)
+          continue
+
+        case S.BEGIN_WHITESPACE:
+          beginWhiteSpace(parser, c)
+          continue
+
+        case S.TEXT:
+          if (parser.sawRoot && !parser.closedRoot) {
+            var starti = i - 1
+            while (c && c !== '<' && c !== '&') {
+              c = charAt(chunk, i++)
+              if (c && parser.trackPosition) {
+                parser.position++
+                if (c === '\n') {
+                  parser.line++
+                  parser.column = 0
+                } else {
+                  parser.column++
+                }
+              }
+            }
+            parser.textNode += chunk.substring(starti, i - 1)
+          }
+          if (c === '<' && !(parser.sawRoot && parser.closedRoot && !parser.strict)) {
+            parser.state = S.OPEN_WAKA
+            parser.startTagPosition = parser.position
+          } else {
+            if (not(whitespace, c) && (!parser.sawRoot || parser.closedRoot)) {
+              strictFail(parser, 'Text data outside of root node.')
+            }
+            if (c === '&') {
+              parser.state = S.TEXT_ENTITY
+            } else {
+              parser.textNode += c
+            }
+          }
+          continue
+
+        case S.SCRIPT:
+          // only non-strict
+          if (c === '<') {
+            parser.state = S.SCRIPT_ENDING
+          } else {
+            parser.script += c
+          }
+          continue
+
+        case S.SCRIPT_ENDING:
+          if (c === '/') {
+            parser.state = S.CLOSE_TAG
+          } else {
+            parser.script += '<' + c
+            parser.state = S.SCRIPT
+          }
+          continue
+
+        case S.OPEN_WAKA:
+          // either a /, ?, !, or text is coming next.
+          if (c === '!') {
+            parser.state = S.SGML_DECL
+            parser.sgmlDecl = ''
+          } else if (is(whitespace, c)) {
+            // wait for it...
+          } else if (is(nameStart, c)) {
+            parser.state = S.OPEN_TAG
+            parser.tagName = c
+          } else if (c === '/') {
+            parser.state = S.CLOSE_TAG
+            parser.tagName = ''
+          } else if (c === '?') {
+            parser.state = S.PROC_INST
+            parser.procInstName = parser.procInstBody = ''
+          } else {
+            strictFail(parser, 'Unencoded <')
+            // if there was some whitespace, then add that in.
+            if (parser.startTagPosition + 1 < parser.position) {
+              var pad = parser.position - parser.startTagPosition
+              c = new Array(pad).join(' ') + c
+            }
+            parser.textNode += '<' + c
+            parser.state = S.TEXT
+          }
+          continue
+
+        case S.SGML_DECL:
+          if ((parser.sgmlDecl + c).toUpperCase() === CDATA) {
+            emitNode(parser, 'onopencdata')
+            parser.state = S.CDATA
+            parser.sgmlDecl = ''
+            parser.cdata = ''
+          } else if (parser.sgmlDecl + c === '--') {
+            parser.state = S.COMMENT
+            parser.comment = ''
+            parser.sgmlDecl = ''
+          } else if ((parser.sgmlDecl + c).toUpperCase() === DOCTYPE) {
+            parser.state = S.DOCTYPE
+            if (parser.doctype || parser.sawRoot) {
+              strictFail(parser,
+                'Inappropriately located doctype declaration')
+            }
+            parser.doctype = ''
+            parser.sgmlDecl = ''
+          } else if (c === '>') {
+            emitNode(parser, 'onsgmldeclaration', parser.sgmlDecl)
+            parser.sgmlDecl = ''
+            parser.state = S.TEXT
+          } else if (is(quote, c)) {
+            parser.state = S.SGML_DECL_QUOTED
+            parser.sgmlDecl += c
+          } else {
+            parser.sgmlDecl += c
+          }
+          continue
+
+        case S.SGML_DECL_QUOTED:
+          if (c === parser.q) {
+            parser.state = S.SGML_DECL
+            parser.q = ''
+          }
+          parser.sgmlDecl += c
+          continue
+
+        case S.DOCTYPE:
+          if (c === '>') {
+            parser.state = S.TEXT
+            emitNode(parser, 'ondoctype', parser.doctype)
+            parser.doctype = true // just remember that we saw it.
+          } else {
+            parser.doctype += c
+            if (c === '[') {
+              parser.state = S.DOCTYPE_DTD
+            } else if (is(quote, c)) {
+              parser.state = S.DOCTYPE_QUOTED
+              parser.q = c
+            }
+          }
+          continue
+
+        case S.DOCTYPE_QUOTED:
+          parser.doctype += c
+          if (c === parser.q) {
+            parser.q = ''
+            parser.state = S.DOCTYPE
+          }
+          continue
+
+        case S.DOCTYPE_DTD:
+          parser.doctype += c
+          if (c === ']') {
+            parser.state = S.DOCTYPE
+          } else if (is(quote, c)) {
+            parser.state = S.DOCTYPE_DTD_QUOTED
+            parser.q = c
+          }
+          continue
+
+        case S.DOCTYPE_DTD_QUOTED:
+          parser.doctype += c
+          if (c === parser.q) {
+            parser.state = S.DOCTYPE_DTD
+            parser.q = ''
+          }
+          continue
+
+        case S.COMMENT:
+          if (c === '-') {
+            parser.state = S.COMMENT_ENDING
+          } else {
+            parser.comment += c
+          }
+          continue
+
+        case S.COMMENT_ENDING:
+          if (c === '-') {
+            parser.state = S.COMMENT_ENDED
+            parser.comment = textopts(parser.opt, parser.comment)
+            if (parser.comment) {
+              emitNode(parser, 'oncomment', parser.comment)
+            }
+            parser.comment = ''
+          } else {
+            parser.comment += '-' + c
+            parser.state = S.COMMENT
+          }
+          continue
+
+        case S.COMMENT_ENDED:
+          if (c !== '>') {
+            strictFail(parser, 'Malformed comment')
+            // allow <!-- blah -- bloo --> in non-strict mode,
+            // which is a comment of " blah -- bloo "
+            parser.comment += '--' + c
+            parser.state = S.COMMENT
+          } else {
+            parser.state = S.TEXT
+          }
+          continue
+
+        case S.CDATA:
+          if (c === ']') {
+            parser.state = S.CDATA_ENDING
+          } else {
+            parser.cdata += c
+          }
+          continue
+
+        case S.CDATA_ENDING:
+          if (c === ']') {
+            parser.state = S.CDATA_ENDING_2
+          } else {
+            parser.cdata += ']' + c
+            parser.state = S.CDATA
+          }
+          continue
+
+        case S.CDATA_ENDING_2:
+          if (c === '>') {
+            if (parser.cdata) {
+              emitNode(parser, 'oncdata', parser.cdata)
+            }
+            emitNode(parser, 'onclosecdata')
+            parser.cdata = ''
+            parser.state = S.TEXT
+          } else if (c === ']') {
+            parser.cdata += ']'
+          } else {
+            parser.cdata += ']]' + c
+            parser.state = S.CDATA
+          }
+          continue
+
+        case S.PROC_INST:
+          if (c === '?') {
+            parser.state = S.PROC_INST_ENDING
+          } else if (is(whitespace, c)) {
+            parser.state = S.PROC_INST_BODY
+          } else {
+            parser.procInstName += c
+          }
+          continue
+
+        case S.PROC_INST_BODY:
+          if (!parser.procInstBody && is(whitespace, c)) {
+            continue
+          } else if (c === '?') {
+            parser.state = S.PROC_INST_ENDING
+          } else {
+            parser.procInstBody += c
+          }
+          continue
+
+        case S.PROC_INST_ENDING:
+          if (c === '>') {
+            emitNode(parser, 'onprocessinginstruction', {
+              name: parser.procInstName,
+              body: parser.procInstBody
+            })
+            parser.procInstName = parser.procInstBody = ''
+            parser.state = S.TEXT
+          } else {
+            parser.procInstBody += '?' + c
+            parser.state = S.PROC_INST_BODY
+          }
+          continue
+
+        case S.OPEN_TAG:
+          if (is(nameBody, c)) {
+            parser.tagName += c
+          } else {
+            newTag(parser)
+            if (c === '>') {
+              openTag(parser)
+            } else if (c === '/') {
+              parser.state = S.OPEN_TAG_SLASH
+            } else {
+              if (not(whitespace, c)) {
+                strictFail(parser, 'Invalid character in tag name')
+              }
+              parser.state = S.ATTRIB
+            }
+          }
+          continue
+
+        case S.OPEN_TAG_SLASH:
+          if (c === '>') {
+            openTag(parser, true)
+            closeTag(parser)
+          } else {
+            strictFail(parser, 'Forward-slash in opening tag not followed by >')
+            parser.state = S.ATTRIB
+          }
+          continue
+
+        case S.ATTRIB:
+          // haven't read the attribute name yet.
+          if (is(whitespace, c)) {
+            continue
+          } else if (c === '>') {
+            openTag(parser)
+          } else if (c === '/') {
+            parser.state = S.OPEN_TAG_SLASH
+          } else if (is(nameStart, c)) {
+            parser.attribName = c
+            parser.attribValue = ''
+            parser.state = S.ATTRIB_NAME
+          } else {
+            strictFail(parser, 'Invalid attribute name')
+          }
+          continue
+
+        case S.ATTRIB_NAME:
+          if (c === '=') {
+            parser.state = S.ATTRIB_VALUE
+          } else if (c === '>') {
+            strictFail(parser, 'Attribute without value')
+            parser.attribValue = parser.attribName
+            attrib(parser)
+            openTag(parser)
+          } else if (is(whitespace, c)) {
+            parser.state = S.ATTRIB_NAME_SAW_WHITE
+          } else if (is(nameBody, c)) {
+            parser.attribName += c
+          } else {
+            strictFail(parser, 'Invalid attribute name')
+          }
+          continue
+
+        case S.ATTRIB_NAME_SAW_WHITE:
+          if (c === '=') {
+            parser.state = S.ATTRIB_VALUE
+          } else if (is(whitespace, c)) {
+            continue
+          } else {
+            strictFail(parser, 'Attribute without value')
+            parser.tag.attributes[parser.attribName] = ''
+            parser.attribValue = ''
+            emitNode(parser, 'onattribute', {
+              name: parser.attribName,
+              value: ''
+            })
+            parser.attribName = ''
+            if (c === '>') {
+              openTag(parser)
+            } else if (is(nameStart, c)) {
+              parser.attribName = c
+              parser.state = S.ATTRIB_NAME
+            } else {
+              strictFail(parser, 'Invalid attribute name')
+              parser.state = S.ATTRIB
+            }
+          }
+          continue
+
+        case S.ATTRIB_VALUE:
+          if (is(whitespace, c)) {
+            continue
+          } else if (is(quote, c)) {
+            parser.q = c
+            parser.state = S.ATTRIB_VALUE_QUOTED
+          } else {
+            strictFail(parser, 'Unquoted attribute value')
+            parser.state = S.ATTRIB_VALUE_UNQUOTED
+            parser.attribValue = c
+          }
+          continue
+
+        case S.ATTRIB_VALUE_QUOTED:
+          if (c !== parser.q) {
+            if (c === '&') {
+              parser.state = S.ATTRIB_VALUE_ENTITY_Q
+            } else {
+              parser.attribValue += c
+            }
+            continue
+          }
+          attrib(parser)
+          parser.q = ''
+          parser.state = S.ATTRIB_VALUE_CLOSED
+          continue
+
+        case S.ATTRIB_VALUE_CLOSED:
+          if (is(whitespace, c)) {
+            parser.state = S.ATTRIB
+          } else if (c === '>') {
+            openTag(parser)
+          } else if (c === '/') {
+            parser.state = S.OPEN_TAG_SLASH
+          } else if (is(nameStart, c)) {
+            strictFail(parser, 'No whitespace between attributes')
+            parser.attribName = c
+            parser.attribValue = ''
+            parser.state = S.ATTRIB_NAME
+          } else {
+            strictFail(parser, 'Invalid attribute name')
+          }
+          continue
+
+        case S.ATTRIB_VALUE_UNQUOTED:
+          if (not(attribEnd, c)) {
+            if (c === '&') {
+              parser.state = S.ATTRIB_VALUE_ENTITY_U
+            } else {
+              parser.attribValue += c
+            }
+            continue
+          }
+          attrib(parser)
+          if (c === '>') {
+            openTag(parser)
+          } else {
+            parser.state = S.ATTRIB
+          }
+          continue
+
+        case S.CLOSE_TAG:
+          if (!parser.tagName) {
+            if (is(whitespace, c)) {
+              continue
+            } else if (not(nameStart, c)) {
+              if (parser.script) {
+                parser.script += '</' + c
+                parser.state = S.SCRIPT
+              } else {
+                strictFail(parser, 'Invalid tagname in closing tag.')
+              }
+            } else {
+              parser.tagName = c
+            }
+          } else if (c === '>') {
+            closeTag(parser)
+          } else if (is(nameBody, c)) {
+            parser.tagName += c
+          } else if (parser.script) {
+            parser.script += '</' + parser.tagName
+            parser.tagName = ''
+            parser.state = S.SCRIPT
+          } else {
+            if (not(whitespace, c)) {
+              strictFail(parser, 'Invalid tagname in closing tag')
+            }
+            parser.state = S.CLOSE_TAG_SAW_WHITE
+          }
+          continue
+
+        case S.CLOSE_TAG_SAW_WHITE:
+          if (is(whitespace, c)) {
+            continue
+          }
+          if (c === '>') {
+            closeTag(parser)
+          } else {
+            strictFail(parser, 'Invalid characters in closing tag')
+          }
+          continue
+
+        case S.TEXT_ENTITY:
+        case S.ATTRIB_VALUE_ENTITY_Q:
+        case S.ATTRIB_VALUE_ENTITY_U:
+          var returnState
+          var buffer
+          switch (parser.state) {
+            case S.TEXT_ENTITY:
+              returnState = S.TEXT
+              buffer = 'textNode'
+              break
+
+            case S.ATTRIB_VALUE_ENTITY_Q:
+              returnState = S.ATTRIB_VALUE_QUOTED
+              buffer = 'attribValue'
+              break
+
+            case S.ATTRIB_VALUE_ENTITY_U:
+              returnState = S.ATTRIB_VALUE_UNQUOTED
+              buffer = 'attribValue'
+              break
+          }
+
+          if (c === ';') {
+            parser[buffer] += parseEntity(parser)
+            parser.entity = ''
+            parser.state = returnState
+          } else if (is(parser.entity.length ? entityBody : entityStart, c)) {
+            parser.entity += c
+          } else {
+            strictFail(parser, 'Invalid character in entity name')
+            parser[buffer] += '&' + parser.entity + c
+            parser.entity = ''
+            parser.state = returnState
+          }
+
+          continue
+
+        default:
+          throw new Error(parser, 'Unknown state: ' + parser.state)
+      }
+    } // while
+
+    if (parser.position >= parser.bufferCheckPosition) {
+      checkBufferLength(parser)
+    }
+    return parser
+  }
+
+  /*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
+  if (!String.fromCodePoint) {
+    (function () {
+      var stringFromCharCode = String.fromCharCode
+      var floor = Math.floor
+      var fromCodePoint = function () {
+        var MAX_SIZE = 0x4000
+        var codeUnits = []
+        var highSurrogate
+        var lowSurrogate
+        var index = -1
+        var length = arguments.length
+        if (!length) {
+          return ''
+        }
+        var result = ''
+        while (++index < length) {
+          var codePoint = Number(arguments[index])
+          if (
+            !isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
+            codePoint < 0 || // not a valid Unicode code point
+            codePoint > 0x10FFFF || // not a valid Unicode code point
+            floor(codePoint) !== codePoint // not an integer
+          ) {
+            throw RangeError('Invalid code point: ' + codePoint)
+          }
+          if (codePoint <= 0xFFFF) { // BMP code point
+            codeUnits.push(codePoint)
+          } else { // Astral code point; split in surrogate halves
+            // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+            codePoint -= 0x10000
+            highSurrogate = (codePoint >> 10) + 0xD800
+            lowSurrogate = (codePoint % 0x400) + 0xDC00
+            codeUnits.push(highSurrogate, lowSurrogate)
+          }
+          if (index + 1 === length || codeUnits.length > MAX_SIZE) {
+            result += stringFromCharCode.apply(null, codeUnits)
+            codeUnits.length = 0
+          }
+        }
+        return result
+      }
+      if (Object.defineProperty) {
+        Object.defineProperty(String, 'fromCodePoint', {
+          value: fromCodePoint,
+          configurable: true,
+          writable: true
+        })
+      } else {
+        String.fromCodePoint = fromCodePoint
+      }
+    }())
+  }
+})(typeof exports === 'undefined' ? this.sax = {} : exports)
+
+}).call(this,require("buffer").Buffer)
+},{"buffer":284,"stream":620,"string_decoder":645}],610:[function(require,module,exports){
 ;(function(exports) {
 
 // export the class if we are in a Node-like system.
@@ -61460,7 +83611,7 @@ if (typeof define === 'function' && define.amd)
   semver = {}
 );
 
-},{}],378:[function(require,module,exports){
+},{}],611:[function(require,module,exports){
 (function (Buffer){
 // prototype class for hash functions
 function Hash (blockSize, finalSize) {
@@ -61533,7 +83684,7 @@ Hash.prototype._update = function () {
 module.exports = Hash
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63}],379:[function(require,module,exports){
+},{"buffer":284}],612:[function(require,module,exports){
 var exports = module.exports = function SHA (algorithm) {
   algorithm = algorithm.toLowerCase()
 
@@ -61550,7 +83701,7 @@ exports.sha256 = require('./sha256')
 exports.sha384 = require('./sha384')
 exports.sha512 = require('./sha512')
 
-},{"./sha":380,"./sha1":381,"./sha224":382,"./sha256":383,"./sha384":384,"./sha512":385}],380:[function(require,module,exports){
+},{"./sha":613,"./sha1":614,"./sha224":615,"./sha256":616,"./sha384":617,"./sha512":618}],613:[function(require,module,exports){
 (function (Buffer){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-0, as defined
@@ -61647,7 +83798,7 @@ Sha.prototype._hash = function () {
 module.exports = Sha
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":378,"buffer":63,"inherits":147}],381:[function(require,module,exports){
+},{"./hash":611,"buffer":284,"inherits":376}],614:[function(require,module,exports){
 (function (Buffer){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
@@ -61749,7 +83900,7 @@ Sha1.prototype._hash = function () {
 module.exports = Sha1
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":378,"buffer":63,"inherits":147}],382:[function(require,module,exports){
+},{"./hash":611,"buffer":284,"inherits":376}],615:[function(require,module,exports){
 (function (Buffer){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
@@ -61805,7 +83956,7 @@ Sha224.prototype._hash = function () {
 module.exports = Sha224
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":378,"./sha256":383,"buffer":63,"inherits":147}],383:[function(require,module,exports){
+},{"./hash":611,"./sha256":616,"buffer":284,"inherits":376}],616:[function(require,module,exports){
 (function (Buffer){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
@@ -61943,7 +84094,7 @@ Sha256.prototype._hash = function () {
 module.exports = Sha256
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":378,"buffer":63,"inherits":147}],384:[function(require,module,exports){
+},{"./hash":611,"buffer":284,"inherits":376}],617:[function(require,module,exports){
 (function (Buffer){
 var inherits = require('inherits')
 var SHA512 = require('./sha512')
@@ -62003,7 +84154,7 @@ Sha384.prototype._hash = function () {
 module.exports = Sha384
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":378,"./sha512":385,"buffer":63,"inherits":147}],385:[function(require,module,exports){
+},{"./hash":611,"./sha512":618,"buffer":284,"inherits":376}],618:[function(require,module,exports){
 (function (Buffer){
 var inherits = require('inherits')
 var Hash = require('./hash')
@@ -62266,7 +84417,7 @@ Sha512.prototype._hash = function () {
 module.exports = Sha512
 
 }).call(this,require("buffer").Buffer)
-},{"./hash":378,"buffer":63,"inherits":147}],386:[function(require,module,exports){
+},{"./hash":611,"buffer":284,"inherits":376}],619:[function(require,module,exports){
 //filter will reemit the data if cb(err,pass) pass is truthy
 
 // reduce is more tricky
@@ -62331,7 +84482,7 @@ function split (matcher, mapper, options) {
   })
 }
 
-},{"string_decoder":412,"through":426}],387:[function(require,module,exports){
+},{"string_decoder":645,"through":659}],620:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -62460,14 +84611,14 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":108,"inherits":147,"readable-stream/duplex.js":389,"readable-stream/passthrough.js":396,"readable-stream/readable.js":397,"readable-stream/transform.js":398,"readable-stream/writable.js":399}],388:[function(require,module,exports){
-arguments[4][53][0].apply(exports,arguments)
-},{"dup":53}],389:[function(require,module,exports){
+},{"events":332,"inherits":376,"readable-stream/duplex.js":622,"readable-stream/passthrough.js":629,"readable-stream/readable.js":630,"readable-stream/transform.js":631,"readable-stream/writable.js":632}],621:[function(require,module,exports){
+arguments[4][274][0].apply(exports,arguments)
+},{"dup":274}],622:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":390}],390:[function(require,module,exports){
-arguments[4][54][0].apply(exports,arguments)
-},{"./_stream_readable":392,"./_stream_writable":394,"core-util-is":67,"dup":54,"inherits":147,"process-nextick-args":213}],391:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":623}],623:[function(require,module,exports){
+arguments[4][275][0].apply(exports,arguments)
+},{"./_stream_readable":625,"./_stream_writable":627,"core-util-is":288,"dup":275,"inherits":376,"process-nextick-args":442}],624:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -62494,18 +84645,18 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":393,"core-util-is":67,"inherits":147}],392:[function(require,module,exports){
-arguments[4][55][0].apply(exports,arguments)
-},{"./_stream_duplex":390,"./internal/streams/BufferList":395,"_process":214,"buffer":63,"buffer-shims":60,"core-util-is":67,"dup":55,"events":108,"inherits":147,"isarray":388,"process-nextick-args":213,"string_decoder/":412,"util":25}],393:[function(require,module,exports){
-arguments[4][56][0].apply(exports,arguments)
-},{"./_stream_duplex":390,"core-util-is":67,"dup":56,"inherits":147}],394:[function(require,module,exports){
-arguments[4][57][0].apply(exports,arguments)
-},{"./_stream_duplex":390,"_process":214,"buffer":63,"buffer-shims":60,"core-util-is":67,"dup":57,"events":108,"inherits":147,"process-nextick-args":213,"util-deprecate":431}],395:[function(require,module,exports){
-arguments[4][58][0].apply(exports,arguments)
-},{"buffer":63,"buffer-shims":60,"dup":58}],396:[function(require,module,exports){
+},{"./_stream_transform":626,"core-util-is":288,"inherits":376}],625:[function(require,module,exports){
+arguments[4][276][0].apply(exports,arguments)
+},{"./_stream_duplex":623,"./internal/streams/BufferList":628,"_process":443,"buffer":284,"buffer-shims":281,"core-util-is":288,"dup":276,"events":332,"inherits":376,"isarray":621,"process-nextick-args":442,"string_decoder/":645,"util":246}],626:[function(require,module,exports){
+arguments[4][277][0].apply(exports,arguments)
+},{"./_stream_duplex":623,"core-util-is":288,"dup":277,"inherits":376}],627:[function(require,module,exports){
+arguments[4][278][0].apply(exports,arguments)
+},{"./_stream_duplex":623,"_process":443,"buffer":284,"buffer-shims":281,"core-util-is":288,"dup":278,"events":332,"inherits":376,"process-nextick-args":442,"util-deprecate":664}],628:[function(require,module,exports){
+arguments[4][279][0].apply(exports,arguments)
+},{"buffer":284,"buffer-shims":281,"dup":279}],629:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":391}],397:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":624}],630:[function(require,module,exports){
 (function (process){
 var Stream = (function (){
   try {
@@ -62525,12 +84676,12 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
 }
 
 }).call(this,require('_process'))
-},{"./lib/_stream_duplex.js":390,"./lib/_stream_passthrough.js":391,"./lib/_stream_readable.js":392,"./lib/_stream_transform.js":393,"./lib/_stream_writable.js":394,"_process":214}],398:[function(require,module,exports){
-arguments[4][59][0].apply(exports,arguments)
-},{"./lib/_stream_transform.js":393,"dup":59}],399:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":623,"./lib/_stream_passthrough.js":624,"./lib/_stream_readable.js":625,"./lib/_stream_transform.js":626,"./lib/_stream_writable.js":627,"_process":443}],631:[function(require,module,exports){
+arguments[4][280][0].apply(exports,arguments)
+},{"./lib/_stream_transform.js":626,"dup":280}],632:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":394}],400:[function(require,module,exports){
+},{"./lib/_stream_writable.js":627}],633:[function(require,module,exports){
 (function (global){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
@@ -62612,7 +84763,7 @@ http.METHODS = [
 	'UNSUBSCRIBE'
 ]
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./lib/request":402,"builtin-status-codes":65,"url":429,"xtend":436}],401:[function(require,module,exports){
+},{"./lib/request":635,"builtin-status-codes":286,"url":662,"xtend":673}],634:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableStream)
 
@@ -62656,7 +84807,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],402:[function(require,module,exports){
+},{}],635:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -62942,7 +85093,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":401,"./response":403,"_process":214,"buffer":63,"inherits":147,"readable-stream":411,"to-arraybuffer":427}],403:[function(require,module,exports){
+},{"./capability":634,"./response":636,"_process":443,"buffer":284,"inherits":376,"readable-stream":644,"to-arraybuffer":660}],636:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -63126,23 +85277,23 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":401,"_process":214,"buffer":63,"inherits":147,"readable-stream":411}],404:[function(require,module,exports){
-arguments[4][53][0].apply(exports,arguments)
-},{"dup":53}],405:[function(require,module,exports){
-arguments[4][54][0].apply(exports,arguments)
-},{"./_stream_readable":407,"./_stream_writable":409,"core-util-is":67,"dup":54,"inherits":147,"process-nextick-args":213}],406:[function(require,module,exports){
-arguments[4][391][0].apply(exports,arguments)
-},{"./_stream_transform":408,"core-util-is":67,"dup":391,"inherits":147}],407:[function(require,module,exports){
-arguments[4][55][0].apply(exports,arguments)
-},{"./_stream_duplex":405,"./internal/streams/BufferList":410,"_process":214,"buffer":63,"buffer-shims":60,"core-util-is":67,"dup":55,"events":108,"inherits":147,"isarray":404,"process-nextick-args":213,"string_decoder/":412,"util":25}],408:[function(require,module,exports){
-arguments[4][56][0].apply(exports,arguments)
-},{"./_stream_duplex":405,"core-util-is":67,"dup":56,"inherits":147}],409:[function(require,module,exports){
-arguments[4][57][0].apply(exports,arguments)
-},{"./_stream_duplex":405,"_process":214,"buffer":63,"buffer-shims":60,"core-util-is":67,"dup":57,"events":108,"inherits":147,"process-nextick-args":213,"util-deprecate":431}],410:[function(require,module,exports){
-arguments[4][58][0].apply(exports,arguments)
-},{"buffer":63,"buffer-shims":60,"dup":58}],411:[function(require,module,exports){
-arguments[4][397][0].apply(exports,arguments)
-},{"./lib/_stream_duplex.js":405,"./lib/_stream_passthrough.js":406,"./lib/_stream_readable.js":407,"./lib/_stream_transform.js":408,"./lib/_stream_writable.js":409,"_process":214,"dup":397}],412:[function(require,module,exports){
+},{"./capability":634,"_process":443,"buffer":284,"inherits":376,"readable-stream":644}],637:[function(require,module,exports){
+arguments[4][274][0].apply(exports,arguments)
+},{"dup":274}],638:[function(require,module,exports){
+arguments[4][275][0].apply(exports,arguments)
+},{"./_stream_readable":640,"./_stream_writable":642,"core-util-is":288,"dup":275,"inherits":376,"process-nextick-args":442}],639:[function(require,module,exports){
+arguments[4][624][0].apply(exports,arguments)
+},{"./_stream_transform":641,"core-util-is":288,"dup":624,"inherits":376}],640:[function(require,module,exports){
+arguments[4][276][0].apply(exports,arguments)
+},{"./_stream_duplex":638,"./internal/streams/BufferList":643,"_process":443,"buffer":284,"buffer-shims":281,"core-util-is":288,"dup":276,"events":332,"inherits":376,"isarray":637,"process-nextick-args":442,"string_decoder/":645,"util":246}],641:[function(require,module,exports){
+arguments[4][277][0].apply(exports,arguments)
+},{"./_stream_duplex":638,"core-util-is":288,"dup":277,"inherits":376}],642:[function(require,module,exports){
+arguments[4][278][0].apply(exports,arguments)
+},{"./_stream_duplex":638,"_process":443,"buffer":284,"buffer-shims":281,"core-util-is":288,"dup":278,"events":332,"inherits":376,"process-nextick-args":442,"util-deprecate":664}],643:[function(require,module,exports){
+arguments[4][279][0].apply(exports,arguments)
+},{"buffer":284,"buffer-shims":281,"dup":279}],644:[function(require,module,exports){
+arguments[4][630][0].apply(exports,arguments)
+},{"./lib/_stream_duplex.js":638,"./lib/_stream_passthrough.js":639,"./lib/_stream_readable.js":640,"./lib/_stream_transform.js":641,"./lib/_stream_writable.js":642,"_process":443,"dup":630}],645:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -63365,7 +85516,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":63}],413:[function(require,module,exports){
+},{"buffer":284}],646:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -63503,7 +85654,7 @@ CircularLinkedList.fromArray = function (list, useNodes) {
 };
 
 
-},{"./LinkedList":416}],414:[function(require,module,exports){
+},{"./LinkedList":649}],647:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -63803,7 +85954,7 @@ Line.Y = new Line(_Vector.Vector.Zero(3), _Vector.Vector.j);
 Line.Z = new Line(_Vector.Vector.Zero(3), _Vector.Vector.k);
 
 
-},{"./Matrix":418,"./PRECISION":419,"./Plane":420,"./Vector":424}],415:[function(require,module,exports){
+},{"./Matrix":651,"./PRECISION":652,"./Plane":653,"./Vector":657}],648:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -63959,7 +86110,7 @@ var LineSegment = exports.LineSegment = function () {
 }();
 
 
-},{"./Line":414,"./Plane":420,"./Vector":424}],416:[function(require,module,exports){
+},{"./Line":647,"./Plane":653,"./Vector":657}],649:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64027,7 +86178,7 @@ var LinkedList = exports.LinkedList = function () {
 LinkedList.prototype.each = LinkedList.prototype.forEach;
 
 
-},{}],417:[function(require,module,exports){
+},{}],650:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64045,7 +86196,7 @@ var LinkedListNode = exports.LinkedListNode = function LinkedListNode(data) {
 };
 
 
-},{}],418:[function(require,module,exports){
+},{}],651:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64792,7 +86943,7 @@ Matrix.prototype.inv = Matrix.prototype.inverse;
 Matrix.prototype.x = Matrix.prototype.multiply;
 
 
-},{"./PRECISION":419,"./Vector":424}],419:[function(require,module,exports){
+},{"./PRECISION":652,"./Vector":657}],652:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64801,7 +86952,7 @@ Object.defineProperty(exports, "__esModule", {
 var PRECISION = exports.PRECISION = 1e-6;
 
 
-},{}],420:[function(require,module,exports){
+},{}],653:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -65116,7 +87267,7 @@ Plane.fromPoints = function (points) {
 };
 
 
-},{"./Line":414,"./Matrix":418,"./PRECISION":419,"./Vector":424}],421:[function(require,module,exports){
+},{"./Line":647,"./Matrix":651,"./PRECISION":652,"./Vector":657}],654:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -65544,7 +87695,7 @@ var Polygon = exports.Polygon = function () {
 }();
 
 
-},{"./Line":414,"./LinkedList":416,"./Matrix":418,"./PRECISION":419,"./Plane":420,"./Vector":424}],422:[function(require,module,exports){
+},{"./Line":647,"./LinkedList":649,"./Matrix":651,"./PRECISION":652,"./Plane":653,"./Vector":657}],655:[function(require,module,exports){
 "use strict";
 
 //Classes
@@ -65686,7 +87837,7 @@ Object.defineProperty(exports, "PRECISION", {
 });
 
 
-},{"./CircularLinkedList":413,"./Line":414,"./LineSegment":415,"./LinkedList":416,"./LinkedListNode":417,"./Matrix":418,"./PRECISION":419,"./Plane":420,"./Polygon":421,"./Utils":423,"./Vector":424,"./Vertex":425}],423:[function(require,module,exports){
+},{"./CircularLinkedList":646,"./Line":647,"./LineSegment":648,"./LinkedList":649,"./LinkedListNode":650,"./Matrix":651,"./PRECISION":652,"./Plane":653,"./Polygon":654,"./Utils":656,"./Vector":657,"./Vertex":658}],656:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -65794,7 +87945,7 @@ function makeOrtho(left, right, bottom, top, znear, zfar) {
 }
 
 
-},{"./Matrix":418,"./Vector":424}],424:[function(require,module,exports){
+},{"./Matrix":651,"./Vector":657}],657:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -66190,7 +88341,7 @@ Vector.j = new Vector([0, 1, 0]);
 Vector.k = new Vector([0, 0, 1]);
 
 
-},{"./Matrix":418,"./PRECISION":419}],425:[function(require,module,exports){
+},{"./Matrix":651,"./PRECISION":652}],658:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -66291,7 +88442,7 @@ Vertex.convert = function (points) {
 };
 
 
-},{"./PRECISION":419,"./Polygon":421,"./Vector":424}],426:[function(require,module,exports){
+},{"./PRECISION":652,"./Polygon":654,"./Vector":657}],659:[function(require,module,exports){
 (function (process){
 var Stream = require('stream')
 
@@ -66403,7 +88554,7 @@ function through (write, end, opts) {
 
 
 }).call(this,require('_process'))
-},{"_process":214,"stream":387}],427:[function(require,module,exports){
+},{"_process":443,"stream":620}],660:[function(require,module,exports){
 var Buffer = require('buffer').Buffer
 
 module.exports = function (buf) {
@@ -66432,7 +88583,7 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":63}],428:[function(require,module,exports){
+},{"buffer":284}],661:[function(require,module,exports){
 "use strict"
 
 function unique_pred(list, compare) {
@@ -66491,7 +88642,7 @@ function unique(list, compare, sorted) {
 
 module.exports = unique
 
-},{}],429:[function(require,module,exports){
+},{}],662:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -67225,7 +89376,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":430,"punycode":221,"querystring":224}],430:[function(require,module,exports){
+},{"./util":663,"punycode":451,"querystring":454}],663:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -67243,7 +89394,7 @@ module.exports = {
   }
 };
 
-},{}],431:[function(require,module,exports){
+},{}],664:[function(require,module,exports){
 (function (global){
 
 /**
@@ -67314,16 +89465,16 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],432:[function(require,module,exports){
-arguments[4][147][0].apply(exports,arguments)
-},{"dup":147}],433:[function(require,module,exports){
+},{}],665:[function(require,module,exports){
+arguments[4][376][0].apply(exports,arguments)
+},{"dup":376}],666:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],434:[function(require,module,exports){
+},{}],667:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -67913,7 +90064,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":433,"_process":214,"inherits":432}],435:[function(require,module,exports){
+},{"./support/isBuffer":666,"_process":443,"inherits":665}],668:[function(require,module,exports){
 var indexOf = require('indexof');
 
 var Object_keys = function (obj) {
@@ -68053,7 +90204,100 @@ exports.createContext = Script.createContext = function (context) {
     return copy;
 };
 
-},{"indexof":146}],436:[function(require,module,exports){
+},{"indexof":375}],669:[function(require,module,exports){
+'use strict';
+
+function deferred(fn) {
+  return function () {
+    // IE9 doesn't support passing arguments to setTimeout so we have to emulate it.
+    var args = arguments;
+
+    setTimeout(function () {
+      fn.apply(null, args);
+    }, 1);
+  };
+}
+
+module.exports = deferred;
+
+},{}],670:[function(require,module,exports){
+arguments[4][95][0].apply(exports,arguments)
+},{"dup":95}],671:[function(require,module,exports){
+'use strict';
+
+function promiseOrCallback(promise, callback) { // eslint-disable-line consistent-return
+  if (callback) {
+    promise
+      .then(function (data) {
+        callback(null, data);
+      })
+      .catch(function (err) {
+        callback(err);
+      });
+  } else {
+    return promise;
+  }
+}
+
+module.exports = promiseOrCallback;
+
+},{}],672:[function(require,module,exports){
+'use strict';
+
+var deferred = require('./lib/deferred');
+var once = require('./lib/once');
+var promiseOrCallback = require('./lib/promise-or-callback');
+
+function wrapPromise(fn) {
+  return function () {
+    var callback;
+    var args = Array.prototype.slice.call(arguments);
+    var lastArg = args[args.length - 1];
+
+    if (typeof lastArg === 'function') {
+      callback = args.pop();
+      callback = once(deferred(callback));
+    }
+    return promiseOrCallback(fn.apply(this, args), callback); // eslint-disable-line no-invalid-this
+  };
+}
+
+wrapPromise.wrapPrototype = function (target, options) {
+  var methods, ignoreMethods, includePrivateMethods;
+
+  options = options || {};
+  ignoreMethods = options.ignoreMethods || [];
+  includePrivateMethods = options.transformPrivateMethods === true;
+
+  methods = Object.getOwnPropertyNames(target.prototype).filter(function (method) {
+    var isNotPrivateMethod;
+    var isNonConstructorFunction = method !== 'constructor' &&
+      typeof target.prototype[method] === 'function';
+    var isNotAnIgnoredMethod = ignoreMethods.indexOf(method) === -1;
+
+    if (includePrivateMethods) {
+      isNotPrivateMethod = true;
+    } else {
+      isNotPrivateMethod = method.charAt(0) !== '_';
+    }
+
+    return isNonConstructorFunction &&
+      isNotPrivateMethod &&
+      isNotAnIgnoredMethod;
+  });
+
+  methods.forEach(function (method) {
+    var original = target.prototype[method];
+
+    target.prototype[method] = wrapPromise(original);
+  });
+
+  return target;
+};
+
+module.exports = wrapPromise;
+
+},{"./lib/deferred":669,"./lib/once":670,"./lib/promise-or-callback":671}],673:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -68074,7 +90318,7 @@ function extend() {
     return target
 }
 
-},{}],437:[function(require,module,exports){
+},{}],674:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -68093,7 +90337,7 @@ function extend(target) {
     return target
 }
 
-},{}],438:[function(require,module,exports){
+},{}],675:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -68166,7 +90410,7 @@ var Address = function (_React$Component) {
 
 module.exports = Address;
 
-},{"react":375}],439:[function(require,module,exports){
+},{"react":605}],676:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -68184,7 +90428,9 @@ var React = require('react');
 var InputAddress = require('./InputAddress.jsx');
 var Items = require('./Items.jsx');
 var ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
-var PayStripe = require('./PayStripe.js');
+
+//const payment_method_client = require('./PayStripeClient.js');
+var payment_method_client = require('./PayBraintreeClient.js');
 
 var Cart = function (_React$Component) {
   _inherits(Cart, _React$Component);
@@ -68385,26 +90631,24 @@ var Cart = function (_React$Component) {
         return this.setState({ processing_payment: false });
       }
 
-      // TODO select payment method
-      var payment_method = PayStripe;
-      payment_method.pay(this.state, function (status, response) {
-        if (response.error) {
+      payment_method_client.getClientNonce(this.props.payment_authorization, this.state, function (err, payment_nonce) {
+        if (err) {
           _this2.setState({ processing_payment: false });
-          _this2.handleSetSectionState("card", { errors: [response.error.message] });
+          _this2.handleSetSectionState("card", { errors: [err] });
           return;
         }
         var payload = {
           store_id: _this2.props.store[0].id,
           email: _this2.state.shipping.email,
           contents: _this2.refs.Items.state.contents,
-          stripe_token: response.id,
+          payment_nonce: payment_nonce,
           address: _this2.state.shipping
         };
         BowAndDrape.api("POST", "/order", payload, function (err, resp) {
           if (err) {
             return _this2.handleSetSectionState("card", { errors: [err.error] });
           }
-          console.log(resp);
+          BowAndDrape.cart_menu.update([]);
           _this2.setState({ done: true });
         });
       });
@@ -68437,6 +90681,26 @@ var Cart = function (_React$Component) {
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          if ("' + process.env.STRIPE_KEY + '"!="undefined")\n            Stripe.setPublishableKey("' + process.env.STRIPE_KEY + '");\n        ' } })
       );
     }
+  }], [{
+    key: 'preprocessProps',
+    value: function preprocessProps(options, callback) {
+      // TODO select payment method
+      //const payment_method = require('../models/PayStripe.js');
+      var payment_method = require('../models/PayBraintree.js');
+
+      // get braintree client token
+      if (payment_method.getClientAuthorization) {
+        return payment_method.getClientAuthorization(function (err, payment_authorization) {
+          if (err) {
+            console.log(err);
+          }
+          options.payment_authorization = payment_authorization;
+          callback(err, options);
+        });
+      }
+
+      callback(null, options);
+    }
   }]);
 
   return Cart;
@@ -68445,7 +90709,7 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 }).call(this,require('_process'))
-},{"./InputAddress.jsx":448,"./Items.jsx":450,"./PayStripe.js":455,"./ThanksPurchaseComplete.jsx":462,"_process":214,"react":375}],440:[function(require,module,exports){
+},{"../models/PayBraintree.js":2,"./InputAddress.jsx":685,"./Items.jsx":687,"./PayBraintreeClient.js":692,"./ThanksPurchaseComplete.jsx":699,"_process":443,"react":605}],677:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -68493,13 +90757,13 @@ var CartMenu = function (_React$Component) {
         } catch (err) {}
       }
       contents = contents || [];
-      this.setState({ contents: contents });
-      this.updateCookie(contents);
+      this.update(contents);
     }
   }, {
-    key: "updateCookie",
-    value: function updateCookie(contents) {
+    key: "update",
+    value: function update(contents) {
       window.localStorage.setItem("cart", JSON.stringify(contents));
+      this.setState({ contents: contents });
       BowAndDrape.dispatcher.emit("update_cart", contents);
     }
   }, {
@@ -68507,8 +90771,7 @@ var CartMenu = function (_React$Component) {
     value: function add(item) {
       var contents = this.state.contents;
       contents.unshift(item);
-      this.setState({ contents: contents });
-      this.updateCookie(contents);
+      this.update(contents);
       /* TODO maybe save this if logged in?
       BowAndDrape.api('POST', '/cart', item, (err, ret) => {});
       */
@@ -68518,8 +90781,7 @@ var CartMenu = function (_React$Component) {
     value: function remove(index) {
       var contents = this.state.contents;
       contents.splice(index, 1);
-      this.setState({ contents: contents });
-      this.updateCookie(contents);
+      this.update(contents);
     }
   }, {
     key: "render",
@@ -68544,7 +90806,7 @@ var CartMenu = function (_React$Component) {
 
 module.exports = CartMenu;
 
-},{"react":375}],441:[function(require,module,exports){
+},{"react":605}],678:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -68769,7 +91031,7 @@ var Component = function () {
 
 module.exports = Component;
 
-},{"async":19,"get-pixels":136,"sylvester-es6":422}],442:[function(require,module,exports){
+},{"async":20,"get-pixels":361,"sylvester-es6":655}],679:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -68923,7 +91185,7 @@ var ComponentEdit = function (_React$Component) {
 
 module.exports = ComponentEdit;
 
-},{"react":375}],443:[function(require,module,exports){
+},{"react":605}],680:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -68993,7 +91255,7 @@ var ComponentSerializer = function () {
 module.exports = ComponentSerializer;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":63,"zlib":51}],444:[function(require,module,exports){
+},{"buffer":284,"zlib":272}],681:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -69060,7 +91322,7 @@ var ComponentsEdit = function (_React$Component) {
 
 module.exports = ComponentsEdit;
 
-},{"./ComponentEdit.jsx":442,"react":375}],445:[function(require,module,exports){
+},{"./ComponentEdit.jsx":679,"react":605}],682:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69439,7 +91701,7 @@ var Customizer = function () {
 
 module.exports = Customizer;
 
-},{"./Component.js":441,"async":19,"get-pixels":136,"gl":137,"sylvester-es6":422}],446:[function(require,module,exports){
+},{"./Component.js":678,"async":20,"get-pixels":361,"gl":362,"sylvester-es6":655}],683:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69541,7 +91803,7 @@ var FacebookLogin = function (_React$Component) {
 
 module.exports = FacebookLogin;
 
-},{"./UserProfile.jsx":466,"https":144,"react":375}],447:[function(require,module,exports){
+},{"./UserProfile.jsx":703,"https":369,"react":605}],684:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69662,7 +91924,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./Scrollable.jsx":459,"./Shipment.jsx":460,"./Tabs.jsx":461,"react":375}],448:[function(require,module,exports){
+},{"./Scrollable.jsx":696,"./Shipment.jsx":697,"./Tabs.jsx":698,"react":605}],685:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69848,7 +92110,7 @@ var InputAddress = function (_React$Component) {
 
 module.exports = InputAddress;
 
-},{"react":375}],449:[function(require,module,exports){
+},{"react":605}],686:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69957,7 +92219,7 @@ var Item = function (_React$Component) {
 
 module.exports = Item;
 
-},{"react":375}],450:[function(require,module,exports){
+},{"react":605}],687:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -70037,7 +92299,7 @@ var Items = function (_React$Component) {
 
 module.exports = Items;
 
-},{"./Item.jsx":449,"react":375}],451:[function(require,module,exports){
+},{"./Item.jsx":686,"react":605}],688:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70093,7 +92355,7 @@ var LayoutBasic = function (_React$Component) {
 
 module.exports = LayoutBasic;
 
-},{"react":375}],452:[function(require,module,exports){
+},{"react":605}],689:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -70229,7 +92491,7 @@ var LayoutMain = function (_React$Component) {
 
 module.exports = LayoutMain;
 
-},{"./UserMenu.jsx":464,"react":375,"react-dom/server":228,"react-swipeable":229}],453:[function(require,module,exports){
+},{"./UserMenu.jsx":701,"react":605,"react-dom/server":458,"react-swipeable":459}],690:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70366,7 +92628,7 @@ var PageEdit = function (_React$Component) {
 
 module.exports = PageEdit;
 
-},{"react":375}],454:[function(require,module,exports){
+},{"react":605}],691:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70430,39 +92692,54 @@ var PageList = function (_React$Component) {
 
 module.exports = PageList;
 
-},{"./PageEdit.jsx":453,"./Scrollable.jsx":459,"react":375}],455:[function(require,module,exports){
-"use strict";
+},{"./PageEdit.jsx":690,"./Scrollable.jsx":696,"react":605}],692:[function(require,module,exports){
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var PayStripe = function () {
-  function PayStripe() {
-    _classCallCheck(this, PayStripe);
+var braintree_client = require('braintree-web').client;
+
+var BraintreeClient = function () {
+  function BraintreeClient() {
+    _classCallCheck(this, BraintreeClient);
   }
 
-  _createClass(PayStripe, null, [{
-    key: "pay",
-    value: function pay(state, callback) {
+  _createClass(BraintreeClient, null, [{
+    key: 'getClientNonce',
+    value: function getClientNonce(authorization, state, callback) {
+      braintree_client.create({ authorization: authorization }, function (err, client) {
+        if (err) return callback(err);
 
-      var stripe_payload = {
-        number: state.card.number,
-        cvc: state.card.cvc,
-        exp_month: state.card.exp_month,
-        exp_year: state.card.exp_year,
-        address_zip: state.same_billing ? state.shipping.postal : state.billing.postal
-      };
-      Stripe.card.createToken(stripe_payload, callback);
+        var data = {
+          creditCard: {
+            number: state.card.number,
+            expirationDate: state.card.exp_month + '/' + state.card.exp_year,
+            cvv: state.card.cvc,
+            billingAddress: {
+              postalCode: state.same_billing ? state.shipping.postal : state.billing.postal
+            }
+          }
+        };
+        client.request({
+          endpoint: 'payment_methods/credit_cards',
+          method: 'post',
+          data: data
+        }, function (err, response) {
+          if (err) return callback(err.details.originalError.error.message);
+          callback(err, response.creditCards[0].nonce);
+        });
+      });
     }
   }]);
 
-  return PayStripe;
+  return BraintreeClient;
 }();
 
-module.exports = PayStripe;
+module.exports = BraintreeClient;
 
-},{}],456:[function(require,module,exports){
+},{"braintree-web":61}],693:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70635,7 +92912,7 @@ var ProductCanvas = function (_React$Component) {
 
 module.exports = ProductCanvas;
 
-},{"react":375,"react-swipeable":229}],457:[function(require,module,exports){
+},{"react":605,"react-swipeable":459}],694:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -70934,6 +93211,8 @@ var ProductList = function (_React$Component) {
       var traverse_options = function traverse_options(option_product) {
         var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
+        // TODO FIXME when not in edit mode, we need to set state.selected_product to the default selected options here
+
         // if we're not editing, select whatever product we end up on
         if (!_this4.props.edit) product = option_product;
         // if at a leaf, we're done
@@ -71168,7 +93447,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ComponentEdit.jsx":442,"./ComponentSerializer.js":443,"./ProductCanvas.jsx":456,"./ProductListEdit.jsx":458,"./Tabs.jsx":461,"async":19,"querystring":224,"react":375}],458:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ComponentEdit.jsx":679,"./ComponentSerializer.js":680,"./ProductCanvas.jsx":693,"./ProductListEdit.jsx":695,"./Tabs.jsx":698,"async":20,"querystring":454,"react":605}],695:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -71294,7 +93573,7 @@ var ProductListEdit = function (_React$Component) {
 
 module.exports = ProductListEdit;
 
-},{"async":19,"react":375,"react-autocomplete":226}],459:[function(require,module,exports){
+},{"async":20,"react":605,"react-autocomplete":456}],696:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -71382,7 +93661,7 @@ var Scrollable = function (_React$Component) {
 
 module.exports = Scrollable;
 
-},{"react":375}],460:[function(require,module,exports){
+},{"react":605}],697:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -71629,7 +93908,7 @@ var Shipment = function (_React$Component) {
 
 module.exports = Shipment;
 
-},{"./Address.jsx":438,"./Item.jsx":449,"./Timestamp.jsx":463,"react":375}],461:[function(require,module,exports){
+},{"./Address.jsx":675,"./Item.jsx":686,"./Timestamp.jsx":700,"react":605}],698:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -71754,7 +94033,7 @@ var Tabs = function (_React$Component) {
 
 module.exports = Tabs;
 
-},{"fs":52,"react":375}],462:[function(require,module,exports){
+},{"fs":273,"react":605}],699:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -71796,7 +94075,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"react":375}],463:[function(require,module,exports){
+},{"react":605}],700:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -71835,7 +94114,7 @@ var Timestamp = function (_React$Component) {
 
 module.exports = Timestamp;
 
-},{"react":375}],464:[function(require,module,exports){
+},{"react":605}],701:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -71927,7 +94206,7 @@ var UserMenu = function (_React$Component) {
 
 module.exports = UserMenu;
 
-},{"./CartMenu.jsx":440,"./FacebookLogin.jsx":446,"./UserProfile.jsx":466,"react":375}],465:[function(require,module,exports){
+},{"./CartMenu.jsx":677,"./FacebookLogin.jsx":683,"./UserProfile.jsx":703,"react":605}],702:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -72025,7 +94304,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserProfile.jsx":466,"jwt-decode":152,"react":375}],466:[function(require,module,exports){
+},{"./UserProfile.jsx":703,"jwt-decode":381,"react":605}],703:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -72147,7 +94426,7 @@ var UserProfile = function (_React$Component) {
 
 module.exports = UserProfile;
 
-},{"bcryptjs":21,"react":375}],"BowAndDrape":[function(require,module,exports){
+},{"bcryptjs":22,"react":605}],"BowAndDrape":[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -72278,4 +94557,4 @@ module.exports = {
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":439,"./ComponentsEdit.jsx":444,"./Customizer.js":445,"./FulfillShipments.jsx":447,"./Items.jsx":450,"./LayoutBasic.jsx":451,"./LayoutMain.jsx":452,"./PageList.jsx":454,"./ProductList.jsx":457,"./UserPasswordReset.jsx":465,"events":108,"jwt-decode":152,"react":375,"react-dom":227}]},{},[]);
+},{"./Cart.jsx":676,"./ComponentsEdit.jsx":681,"./Customizer.js":682,"./FulfillShipments.jsx":684,"./Items.jsx":687,"./LayoutBasic.jsx":688,"./LayoutMain.jsx":689,"./PageList.jsx":691,"./ProductList.jsx":694,"./UserPasswordReset.jsx":702,"events":332,"jwt-decode":381,"react":605,"react-dom":457}]},{},[]);

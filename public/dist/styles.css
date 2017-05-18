@@ -96,6 +96,7 @@ input[type="password"]:focus {
   width: auto;
   border: 1px solid #000;
   background-color: #fff;
+  font-size: 12px;
 }
 .card .autocomplete {
   position: relative;

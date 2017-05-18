@@ -27,20 +27,19 @@ class CartMenu extends React.Component {
       } catch (err) {}
     }
     contents = contents || [];
-    this.setState({contents: contents});
-    this.updateCookie(contents);
+    this.update(contents);
   }
 
-  updateCookie(contents) {
+  update(contents) {
     window.localStorage.setItem("cart", JSON.stringify(contents));
+    this.setState({contents: contents});
     BowAndDrape.dispatcher.emit("update_cart", contents);
   }
 
   add(item) {
     let contents = this.state.contents;
     contents.unshift(item);
-    this.setState({contents});
-    this.updateCookie(contents);
+    this.update(contents);
     /* TODO maybe save this if logged in?
     BowAndDrape.api('POST', '/cart', item, (err, ret) => {});
     */
@@ -49,8 +48,7 @@ class CartMenu extends React.Component {
   remove(index) {
     let contents = this.state.contents;
     contents.splice(index, 1);
-    this.setState({contents});
-    this.updateCookie(contents);
+    this.update(contents);
   }
 
   render() {

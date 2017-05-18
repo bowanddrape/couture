@@ -1,5 +1,4 @@
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 const SQLTable = require('./SQLTable');
 const Item = require('./Item');
@@ -8,6 +7,9 @@ const Store = require('./Store');
 const Shipment = require('./Shipment');
 const Address = require('./Address');
 const Log = require('./Log');
+
+//const payment_method = require('./PayStripe.js');
+const payment_method = require('./PayBraintree.js');
 
 class Order {
 
@@ -26,7 +28,7 @@ class Order {
 
       let store_id = req.body.store_id;
       let email = req.body.email;
-      let stripe_token = req.body.stripe_token;
+      let payment_nonce = req.body.payment_nonce;
       let contents = new Item(req.body.contents);
       let address = new Address(req.body.address);
 
@@ -56,56 +58,38 @@ class Order {
 
       // figure out payment
       return Store.get(req.body.store_id, (err, store) => {
+        let payments = [];
+        let total_payments = 0;
         let total_price = 0;
         contents.recurseAssembly((component) => {
           if (component.props.price)
-            total_price += component.props.price;
+            total_price += parseFloat(component.props.price);
         });
 
-        let payments = [];
-        let total_payments = 0;
+        // if this is a store that we've already billed, just label as paid
         if (store.props.kiosk) {
           payments.push({type:"kiosk",price:total_price});
           total_payments += total_price;
         }
 
+        // if it ain't free, charge for it
         if (total_price > total_payments) {
-          // charge stripe
-          return stripe.charges.create({
-            amount: (total_price - total_payments),
-            currency: "usd",
-            source: stripe_token,
-            description: "Charge for "+email
-          }, (err, charge) => {
-            if (err) {
-              return res.status(403).json({error: "Could not process credit transaction! "+err.message}).end();
-            }
-            if (!charge.paid) {
-              return res.status(403).json({error: "Credit transaction denied "+charge.outcome.reason}).end();
-            }
-
+          // process payment
+          payment_method.charge(payment_nonce, total_price-total_payments, (err, charge) => {
+            if (err)
+              return res.status(403).json({error: err}).end();
             // update payments, then save shipment
-            payments.push({type: "stripe", price: charge.amount});
+            payments.push({type: charge.type, price: charge.amount});
             shipment.payments = payments;
             shipment.upsert((err)=> {
               if (err)
                 return res.status(500).json({error: "Could not save shipment info"}).end();
-
-              Log.message(email+ " purchased "+total_price+" with stripe");
-
+              // log that a purchase was made
+              console.log(email+ " purchased $"+total_price+" with "+charge.type);
               res.json({ok: "ok"}).end();
-            });
-          }); // stripe charge
+            }); // shipment.upsert()
+          }); // payment_method.charge()
         }
-
-        shipment.payments = payments;
-        shipment.upsert((err)=> {
-          if (err)
-            return res.status(500).json({error: "Could not save shipment info"}).end();
-          Log.message(email+ " purchased "+total_price+" (prepaid)");
-
-          res.json({ok: "ok"}).end();
-        });
       }); // get store
     }
     res.json({error: "invalid endpoint"}).end();

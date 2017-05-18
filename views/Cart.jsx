@@ -3,7 +3,9 @@ const React = require('react');
 const InputAddress = require('./InputAddress.jsx');
 const Items = require('./Items.jsx');
 const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
-const PayStripe = require('./PayStripe.js');
+
+//const payment_method_client = require('./PayStripeClient.js');
+const payment_method_client = require('./PayBraintreeClient.js');
 
 class Cart extends React.Component {
   constructor(props) {
@@ -49,6 +51,25 @@ class Cart extends React.Component {
     if (!this.props.store[0].id) {
       this.state.errors.push(<div>Config Error: Store not set</div>);
     }
+  }
+
+  static preprocessProps(options, callback) {
+    // TODO select payment method
+    //const payment_method = require('../models/PayStripe.js');
+    const payment_method = require('../models/PayBraintree.js');
+
+    // get braintree client token
+    if (payment_method.getClientAuthorization) {
+      return payment_method.getClientAuthorization((err, payment_authorization) => {
+        if (err) {
+          console.log(err)
+        }
+        options.payment_authorization = payment_authorization;
+        callback(err, options);
+      });
+    }
+
+    callback(null, options);
   }
 
   componentDidMount() {
@@ -138,26 +159,24 @@ class Cart extends React.Component {
       return this.setState({processing_payment:false});
     }
 
-    // TODO select payment method
-    let payment_method = PayStripe;
-    payment_method.pay(this.state, (status, response) => {
-      if (response.error) {
+    payment_method_client.getClientNonce(this.props.payment_authorization, this.state, (err, payment_nonce) => {
+      if (err) {
         this.setState({processing_payment:false});
-        this.handleSetSectionState("card", {errors: [response.error.message]});
+        this.handleSetSectionState("card", {errors: [err]});
         return;
       }
       let payload = {
         store_id: this.props.store[0].id,
         email: this.state.shipping.email,
         contents: this.refs.Items.state.contents,
-        stripe_token: response.id,
+        payment_nonce: payment_nonce,
         address: this.state.shipping,
       }
       BowAndDrape.api("POST", "/order", payload, (err, resp) => {
         if (err) {
           return this.handleSetSectionState("card", {errors: [err.error]});
         }
-        console.log(resp);
+        BowAndDrape.cart_menu.update([]);
         this.setState({done:true});
       });
     });
