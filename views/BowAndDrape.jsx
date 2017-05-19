@@ -100,6 +100,7 @@ module.exports = {
     FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),
     Cart: require('./Cart.jsx'),
+    Placeholder: require('./Placeholder.jsx'),
     PageList: require('./PageList.jsx'),
     Items: require('./Items.jsx'),
     ComponentsEdit: require('./ComponentsEdit.jsx'),
