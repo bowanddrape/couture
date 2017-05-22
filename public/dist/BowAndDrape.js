@@ -93972,33 +93972,48 @@ var Stroke = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      var object = document.createElement("object");
+      if (this.object) return;
 
-      for (var rule in this.props.style) {
+      // create a new embedded svg, NEEDED for webkit as if you reuse an existing
+      // element, as it will not fire the onload event
+      this.object = document.createElement("object");
+      var object = this.object;
+
+      // apply inline styles
+      for (var rule in this.props.style || {}) {
         object.style[rule] = this.props.style[rule];
       }
       object.style.opacity = 0;
       this.refs.div.appendChild(object);
 
+      // once the svg is loaded, set up our css
       object.onload = function () {
+        // compute the longest path. Try to keep disconnected svg segments in
+        // different paths (shft+ctrl+k in inkscape)
         var max_length = 0;
         object.contentDocument.querySelectorAll("path").forEach(function (path) {
           max_length = Math.max(max_length, path.getTotalLength());
         });
 
+        // the animated stroke works by setting a dash that is the length of the
+        // longest path, then offsetting it so nothing is visible, then animating
+        // it back to 0 offset
         var style = object.contentDocument.createElementNS("http://www.w3.org/2000/svg", "style");
-        style.innerHTML = "\n        path {\n          stroke-dasharray: " + max_length + " !important;\n          stroke-dashoffset: -" + max_length + " !important;\n        }\n        svg.drawn path {\n          stroke-dashoffset: 0 !important;\n          transition: stroke-dashoffset 3s cubic-bezier(0,.08,.04,.98);\n        }\n      ";
+        style.innerHTML = "\n        path {\n          stroke-dasharray: " + max_length + " !important;\n          stroke-dashoffset: -" + max_length + " !important;\n        }\n        svg.drawn path {\n          stroke-dashoffset: 0 !important;\n          transition: stroke-dashoffset " + (_this2.props.duration || 3) + "s cubic-bezier(0,.08,.04,.98);\n        }\n      ";
 
+        // scaling svgs seems to be dumb, I guess I need to scale it myself?
         var svg = object.contentDocument.querySelector("svg");
-        if (!_this2.svg_width) _this2.svg_width = svg.getAttribute("width");
-        //let svg_height = svg.getAttribute("height");
-        //svg.removeAttribute("width");
-        //svg.removeAttribute("height");
-        var scale = object.offsetWidth / _this2.svg_width;
+        // find out how much we need to scale the svg by
+        if (!_this2.scale) {
+          var svg_width = svg.getAttribute("width");
+          var svg_height = svg.getAttribute("height");
+          _this2.scale = Math.min(object.offsetWidth / svg_width, object.offsetHeight / svg_height);
+        }
         svg.querySelectorAll("path").forEach(function (path) {
-          path.setAttribute("transform", "scale(" + scale + ")");
+          path.setAttribute("transform", "scale(" + _this2.scale + ")");
         });
         svg.appendChild(style);
+        // make it visible now that it's ready to rock
         object.style.opacity = 1;
 
         // apparently needs to wait for the styles we appended to apply
@@ -94007,6 +94022,11 @@ var Stroke = function (_React$Component) {
         }, 10);
       };
       object.data = "/logo_stroke.svg";
+    }
+  }, {
+    key: "setVisible",
+    value: function setVisible() {
+      object.contentDocument.querySelector("svg").classList.add("drawn");
     }
   }, {
     key: "render",

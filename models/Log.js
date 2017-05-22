@@ -1,9 +1,47 @@
 
 const os = require('os');
 const https = require('https');
+const EventEmitter = require('events');
+let listen = new EventEmitter();
+
+const username = "couture_"+os.hostname();
+const regex_username = new RegExp(`@${username}`);
+
+const slack = require('slack')
+const slackbot = slack.rtm.client();
+slackbot.started((reconnect) => {
+  // TODO handle errors and reconnect
+  //slackbot.ws.[how does this detect errors?];
+});
+slackbot.message((message) => {
+  // ignore messages from bots
+  if (message.subtype=="bot_message") return;
+  // ignore messages that didn't have an @mention of us
+  if (!regex_username.test(message.text)) return;
+  // send to event dispatcher
+  listen.emit("message", message.text);
+});
+const token = process.env.SLACK_TOKEN;
+slackbot.listen({token});
+
 
 class Log {
-  static message(msg) {
+
+  static message(msg, callback) {
+    callback = callback || function(err){
+      if (err) console.info(err);
+    };
+    slack.chat.postMessage({
+      token,
+      as_user: false,
+      username,
+      channel: "#technology",
+      icon_emoji: ":moneybag:",
+      text: msg,
+    }, callback);
+  }
+
+  static slackWebhookMessage(msg) {
     // TODO we NEED ratelimiting here or we risk disabling the slack webhook
     let slack_notify = https.request({
         protocol: 'https:',
@@ -15,11 +53,15 @@ class Log {
     slack_notify.on('error', function(err) {console.info(err);});
     slack_notify.end(JSON.stringify({
       as_user: false,
-      username: "couture "+os.hostname(),
+      username,
       icon_emoji: ":moneybag:",
       text: msg,
     }));
   }
 }
+
+Log.username = username;
+Log.slackbot = slackbot;
+Log.listen = listen;
 module.exports = Log;
 

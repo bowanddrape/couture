@@ -75,6 +75,7 @@ const LayoutMain = require('./views/LayoutMain');
 const BowAndDrape = require('./views/BowAndDrape.jsx');
 
 const Placeholder = require('./views/Placeholder.jsx');
+const SpreadsheetEmails = require('./models/SpreadsheetEmails.js');
 
 Facility.initMandatory([
     "customer_ship",
@@ -142,6 +143,7 @@ app.use(Store.handleHTTP);
 app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Page().handleHTTP(req, res, next);});
+app.use((req, res, next) => {new SpreadsheetEmails().handleHTTP(req, res, next);});
 
 // handle pages
 app.use(Page.handleRenderPage);
