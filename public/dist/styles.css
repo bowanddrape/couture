@@ -244,12 +244,14 @@ customize product_options {
 customize product_options select {
   font-size: 35px;
 }
+customize switch {
+  margin-bottom: 20px;
+}
 customize .canvas_container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   max-width: 100%;
-  margin-bottom: 270px;
   overflow: hidden;
 }
 customize .canvas_container canvas {
@@ -258,6 +260,9 @@ customize .canvas_container canvas {
   background-position: center;
   background-repeat: no-repeat;
   max-height: 100%;
+}
+customize .component_spacer {
+  height: 270px;
 }
 customize tabs.components {
   position: fixed;

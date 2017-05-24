@@ -12,12 +12,14 @@ customize {
       font-size: 35px;
     }
   }
+  switch {
+    margin-bottom: 20px;
+  }
   .canvas_container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 100%;
-    margin-bottom:(@customize_emoji_key_height + @customize_emoji_key_margin * 2) * 4 + 15px + 55px;
     overflow: hidden;
 
     canvas {
@@ -28,6 +30,9 @@ customize {
       max-height: 100%;
     }
   }
+  .component_spacer {
+    height: (@customize_emoji_key_height + @customize_emoji_key_margin * 2) * 4 + 15px + 55px;
+  }
   tabs.components {
     position: fixed;
     height: (@customize_emoji_key_height + @customize_emoji_key_margin * 2) * 4 + 15px + 55px;
@@ -35,6 +40,7 @@ customize {
     left: 0;
     right: 0;
   }
+
   .component_container {
     display: flex;
     flex-direction: column;

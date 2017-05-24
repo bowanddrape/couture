@@ -7,6 +7,7 @@ const ProductCanvas = require('./ProductCanvas.jsx');
 const ProductListEdit = require('./ProductListEdit.jsx');
 const ComponentEdit = require('./ComponentEdit.jsx');
 const Tabs = require('./Tabs.jsx');
+const Switch = require('./Switch.jsx');
 const ComponentSerializer = require('./ComponentSerializer.js');
 
 class ProductList extends React.Component {
@@ -138,6 +139,7 @@ class ProductList extends React.Component {
           </product_options>
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
         </div>
+        <div className="component_spacer"/>
         <Tabs className="components">
           {components}
         </Tabs>
@@ -145,7 +147,7 @@ class ProductList extends React.Component {
     );
   }
 
-  handleOptionChange(value, depth) {
+  handleOptionChange(depth, value) {
     let selected_product = this.state.selected_product;
     selected_product[depth] = value;
     let product = this.state.product_map[this.state.selected_product[0]];
@@ -227,7 +229,7 @@ class ProductList extends React.Component {
   renderProductList() {
     let products = [];
     this.props.store.products.forEach((product) => {
-      products.push(<a className="card" onClick={(event)=>{this.handleOptionChange(product.sku, 0)}} key={products.length} style={{backgroundImage:`url(${product.props.image})`}}>
+      products.push(<a className="card" onClick={(event)=>{this.handleOptionChange(0, product.sku)}} key={products.length} style={{backgroundImage:`url(${product.props.image})`}}>
         <label>{product.props.name}</label>
         <price>${product.props.price}</price>
       </a>);
@@ -259,10 +261,10 @@ class ProductList extends React.Component {
     });
     if (options.length) {
       product_options.push(
-        <select onChange={(event)=>{this.handleOptionChange(event.target.value, 0)}} value={this.state.selected_product[0]} key={Math.random()}>{options}</select>
-      )
+        <Switch onChange={(value)=>{this.handleOptionChange(0, value)}} value={this.state.selected_product[0]} key={product_options.length}>{options}</Switch>
+      );
     }
-    
+
     // recurse to fill out option menus
     let traverse_options = (option_product, depth=1) => {
       // TODO FIXME when not in edit mode, we need to set state.selected_product to the default selected options here
@@ -292,11 +294,12 @@ class ProductList extends React.Component {
         selected_option = available_options[0];
       // populate options
       for (let i=0; i<available_options.length; i++) {
-        options.push(<option key={options.length}>{available_options[i]}</option>);
+        options.push(<option key={options.length} value={available_options[i]}>{available_options[i]}</option>);
       };
       if (options.length) {
         product_options.push(
-          <select onChange={(event)=>{this.handleOptionChange(event.target.value, depth)}} key={Math.random()} value={selected_option}>{options}</select>
+//          <select onChange={(event)=>{this.handleOptionChange(depth, event.target.value)}} key={Math.random()} value={selected_option}>{options}</select>
+  <Switch onChange={(value)=>{this.handleOptionChange(depth, value)}} value={selected_option} key={product_options.length}>{options}</Switch>
         )
       }
       if (selected_option=="no option selected") {

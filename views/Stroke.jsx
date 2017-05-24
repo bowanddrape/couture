@@ -36,12 +36,12 @@ class Stroke extends React.Component {
       let style = object.contentDocument.createElementNS("http://www.w3.org/2000/svg", "style");
       style.innerHTML = `
         path {
-          stroke-dasharray: ${max_length} !important;
-          stroke-dashoffset: -${max_length} !important;
+          stroke-dasharray: ${max_length}, ${max_length} !important;
+          stroke-dashoffset: ${max_length} !important;
         }
         svg.drawn path {
           stroke-dashoffset: 0 !important;
-          transition: stroke-dashoffset ${this.props.duration||3}s cubic-bezier(0,.08,.04,.98);
+          transition: stroke-dashoffset ${this.props.duration||3}s linear;
         }
       `;
 
@@ -60,16 +60,23 @@ class Stroke extends React.Component {
       // make it visible now that it's ready to rock
       object.style.opacity = 1;
 
-      // apparently needs to wait for the styles we appended to apply
-      setTimeout(()=>{
-        object.contentDocument.querySelector("svg").classList.add("drawn");
-      }, 10);
+      // optionally draw as soon as we can
+      if (this.props.draw_loaded)
+        this.object.contentDocument.querySelector("svg").classList.add("drawn");
+      if (this.set_visible || this.props.draw_on_load) {
+        this.setVisible();
+      }
     }
-    object.data = "/logo_stroke.svg";
+    object.data = this.props.data || "/logo_stroke.svg";
   }
 
   setVisible() {
-        object.contentDocument.querySelector("svg").classList.add("drawn");
+    // if not loaded yet, draw at next chance
+    this.set_visible = true;
+    // FIXME I have a hard-coded delay in here to wait for it to finish transitioning to the not-drawn state before we animate drawing it
+    setTimeout(()=>{
+      this.object.contentDocument.querySelector("svg").classList.add("drawn");
+    }, 10);
   }
 
   render() {

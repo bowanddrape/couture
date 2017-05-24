@@ -90711,7 +90711,7 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 }).call(this,require('_process'))
-},{"../models/PayBraintree.js":2,"./InputAddress.jsx":685,"./Items.jsx":687,"./PayBraintreeClient.js":692,"./ThanksPurchaseComplete.jsx":701,"_process":443,"react":605}],677:[function(require,module,exports){
+},{"../models/PayBraintree.js":2,"./InputAddress.jsx":685,"./Items.jsx":687,"./PayBraintreeClient.js":692,"./ThanksPurchaseComplete.jsx":702,"_process":443,"react":605}],677:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -91805,7 +91805,7 @@ var FacebookLogin = function (_React$Component) {
 
 module.exports = FacebookLogin;
 
-},{"./UserProfile.jsx":705,"https":369,"react":605}],684:[function(require,module,exports){
+},{"./UserProfile.jsx":706,"https":369,"react":605}],684:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -91926,7 +91926,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./Scrollable.jsx":697,"./Shipment.jsx":698,"./Tabs.jsx":700,"react":605}],685:[function(require,module,exports){
+},{"./Scrollable.jsx":697,"./Shipment.jsx":698,"./Tabs.jsx":701,"react":605}],685:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -92493,7 +92493,7 @@ var LayoutMain = function (_React$Component) {
 
 module.exports = LayoutMain;
 
-},{"./UserMenu.jsx":703,"react":605,"react-dom/server":458,"react-swipeable":459}],690:[function(require,module,exports){
+},{"./UserMenu.jsx":704,"react":605,"react-dom/server":458,"react-swipeable":459}],690:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -92767,7 +92767,7 @@ var Placeholder = function (_React$Component) {
   _createClass(Placeholder, [{
     key: 'render',
     value: function render() {
-      return React.createElement("content", {}, React.createElement(Stroke, { src: "/logo_stroke.svg", style: { display: "block", width: "600px", maxWidth: "100%" } }));
+      return React.createElement("content", {}, React.createElement(Stroke, { data: "/logo_stroke.svg", style: { display: "block", width: "600px", maxWidth: "100%" }, draw_on_load: true }));
     }
   }]);
 
@@ -92972,6 +92972,7 @@ var ProductCanvas = require('./ProductCanvas.jsx');
 var ProductListEdit = require('./ProductListEdit.jsx');
 var ComponentEdit = require('./ComponentEdit.jsx');
 var Tabs = require('./Tabs.jsx');
+var Switch = require('./Switch.jsx');
 var ComponentSerializer = require('./ComponentSerializer.js');
 
 var ProductList = function (_React$Component) {
@@ -93082,6 +93083,7 @@ var ProductList = function (_React$Component) {
           ),
           React.createElement(ProductCanvas, { ref: 'ProductCanvas', product: product, handleUpdateProduct: this.handleUpdateProduct.bind(this), assembly: this.initial_assembly })
         ),
+        React.createElement('div', { className: 'component_spacer' }),
         React.createElement(
           Tabs,
           { className: 'components' },
@@ -93091,7 +93093,7 @@ var ProductList = function (_React$Component) {
     }
   }, {
     key: 'handleOptionChange',
-    value: function handleOptionChange(value, depth) {
+    value: function handleOptionChange(depth, value) {
       var selected_product = this.state.selected_product;
       selected_product[depth] = value;
       var product = this.state.product_map[this.state.selected_product[0]];
@@ -93185,7 +93187,7 @@ var ProductList = function (_React$Component) {
         products.push(React.createElement(
           'a',
           { className: 'card', onClick: function onClick(event) {
-              _this3.handleOptionChange(product.sku, 0);
+              _this3.handleOptionChange(0, product.sku);
             }, key: products.length, style: { backgroundImage: 'url(' + product.props.image + ')' } },
           React.createElement(
             'label',
@@ -93236,10 +93238,10 @@ var ProductList = function (_React$Component) {
       });
       if (options.length) {
         product_options.push(React.createElement(
-          'select',
-          { onChange: function onChange(event) {
-              _this4.handleOptionChange(event.target.value, 0);
-            }, value: this.state.selected_product[0], key: Math.random() },
+          Switch,
+          { onChange: function onChange(value) {
+              _this4.handleOptionChange(0, value);
+            }, value: this.state.selected_product[0], key: product_options.length },
           options
         ));
       }
@@ -93273,16 +93275,18 @@ var ProductList = function (_React$Component) {
         for (var _i2 = 0; _i2 < available_options.length; _i2++) {
           options.push(React.createElement(
             'option',
-            { key: options.length },
+            { key: options.length, value: available_options[_i2] },
             available_options[_i2]
           ));
         };
         if (options.length) {
-          product_options.push(React.createElement(
-            'select',
-            { onChange: function onChange(event) {
-                _this4.handleOptionChange(event.target.value, depth);
-              }, key: Math.random(), value: selected_option },
+          product_options.push(
+          //          <select onChange={(event)=>{this.handleOptionChange(depth, event.target.value)}} key={Math.random()} value={selected_option}>{options}</select>
+          React.createElement(
+            Switch,
+            { onChange: function onChange(value) {
+                _this4.handleOptionChange(depth, value);
+              }, value: selected_option, key: product_options.length },
             options
           ));
         }
@@ -93484,7 +93488,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ComponentEdit.jsx":679,"./ComponentSerializer.js":680,"./ProductCanvas.jsx":694,"./ProductListEdit.jsx":696,"./Tabs.jsx":700,"async":20,"querystring":454,"react":605}],696:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ComponentEdit.jsx":679,"./ComponentSerializer.js":680,"./ProductCanvas.jsx":694,"./ProductListEdit.jsx":696,"./Switch.jsx":700,"./Tabs.jsx":701,"async":20,"querystring":454,"react":605}],696:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -93945,7 +93949,7 @@ var Shipment = function (_React$Component) {
 
 module.exports = Shipment;
 
-},{"./Address.jsx":675,"./Item.jsx":686,"./Timestamp.jsx":702,"react":605}],699:[function(require,module,exports){
+},{"./Address.jsx":675,"./Item.jsx":686,"./Timestamp.jsx":703,"react":605}],699:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -93999,7 +94003,7 @@ var Stroke = function (_React$Component) {
         // longest path, then offsetting it so nothing is visible, then animating
         // it back to 0 offset
         var style = object.contentDocument.createElementNS("http://www.w3.org/2000/svg", "style");
-        style.innerHTML = "\n        path {\n          stroke-dasharray: " + max_length + " !important;\n          stroke-dashoffset: -" + max_length + " !important;\n        }\n        svg.drawn path {\n          stroke-dashoffset: 0 !important;\n          transition: stroke-dashoffset " + (_this2.props.duration || 3) + "s cubic-bezier(0,.08,.04,.98);\n        }\n      ";
+        style.innerHTML = "\n        path {\n          stroke-dasharray: " + max_length + ", " + max_length + " !important;\n          stroke-dashoffset: " + max_length + " !important;\n        }\n        svg.drawn path {\n          stroke-dashoffset: 0 !important;\n          transition: stroke-dashoffset " + (_this2.props.duration || 3) + "s linear;\n        }\n      ";
 
         // scaling svgs seems to be dumb, I guess I need to scale it myself?
         var svg = object.contentDocument.querySelector("svg");
@@ -94016,17 +94020,25 @@ var Stroke = function (_React$Component) {
         // make it visible now that it's ready to rock
         object.style.opacity = 1;
 
-        // apparently needs to wait for the styles we appended to apply
-        setTimeout(function () {
-          object.contentDocument.querySelector("svg").classList.add("drawn");
-        }, 10);
+        // optionally draw as soon as we can
+        if (_this2.props.draw_loaded) _this2.object.contentDocument.querySelector("svg").classList.add("drawn");
+        if (_this2.set_visible || _this2.props.draw_on_load) {
+          _this2.setVisible();
+        }
       };
-      object.data = "/logo_stroke.svg";
+      object.data = this.props.data || "/logo_stroke.svg";
     }
   }, {
     key: "setVisible",
     value: function setVisible() {
-      object.contentDocument.querySelector("svg").classList.add("drawn");
+      var _this3 = this;
+
+      // if not loaded yet, draw at next chance
+      this.set_visible = true;
+      // apparently needs to wait for the styles we appended to apply
+      setTimeout(function () {
+        _this3.object.contentDocument.querySelector("svg").classList.add("drawn");
+      }, 10);
     }
   }, {
     key: "render",
@@ -94041,6 +94053,85 @@ var Stroke = function (_React$Component) {
 module.exports = Stroke;
 
 },{"react":605}],700:[function(require,module,exports){
+'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+var Stroke = require('./Stroke.jsx');
+
+var Switch = function (_React$Component) {
+  _inherits(Switch, _React$Component);
+
+  function Switch(props) {
+    _classCallCheck(this, Switch);
+
+    var _this = _possibleConstructorReturn(this, (Switch.__proto__ || Object.getPrototypeOf(Switch)).call(this, props));
+
+    _this.stroke = React.createElement(Stroke, { data: '/flower_stroke.svg', style: { zIndex: "-1", width: "300px", height: "100px", position: "absolute", top: "-30px", left: "-30px" }, draw_loaded: true, duration: 5 });
+    return _this;
+  }
+
+  _createClass(Switch, [{
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      var options = [];
+      var children = React.Children.toArray(this.props.children);
+
+      var _loop = function _loop(index) {
+        var child = children[index];
+        if (child.type != "option") return 'continue';
+        options.push(React.createElement(
+          'switch_option',
+          _extends({ ref: index, key: index }, child.props, { style: { position: "relative", margin: "0 10px", color: _this2.props.value == child.props.value ? "#000" : "#f7afc9" }, onClick: function onClick() {
+              console.log(child.props.value);_this2.props.onChange(child.props.value);
+            } }),
+          React.createElement(
+            'div',
+            { style: { textAlign: "center", width: "160px" } },
+            child.props.children
+          ),
+          child.props.value == _this2.props.value ? React.createElement(Stroke, { data: '/select_stroke.svg', style: { zIndex: "-1", width: "200px", height: "100px", position: "absolute", top: "-28px", left: "-20px" }, draw_on_load: true, duration: 1 }) : null
+        ));
+      };
+
+      for (var index = 0; index < children.length; index++) {
+        var _ret = _loop(index);
+
+        if (_ret === 'continue') continue;
+      }
+      return React.createElement(
+        'switch',
+        { style: styles.switch },
+        options
+      );
+    }
+  }]);
+
+  return Switch;
+}(React.Component);
+
+var styles = {
+  switch: {
+    display: "flex",
+    flexFlow: "row wrap"
+  },
+  option: {}
+};
+
+module.exports = Switch;
+
+},{"./Stroke.jsx":699,"react":605}],701:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94166,7 +94257,7 @@ var Tabs = function (_React$Component) {
 
 module.exports = Tabs;
 
-},{"fs":273,"react":605}],701:[function(require,module,exports){
+},{"fs":273,"react":605}],702:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94208,7 +94299,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"react":605}],702:[function(require,module,exports){
+},{"react":605}],703:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94247,7 +94338,7 @@ var Timestamp = function (_React$Component) {
 
 module.exports = Timestamp;
 
-},{"react":605}],703:[function(require,module,exports){
+},{"react":605}],704:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -94339,7 +94430,7 @@ var UserMenu = function (_React$Component) {
 
 module.exports = UserMenu;
 
-},{"./CartMenu.jsx":677,"./FacebookLogin.jsx":683,"./UserProfile.jsx":705,"react":605}],704:[function(require,module,exports){
+},{"./CartMenu.jsx":677,"./FacebookLogin.jsx":683,"./UserProfile.jsx":706,"react":605}],705:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94437,7 +94528,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserProfile.jsx":705,"jwt-decode":381,"react":605}],705:[function(require,module,exports){
+},{"./UserProfile.jsx":706,"jwt-decode":381,"react":605}],706:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94691,4 +94782,4 @@ module.exports = {
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":676,"./ComponentsEdit.jsx":681,"./Customizer.js":682,"./FulfillShipments.jsx":684,"./Items.jsx":687,"./LayoutBasic.jsx":688,"./LayoutMain.jsx":689,"./PageList.jsx":691,"./Placeholder.jsx":693,"./ProductList.jsx":695,"./UserPasswordReset.jsx":704,"events":332,"jwt-decode":381,"react":605,"react-dom":457}]},{},[]);
+},{"./Cart.jsx":676,"./ComponentsEdit.jsx":681,"./Customizer.js":682,"./FulfillShipments.jsx":684,"./Items.jsx":687,"./LayoutBasic.jsx":688,"./LayoutMain.jsx":689,"./PageList.jsx":691,"./Placeholder.jsx":693,"./ProductList.jsx":695,"./UserPasswordReset.jsx":705,"events":332,"jwt-decode":381,"react":605,"react-dom":457}]},{},[]);
