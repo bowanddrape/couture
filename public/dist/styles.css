@@ -4,21 +4,21 @@
 }
 .bodyfont {
   font-family: "Open Sans", Arial, sans-serif;
-  color: #000;
+  color: #000000;
 }
 .headerfont {
   font-family: "Zurich-Condensed-Bold", sans-serif;
-  color: #000;
+  color: #000000;
 }
 button,
 .button {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   display: block;
-  background-color: #fff;
-  color: #000;
+  background-color: #ffffff;
+  color: #000000;
   font-weight: bold;
   font-size: 20px;
-  border: solid 5px #000;
+  border: solid 5px #000000;
   padding: 5px;
   text-align: center;
   text-decoration: none;
@@ -29,22 +29,22 @@ button,
 }
 button:hover,
 .button:hover {
-  background-color: #000;
-  color: #fff;
+  background-color: #000000;
+  color: #ffffff;
 }
 actions {
   display: flex;
 }
 errors {
-  color: #fff;
-  background-color: #a00;
+  color: #ffffff;
+  background-color: #aa0000;
   padding: 5px;
   border-radius: 5px;
   display: block;
 }
 input.error {
-  box-shadow: 0 0 10px #a00;
-  color: #a00;
+  box-shadow: 0 0 10px #aa0000;
+  color: #aa0000;
 }
 input[type="text"],
 input[type="password"] {
@@ -94,8 +94,8 @@ input[type="password"]:focus {
   display: inline-block;
   padding: 7px;
   width: auto;
-  border: 1px solid #000;
-  background-color: #fff;
+  border: 1px solid #000000;
+  background-color: #ffffff;
   font-size: 12px;
 }
 .card .autocomplete {
@@ -172,7 +172,7 @@ shipment:last-child {
 }
 .timestamp {
   display: inline-block;
-  color: #000;
+  color: #000000;
   opacity: 0.5;
   width: 180px;
 }
@@ -185,7 +185,7 @@ item {
   border-bottom: none;
 }
 item:last-of-type {
-  border-bottom: solid 1px #000;
+  border-bottom: solid 1px #000000;
 }
 item preview {
   display: none;
@@ -208,7 +208,7 @@ item deets {
   margin-right: 10px;
 }
 item deets * {
-  color: #000;
+  color: #000000;
   float: left;
   display: inline-block;
 }
@@ -230,7 +230,7 @@ item deets .remove {
   font-size: 15px;
 }
 item deets .remove:hover {
-  color: #000;
+  color: #000000;
 }
 item deets .remove.confirm {
   background-color: #ff5c5c;
@@ -517,12 +517,12 @@ component_edit input[type="text"][name="props_name"] {
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
-  color: #000;
+  color: #000000;
 }
 menu {
   position: fixed;
   top: 0;
-  border-left: solid 1px #000;
+  border-left: solid 1px #000000;
   height: 100%;
   background-color: #c79e6a;
   margin: 0;
@@ -532,7 +532,7 @@ menu {
 }
 menu user {
   display: block;
-  color: #fff;
+  color: #ffffff;
   margin-left: 55px;
   margin-bottom: 15px;
 }
@@ -545,7 +545,7 @@ menu user img {
   width: 53px;
   height: 53px;
   border-radius: 5px;
-  border: solid 2px #fff;
+  border: solid 2px #ffffff;
   position: absolute;
   width: 50px;
   height: 50px;
@@ -554,7 +554,7 @@ menu user img {
 menu login msg {
   display: block;
   font-size: 20px;
-  color: #a00;
+  color: #aa0000;
 }
 menu handle {
   background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
@@ -570,14 +570,14 @@ menu handle {
   left: -30px;
   width: 30px;
   height: 34px;
-  border: solid 1px #000;
+  border: solid 1px #000000;
   border-right: none;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
 }
 menu a {
   font-family: "Zurich-Condensed-Bold", sans-serif;
-  color: #000;
+  color: #000000;
   display: block;
   padding: 5px;
   margin-bottom: 10px;
@@ -591,7 +591,7 @@ menu a cart_bug {
   top: -9px;
   padding: 0px 10px;
   border-radius: 500px;
-  background-color: #fff;
+  background-color: #ffffff;
   font-size: 16px;
   right: -9px;
 }
