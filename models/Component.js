@@ -7,7 +7,7 @@ const ComponentsEdit = require('../views/ComponentsEdit.jsx');
 
 const inherited_props = ['name', 'image', 'price', 'imagewidth', 'imageheight', 'weight'];
 
-/*
+/***
 This is a bit weird and super ad-hoc...
 Component can either refer to a line-item in a BoM, invoice, or a product or a product family. Here are some examples (TODO these should be unit tests instead)
   let bom_component = {sku:"whatever", props{what:"ever"}, quantity: 1};
@@ -23,7 +23,7 @@ Component can either refer to a line-item in a BoM, invoice, or a product or a p
       biggie: {sku:"family_shade_biggie",props:{}},
     }}
   }};
-*/
+***/
 class Component extends JSONAPI {
   constructor(object) {
     super();

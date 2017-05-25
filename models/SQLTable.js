@@ -12,7 +12,6 @@ let pg_read_pool = new pg.Pool({
   idleTimeoutMillis: 1000,
 });
 pg_read_pool.on('error', function (err, client) {
-  // TODO escalate this
   console.error('pg client error', err.message, err.stack)
 })
 
@@ -26,12 +25,23 @@ let pg_write_pool = new pg.Pool({
   idleTimeoutMillis: 1000,
 });
 pg_write_pool.on('error', function (err, client) {
-  // TODO escalate this
   console.error('pg client error', err.message, err.stack)
 })
 
 
+/***
+Base class for objects based around a table in the db
 
+Classes extending this one MUST implement the function
+  static getSQLSettings() {
+    return {
+      tablename: "", // name of table (or relation)
+      pkey: "", // primary key //TODO allow multiple pkeys
+      fields: [] // array of fields
+    };
+  }
+but then gain access to the functions get(), getAll(), upsert(), and remove()
+***/
 class SQLTable {
 
   // run a query, optionally returning an array of the provided model
@@ -57,9 +67,9 @@ class SQLTable {
         return callback(null, result);
       }); // query
     }); // db connection
-  } // sqlQuery
+  } // sqlQuery()
 
-  // run a write statement, in the future this will go to master, where
+  // run a write statement, this will go to master, where
   // as the sqlQuery function will go to a read replica
   static sqlExec(query, values, callback) {
     pg_write_pool.connect(function(err, client, done) {
@@ -94,7 +104,10 @@ class SQLTable {
     });
   }
 
-  // helper function to build a query statement from an object
+  // query db for all objects matching the constraints query object
+  // constraints can have all the normal fields specified in getSQLSettings(),
+  // but also can specify page:{limit:#,sort:"ASC|DESC",start:#} or 
+  // search:"" which does a string search
   static getAll(constraints, callback) {
     if (!this.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.getSQLSettings();
@@ -159,8 +172,9 @@ class SQLTable {
       if (err || !result.length) return callback(err, []);
       return callback(null, result);
     });
-  }
+  } // getAll()
 
+  // update or insert if row not already existing
   upsert(callback) {
     if (!this.constructor.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.constructor.getSQLSettings();

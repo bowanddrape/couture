@@ -2,6 +2,11 @@
 
 const React = require('react');
 
+/***
+Use this layout when rendering an email
+props:
+  content_string // body of email
+***/
 class LayoutEmail extends React.Component {
   constructor(props) {
     super(props);

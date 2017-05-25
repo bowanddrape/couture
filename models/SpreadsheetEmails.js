@@ -3,6 +3,9 @@ const GoogleSheets = require('./GoogleSheets.js');
 
 const spreadsheet_id_emails = '1Fx2iZxXQqkIQboRXHz5y3ZI6bxKFRCGbCrRl277a_zQ';
 
+/***
+Handle requests to "/spreadsheetemails/new" for legacy email collection
+***/
 class SpreadsheetEmails {
   constructor() {
     this.sheets = new GoogleSheets(spreadsheet_id_emails);

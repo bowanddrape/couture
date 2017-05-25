@@ -4,6 +4,9 @@ const SylvestorGlUtils = require('sylvester-es6');
 const Matrix = SylvestorGlUtils.Matrix;
 const Vector = SylvestorGlUtils.Vector;
 
+/***
+Describe a component for the Customizer to draw
+***/
 class Component {
   constructor() {
     this.bounds = {

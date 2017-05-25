@@ -10,6 +10,14 @@ const Tabs = require('./Tabs.jsx');
 const Switch = require('./Switch.jsx');
 const ComponentSerializer = require('./ComponentSerializer.js');
 
+/***
+Draws List of products available in a store.
+Also draws product options and product customizer
+props:
+  store:{} // store object
+  c:"" // serialized customization string (from ComponentSerializer)
+  edit:? // are we an admin making changes?
+***/
 class ProductList extends React.Component {
   constructor(props) {
     super(props);
@@ -67,6 +75,10 @@ class ProductList extends React.Component {
   };
 
   componentWillMount() {
+    // TODO we should probably figure out a way to pull this reconstitution of
+    // a customization out of this class and into ComponentSerializer, probably
+    // also moving over the some of the recursive inheriting out of
+    // preprocessProps as well!
     let customization = ComponentSerializer.parse(this.props.c);
     if (customization) {
       // disable logging for this statement as it whines and I can't shut it up

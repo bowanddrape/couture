@@ -2,6 +2,9 @@
 const React = require('react');
 const LayoutMain = require('./LayoutMain');
 
+/***
+Contents of the 404 page
+***/
 class NotFound extends React.Component {
   render() {
     return (

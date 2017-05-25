@@ -1,6 +1,15 @@
 
 const React = require('react');
 
+/***
+This draws an svg, animating the paths as if being drawn
+props:
+  data // path to svg
+  style // applied to the embed object container svg is scaled to fit in
+  duration // # seconds taken to draw paths
+  draw_on_load // display draw animation as soon as we can
+  draw_loaded // spawn in drawn state
+***/
 class Stroke extends React.Component {
   constructor(props) {
     super(props);
@@ -61,10 +70,14 @@ class Stroke extends React.Component {
       object.style.opacity = 1;
 
       // optionally draw as soon as we can
-      if (this.props.draw_loaded)
+      if (this.props.draw_loaded) {
         this.object.contentDocument.querySelector("svg").classList.add("drawn");
+      }
       if (this.set_visible || this.props.draw_on_load) {
-        this.setVisible();
+        // FIXME I have a hard-coded delay in here to wait for it to finish transitioning to the not-drawn state before we animate drawing it
+        setTimeout(()=>{
+          this.setVisible();
+        }, 20);
       }
     }
     object.data = this.props.data || "/logo_stroke.svg";
@@ -73,10 +86,7 @@ class Stroke extends React.Component {
   setVisible() {
     // if not loaded yet, draw at next chance
     this.set_visible = true;
-    // FIXME I have a hard-coded delay in here to wait for it to finish transitioning to the not-drawn state before we animate drawing it
-    setTimeout(()=>{
-      this.object.contentDocument.querySelector("svg").classList.add("drawn");
-    }, 10);
+    this.object.contentDocument.querySelector("svg").classList.add("drawn");
   }
 
   render() {

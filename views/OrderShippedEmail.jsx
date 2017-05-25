@@ -1,13 +1,15 @@
 
 const React = require('react');
 
+/***
+Transactional email. Send this when an order is shipped
+***/
 class OrderShippedEmail extends React.Component {
   constructor(props) {
     super(props);
   }
 
   render() {
-
     return (
       <table align="center" style={{width:"100%"}}><tbody>
         <tr><td style={styles.fullwidth}>

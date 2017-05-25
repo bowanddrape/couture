@@ -3,6 +3,9 @@ const React = require('react');
 const async = require('async');
 const Autocomplete = require('react-autocomplete');
 
+/***
+admin widget to add a new product to a ProductList
+***/
 class ProductListEdit extends React.Component {
   constructor(props) {
     super(props);

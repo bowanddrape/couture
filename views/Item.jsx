@@ -1,6 +1,10 @@
 
 const React = require('react');
 
+/***
+Draw an Item. Used in views/Items.jsx
+props: will mirror a Component model
+***/
 class Item extends React.Component {
   render() {
     if (!this.props.props) {

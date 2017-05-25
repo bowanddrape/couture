@@ -1,6 +1,10 @@
 
 const React = require('react');
 
+/***
+Admin widget for managing CMS pages
+Called by PageList
+***/
 class PageEdit extends React.Component {
   constructor(props) {
     super(props);

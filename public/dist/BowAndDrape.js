@@ -11,6 +11,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var SQLTable = require('./SQLTable');
 
+/***
+inventory is a view that queries through all shipments and tells you
+what parts/components/products are at which facilities
+***/
+
 var Inventory = function (_SQLTable) {
   _inherits(Inventory, _SQLTable);
 
@@ -127,7 +132,6 @@ var pg_read_pool = new pg.Pool({
   idleTimeoutMillis: 1000
 });
 pg_read_pool.on('error', function (err, client) {
-  // TODO escalate this
   console.error('pg client error', err.message, err.stack);
 });
 
@@ -141,9 +145,22 @@ var pg_write_pool = new pg.Pool({
   idleTimeoutMillis: 1000
 });
 pg_write_pool.on('error', function (err, client) {
-  // TODO escalate this
   console.error('pg client error', err.message, err.stack);
 });
+
+/***
+Base class for objects based around a table in the db
+
+Classes extending this one MUST implement the function
+  static getSQLSettings() {
+    return {
+      tablename: "", // name of table (or relation)
+      pkey: "", // primary key //TODO allow multiple pkeys
+      fields: [] // array of fields
+    };
+  }
+but then gain access to the functions get(), getAll(), upsert(), and remove()
+***/
 
 var SQLTable = function () {
   function SQLTable() {
@@ -152,6 +169,9 @@ var SQLTable = function () {
 
   _createClass(SQLTable, [{
     key: 'upsert',
+    // getAll()
+
+    // update or insert if row not already existing
     value: function upsert(callback) {
       var _this = this;
 
@@ -248,9 +268,9 @@ var SQLTable = function () {
           return callback(null, result);
         }); // query
       }); // db connection
-    } // sqlQuery
+    } // sqlQuery()
 
-    // run a write statement, in the future this will go to master, where
+    // run a write statement, this will go to master, where
     // as the sqlQuery function will go to a read replica
 
   }, {
@@ -289,7 +309,10 @@ var SQLTable = function () {
       });
     }
 
-    // helper function to build a query statement from an object
+    // query db for all objects matching the constraints query object
+    // constraints can have all the normal fields specified in getSQLSettings(),
+    // but also can specify page:{limit:#,sort:"ASC|DESC",start:#} or 
+    // search:"" which does a string search
 
   }, {
     key: 'getAll',
@@ -90434,6 +90457,17 @@ var ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 //const payment_method_client = require('./PayStripeClient.js');
 var payment_method_client = require('./PayBraintreeClient.js');
 
+/***
+Draws the cart page.
+
+This should probably always be bound to the path '/cart'. Payment methods
+currently determed by hardcoding payment_method_client here and hardcoding
+payment_method in preprocessProps() and in models/Order.js (3 places FIXME)
+
+The contents of the cart are managed in views/CartMenu.jsx This is just the cart
+page and the shipping/payment on it.
+***/
+
 var Cart = function (_React$Component) {
   _inherits(Cart, _React$Component);
 
@@ -90487,10 +90521,12 @@ var Cart = function (_React$Component) {
       ));
     }
     return _this;
-  }
+  } // constructor()
 
   _createClass(Cart, [{
     key: 'componentDidMount',
+    // preprocessProps()
+
     value: function componentDidMount() {
       // TODO fill in shipping info if we know it
       if (BowAndDrape.cart_menu) {
@@ -90503,7 +90539,7 @@ var Cart = function (_React$Component) {
     value: function updateContents(items) {
       items = items || [];
       this.refs.Items.updateContents(items);
-      this.forceUpdate();
+      this.forceUpdate(); // TODO I may not need this? remove if not needed!
     }
   }, {
     key: 'handleSameBillingToggle',
@@ -90520,6 +90556,9 @@ var Cart = function (_React$Component) {
       }
       this.setState(update);
     }
+
+    // this.state has a lot of objects that in-turn have fields, use this callback
+
   }, {
     key: 'handleSetSectionState',
     value: function handleSetSectionState(section, state) {
@@ -90527,6 +90566,7 @@ var Cart = function (_React$Component) {
       if (section) {
         update[section] = Object.assign(this.state[section], state);
         // special handling for shipping to display warning about customs
+        // TODO put this somewhere else (maybe in render()?)
         if (section == "shipping") {
           if (state.country) {
             update[section].errors = [];
@@ -90606,6 +90646,9 @@ var Cart = function (_React$Component) {
         )
       );
     }
+
+    // call when payment gets submitted
+
   }, {
     key: 'handlePay',
     value: function handlePay() {
@@ -90633,6 +90676,10 @@ var Cart = function (_React$Component) {
         return this.setState({ processing_payment: false });
       }
 
+      // credit card info goes to the payment gateway ONLY, not to our servers
+      // the payment handling gateway then gives us a nonce to reference that
+      // client's payment info, and this is what we pass back to the server to
+      // initiate the billing
       payment_method_client.getClientNonce(this.props.payment_authorization, this.state, function (err, payment_nonce) {
         if (err) {
           _this2.setState({ processing_payment: false });
@@ -90654,7 +90701,8 @@ var Cart = function (_React$Component) {
           _this2.setState({ done: true });
         });
       });
-    }
+    } // handlePay()
+
   }, {
     key: 'render',
     value: function render() {
@@ -90723,6 +90771,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+
+/***
+This is the cart link and bug in the menu. Also manages the cart contents
+
+cart contents are saved in localstorage
+***/
 
 var CartMenu = function (_React$Component) {
   _inherits(CartMenu, _React$Component);
@@ -90819,6 +90873,10 @@ var async = require('async');
 var SylvestorGlUtils = require('sylvester-es6');
 var Matrix = SylvestorGlUtils.Matrix;
 var Vector = SylvestorGlUtils.Vector;
+
+/***
+Describe a component for the Customizer to draw
+***/
 
 var Component = function () {
   function Component() {
@@ -91046,6 +91104,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
+/***
+Used in the admin page for editing components
+***/
+
 var ComponentEdit = function (_React$Component) {
   _inherits(ComponentEdit, _React$Component);
 
@@ -91197,6 +91259,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var zlib = require('zlib');
 
+/***
+Handle conversion between a customization object and a string representation
+
+parse() and stringify() are the entry points here. zlib compression is used so
+we need to be careful when passing along in GET params as we need to watch for
+'/' and ' ' characters.
+In order to reconstitute a serialzed customization, you pretty much need to have
+an instance of views/ProductList.jsx, call preprocessProps(), and componentWillMount() in order to fill in the component fields from the db
+***/
+
 var ComponentSerializer = function () {
   function ComponentSerializer() {
     _classCallCheck(this, ComponentSerializer);
@@ -91231,6 +91303,11 @@ var ComponentSerializer = function () {
         callback(err, buffer.toString('base64'));
       });
     }
+
+    // basically we need to strip everything that isn't specifically related to
+    // the user's customization. This is for space as well as to make sure that
+    // we don't keep any dirty information from a previous component db setting!
+
   }, {
     key: 'stripVolatile',
     value: function stripVolatile(component) {
@@ -91338,16 +91415,26 @@ var SylvestorGlUtils = require('sylvester-es6');
 var Matrix = SylvestorGlUtils.Matrix;
 var Vector = SylvestorGlUtils.Vector;
 
+/***
+WebGL customizer view
+
+uses views/Component.js as a renderable facsimile of the usual Component model
+***/
+
 var Customizer = function () {
   function Customizer(options) {
     _classCallCheck(this, Customizer);
 
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
+    // TODO we're going to want to move camera_elevation to properly frame
+    // our products
     this.camera_elevation = this.options.camera_elevation || 1.0;
 
     this.gl = null;
 
+    // TODO all this particle stuff is leftover from when I stole this code
+    // from a personal project, clean this up eventually
     this.particleVerticesBuffer;
     this.particleVerticesTextureCoordBuffer;
     this.particleVerticesIndexBuffer;
@@ -91719,6 +91806,10 @@ var React = require('react');
 
 var UserProfile = require('./UserProfile.jsx');
 
+/***
+This lives in the menu and handles facebook login integration
+***/
+
 var FacebookLogin = function (_React$Component) {
   _inherits(FacebookLogin, _React$Component);
 
@@ -91810,8 +91901,6 @@ module.exports = FacebookLogin;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -91822,6 +91911,10 @@ var React = require('react');
 var Shipment = require('./Shipment.jsx');
 var Tabs = require('./Tabs.jsx');
 var Scrollable = require('./Scrollable.jsx');
+
+/***
+Admin page to display list of orders at various states of shipment
+***/
 
 var FulfillShipments = function (_React$Component) {
   _inherits(FulfillShipments, _React$Component);
@@ -91844,11 +91937,8 @@ var FulfillShipments = function (_React$Component) {
   _createClass(FulfillShipments, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _this2 = this;
-
-      BowAndDrape.dispatcher.on("shipment", function (shipment) {
-        _this2.setState(_defineProperty({ shipment: shipment }, 'shipment', shipment));
-      });
+      // TODO listen on a websocket for updates to shipments that are made
+      // while this page is open in a browser
     }
   }, {
     key: 'render',
@@ -91939,6 +92029,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
+/***
+Widget allowing user to input an address.
+
+Uses google maps api to autocomplete and sanitize input
+***/
+
 var InputAddress = function (_React$Component) {
   _inherits(InputAddress, _React$Component);
 
@@ -91955,6 +92051,8 @@ var InputAddress = function (_React$Component) {
   _createClass(InputAddress, [{
     key: "componentDidMount",
     value: function componentDidMount() {
+      // Called immediately and then on loaded as we don't know if the google
+      // maps scripts loaded before or after this component
       this.initAutocomplete();
       BowAndDrape.dispatcher.on("loaded", this.initAutocomplete.bind(this));
     }
@@ -92125,6 +92223,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
+/***
+Draw an Item. Used in views/Items.jsx
+props: will mirror a Component model
+***/
+
 var Item = function (_React$Component) {
   _inherits(Item, _React$Component);
 
@@ -92237,7 +92340,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var Item = require('./Item.jsx');
 
-// optional props: ["is_cart"]
+/***
+Draw a list of Item.
+props:
+  is_cart:? // draw as a cart? (vs draw in an order shipment)
+***/
 
 var Items = function (_React$Component) {
   _inherits(Items, _React$Component);
@@ -92314,6 +92421,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
+/***
+The most minimalist of layouts
+
+renders any react component and that's it
+props:
+  content_name:"" // react component
+  content_props:{} // properties for react component
+  content_string:"" // page as server-side rendered string
+***/
+
 var LayoutBasic = function (_React$Component) {
   _inherits(LayoutBasic, _React$Component);
 
@@ -92379,6 +92496,16 @@ var Swipeable = require('react-swipeable');
 var UserMenu = require('./UserMenu.jsx');
 
 var menu_width = 350;
+
+/***
+The most common of layout. Renders a react component
+
+renders any react component but also the menu and any header elements
+props:
+  content_name:"" // react component
+  content_props:{} // properties for react component
+  content_string:"" // page as server-side rendered string
+***/
 
 var LayoutMain = function (_React$Component) {
   _inherits(LayoutMain, _React$Component);
@@ -92505,6 +92632,11 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+
+/***
+Admin widget for managing CMS pages
+Called by PageList
+***/
 
 var PageEdit = function (_React$Component) {
   _inherits(PageEdit, _React$Component);
@@ -92645,6 +92777,10 @@ var React = require('react');
 var Scrollable = require('./Scrollable.jsx');
 var PageEdit = require('./PageEdit.jsx');
 
+/***
+Admin page for CMS pages
+***/
+
 var PageList = function (_React$Component) {
   _inherits(PageList, _React$Component);
 
@@ -92755,6 +92891,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var Stroke = require('./Stroke.jsx');
 
+/***
+If something is not yet designed but you want to draw something there
+***/
+
 var Placeholder = function (_React$Component) {
   _inherits(Placeholder, _React$Component);
 
@@ -92789,6 +92929,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var Swipeable = require('react-swipeable');
+
+/***
+Drawn by ProductList and contains the Customizer
+Also manages hitboxes for Customizer Components
+props:
+  assembly:[] // list of components
+  handleUpdateProduct:() // called when any update happens
+***/
 
 var ProductCanvas = function (_React$Component) {
   _inherits(ProductCanvas, _React$Component);
@@ -92975,6 +93123,15 @@ var Tabs = require('./Tabs.jsx');
 var Switch = require('./Switch.jsx');
 var ComponentSerializer = require('./ComponentSerializer.js');
 
+/***
+Draws List of products available in a store.
+Also draws product options and product customizer
+props:
+  store:{} // store object
+  c:"" // serialized customization string (from ComponentSerializer)
+  edit:? // are we an admin making changes?
+***/
+
 var ProductList = function (_React$Component) {
   _inherits(ProductList, _React$Component);
 
@@ -93000,6 +93157,10 @@ var ProductList = function (_React$Component) {
     value: function componentWillMount() {
       var _this2 = this;
 
+      // TODO we should probably figure out a way to pull this reconstitution of
+      // a customization out of this class and into ComponentSerializer, probably
+      // also moving over the some of the recursive inheriting out of
+      // preprocessProps as well!
       var customization = ComponentSerializer.parse(this.props.c);
       if (customization) {
         (function () {
@@ -93503,6 +93664,10 @@ var React = require('react');
 var async = require('async');
 var Autocomplete = require('react-autocomplete');
 
+/***
+admin widget to add a new product to a ProductList
+***/
+
 var ProductListEdit = function (_React$Component) {
   _inherits(ProductListEdit, _React$Component);
 
@@ -93627,6 +93792,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
+/***
+An infinite scroll widget
+props:
+  component:{} // React component
+  data:[] // whatever the content is to be rendered by the component
+  component_props:{} // default props to be passed into all components drawn
+  endpoint:"" // API endpoint
+  page:{} // page object, as required by models/SQLTable.js
+***/
+
 var Scrollable = function (_React$Component) {
   _inherits(Scrollable, _React$Component);
 
@@ -93636,7 +93811,7 @@ var Scrollable = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Scrollable.__proto__ || Object.getPrototypeOf(Scrollable)).call(this, props));
 
     _this.state = {
-      data: _this.props.data ? _this.props.data : []
+      data: _this.props.data || []
     };
     _this.detector;
     _this.handleScroll = _this.handleScroll.bind(_this);
@@ -93646,6 +93821,7 @@ var Scrollable = function (_React$Component) {
   _createClass(Scrollable, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      this.handleScroll();
       BowAndDrape.dispatcher.on("authenticated", this.handleScroll.bind(this));
       document.addEventListener('scroll', this.handleScroll);
     }
@@ -93720,6 +93896,11 @@ var React = require('react');
 var Item = require('./Item.jsx');
 var Timestamp = require('./Timestamp.jsx');
 var Address = require('./Address.jsx');
+
+/***
+Draw a shipment. Used in lists of orders/shipments
+This is still WiP
+***/
 
 var Shipment = function (_React$Component) {
   _inherits(Shipment, _React$Component);
@@ -93962,6 +94143,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
+/***
+This draws an svg, animating the paths as if being drawn
+props:
+  data // path to svg
+  style // applied to the embed object container svg is scaled to fit in
+  duration // # seconds taken to draw paths
+  draw_on_load // display draw animation as soon as we can
+  draw_loaded // spawn in drawn state
+***/
+
 var Stroke = function (_React$Component) {
   _inherits(Stroke, _React$Component);
 
@@ -94021,9 +94212,14 @@ var Stroke = function (_React$Component) {
         object.style.opacity = 1;
 
         // optionally draw as soon as we can
-        if (_this2.props.draw_loaded) _this2.object.contentDocument.querySelector("svg").classList.add("drawn");
+        if (_this2.props.draw_loaded) {
+          _this2.object.contentDocument.querySelector("svg").classList.add("drawn");
+        }
         if (_this2.set_visible || _this2.props.draw_on_load) {
-          _this2.setVisible();
+          // FIXME I have a hard-coded delay in here to wait for it to finish transitioning to the not-drawn state before we animate drawing it
+          setTimeout(function () {
+            _this2.setVisible();
+          }, 20);
         }
       };
       object.data = this.props.data || "/logo_stroke.svg";
@@ -94031,14 +94227,9 @@ var Stroke = function (_React$Component) {
   }, {
     key: "setVisible",
     value: function setVisible() {
-      var _this3 = this;
-
       // if not loaded yet, draw at next chance
       this.set_visible = true;
-      // apparently needs to wait for the styles we appended to apply
-      setTimeout(function () {
-        _this3.object.contentDocument.querySelector("svg").classList.add("drawn");
-      }, 10);
+      this.object.contentDocument.querySelector("svg").classList.add("drawn");
     }
   }, {
     key: "render",
@@ -94068,16 +94259,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var Stroke = require('./Stroke.jsx');
 
+/***
+This attempts to emulate a select drop-down, but displays options side-by-side
+props:
+  value:"" // the selected value
+  onChange() // called when something else is selected
+children:
+  <option value={}>{content}</option>
+***/
+
 var Switch = function (_React$Component) {
   _inherits(Switch, _React$Component);
 
   function Switch(props) {
     _classCallCheck(this, Switch);
 
-    var _this = _possibleConstructorReturn(this, (Switch.__proto__ || Object.getPrototypeOf(Switch)).call(this, props));
-
-    _this.stroke = React.createElement(Stroke, { data: '/flower_stroke.svg', style: { zIndex: "-1", width: "300px", height: "100px", position: "absolute", top: "-30px", left: "-30px" }, draw_loaded: true, duration: 5 });
-    return _this;
+    return _possibleConstructorReturn(this, (Switch.__proto__ || Object.getPrototypeOf(Switch)).call(this, props));
   }
 
   _createClass(Switch, [{
@@ -94093,15 +94290,26 @@ var Switch = function (_React$Component) {
         if (child.type != "option") return 'continue';
         options.push(React.createElement(
           'switch_option',
-          _extends({ ref: index, key: index }, child.props, { style: { position: "relative", margin: "0 10px", color: _this2.props.value == child.props.value ? "#000" : "#f7afc9" }, onClick: function onClick() {
-              console.log(child.props.value);_this2.props.onChange(child.props.value);
+          _extends({ ref: index, key: index }, child.props, { style: {
+              position: "relative",
+              margin: "0 10px",
+              color: _this2.props.value == child.props.value ? "#000" : "#f7afc9"
+            }, onClick: function onClick() {
+              _this2.props.onChange(child.props.value);
             } }),
           React.createElement(
             'div',
-            { style: { textAlign: "center", width: "160px" } },
+            { style: { zIndex: "2", textAlign: "center", width: "160px" } },
             child.props.children
           ),
-          child.props.value == _this2.props.value ? React.createElement(Stroke, { data: '/select_stroke.svg', style: { zIndex: "-1", width: "200px", height: "100px", position: "absolute", top: "-28px", left: "-20px" }, draw_on_load: true, duration: 1 }) : null
+          child.props.value == _this2.props.value ? React.createElement(Stroke, { data: '/select_stroke.svg', style: {
+              zIndex: "2",
+              width: "200px",
+              height: "100px",
+              position: "absolute",
+              top: "-28px",
+              left: "-20px"
+            }, draw_on_load: true, duration: 1 }) : null
         ));
       };
 
@@ -94112,7 +94320,10 @@ var Switch = function (_React$Component) {
       }
       return React.createElement(
         'switch',
-        { style: styles.switch },
+        { style: {
+            display: "flex",
+            flexFlow: "row wrap"
+          } },
         options
       );
     }
@@ -94120,14 +94331,6 @@ var Switch = function (_React$Component) {
 
   return Switch;
 }(React.Component);
-
-var styles = {
-  switch: {
-    display: "flex",
-    flexFlow: "row wrap"
-  },
-  option: {}
-};
 
 module.exports = Switch;
 
@@ -94145,51 +94348,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 // TODO move this into it's own repo
 var fs = require('fs');
 var React = require('react');
+var Switch = require('./Switch.jsx');
 
-var colors = {
-  'color_primary': '#fff',
-  'color_secondary': '#000',
-  'color_support_0': '#eaeaea',
-  'color_support_1': '#f5c9ca',
-  'color_support_3': '#7f5cff'
-};
-
-var styles = {
-  tab_select: {
-    display: 'flex'
-  },
-  tab: {
-    padding: '15px',
-    margin: '0 15px',
-    flexGrow: '1',
-    flexShrink: '1',
-    opacity: '0.8',
-    border: '2px solid ' + colors['color_secondary'],
-    borderBottom: 'none',
-    backgroundColor: colors['color_primary'],
-    borderTopLeftRadius: '20px',
-    borderTopRightRadius: '20px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
-  },
-  tab_selected: {
-    padding: '15px',
-    margin: '0 15px',
-    flexGrow: '1',
-    flexShrink: '1',
-    backgroundColor: colors['color_support_0'],
-    borderTopLeftRadius: '20px',
-    borderTopRightRadius: '20px',
-    whiteSpace: 'nowrap'
-  }
-};
-
-var initDefaultFallback = function initDefaultFallback() {
-  for (var i = 0; i < arguments.length; i++) {
-    if (arguments[i]) return arguments[i];
-  }return null;
-};
+/***
+This takes multiple children and lets you choose which one is visible
+props:
+  className:"" // does what you expect
+children:
+  <anytag name={displayed as tab}>{contents}</anytag>
+***/
 
 var Tabs = function (_React$Component) {
   _inherits(Tabs, _React$Component);
@@ -94223,10 +94390,10 @@ var Tabs = function (_React$Component) {
         if (grandchildren.length) tab_name_options.push(grandchildren[0].props.children);
         var tab_name = initDefaultFallback.apply(undefined, tab_name_options.concat(["Tab"]));
         tabs.push(React.createElement(
-          'div',
+          'option',
           { key: tabs.length, onClick: function onClick() {
               _this2.setState({ selected_tab: index });
-            }, style: _this2.state.selected_tab == index ? styles.tab_selected : styles.tab },
+            }, value: tabs.length },
           tab_name
         ));
       };
@@ -94239,8 +94406,10 @@ var Tabs = function (_React$Component) {
         'tabs',
         { className: this.props.className },
         React.createElement(
-          'tab_select',
-          { style: styles.tab_select },
+          Switch,
+          { style: {}, value: this.state.selected_tab, onChange: function onChange(value) {
+              _this2.setState({ selected_tab: value });
+            } },
           tabs
         ),
         React.createElement(
@@ -94255,9 +94424,18 @@ var Tabs = function (_React$Component) {
   return Tabs;
 }(React.Component);
 
+// returns the first non-null argument, useful for setting a default value
+
+
+var initDefaultFallback = function initDefaultFallback() {
+  for (var i = 0; i < arguments.length; i++) {
+    if (arguments[i]) return arguments[i];
+  }return null;
+};
+
 module.exports = Tabs;
 
-},{"fs":273,"react":605}],702:[function(require,module,exports){
+},{"./Switch.jsx":700,"fs":273,"react":605}],702:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94269,6 +94447,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+
+/***
+Draw after successful purchase
+***/
 
 var ThanksPurchaseComplete = function (_React$Component) {
   _inherits(ThanksPurchaseComplete, _React$Component);
@@ -94311,6 +94493,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+
+/***
+Display a timestamp
+props:
+  time:# // epoch time in seconds
+***/
 
 var Timestamp = function (_React$Component) {
   _inherits(Timestamp, _React$Component);
@@ -94356,6 +94544,13 @@ var React = require('react');
 var FacebookLogin = require('./FacebookLogin.jsx');
 var UserProfile = require('./UserProfile.jsx');
 var CartMenu = require('./CartMenu.jsx');
+
+/***
+Draw the user menu
+props:
+  user:{} // user object
+  handleToggleMenu:() // called when toggling menu visiblity
+***/
 
 var UserMenu = function (_React$Component) {
   _inherits(UserMenu, _React$Component);
@@ -94420,7 +94615,7 @@ var UserMenu = function (_React$Component) {
   }, {
     key: 'logout',
     value: function logout() {
-      // TODO also logout facebook
+      // FIXME we also need to unauth or logout facebook
       BowAndDrape.dispatcher.handleAuth({});
     }
   }]);
@@ -94444,6 +94639,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var UserProfile = require('./UserProfile.jsx');
 var jwt_decode = require('jwt-decode');
+
+/***
+Page allowing user to reset password / verify account
+user jwt must be in the document.location.href
+***/
 
 var UserPasswordReset = function (_React$Component) {
   _inherits(UserPasswordReset, _React$Component);
@@ -94541,6 +94741,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var bcrypt = require('bcryptjs');
+
+/***
+Widget to show logged-in user. If not logged in, allow user to log in?
+props:
+  user:{} // user object
+***/
 
 var UserProfile = function (_React$Component) {
   _inherits(UserProfile, _React$Component);
@@ -94672,6 +94878,16 @@ var LayoutBasic = require('./LayoutBasic.jsx');
 var LayoutMain = require('./LayoutMain.jsx');
 var Customizer = require('./Customizer.js');
 
+/***
+Okay, this is a namespace to wrap all the things needed globally on the client-
+side.
+
+Notably, BowAndDrape.dispatcher is a global event framework that anything client-side
+can listen on or emit events on. Like using the ReDux framework, but since we're
+using nodejs, we can just extend 'events' and make things look more symmetrical
+between client and server code styles
+***/
+
 // helper function for reading cookies
 var readCookie = function readCookie(name) {
   var nameEQ = name + "=";
@@ -94734,12 +94950,14 @@ dispatcher.on("loaded", function () {
   }
 });
 
+// helper function mostly for making XHR calls. Our API expects multipart form
+// data and a json request header. Some calls need an auth token to take effect
 var api = function api(method, endpoint, body, callback) {
   var self = this;
   var xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Accept", "application/json");
-  // busboy doesn't like if you set the content type
+  // busboy doesn't like if you set the content type, so comment this out
   //xhr.setRequestHeader("Content-Type", "multipart/form-data");
   if (BowAndDrape.token) xhr.setRequestHeader("Authorization", "Bearer " + BowAndDrape.token);else console.log("attempting api call while not logged in");
   xhr.onreadystatechange = function () {
@@ -94755,9 +94973,9 @@ var api = function api(method, endpoint, body, callback) {
       // if it's an object but not named file, stringify
       if (_typeof(body[key]) == 'object' && !/file/.test(key)) payload.append(key, JSON.stringify(body[key]));else payload.append(key, body[key]);
     });
-  }
+  } // build payload
   xhr.send(payload);
-};
+}; // api
 
 module.exports = {
   React: React,

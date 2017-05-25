@@ -2,6 +2,9 @@
 const React = require('react');
 const Stroke = require('./Stroke.jsx');
 
+/***
+If something is not yet designed but you want to draw something there
+***/
 class Placeholder extends React.Component {
 
   render() {

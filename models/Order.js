@@ -11,6 +11,9 @@ const Log = require('./Log');
 //const payment_method = require('./PayStripe.js');
 const payment_method = require('./PayBraintree.js');
 
+/***
+Handle requests to the endpoints "/order/"
+***/
 class Order {
 
   static handleHTTP(req, res, next) {

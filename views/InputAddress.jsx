@@ -1,6 +1,11 @@
 
 const React = require('react');
 
+/***
+Widget allowing user to input an address.
+
+Uses google maps api to autocomplete and sanitize input
+***/
 class InputAddress extends React.Component {
 
   constructor(props) {
@@ -11,6 +16,8 @@ class InputAddress extends React.Component {
   }
 
   componentDidMount() {
+    // Called immediately and then on loaded as we don't know if the google
+    // maps scripts loaded before or after this component
     this.initAutocomplete();
     BowAndDrape.dispatcher.on("loaded", this.initAutocomplete.bind(this));
   }

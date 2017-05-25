@@ -7,6 +7,9 @@ const Page = require('./Page');
 const FulfillShipments = require('../views/FulfillShipments.jsx');
 const GenericList = require('../views/GenericList.jsx');
 
+/***
+Handle requests to /fulfillment/
+***/
 class Fulfillment {
 
   static handleHTTP(req, res, next) {

@@ -1,6 +1,11 @@
 
 const React = require('react');
 
+/***
+A raw display helper used by some admin models.
+No react handlers or bindings allowed here aside from render() and
+componentWillMount() as this rendered server side only
+***/
 class GenericList extends React.Component {
   constructor(props) {
     super(props);

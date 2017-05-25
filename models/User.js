@@ -18,6 +18,9 @@ const jwt_secret = fs.readFileSync('./jwt_secret');
 // enumerate available roles
 const available_roles = ["bowanddrape", "nordstrom", "bloomingdales", "thebay", "lordandtaylor"];
 
+/***
+Handle all things related to user auth and settings
+***/
 class User extends SQLTable {
   constructor(user) {
     super();
@@ -81,12 +84,10 @@ class User extends SQLTable {
     }
 
     if (req.path_tokens[1]=="reset_password" && req.method=="POST") {
-      console.log("resetting password");
       if (!req.user) {
-          return res.status(401).json({"error":"invalid authorization"});
+        return res.status(401).json({"error":"invalid authorization"});
       }
       req.user.passhash = req.body.passhash;
-      delete req.user.verified;
       return req.user.upsert(function(err, result) {
         if (err) return res.status(500).json({"error":"could not update password"});
         User.sendJwtToken(res, req.user);

@@ -1,6 +1,10 @@
 
 const SQLTable = require('./SQLTable');
 
+/***
+inventory is a view that queries through all shipments and tells you
+what parts/components/products are at which facilities
+***/
 class Inventory extends SQLTable {
   constructor(store_inventory) {
     super();

@@ -1,17 +1,27 @@
 
 const React = require('react');
 
+/***
+An infinite scroll widget
+props:
+  component:{} // React component
+  data:[] // whatever the content is to be rendered by the component
+  component_props:{} // default props to be passed into all components drawn
+  endpoint:"" // API endpoint
+  page:{} // page object, as required by models/SQLTable.js
+***/
 class Scrollable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.data?this.props.data:[]
+      data: this.props.data || []
     };
     this.detector;
     this.handleScroll = this.handleScroll.bind(this);
   }
 
   componentDidMount() {
+    this.handleScroll();
     BowAndDrape.dispatcher.on("authenticated", this.handleScroll.bind(this));
     document.addEventListener('scroll', this.handleScroll);
   }
@@ -37,6 +47,7 @@ class Scrollable extends React.Component {
       <div>
         {children}
         <div ref={(element) => {this.detector = element;}}></div>
+        {/* TODO show loading state and error messages */}
       </div>
     );
   }

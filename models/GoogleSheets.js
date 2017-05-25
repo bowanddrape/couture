@@ -14,12 +14,21 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const TOKEN_DIR = __dirname+'/../';
 const TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com.token';
 
+/***
+An integration with google spreadsheets
+This will ask for a google oauth login in order to do any actions on a sheet,
+so will chat on slack asking for permission.
+always call query() before you call update(), not only to check which cells
+you should update in the first place, but query() will init() auth if you are
+not currently auth'd
+***/
 class GoogleSheets {
   constructor(id) {
     this.spreadsheet_id = id;
     this.google_sheets = google.sheets('v4');
   }
 
+  // go through the google oauth flow
   init(callback) {
     let options = {
       "web": {
@@ -138,7 +147,7 @@ class GoogleSheets {
       scope: SCOPES
     });
     Log.message(`Authorize this app by visiting this url ${authUrl} and replying \`@${Log.username} [code]\` with the code copied from the url`);
-    // TODO if I set up the redirect uris properly you don't need to chat it
+    // TODO if I set up the redirect uris properly you don't need to chat back
     Log.listen.once('message', (message) => {
       let toks = message.split(' ');
       let code = toks[1];

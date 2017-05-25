@@ -7,6 +7,15 @@ const UserMenu = require('./UserMenu.jsx');
 
 const menu_width = 350;
 
+/***
+The most common of layout. Renders a react component
+
+renders any react component but also the menu and any header elements
+props:
+  content_name:"" // react component
+  content_props:{} // properties for react component
+  content_string:"" // page as server-side rendered string
+***/
 class LayoutMain extends React.Component {
   constructor(props) {
     super(props);

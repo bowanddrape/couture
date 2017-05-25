@@ -1,6 +1,11 @@
 
 const SQLTable = require('./SQLTable');
 
+/***
+Have any model you want connected to the API inherit this, then call handleHTTP
+in your server.js as middleware for express
+Has a bunch of default function definitions that can be overwritten
+***/
 class JSONAPI extends SQLTable {
 
   handleHTTP(req, res, next) {
@@ -50,12 +55,12 @@ class JSONAPI extends SQLTable {
   }
 
   hasApiPermission(req, res) {
-    // user must be an admin
+    // by default user must be a super-admin
     return (req.user && req.user.roles.indexOf("bowanddrape")!=-1);
   }
 
   onApiSave(req, res, object, callback) {
-    // default action is just to save
+    // by default action is just to save
     object.upsert((err, result) => {
       if (callback)
         return (callback(err, result));
@@ -66,7 +71,7 @@ class JSONAPI extends SQLTable {
   }
 
   onApiRemove(req, res, object, callback) {
-    // default action is just to remove
+    // by default action is just to remove
     object.remove((err, result) => {
       if (callback)
         return (callback(err, result));

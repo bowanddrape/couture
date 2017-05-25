@@ -1,4 +1,8 @@
 
+/***
+Don't remember why I wrote this, but maybe thought I needed to so address
+sanitization. Well, if that needs to happen, it goes here.
+***/
 class Address {
   constructor(address) {
     this.name = address.name;

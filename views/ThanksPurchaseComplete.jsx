@@ -1,7 +1,10 @@
 
 const React = require('react');
-class ThanksPurchaseComplete extends React.Component {
 
+/***
+Draw after successful purchase
+***/
+class ThanksPurchaseComplete extends React.Component {
   render() {
     return (
       <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}>

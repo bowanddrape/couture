@@ -1,6 +1,15 @@
 
 const zlib = require('zlib');
 
+/***
+Handle conversion between a customization object and a string representation
+
+parse() and stringify() are the entry points here. zlib compression is used so
+we need to be careful when passing along in GET params as we need to watch for
+'/' and ' ' characters.
+In order to reconstitute a serialzed customization, you pretty much need to have
+an instance of views/ProductList.jsx, call preprocessProps(), and componentWillMount() in order to fill in the component fields from the db
+***/
 class ComponentSerializer {
   constructor() {
   }
@@ -30,6 +39,9 @@ class ComponentSerializer {
     });
   }
 
+  // basically we need to strip everything that isn't specifically related to
+  // the user's customization. This is for space as well as to make sure that
+  // we don't keep any dirty information from a previous component db setting!
   static stripVolatile(component) {
     let whitelist = [
       "sku", "props", "assembly", "selected_product", "version"

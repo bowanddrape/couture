@@ -1,6 +1,11 @@
 
 const React = require('react');
 
+/***
+Display a timestamp
+props:
+  time:# // epoch time in seconds
+***/
 class Timestamp extends React.Component {
   render() {
 

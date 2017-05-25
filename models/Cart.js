@@ -2,6 +2,10 @@
 const JSONAPI = require('./JSONAPI');
 const Item = require('./Item');
 
+/***
+When logged-in, allow sharing of cart contents across devices
+Also put cart metric tracking in here
+***/
 class Cart extends JSONAPI {
   constructor(shipment) {
     super();

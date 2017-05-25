@@ -245,6 +245,7 @@ customize product_options select {
   font-size: 35px;
 }
 customize switch {
+  background-color: #eaeaea;
   margin-bottom: 20px;
 }
 customize .canvas_container {
@@ -262,11 +263,11 @@ customize .canvas_container canvas {
   max-height: 100%;
 }
 customize .component_spacer {
-  height: 270px;
+  height: 237px;
 }
 customize tabs.components {
   position: fixed;
-  height: 270px;
+  height: 237px;
   bottom: 0;
   left: 0;
   right: 0;

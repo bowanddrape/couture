@@ -9,6 +9,17 @@ const LayoutBasic = require('./LayoutBasic.jsx');
 const LayoutMain = require('./LayoutMain.jsx');
 const Customizer = require('./Customizer.js');
 
+/***
+Okay, this is a namespace to wrap all the things needed globally on the client-
+side.
+
+Notably, BowAndDrape.dispatcher is a global event framework that anything client-side
+can listen on or emit events on. Like using the ReDux framework, but since we're
+using nodejs, we can just extend 'events' and make things look more symmetrical
+between client and server code styles
+***/
+
+
 // helper function for reading cookies
 let readCookie = function(name) {
   var nameEQ = name + "=";
@@ -57,12 +68,14 @@ dispatcher.on("loaded", () => {
   }
 });
 
+// helper function mostly for making XHR calls. Our API expects multipart form
+// data and a json request header. Some calls need an auth token to take effect
 let api = function(method, endpoint, body, callback) {
   var self = this;
   let xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Accept","application/json");
-  // busboy doesn't like if you set the content type
+  // busboy doesn't like if you set the content type, so comment this out
   //xhr.setRequestHeader("Content-Type", "multipart/form-data");
   if (BowAndDrape.token)
     xhr.setRequestHeader("Authorization", "Bearer "+BowAndDrape.token);
@@ -83,9 +96,9 @@ let api = function(method, endpoint, body, callback) {
       else
         payload.append(key, body[key]);
     });
-  }
+  } // build payload
   xhr.send(payload);
-}
+} // api
 
 module.exports = {
   React,

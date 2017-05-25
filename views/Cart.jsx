@@ -7,6 +7,16 @@ const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 //const payment_method_client = require('./PayStripeClient.js');
 const payment_method_client = require('./PayBraintreeClient.js');
 
+/***
+Draws the cart page.
+
+This should probably always be bound to the path '/cart'. Payment methods
+currently determed by hardcoding payment_method_client here and hardcoding
+payment_method in preprocessProps() and in models/Order.js (3 places FIXME)
+
+The contents of the cart are managed in views/CartMenu.jsx This is just the cart
+page and the shipping/payment on it.
+***/
 class Cart extends React.Component {
   constructor(props) {
     super(props);
@@ -51,7 +61,7 @@ class Cart extends React.Component {
     if (!this.props.store[0].id) {
       this.state.errors.push(<div>Config Error: Store not set</div>);
     }
-  }
+  } // constructor()
 
   static preprocessProps(options, callback) {
     // TODO select payment method
@@ -70,7 +80,7 @@ class Cart extends React.Component {
     }
 
     callback(null, options);
-  }
+  } // preprocessProps()
 
   componentDidMount() {
     // TODO fill in shipping info if we know it
@@ -79,10 +89,11 @@ class Cart extends React.Component {
     }
     BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
   }
+
   updateContents(items) {
     items = items || [];
     this.refs.Items.updateContents(items);
-    this.forceUpdate();
+    this.forceUpdate(); // TODO I may not need this? remove if not needed!
   }
 
   handleSameBillingToggle(e) {
@@ -98,11 +109,13 @@ class Cart extends React.Component {
     this.setState(update);
   }
 
+  // this.state has a lot of objects that in-turn have fields, use this callback
   handleSetSectionState(section, state) {
     let update = {};
     if (section) {
       update[section] = Object.assign(this.state[section], state);
       // special handling for shipping to display warning about customs
+      // TODO put this somewhere else (maybe in render()?)
       if (section=="shipping") {
         if (state.country) {
           update[section].errors = [];
@@ -142,6 +155,7 @@ class Cart extends React.Component {
     );
   }
 
+  // call when payment gets submitted
   handlePay() {
     if (this.state.processing_payment) return;
     this.setState({processing_payment:true});
@@ -159,6 +173,10 @@ class Cart extends React.Component {
       return this.setState({processing_payment:false});
     }
 
+    // credit card info goes to the payment gateway ONLY, not to our servers
+    // the payment handling gateway then gives us a nonce to reference that
+    // client's payment info, and this is what we pass back to the server to
+    // initiate the billing
     payment_method_client.getClientNonce(this.props.payment_authorization, this.state, (err, payment_nonce) => {
       if (err) {
         this.setState({processing_payment:false});
@@ -180,8 +198,7 @@ class Cart extends React.Component {
         this.setState({done:true});
       });
     });
-
-  }
+  } // handlePay()
 
   render() {
     if (this.state.done)
@@ -196,6 +213,7 @@ class Cart extends React.Component {
         {this.state.same_billing?null:<InputAddress section_title="Billing Address" handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}
         {this.renderInputCredit()}
 
+        {/* TODO display loading state when this.state.processing_payment */}
         <button onClick={this.handlePay.bind(this)}>Get it!</button>
 
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>

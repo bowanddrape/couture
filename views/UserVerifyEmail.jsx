@@ -1,20 +1,24 @@
 
 const React = require('react');
 
+/***
+Transactional email. Send this when a user requested to verify email ownership
+***/
 class UserVerifyEmail extends React.Component {
   constructor(props) {
     super(props);
   }
 
   render() {
-
     return (
       <table align="center"><tbody>
+        {/* TODO use LayoutEmail to draw this email!! */}
         <tr><td style={styles.fullwidth}>
             <img src="https://{this.props.host}/sprite.png" width="600" alt="some image" />
         </td></tr>
         <tr><td style={styles.fullwidth}>
-            <a href={this.props.link}><img src="http://www.bowanddrape.com/public/images/bad-logo.png" width="600" alt="some image" />
+            <a href={this.props.link}>
+              Click here to reset your password / verify your account
             </a>
           </td></tr>
       </tbody></table>

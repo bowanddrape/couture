@@ -9,6 +9,10 @@ const Address = require('./Address');
 var aws = require('aws-sdk');
 var s3 = new aws.S3({ accessKeyId: process.env.AWS_ACCESS_KEY, secretAccessKey: process.env.AWS_SECRET_KEY, region: process.env.AWS_REGION })
 
+/***
+A shipment is any transfer of parts/components/products between facilities
+This model also handles shipping API integrations
+***/
 class Shipment extends JSONAPI {
   constructor(shipment) {
     super();

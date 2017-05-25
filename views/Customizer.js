@@ -5,14 +5,23 @@ const SylvestorGlUtils = require('sylvester-es6');
 const Matrix = SylvestorGlUtils.Matrix;
 const Vector = SylvestorGlUtils.Vector;
 
+/***
+WebGL customizer view
+
+uses views/Component.js as a renderable facsimile of the usual Component model
+***/
 class Customizer {
   constructor(options) {
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
+    // TODO we're going to want to move camera_elevation to properly frame
+    // our products
     this.camera_elevation = this.options.camera_elevation || 1.0;
 
     this.gl = null;
 
+    // TODO all this particle stuff is leftover from when I stole this code
+    // from a personal project, clean this up eventually
     this.particleVerticesBuffer;
     this.particleVerticesTextureCoordBuffer;
     this.particleVerticesIndexBuffer;

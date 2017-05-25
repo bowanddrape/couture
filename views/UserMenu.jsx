@@ -5,6 +5,12 @@ const FacebookLogin = require('./FacebookLogin.jsx');
 const UserProfile = require('./UserProfile.jsx');
 const CartMenu = require('./CartMenu.jsx');
 
+/***
+Draw the user menu
+props:
+  user:{} // user object
+  handleToggleMenu:() // called when toggling menu visiblity
+***/
 class UserMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -40,7 +46,7 @@ class UserMenu extends React.Component {
     );
   }
   logout() {
-    // TODO also logout facebook
+    // FIXME we also need to unauth or logout facebook
     BowAndDrape.dispatcher.handleAuth({});
   }
 

@@ -23,6 +23,11 @@ const whitelisted_components = [
   "Cart",
 ]
 
+/***
+Responsible for drawing pages
+
+upon a request, checks the db for a matching path. Then retrieves the "elements" field from db. The elements will be a list of react components and props. Props in the format {model:"",query:{}} will have the corresponding SQLTable.get() call. If the react component class has a preprocessProps() defined, that gets called server-side here. The react components then get rendered as the response
+***/
 class Page extends JSONAPI {
   constructor(page) {
     super();
@@ -139,6 +144,7 @@ class Page extends JSONAPI {
     return res.status(404).end(ReactDOMServer.renderToString(page));
   }
 
+  // helper functions to get <head> stuff, usually used to popoulate meta tags
   static getHTMLHead(req, res, props) {
     let image_header = "";
     if (props.c && props.store) {
@@ -155,6 +161,7 @@ class Page extends JSONAPI {
     `;
   }
 
+  // respond to a req by rendering page contents
   static render(req, res, component, props, layout=LayoutMain) {
     // if json was requested, just return the props object
     if (!req.accepts('*/*') && req.accepts('application/json'))

@@ -2,6 +2,13 @@
 const React = require('react');
 const Swipeable = require('react-swipeable');
 
+/***
+Drawn by ProductList and contains the Customizer
+Also manages hitboxes for Customizer Components
+props:
+  assembly:[] // list of components
+  handleUpdateProduct:() // called when any update happens
+***/
 class ProductCanvas extends React.Component {
   constructor(props) {
     super(props);

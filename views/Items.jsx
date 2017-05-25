@@ -3,7 +3,11 @@
 const React = require('react');
 const Item = require('./Item.jsx');
 
-// optional props: ["is_cart"]
+/***
+Draw a list of Item.
+props:
+  is_cart:? // draw as a cart? (vs draw in an order shipment)
+***/
 class Items extends React.Component {
   constructor(props) {
     super(props);

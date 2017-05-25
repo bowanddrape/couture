@@ -1,53 +1,15 @@
 // TODO move this into it's own repo
 const fs = require('fs');
 const React = require('react');
+const Switch = require('./Switch.jsx');
 
-const colors = {
-  'color_primary': '#fff',
-  'color_secondary': '#000',
-  'color_support_0': '#eaeaea',
-  'color_support_1': '#f5c9ca',
-  'color_support_3': '#7f5cff',
-};
-
-let styles = {
-  tab_select: {
-    display: 'flex',
-  },
-  tab: {
-    padding: '15px',
-    margin: '0 15px',
-    flexGrow: '1',
-    flexShrink: '1',
-    opacity: '0.8',
-    border: '2px solid '+colors['color_secondary'],
-    borderBottom: 'none',
-    backgroundColor: colors['color_primary'],
-    borderTopLeftRadius: '20px',
-    borderTopRightRadius: '20px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  tab_selected: {
-    padding: '15px',
-    margin: '0 15px',
-    flexGrow: '1',
-    flexShrink: '1',
-    backgroundColor: colors['color_support_0'],
-    borderTopLeftRadius: '20px',
-    borderTopRightRadius: '20px',
-    whiteSpace: 'nowrap',
-  },
-}
-
-var initDefaultFallback = function() {
-  for (let i=0; i<arguments.length; i++)
-    if (arguments[i])
-      return arguments[i];
-  return null;
-}
-
+/***
+This takes multiple children and lets you choose which one is visible
+props:
+  className:"" // does what you expect
+children:
+  <anytag name={displayed as tab}>{contents}</anytag>
+***/
 class Tabs extends React.Component {
   constructor(props) {
     super(props);
@@ -70,19 +32,28 @@ class Tabs extends React.Component {
       if (grandchildren.length)
         tab_name_options.push(grandchildren[0].props.children);
       let tab_name = initDefaultFallback(...tab_name_options, "Tab");
-      tabs.push(<div key={tabs.length} onClick={()=>{this.setState({selected_tab:index})}} style={this.state.selected_tab==index?styles.tab_selected:styles.tab}>{tab_name}</div>);
+      tabs.push(<option key={tabs.length} onClick={()=>{this.setState({selected_tab:index})}} value={tabs.length}>{tab_name}</option>);
     };
 
     return (
       <tabs className={this.props.className}>
-        <tab_select style={styles.tab_select}>{tabs}</tab_select>
+        <Switch style={{}} value={this.state.selected_tab} onChange={(value)=>{this.setState({selected_tab:value});}}>
+          {tabs}
+        </Switch>
         <tab_contents>
           {children[this.state.selected_tab]}
         </tab_contents>
       </tabs>
     );
   }
+}
 
+// returns the first non-null argument, useful for setting a default value
+var initDefaultFallback = function() {
+  for (let i=0; i<arguments.length; i++)
+    if (arguments[i])
+      return arguments[i];
+  return null;
 }
 
 

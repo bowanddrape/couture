@@ -4,6 +4,9 @@ const React = require('react');
 
 const UserProfile = require('./UserProfile.jsx');
 
+/***
+This lives in the menu and handles facebook login integration
+***/
 class FacebookLogin extends React.Component {
   constructor(props) {
     super(props);

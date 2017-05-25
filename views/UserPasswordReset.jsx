@@ -3,6 +3,10 @@ const React = require('react');
 const UserProfile = require('./UserProfile.jsx');
 const jwt_decode = require('jwt-decode');
 
+/***
+Page allowing user to reset password / verify account
+user jwt must be in the document.location.href
+***/
 class UserPasswordReset extends React.Component {
   constructor(props) {
     super(props);

@@ -1,6 +1,9 @@
 
 const React = require('react');
 
+/***
+Used in the admin page for editing components
+***/
 class ComponentEdit extends React.Component {
   constructor(props) {
     super(props);

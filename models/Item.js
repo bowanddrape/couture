@@ -2,10 +2,12 @@
 const async = require('async');
 const Component = require('./Component');
 
-// This class handles arrays of items, where items may have assemblies or
-// be families of products, it's intentionally open but could get messy
-// quickly but I suppose we'll deal with that problem later
-// TODO rename this class and file to 'Items' because plurality
+/***
+This class handles arrays of Components (where Components in turn may have
+assemblies or be families of products. More description in the Components model
+// TODO rename this class and file to 'Components' because that's the way
+plurals work. I may use the term "item" or "component" interchangably =(
+***/
 class Item extends Array {
   constructor(items) {
     super();

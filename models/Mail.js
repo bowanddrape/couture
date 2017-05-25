@@ -18,6 +18,10 @@ const OrderShippedEmail = require('../views/OrderShippedEmail.jsx');
 const OrderSurveyEmail = require('../views/OrderSurveyEmail.jsx');
 const Page = require('./Page');
 
+/***
+Interface to send mail
+Helps build and send out email
+***/
 class Mail {
 
   static send(to, subject, html, callback) {

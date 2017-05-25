@@ -5,6 +5,10 @@ const Item = require('./Item.jsx');
 const Timestamp = require('./Timestamp.jsx');
 const Address = require('./Address.jsx');
 
+/***
+Draw a shipment. Used in lists of orders/shipments
+This is still WiP
+***/
 class Shipment extends React.Component {
   constructor(props) {
     super(props);

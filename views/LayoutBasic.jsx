@@ -1,6 +1,15 @@
 
 const React = require('react');
 
+/***
+The most minimalist of layouts
+
+renders any react component and that's it
+props:
+  content_name:"" // react component
+  content_props:{} // properties for react component
+  content_string:"" // page as server-side rendered string
+***/
 class LayoutBasic extends React.Component {
   constructor(props) {
     super(props);

@@ -7,10 +7,12 @@ const SQLTable = require('./SQLTable');
 const Item = require('./Item.js');
 const Page = require('./Page.js');
 const GenericList = require('../views/GenericList.jsx');
-const View = require('../views/Store.jsx');
 const ProductList = require('../views/ProductList.jsx')
 const Customizer = require('../views/Customizer.js')
 
+/***
+Handles store model and all /store/ endpoints
+***/
 class Store extends SQLTable {
   constructor(store) {
     super();

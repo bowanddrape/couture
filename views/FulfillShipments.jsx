@@ -4,6 +4,9 @@ const Shipment = require('./Shipment.jsx');
 const Tabs = require('./Tabs.jsx');
 const Scrollable = require('./Scrollable.jsx');
 
+/***
+Admin page to display list of orders at various states of shipment
+***/
 class FulfillShipments extends React.Component {
   constructor(props) {
     super(props);
@@ -18,9 +21,8 @@ class FulfillShipments extends React.Component {
   }
 
   componentDidMount() {
-    BowAndDrape.dispatcher.on("shipment", (shipment) => {
-      this.setState({shipment, shipment});
-    });
+    // TODO listen on a websocket for updates to shipments that are made
+    // while this page is open in a browser
   }
 
   render() {

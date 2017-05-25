@@ -1,6 +1,10 @@
 
 const React = require('react');
 
+/***
+Transactional email. Send this when you want to survey someone on a recently
+recieved product
+***/
 class OrderSurveyEmail extends React.Component {
   constructor(props) {
     super(props);

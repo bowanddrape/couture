@@ -3,6 +3,11 @@
 const React = require('react');
 const bcrypt = require('bcryptjs');
 
+/***
+Widget to show logged-in user. If not logged in, allow user to log in?
+props:
+  user:{} // user object
+***/
 class UserProfile extends React.Component {
   constructor(props) {
     super(props);

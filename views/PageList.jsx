@@ -3,6 +3,9 @@ const React = require('react');
 const Scrollable = require('./Scrollable.jsx');
 const PageEdit = require('./PageEdit.jsx');
 
+/***
+Admin page for CMS pages
+***/
 class PageList extends React.Component {
   constructor(props) {
     super(props);

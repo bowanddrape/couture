@@ -1,6 +1,11 @@
 
 const React = require('react');
 
+/***
+This is the cart link and bug in the menu. Also manages the cart contents
+
+cart contents are saved in localstorage
+***/
 class CartMenu extends React.Component {
   constructor(props) {
     super(props);

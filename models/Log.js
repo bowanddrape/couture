@@ -22,9 +22,12 @@ slackbot.message((message) => {
   listen.emit("message", message.text);
 });
 const token = process.env.SLACK_TOKEN;
+// connect to slack RTM for messages
 slackbot.listen({token});
 
-
+/***
+Log a message. Currently goes to Slack
+***/
 class Log {
 
   static message(msg, callback) {
