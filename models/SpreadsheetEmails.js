@@ -18,7 +18,7 @@ class SpreadsheetEmails {
       return next();
 
     if (req.path_tokens[1]=="new") {
-      if (!req.query.email) return req.json({error:"no email specified"});
+      if (!req.query.email) return res.json({error:"no email specified"});
 
       //this.sheets.init((err, auth) => {
         this.sheets.query('Sheet1!A1:A10', (err, response) => {
