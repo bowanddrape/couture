@@ -133,6 +133,7 @@ class SQLTable {
       }
       // parse the rest of constraints into a query
       if (constraints[column]===null || constraints[column]==="null") {
+        // apply this to NULL and empty strings
         where = where ?
           where + ` AND ${column} IS NULL`:
           `WHERE ${column} IS NULL`;
@@ -194,6 +195,9 @@ class SQLTable {
         substitutions.push('$'+fields.length);
         if (typeof(self[field])=='object') {
           values.push(JSON.stringify(self[field]));
+        } else if (self[field]=='' || self[field]=='null') {
+          // set empty strings or the word 'null' to null
+          values.push(null);
         } else {
           values.push(self[field]);
         }

@@ -48,7 +48,9 @@ class Component extends JSONAPI {
       }
     }
     // assemblies are how to build a product, also convert these to Components
-    if (this.assembly) {
+    if (typeof(this.assembly)!='array' && typeof(this.assembly)!='object') {
+      this.assembly = [];
+    } else if (this.assembly) {
       this.assembly = this.assembly.map((assembly) => {
         return new Component(assembly);
       });

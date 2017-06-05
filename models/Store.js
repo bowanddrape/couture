@@ -128,6 +128,11 @@ class Store extends SQLTable {
     Store.get(req.path_tokens[1], (err, store) => {
       if (err) return res.status(500).end(err.toString());
       if (!store) return Page.renderNotFound(req, res);
+
+      // cache EVERYTHING: if the browser had something, use it!
+      if (req.headers['if-modified-since'])
+        return res.status(304).end();
+
       ProductList.preprocessProps({store:store}, (err, product_list) => {
         product_list.c = req.query['c'];
         product_list = new ProductList(product_list);
@@ -148,6 +153,9 @@ class Store extends SQLTable {
           let pixels = zeros([height, width, 4]);
           pixels.data = pixel_buffer;
 
+          res.setHeader("Cache-Control", "public, max-age=0");
+          res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+          res.setHeader("Last-Modified", new Date(0).toUTCString());
           savePixels(pixels, "png").pipe(sharp().rotate(270)).pipe(res).on("finish", () => {
             // tell headless-gl to garbage collect
             gl.getExtension('STACKGL_destroy_context').destroy();

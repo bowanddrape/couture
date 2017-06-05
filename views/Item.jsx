@@ -1,6 +1,16 @@
 
 const React = require('react');
 
+let recurse_assembly = (component, foreach) => {
+  if (!component) return;
+  foreach(component);
+  if (component.assembly) {
+    component.assembly.forEach((component) => {
+      recurse_assembly(component, foreach);
+    });
+  }
+}
+
 /***
 Draw an Item. Used in views/Items.jsx
 props: will mirror a Component model
@@ -13,20 +23,25 @@ class Item extends React.Component {
       );
     }
     let assembly = [];
-    if (this.props.assembly) {
+    if (this.props.picklist && this.props.assembly) {
       for (let i=0; i<this.props.assembly.length; i++) {
-        if (this.props.assembly[i].props) {
-          assembly.push(<img key={i} src={this.props.assembly[i].props.image} />);
-        }
-        else
-          assembly.push(<span key={i}>{this.props.assembly[i].sku} </span>);
+        let assembly_row = [];
+        recurse_assembly(this.props.assembly[i], (component) => {
+          if (component.props && component.props.image && component.text)
+            assembly_row.push(<span key={assembly_row.length}><img src={component.props.image}/>{component.text}</span>);
+          else if (component.props && component.props.image)
+            assembly_row.push(<img key={assembly_row.length} src={component.props.image} />);
+          else if (!component.assembly)
+            assembly_row.push(<span key={assembly_row.length}>{JSON.stringify(component)}</span>);
+        });
+        assembly.push(<div key={assembly.length}>{assembly_row}</div>);
       }
     }
 
     return (
       <item className={this.props.props.image?"has_image":""}>
         <a href={this.props.props.url}>
-          <preview style={{backgroundImage: "url("+this.props.props.image+")"}}/>
+          <img className="preview" src={this.props.props.image}/>
         </a>
         <deets>
           {/*<div className="sku">{this.props.sku}</div>*/}
@@ -38,8 +53,8 @@ class Item extends React.Component {
         </deets>
         <assembly>
           {assembly}
+          {/*JSON.stringify(this.props.assembly)*/}
         </assembly>
-        {/*JSON.stringify(this.props.assembly)*/}
       </item>
     )
   }

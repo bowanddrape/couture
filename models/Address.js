@@ -5,7 +5,14 @@ sanitization. Well, if that needs to happen, it goes here.
 ***/
 class Address {
   constructor(address) {
+    if (typeof(address)=="string") {
+      try {
+        address = JSON.parse(address);
+      } catch(err) {
+      }
+    }
     this.name = address.name;
+    this.email = address.email;
     if (this.name)
       this.name = this.name.replace(/"/g, "'");
     this.street = address.street;

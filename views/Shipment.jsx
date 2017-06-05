@@ -16,11 +16,13 @@ class Shipment extends React.Component {
       from_id: this.props.from_id,
       to_id: this.props.to_id,
       packed: this.props.packed,
+      approved: this.props.approved,
+      on_hold: this.props.on_hold,
       received: this.props.received,
+      tracking_code: this.props.tracking_code,
+      shipping_label: this.props.shipping_label,
     }
-    this.handlePack = this.handlePack.bind(this);
-    this.handlePickup = this.handlePickup.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
+    this.handleQueryRates = this.handleQueryRates.bind(this);
   }
 
   setSink(sink) {
@@ -35,7 +37,7 @@ class Shipment extends React.Component {
     }
     if (!id)
       return console.log("No shipment sink: "+sink);
-    let shipment = {};
+    let shipment = {id: this.props.id};
     Object.assign(shipment, this.state);
     shipment.to_id = id;
     shipment.received = Math.round(new Date().getTime()/1000);
@@ -45,31 +47,81 @@ class Shipment extends React.Component {
   }
 
   // FIXME altering state on client-side without tracking updates makes races
-  handlePack() {
-    let shipment = {};
+  handleMarkState(state) {
+    let shipment = {id: this.props.id};
     Object.assign(shipment, this.state);
-    shipment.packed = Math.round(new Date().getTime()/1000);
+    shipment[state] = Math.round(new Date().getTime()/1000);
     BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
       this.setState(shipment);
     });
   }
 
-  handlePickup() {
-    this.setSink("customer_pickup");
+  handleRemoveHold() {
+    let shipment = {id: this.props.id};
+    shipment.on_hold = "";
+    BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
+      this.setState(shipment);
+    });
   }
 
-  handleCancel() {
-    this.setSink("canceled");
+  handleQueryRates() {
+    let shipment = {id: this.props.id};
+    BowAndDrape.api("POST", "/shipment/quote", shipment, (err, ret) =>{
+      if (err) return alert(err.error);
+      let rates = [];
+      ret.forEach((rate) => {
+        rates.push({
+          rate_id: rate.object_id,
+          duration: rate.duration_terms || (rate.days?rate.days+" days":""),
+          provider: rate.provider,
+          service: rate.servicelevel.name,
+          price: rate.amount,
+        });
+      });
+      this.setState({
+        rates: rates,
+        tracking_code: "quoting...",
+      });
+    });
+  }
+
+  handleBuyLabel(rate_id) {
+    let shipment = {id: this.props.id,rate_id: rate_id};
+    BowAndDrape.api("POST", "/shipment/buylabel", shipment, (err, shipment) =>{
+      if (err) return alert(err.error);
+      this.setState({
+        rates: undefined,
+        tracking_code: shipment.tracking_code,
+        shipping_label: shipment.shipping_label,
+      });
+    });
   }
 
   render() {
     let line_items = [];
     if (this.props.contents) {
       let item_array = typeof(this.props.contents.items)!='undefined'?this.props.contents.items:this.props.contents;
+      let picklist = this.state.approved && !this.state.in_production && !this.state.packed && !this.state.received;
       for (let i=0; i<item_array.length; i++) {
-        line_items.push(<Item key={line_items.length} picklist={true} {...item_array[i]} />);
+        line_items.push(<Item key={line_items.length} picklist={picklist} {...item_array[i]} />);
       }
     } // populate line_items
+    if (this.state.rates) {
+      this.state.rates.slice(0).reverse().forEach((rate) => {
+        line_items.unshift(
+          <item key={line_items.length} style={{minHeight:"65px"}}>
+            <button onClick={this.handleBuyLabel.bind(this, rate.rate_id)} style={{maxWidth:"190px",position:"absolute"}}>Buy Label</button>
+            <deets>
+              <div className="name">{rate.provider}</div>
+              <div style={{marginLeft:"10px"}}>{rate.service}</div>
+              <div style={{marginLeft:"10px"}}>{rate.duration}</div>
+              <div className="price">{rate.price}$</div>
+            </deets>
+            <div style={{clear:"both"}}/>
+          </item>
+        );
+      });
+    } // this.state.rates
 
     let from = (<div><label>From: </label>{this.state.from_id}</div>);
     let to = (<div><label>To: </label>{this.state.to_id}</div>);
@@ -85,20 +137,33 @@ class Shipment extends React.Component {
     } // lookup facilities
 
     let actions = [];
-    if (!this.state.received) {
-      if (!this.state.packed) {
-        actions.push(<button key={actions.length} onClick={this.handlePack}>Mark as Packed</button>);
-      }
-      if (this.state.packed) {
-        actions.push(<button key={actions.length} onClick={this.handlePickup}>Marked as Pickedup</button>);
-      }
-      actions.push(<button key={actions.length} onClick={this.handleCancel}>Mark as Canceled</button>);
+
+    if (!this.state.tracking_code)
+      actions.push(<button key={actions.length} onClick={this.handleQueryRates}>Ship</button>);
+
+    if (this.state.tracking_code && this.state.tracking_code!="quoting..." && !this.state.approved && !this.state.on_hold)
+      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "approved")}>Ready to Make</button>);
+    if (!this.state.approved && !this.state.on_hold)
+      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "on_hold")}>Hold</button>);
+    if (this.state.on_hold)
+      actions.push(<button key={actions.length} onClick={this.handleRemoveHold.bind(this)}>Remove Hold</button>);
+
+    if (this.state.approved && !this.state.in_production && !this.state.packed && !this.state.received)
+      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "in_production")}>Send to Production</button>);
+    if (this.state.in_production && !this.state.packed && !this.state.received)
+      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "packed")}>Mark as Packed</button>);
+    // TODO for kiosk mode
+    if (false) {
+      actions.push(<button key={actions.length} onClick={this.setSink.bind(this, "customer_pickup")}>Marked as Pickedup</button>);
     }
+
+    actions.push(<button key={actions.length} onClick={this.setSink.bind(this, "canceled")}>Cancel</button>);
 
     return (
       <shipment>
         <div className="time_bar">
           requested: <Timestamp time={this.props.requested} />
+          approved: <Timestamp time={this.props.approved} />
           packed: <Timestamp time={this.state.packed} />
           received: <Timestamp time={this.state.received} />
         </div>
@@ -106,11 +171,12 @@ class Shipment extends React.Component {
           {actions}
         </div>
         <shipping_details>
-          {from}
+          <div><label>Order_id: </label>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</div>
+          <div><label>Deliver_by: </label><Timestamp time={this.state.delivery_promised} /></div>
           {to}
           <div><label>User: </label>{this.props.email}</div>
           {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
-          <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.props.tracking_code}`} target="_blank">{this.props.tracking_code}</a></div>
+          <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
         </shipping_details>
         <div style={{clear:'both'}}/>
         <contents>{line_items}</contents>

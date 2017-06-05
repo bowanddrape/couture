@@ -26,8 +26,10 @@ class JSONAPI extends SQLTable {
       }
       req.query.page = JSON.parse(req.query.page);
       // restrict how many entries we return
-      if (!req.query.page.limit || req.query.page.limit>20)
+      if (!req.query.page.limit)
         req.query.page.limit = 20;
+      if (req.query.page.limit>100)
+        req.query.page.limit = 100;
       return this.constructor.getAll(req.query, (err, objects) => {
         res.json(objects).end();
       });
@@ -35,6 +37,9 @@ class JSONAPI extends SQLTable {
     if (req.method=='POST') {
       // convert any parsable json field
       for(let field in req.body) {
+        // but skip strings that are numbers!
+        if (!isNaN(parseFloat(req.body[field])))
+          continue;
         try {
           req.body[field] = JSON.parse(req.body[field]);
         } catch(err) {}
