@@ -26,30 +26,45 @@ class FulfillShipments extends React.Component {
   }
 
   render() {
-    let pending_outbound_shipments = [];
-    for (let i=0; i<this.props.pending_outbound_shipments.length; i++) {
-      let props = {};
-      Object.assign(props, this.props.pending_outbound_shipments[i]);
-      props.key = i;
-      pending_outbound_shipments.push(
-        React.createElement(Shipment, props)
-      );
-    }
     return (
       <div>
         <h1>Store "{this.props.store.props.name}"</h1>
         <Tabs>
           <shipments>
-            <h2>Pending Outbound Shipments</h2>
+            <h2>New</h2>
             <Scrollable
               component={Shipment}
-              endpoint={`/shipment?store_id=${this.props.store.id}&packed=null&received=null`}
+              endpoint={`/shipment?store_id=${this.props.store.id}&approved=null&on_hold=null&packed=null&received=null`}
               page = {{sort:"requested", direction:"ASC"}}
-              data={this.props.pending_outbound_shipments}
             />
           </shipments>
           <shipments>
-            <h2>For/In Transit</h2>
+            <h2>Hold</h2>
+            <Scrollable
+              component={Shipment}
+              endpoint={`/shipment?store_id=${this.props.store.id}&approved=null&on_hold=not_null`}
+              page = {{sort:"requested", direction:"ASC"}}
+            />
+          </shipments>
+          <shipments>
+            <h2>For Production</h2>
+            <Scrollable
+              component={Shipment}
+              component_props={{picklist:true}}
+              endpoint={`/shipment?store_id=${this.props.store.id}&approved=not_null&in_production=null`}
+              page = {{sort:"requested", direction:"ASC", limit:100}}
+            />
+          </shipments>
+          <shipments>
+            <h2>In Production</h2>
+            <Scrollable
+              component={Shipment}
+              endpoint={`/shipment?store_id=${this.props.store.id}&in_production=not_null&packed=null`}
+              page = {{sort:"requested", direction:"ASC"}}
+            />
+          </shipments>
+          <shipments>
+            <h2>Shipped</h2>
             <Scrollable
               component={Shipment}
               endpoint={`/shipment?store_id=${this.props.store.id}&packed=not_null&received=null`}

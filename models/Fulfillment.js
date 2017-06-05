@@ -69,18 +69,11 @@ class Fulfillment {
           facilities[facility.id] = facility;
         });
 
-        // get pending outbound shipments
-        Shipment.getAll({store_id:store.id, packed:null, received:null, page: {sort:"requested", direction:"ASC", limit:10}}, (err, pending_outbound_shipments) => {
-          pending_outbound_shipments = pending_outbound_shipments ?
-              pending_outbound_shipments : [];
-          // this is a shipment, so all details are already fully hydrated
-          Page.render(req, res, FulfillShipments, {
-            store: store,
-            facilities: facilities,
-            pending_outbound_shipments: pending_outbound_shipments
-          });
+        Page.render(req, res, FulfillShipments, {
+          store: store,
+          facilities: facilities,
         });
-      });
+      }); // Facility.getAll
     }); // get store
   }
 }

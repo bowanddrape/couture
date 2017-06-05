@@ -4,21 +4,21 @@
 }
 .bodyfont {
   font-family: "Open Sans", Arial, sans-serif;
-  color: #000000;
+  color: #000;
 }
 .headerfont {
   font-family: "Zurich-Condensed-Bold", sans-serif;
-  color: #000000;
+  color: #000;
 }
 button,
 .button {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   display: block;
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #fff;
+  color: #000;
   font-weight: bold;
   font-size: 20px;
-  border: solid 5px #000000;
+  border: solid 5px #000;
   padding: 5px;
   text-align: center;
   text-decoration: none;
@@ -29,22 +29,22 @@ button,
 }
 button:hover,
 .button:hover {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #000;
+  color: #fff;
 }
 actions {
   display: flex;
 }
 errors {
-  color: #ffffff;
-  background-color: #aa0000;
+  color: #fff;
+  background-color: #a00;
   padding: 5px;
   border-radius: 5px;
   display: block;
 }
 input.error {
-  box-shadow: 0 0 10px #aa0000;
-  color: #aa0000;
+  box-shadow: 0 0 10px #a00;
+  color: #a00;
 }
 input[type="text"],
 input[type="password"] {
@@ -94,8 +94,8 @@ input[type="password"]:focus {
   display: inline-block;
   padding: 7px;
   width: auto;
-  border: 1px solid #000000;
-  background-color: #ffffff;
+  border: 1px solid #000;
+  background-color: #fff;
   font-size: 12px;
 }
 .card .autocomplete {
@@ -129,7 +129,7 @@ shipment {
   width: 95%;
   padding: 20px;
   margin-top: 10px;
-  border-bottom: solid 5px #0005;
+  border-bottom: solid 5px rgba(0, 0, 0, 0.5);
 }
 shipment .time_bar {
   position: absolute;
@@ -172,7 +172,7 @@ shipment:last-child {
 }
 .timestamp {
   display: inline-block;
-  color: #000000;
+  color: #000;
   opacity: 0.5;
   width: 180px;
 }
@@ -185,21 +185,18 @@ item {
   border-bottom: none;
 }
 item:last-of-type {
-  border-bottom: solid 1px #000000;
+  border-bottom: solid 1px #000;
 }
-item preview {
+item img.preview {
   display: none;
   position: absolute;
-  width: 200px;
-  height: 200px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  max-width: 200px;
+  max-height: 200px;
 }
 item.has_image {
-  height: 200px;
+  min-height: 200px;
 }
-item.has_image preview {
+item.has_image img.preview {
   display: block;
 }
 item deets {
@@ -208,7 +205,7 @@ item deets {
   margin-right: 10px;
 }
 item deets * {
-  color: #000000;
+  color: #000;
   float: left;
   display: inline-block;
 }
@@ -230,10 +227,14 @@ item deets .remove {
   font-size: 15px;
 }
 item deets .remove:hover {
-  color: #000000;
+  color: #000;
 }
 item deets .remove.confirm {
   background-color: #ff5c5c;
+}
+item assembly {
+  clear: both;
+  margin-left: 200px;
 }
 customize product_options {
   display: flex;
@@ -517,12 +518,12 @@ component_edit input[type="text"][name="props_name"] {
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
-  color: #000000;
+  color: #000;
 }
 menu {
   position: fixed;
   top: 0;
-  border-left: solid 1px #000000;
+  border-left: solid 1px #000;
   height: 100%;
   background-color: #c79e6a;
   margin: 0;
@@ -532,7 +533,7 @@ menu {
 }
 menu user {
   display: block;
-  color: #ffffff;
+  color: #fff;
   margin-left: 55px;
   margin-bottom: 15px;
 }
@@ -545,7 +546,7 @@ menu user img {
   width: 53px;
   height: 53px;
   border-radius: 5px;
-  border: solid 2px #ffffff;
+  border: solid 2px #fff;
   position: absolute;
   width: 50px;
   height: 50px;
@@ -554,7 +555,7 @@ menu user img {
 menu login msg {
   display: block;
   font-size: 20px;
-  color: #aa0000;
+  color: #a00;
 }
 menu handle {
   background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
@@ -570,14 +571,14 @@ menu handle {
   left: -30px;
   width: 30px;
   height: 34px;
-  border: solid 1px #000000;
+  border: solid 1px #000;
   border-right: none;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
 }
 menu a {
   font-family: "Zurich-Condensed-Bold", sans-serif;
-  color: #000000;
+  color: #000;
   display: block;
   padding: 5px;
   margin-bottom: 10px;
@@ -591,7 +592,7 @@ menu a cart_bug {
   top: -9px;
   padding: 0px 10px;
   border-radius: 500px;
-  background-color: #ffffff;
+  background-color: #fff;
   font-size: 16px;
   right: -9px;
 }

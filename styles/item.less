@@ -14,18 +14,15 @@ item {
   &:last-of-type {
     border-bottom: solid 1px @color_secondary;
   }
-  preview {
+  img.preview {
     display: none;
     position: absolute;
-    width: @item_preview_width;
-    height: @item_preview_height;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    max-width: @item_preview_width;
+    max-height: @item_preview_height;
   }
   &.has_image {
-    height: @item_preview_height;
-    preview {
+    min-height: @item_preview_height;
+    img.preview {
       display: block;
     }
   }
@@ -60,6 +57,10 @@ item {
         background-color: @color_support_2;
       }
     }
+  }
+  assembly {
+    clear: both;
+    margin-left: @item_preview_width;
   }
 }
 

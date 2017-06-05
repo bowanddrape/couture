@@ -33,11 +33,11 @@ function parseLegacyAssembly(mysql_connection, prerenderkey, callback) {
       }
       let part_option_color_settings = component_config[1]?component_config[1].split('^') : [];
       let text = part_option_color_settings.length>3 ? decodeURIComponent(part_option_color_settings[0]) : "";
-      let query = "SELECT name FROM part_option po, part_option_color poc WHERE po.id=poc.part_option_id AND poc.id="+part_option_color+" LIMIT 1";
+      let query = "SELECT name, CONCAT('http://www.bowanddrape.com/',SUBSTR(image.directory_local,16),thumbnail_file_name) as image FROM part_option po, part_option_color poc, image WHERE po.id=poc.part_option_id AND poc.id="+part_option_color+" AND poc.front_image_id=image.id LIMIT 1";
       mysql_connection.query(query, function(err, rows, fields) {
         if (err) return query_callback(err);
         if (!rows[0]) return query_callback(err, {});
-        return query_callback(err, {text:text, sku:rows[0].name});
+        return query_callback(err, {text:text, name:rows[0].name, image:rows[0].image.replace(/ /g,"%20")});
       });
     });
   }
@@ -47,12 +47,12 @@ function parseLegacyAssembly(mysql_connection, prerenderkey, callback) {
       if (data[i].text) {
         // remove all characters treated as whitespace
         let text = data[i].text.toUpperCase();
-        for (let letter=0; letter<text.length; letter++) {
-          if (/[ ~]/.test(text[letter])) continue;
-          assembly.push({name: data[i].name+": "+text[letter],text: text[letter]});
-        }
+        text = text.split("").filter((letter) => {
+          return !/[ ~]/.test(letter);
+        }).join("");
+        assembly.push({props:{image:data[i].image, name: data[i].name}, text: text});
       } else {
-        assembly.push({name: data[i].name});
+        assembly.push({props:{image:data[i].image, name: data[i].name}});
       }
     }
     callback(null, assembly);
@@ -103,10 +103,11 @@ mysql_connection.connect();
 
 let getOrders = function(callback) {
   let get_items_queries = [];
-  let query = "SELECT orders.id as order_id, UNIX_TIMESTAMP(orders.created_at) AS requested, UNIX_TIMESTAMP(ship_date) AS packed, email, CONCAT('{\"name\":\"',shipping_name,'\",\"street\":\"',shipping_addr1,' ',shipping_addr2,'\",\"locality\":\"',shipping_city,'\",\"region\":\"',shipping_state,'\",\"postal\":\"',shipping_zip,'\",\"country\":\"',shipping_country,'\"}') AS address, tracking_code, delivered_date FROM orders, user WHERE orders.user_id=user.id ORDER BY orders.id DESC LIMIT 5000";
+  let query = "SELECT orders.id as order_id, UNIX_TIMESTAMP(orders.created_at) AS requested, UNIX_TIMESTAMP(ship_date) AS packed, email, CONCAT('{\"name\":\"',shipping_name,'\",\"street\":\"',shipping_addr1,' ',shipping_addr2,'\",\"locality\":\"',shipping_city,'\",\"region\":\"',shipping_state,'\",\"postal\":\"',shipping_zip,'\",\"country\":\"',shipping_country,'\"}') AS address, tracking_code, delivered_date FROM orders, user WHERE orders.user_id=user.id ORDER BY orders.id DESC LIMIT 1000";
   mysql_connection.query(query, function(err, rows, fields) {
     if (err) return console.error(err);
     for (let i=0; i<rows.length; i++) {
+      // if delivered in the future, remove
       get_items_queries.push(function(callback) {
         getLegacyItems(mysql_connection, rows[i].order_id, function(err, items) {
           let ret = {};
@@ -152,16 +153,16 @@ Store.initMandatory(["haute"], (err, store_ids) => {
             contents: order_object.contents,
             props: {imported: "haute", legacy_id: order_object.order_id},
           };
-          let received = new Date(order_object.delivered_date).getTime()/1000;
-          if (!isNaN(received))
-            imported_shipment.received = received;
+          let delivery_promised = new Date(order_object.delivered_date).getTime()/1000;
+          if (!isNaN(delivery_promised))
+            imported_shipment.delivery_promised = delivery_promised;
           try {
             imported_shipment.address = new Address(JSON.parse(order_object.address.replace(/\s+/g," ")));
           } catch (error) {
             console.log(order_object.address);
           }
           let serialized_old_shipment = JSON.stringify(shipment);
-          Object.assign(shipment, imported_shipment);
+          shipment = Object.assign(shipment, imported_shipment);
           shipment = new Shipment(shipment);
           shipment.lookupTracking((err) => {
             let serialized_new_shipment = JSON.stringify(shipment);
