@@ -25,7 +25,6 @@ class ProductCanvas extends React.Component {
     this.customizer = new BowAndDrape.Customizer({canvas: this.canvas});
     this.customizer.init();
     this.forceUpdate();
-    this.customizer.animate();
   }
 
   handleAddComponent(component) {
@@ -38,15 +37,15 @@ class ProductCanvas extends React.Component {
       }
       // if nothing is selected make a new selected component
       let position = [0,0,0];
-      // if there was an existing component, place new one a line lower
-      if (this.customizer.components.length) {
-        let prev_component = this.customizer.components[this.customizer.components.length-1];
-        position[0] = prev_component.position[0];
-        position[1] = prev_component.position[1] - prev_component.getWorldDims()[1];
+      // facing the camera for now TODO get normal of intersected tri
+      let rotation = {
+        angle: -this.customizer.camera.rotation.angle,
+        axis: this.customizer.camera.rotation.axis,
       }
       assembly.push({
         props: {
           position: position,
+          rotation: rotation,
         },
         assembly: [component],
       });
@@ -71,12 +70,11 @@ class ProductCanvas extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     // handle actions on hitboxes
-    let index = 0;
     this.canvas.parentNode.childNodes.forEach((node) => {
       if (node.tagName.toLowerCase()!="component_hitbox") return;
-      node.ontouchmove = this.handleComponentMove.bind(this, index);
-      node.onmousemove = this.handleComponentMove.bind(this, index);
-      index++;
+      // this overrides the synthetic react events so we don't scroll
+      node.ontouchmove = this.handleComponentMove.bind(this, node.getAttribute("data"));
+      node.onmousemove = this.handleComponentMove.bind(this, node.getAttribute("data"));
     });
     this.handleUpdateProduct();
   }
@@ -107,30 +105,77 @@ class ProductCanvas extends React.Component {
     this.setState({selected_component: index});
   }
   componentWillUpdate(nextProps, nextState) {
+    // send state to gl
     this.customizer.set(nextProps.product, nextState);
+    // update our cameras
+    this.cameras = nextProps.product.cameras;
+    if (!this.cameras || typeof(this.cameras)!='array') {
+      // the default camera, one meter away
+      this.cameras = [];
+      this.cameras.push({
+        position: [0, 0, -1],
+        rotation: {
+          angle: 0,
+          axis: [0, 1, 0],
+        }
+      });
+      this.cameras.push({
+        position: [0, 0, -1],
+        rotation: {
+          angle: Math.PI/4,
+          axis: [0, 1, 0],
+        }
+      });
+      this.cameras.push({
+        position: [0, 0, -1],
+        rotation: {
+          angle: Math.PI,
+          axis: [0, 1, 0],
+        }
+      });
+    }
+  }
+
+  handleChangeCamera(index) {
+    this.customizer.updatePMatrix(this.cameras[index]);
+    this.handleSelectComponent(-1);
   }
 
   render() {
     let component_hitboxes = [];
 
     if (this.customizer) {
-      this.customizer.components.forEach((component) => {
-        let position_screen = this.customizer.worldToScreen(component.position);
-        let dims_screen = this.customizer.getScreenDims(component);
+      for (let index=0; index<this.customizer.components.length; index++) {
+        let component = this.customizer.components[index];
+        let dims_screen = this.customizer.getScreenBoundingBox(component);
+        // cull backfacing hitboxes
+        if (dims_screen.bottom_right[0]<dims_screen.top_left[0]) continue;
         component_hitboxes.push(
           <component_hitbox
             key={component_hitboxes.length}
             style={{
               position:"absolute",
-              left:`${position_screen[0]-dims_screen[0]/2}px`,
-              top:`${position_screen[1]-dims_screen[1]/2}px`,
-              width:`${dims_screen[0]}px`,
-              height:`${dims_screen[1]}px`,
+              left:`${dims_screen.top_left[0]}px`,
+              top:`${dims_screen.bottom_right[1]}px`,
+              width:`${dims_screen.bottom_right[0]-dims_screen.top_left[0]}px`,
+              height:`${dims_screen.top_left[1]-dims_screen.bottom_right[1]}px`,
               backgroundColor:"rgba(0,0,0,0)",
-              border:component_hitboxes.length==this.state.selected_component?"solid 1px #000":"none",
+              border:index==this.state.selected_component?`solid 1px #000`:`none`,
             }}
+            data={index}
           />
         );
+      };
+    }
+
+    let camera_switcher = [];
+    if (this.cameras) {
+      this.cameras.forEach((camera) => {
+        camera_switcher.push(
+          <button key={camera_switcher.length} onClick={this.handleChangeCamera.bind(this, camera_switcher.length)}>
+            Camera {camera_switcher.length}
+          </button>
+        )
       });
     }
 
@@ -139,6 +184,9 @@ class ProductCanvas extends React.Component {
         <canvas height="300" style={{position:"relative"}}>
         </canvas>
         {component_hitboxes}
+        <hud_controls style={{position:"absolute",right:"0",top:"0"}}>
+          {camera_switcher}
+        </hud_controls>
       </div>
     );
   }

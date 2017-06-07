@@ -36,6 +36,7 @@
     "node-jsx-babel": "^0.14.2",
     "pg": "^6.1.0",
     "pg-native": "^1.10.0",
+    "ray-triangle-intersection": "^1.0.3",
     "react": "~15.3.2",
     "react-autocomplete": "^1.4.0",
     "react-swipeable": "^3.9.2",

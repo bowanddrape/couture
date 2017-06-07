@@ -1,4 +1,5 @@
 const async = require('async');
+const rayTriangleIntersection = require('ray-triangle-intersection');
 
 const Component = require('./Component.js');
 const SylvestorGlUtils = require('sylvester-es6');
@@ -14,22 +15,16 @@ class Customizer {
   constructor(options) {
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
-    // TODO we're going to want to move camera_elevation to properly frame
-    // our products
-    this.camera_elevation = this.options.camera_elevation || 1.0;
+
+    this.camera = {
+      position: [0, 0, -1],
+      rotation: {
+        angle: 0,
+        axis: [0, 1, 0],
+      }
+    }
 
     this.gl = null;
-
-    // TODO all this particle stuff is leftover from when I stole this code
-    // from a personal project, clean this up eventually
-    this.particleVerticesBuffer;
-    this.particleVerticesTextureCoordBuffer;
-    this.particleVerticesIndexBuffer;
-    this.particleVerticesIndexBuffer;
-    this.particleRotation = 0.0;
-    this.lastParticleUpdateTime = (new Date).getTime();
-
-    this.particleTexture;
 
     this.mvMatrix;
     this.mvMatrixStack = [];
@@ -37,11 +32,6 @@ class Customizer {
     this.vertexPositionAttribute;
     this.textureCoordAttribute;
     this.pMatrix;
-
-    this.particles = [];
-    for (let i=0; i<12; i++) {
-      this.particles.push(new Component());
-    }
 
     this.components = [];
     this.product = new Component();
@@ -53,12 +43,13 @@ class Customizer {
     let components = [];
     // set product
     if (product)
-      set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props}));
-    // TODO recurse assemblies
-    if (construction && construction.assembly)
+      set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props, geometry:"doublesided"}));
+    // recurse assemblies
+    if (construction && construction.assembly) {
       construction.assembly.forEach((component) => {
         components.push(component);
       });
+    }
     // sync component list the same
     while (this.components.length < components.length) {
       this.components.push(new Component());
@@ -70,24 +61,34 @@ class Customizer {
     }
     async.parallel(set_tasks, (err) => {
       if (callback) callback();
+      if (typeof(window)!='undefined') window.requestAnimationFrame(this.render.bind(this));
     });
   }
 
+  // call this on window resize, when we need to re-setup pretty much everything
   resizeViewport() {
     // set canvas space to be 1-to-1 with browser space
     this.gl.viewport(0, 0, this.options.width, this.options.height);
-
-    // init pMatrix with view frustrum
-    this.pMatrix = SylvestorGlUtils.makePerspective(this.options.vfov, this.options.width/this.options.height, 0.1, 100.0);
-    // move camera upwards by elevation
-    this.pMatrix = this.translate(this.pMatrix, [-0.0, 0.0, -this.camera_elevation]);
-    // TODO if camera_elevation is negative, then rotate Y 180
-
+    // f_pixels is useful for a lot of transforms, remember it
     this.focal_length_pixels = this.options.height/2/Math.tan(this.options.vfov*Math.PI/360);
 
+    this.updatePMatrix();
     this.updateCanvasScreenPosition();
   }
 
+  // compute pMatrix, call whenever changing camera or viewport!
+  updatePMatrix(camera=undefined) {
+    if (camera) this.camera = camera;
+    // init pMatrix with view frustrum
+    this.pMatrix = SylvestorGlUtils.makePerspective(this.options.vfov, this.options.width/this.options.height, 0.1, 100.0);
+    // move camera upwards by elevation
+    this.pMatrix = this.translate(this.pMatrix, this.camera.position);
+    // rotate camera around origin
+    this.pMatrix = this.rotate(this.pMatrix, this.camera.rotation.angle, this.camera.rotation.axis);
+    if (typeof(window)!='undefined') window.requestAnimationFrame(this.render.bind(this));
+  }
+
+  // call this after appending a child before our canvas!
   updateCanvasScreenPosition() {
     let position = [0, 0];
     let element = this.options.canvas;
@@ -106,7 +107,6 @@ class Customizer {
     this.canvas_offset = position;
   }
 
-
   init() {
     this.gl = this.initWebGL();
     let gl = this.gl;
@@ -117,57 +117,82 @@ class Customizer {
     gl.depthFunc(gl.LEQUAL);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    gl.enable(gl.CULL_FACE);
+    gl.cullFace(gl.BACK);
 
     this.resizeViewport();
     this.initShaders();
-    this.initBuffers();
-    this.initTextures();
 
     // init mvMatrix
     this.mvMatrix = Matrix.I(4);
   }
 
   browserToWorld(browser) {
-//    let scroll = document.body.scrollTop || document.documentElement.scrollTop;
     return this.screenToWorld([
       browser[0]-this.canvas_offset[0],
       browser[1]-this.canvas_offset[1],
     ]);
   }
   screenToWorld(screen) {
-    let ret = [
-      screen[0]-(this.options.canvas.offsetWidth/2),
-      (this.options.canvas.offsetHeight/2)-screen[1],
-      0,
-      1
-    ];
-    ret[0] = ret[0]*this.camera_elevation/this.focal_length_pixels;
-    ret[1] = ret[1]*this.camera_elevation/this.focal_length_pixels;
-    return ret;
+    // get a unit directional vector from camera origin through screen pixel
+    let rotY = Math.atan2(screen[0]-(this.options.canvas.offsetWidth/2), this.focal_length_pixels);
+    let rotX = Math.atan2(screen[1]-(this.options.canvas.offsetHeight/2), this.focal_length_pixels);
+    let screen_direction_world = new Vector([0, 0, 1]);
+    // rotate by pixel offset
+    screen_direction_world = Matrix.Rotation(rotX, new Vector([1,0,0])).x(screen_direction_world);
+    screen_direction_world = Matrix.Rotation(rotY, new Vector([0,1,0])).x(screen_direction_world);
+    // rotate by camera
+    screen_direction_world = Matrix.Rotation(this.camera.rotation.angle, new Vector(this.camera.rotation.axis)).x(screen_direction_world);
+
+    let geometry_intersection = null;
+    let pt = Matrix.Rotation(this.camera.rotation.angle, new Vector(this.camera.rotation.axis)).x(new Vector(this.camera.position.slice(0, 3))).elements;
+    let dir = screen_direction_world.elements.slice(0, 3);
+    for (let tri_index=0; tri_index<this.product.vertex_indices.length/3; tri_index++) {
+      let triangle = []
+      for (let i=0; i<3; i++) {
+        let index = this.product.vertex_indices[tri_index*3+i];
+        triangle.push(this.product.vertices.slice(index*3, index*3+3));
+      }
+
+      // the intersect we're using only intersects backfaces and not front?
+      // reverse our winding to compensate... -_-
+      let swap = triangle[2];
+      triangle[2] = triangle[1];
+      triangle[1] = swap;
+      let intersect = rayTriangleIntersection([], pt, dir, triangle);
+      // TODO find the closest intersection, for now I'm just grabbing ANY
+      if (intersect) {
+        geometry_intersection = intersect;
+        break;
+      }
+    }
+    return geometry_intersection;
   }
+
   worldToScreen(world) {
-    let ret = [
-      world[0]*this.focal_length_pixels/this.camera_elevation+(this.options.canvas.offsetWidth/2),
-      (this.options.canvas.offsetHeight/2)-(world[1]*this.focal_length_pixels/this.camera_elevation),
-      0,
-      1
-    ];
-    return ret;
+    world[3] = world[3] || 1;
+    let normDeviceCoords = this.pMatrix.x(new Vector([world[0], world[1], world[2], world[3]]));
+    let screen = [0, 0, 0, 1];
+    screen[0] = normDeviceCoords.elements[0] * this.options.canvas.offsetWidth/2
+      + this.options.canvas.offsetWidth/2;
+    screen[1] = this.options.canvas.offsetHeight/2 - (normDeviceCoords.elements[1] * this.options.canvas.offsetHeight/2);
+
+    return screen;
   }
-  getScreenDims(component) {
+
+  getScreenBoundingBox(component) {
+    let rotation_matrix = Matrix.Rotation(component.rotation.angle, new Vector(component.rotation.axis));
     let world_dims = component.getWorldDims();
-    let top_left = this.worldToScreen([
-      component.position[0] - world_dims[0]/2,
-      component.position[1] - world_dims[1]/2,
-    ]);
-    let bottom_right = this.worldToScreen([
-      component.position[0] + world_dims[0]/2,
-      component.position[1] + world_dims[1]/2,
-    ]);
-    return [
-      Math.abs(bottom_right[0]-top_left[0]),
-      Math.abs(bottom_right[1]-top_left[1]),
-    ];
+    let bottom_right = new Vector(component.position).add(rotation_matrix.x(new Vector(world_dims).x(0.5))).elements;
+    bottom_right = this.worldToScreen(bottom_right);
+    let top_left = new Vector(component.position).subtract(rotation_matrix.x(new Vector(world_dims).x(0.5))).elements;
+    top_left = this.worldToScreen(top_left);
+
+    return {
+      top_left,
+      bottom_right,
+    }
   }
 
   initWebGL() {
@@ -192,66 +217,6 @@ class Customizer {
     return gl;
   }
 
-  initBuffers() {
-    let gl = this.gl;
-
-    // vertex buffer object
-    this.particleVerticesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesBuffer);
-
-    let vertices = [
-      -0.5, -0.5, 0.0, 
-       0.5, -0.5, 0.0, 
-       0.5,  0.5, 0.0, 
-      -0.5,  0.5, 0.0, 
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-    // texture coordinate buffer object
-    this.particleVerticesTextureCoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesTextureCoordBuffer);
-    let textureCoordinates = [
-      0.0,  1.0,
-      1.0,  1.0,
-      1.0,  0.0,
-      0.0,  0.0,
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
-
-    // index buffer object
-    this.particleVerticesIndexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.particleVerticesIndexBuffer);
-    let particleVertexIndices = [
-      0,  1,  2,      0,  2,  3,
-    ]
-
-    // Now send the element array to GL
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
-        new Uint16Array(particleVertexIndices), gl.STATIC_DRAW);
-  }
-
-  initTextures() {
-    let gl = this.gl;
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-    this.particleTexture = gl.createTexture();
-    if (typeof(Image)!="undefined") {
-      let particleImage = new Image();
-      let self = this;
-      particleImage.onload = function() {
-        self.handleTextureLoaded(particleImage, self.particleTexture);
-        for (let i=0; i<self.particles.length; i++)
-          self.particles[i].texture = self.particleTexture;
-      }
-      particleImage.src = "/petal.png";
-    } else {
-      const getPixels = require("get-pixels")
-      getPixels("http://localhost/petal.png", (err, pixels) => {
-        if (err) return;
-        this.handleTextureLoaded(pixels, this.particleTexture);
-      });
-    }
-  }
-
   handleTextureLoaded(image, texture) {
     let gl = this.gl;
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -260,6 +225,7 @@ class Customizer {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
     gl.generateMipmap(gl.TEXTURE_2D);
     gl.bindTexture(gl.TEXTURE_2D, null);
+    if (typeof(window)!='undefined') window.requestAnimationFrame(this.render.bind(this));
   }
 
   render() {
@@ -271,23 +237,6 @@ class Customizer {
     let pUniform = gl.getUniformLocation(this.shaderProgram, "uPMatrix");
     gl.uniformMatrix4fv(pUniform, false, new Float32Array(this.pMatrix.flatten()));
 
-    // Draw the particle by binding the array buffer to the particle's vertices
-    // array, setting attributes, and pushing it to GL
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesBuffer);
-    gl.vertexAttribPointer(this.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-    // Set the texture coordinates attribute for the vertices
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.particleVerticesTextureCoordBuffer);
-    gl.vertexAttribPointer(this.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
-
-    // Specify geometry
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.particleVerticesIndexBuffer);
-
-    // update time
-    let currentTime = (new Date).getTime();
-    this.time_delta = currentTime - this.lastParticleUpdateTime;
-    this.lastParticleUpdateTime = currentTime;
-
     // draw product
     this.product.render(gl, this.mvMatrix, this.shaderProgram);
 
@@ -295,13 +244,10 @@ class Customizer {
     for (let i=0; i<this.components.length; i++) {
       this.components[i].render(gl, this.mvMatrix, this.shaderProgram);
     }
-
-    for (let i=0; i<this.particles.length; i++) {
-      this.particles[i].render(gl, this.mvMatrix, this.shaderProgram);
-      this.particles[i].updatePosition(this.time_delta);
-    }
   }
 
+  // draw continuously? We shouln't really do this, just call render when
+  // anything changes as that'll be way cheaper than redrawing all the time
   animate() {
     this.render();
     window.requestAnimationFrame(this.animate.bind(this));
@@ -385,7 +331,7 @@ class Customizer {
 
   rotate(m, angle, v) {
     let r = Matrix.Rotation(angle, new Vector([v[0], v[1], v[2]])).ensure4x4();
-    return m.x(r); 
+    return m.x(r);
   }
 
   translate(m, v) {

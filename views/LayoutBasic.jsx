@@ -34,7 +34,7 @@ class LayoutBasic extends React.Component {
     return (
       <div>
         <meta httpEquiv="content-type" content="text/html; charset=utf-8" />
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/> 
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
         {content}
         <script src="/BowAndDrape.js"></script>

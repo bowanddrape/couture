@@ -120,7 +120,7 @@ class Page extends JSONAPI {
             }
             Page.render(req, res, component, props);
           });
-        } 
+        }
       }
       next();
     });

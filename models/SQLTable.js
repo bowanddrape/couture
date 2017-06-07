@@ -106,7 +106,7 @@ class SQLTable {
 
   // query db for all objects matching the constraints query object
   // constraints can have all the normal fields specified in getSQLSettings(),
-  // but also can specify page:{limit:#,sort:"ASC|DESC",start:#} or 
+  // but also can specify page:{limit:#,sort:"ASC|DESC",start:#} or
   // search:"" which does a string search
   static getAll(constraints, callback) {
     if (!this.getSQLSettings) return callback("getSQLSettings not defined");

@@ -7,6 +7,7 @@ let listen = new EventEmitter();
 const username = "couture_"+os.hostname();
 const regex_username = new RegExp(`@${username}`);
 
+// FIXME we need to catch connection exceptions to slack because this kills us
 const slack = require('slack')
 const slackbot = slack.rtm.client();
 slackbot.started((reconnect) => {
