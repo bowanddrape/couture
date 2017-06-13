@@ -74,7 +74,7 @@ class Store extends SQLTable {
               if (product) {
                 product = req.body;
               }
-            } 
+            }
           }
           // save updated store
           store.upsert((err, result) => {

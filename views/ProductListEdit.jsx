@@ -79,7 +79,7 @@ class ProductListEdit extends React.Component {
 
     async.series(add_tasks, (err, data) => {
       if (err) return console.log(err);
-      // if we successfully updated, reload so we can see our changes 
+      // if we successfully updated, reload so we can see our changes
       location.reload();
     });
 

@@ -36,12 +36,13 @@ class Switch extends React.Component {
           {
             (child.props.value==this.props.value) ?
               <Stroke data="/select_stroke.svg" style={{
-                zIndex: "2",
+                zIndex: "1",
                 width: "200px",
                 height: "100px",
                 position: "absolute",
                 top: "-28px",
                 left: "-20px",
+                pointerEvents: "none",
               }} draw_on_load={true} duration={1}/>
               : null
           }
