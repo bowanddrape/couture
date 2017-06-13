@@ -76,17 +76,20 @@ class Stroke extends React.Component {
       if (this.set_visible || this.props.draw_on_load) {
         // FIXME I have a hard-coded delay in here to wait for it to finish transitioning to the not-drawn state before we animate drawing it
         setTimeout(()=>{
-          this.setVisible();
+          this.setVisible(true);
         }, 20);
       }
     }
     object.data = this.props.data || "/logo_stroke.svg";
   }
 
-  setVisible() {
+  setVisible(state = true) {
     // if not loaded yet, draw at next chance
-    this.set_visible = true;
-    this.object.contentDocument.querySelector("svg").classList.add("drawn");
+    this.set_visible = state;
+    if (state)
+      this.object.contentDocument.querySelector("svg").classList.add("drawn");
+    else
+      this.object.contentDocument.querySelector("svg").classList.remove("drawn");
   }
 
   render() {

@@ -92299,7 +92299,6 @@ var Item = function (_React$Component) {
         );
       }
       var assembly = [];
-      console.log(this.props.picklist);
       if (this.props.picklist && this.props.assembly) {
         var _loop = function _loop(i) {
           var assembly_row = [];
@@ -92971,9 +92970,20 @@ var Placeholder = function (_React$Component) {
   }
 
   _createClass(Placeholder, [{
+    key: 'handleClick',
+    value: function handleClick() {
+      var _this2 = this;
+
+      console.log("click");
+      this.refs.logo.setVisible(false);
+      setTimeout(function () {
+        _this2.refs.logo.setVisible(true);
+      }, 20);
+    }
+  }, {
     key: 'render',
     value: function render() {
-      return React.createElement("content", {}, React.createElement(Stroke, { data: "/logo_stroke.svg", style: { display: "block", width: "600px", maxWidth: "100%" }, draw_on_load: true }));
+      return React.createElement("content", { onClick: this.handleClick.bind(this) }, React.createElement(Stroke, { data: "/logo_stroke.svg", style: { display: "block", width: "600px", maxWidth: "100%", pointerEvents: "none" }, draw_on_load: true, ref: "logo" }));
     }
   }]);
 
@@ -94415,7 +94425,7 @@ var Stroke = function (_React$Component) {
         if (_this2.set_visible || _this2.props.draw_on_load) {
           // FIXME I have a hard-coded delay in here to wait for it to finish transitioning to the not-drawn state before we animate drawing it
           setTimeout(function () {
-            _this2.setVisible();
+            _this2.setVisible(true);
           }, 20);
         }
       };
@@ -94424,9 +94434,11 @@ var Stroke = function (_React$Component) {
   }, {
     key: "setVisible",
     value: function setVisible() {
+      var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
       // if not loaded yet, draw at next chance
-      this.set_visible = true;
-      this.object.contentDocument.querySelector("svg").classList.add("drawn");
+      this.set_visible = state;
+      if (state) this.object.contentDocument.querySelector("svg").classList.add("drawn");else this.object.contentDocument.querySelector("svg").classList.remove("drawn");
     }
   }, {
     key: "render",
