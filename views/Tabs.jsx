@@ -19,6 +19,22 @@ class Tabs extends React.Component {
     };
   }
 
+  handleTabChange(value) {
+    this.setState({selected_tab:value});
+    // fire an onChange on click as well as on change?
+    if (typeof(this.props.onChange) == "function")
+      this.props.onChange();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      typeof(this.props.onChange) == "function" &&
+      prevState.selected_tab != this.state.selected_tab
+    ) {
+      this.props.onChange();
+    }
+  }
+
   render() {
     let tabs = [];
 
@@ -32,12 +48,12 @@ class Tabs extends React.Component {
       if (grandchildren.length)
         tab_name_options.push(grandchildren[0].props.children);
       let tab_name = initDefaultFallback(...tab_name_options, "Tab");
-      tabs.push(<option key={tabs.length} onClick={()=>{this.setState({selected_tab:index})}} value={tabs.length}>{tab_name}</option>);
+      tabs.push(<option key={tabs.length} value={tabs.length}>{tab_name}</option>);
     };
 
     return (
       <tabs className={this.props.className}>
-        <Switch style={{}} value={this.state.selected_tab} onChange={(value)=>{this.setState({selected_tab:value});}}>
+        <Switch style={{}} value={this.state.selected_tab} onChange={this.handleTabChange.bind(this)}>
           {tabs}
         </Switch>
         <tab_contents>

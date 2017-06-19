@@ -6,7 +6,6 @@ const querystring = require('querystring');
 const ProductCanvas = require('./ProductCanvas.jsx');
 const ProductListEdit = require('./ProductListEdit.jsx');
 const ComponentEdit = require('./ComponentEdit.jsx');
-const Tabs = require('./Tabs.jsx');
 const Switch = require('./Switch.jsx');
 const ComponentSerializer = require('./ComponentSerializer.js');
 
@@ -120,7 +119,7 @@ class ProductList extends React.Component {
       });
       // fill in things we just have the sku for
       traverse_item_options(initial_assembly, (component) => {
-        if (component && component.sku) {
+        if (component && component.sku && components[component.sku]) {
           component.props = JSON.parse(JSON.stringify(components[component.sku].props));
         }
       });
@@ -136,14 +135,13 @@ class ProductList extends React.Component {
     if (!product)
       return this.renderProductList();
 
-    let components = this.populateComponents(product);
     let product_raw = this.getSelectedProductRaw();
 
     return (
       <customize>
         {this.props.edit ?
           <ComponentEdit {...product_raw} inherits={product} /> :
-          <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"1",maxWidth:"none",margin:"0px"}}>Add To Cart</button>
+          <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"3",maxWidth:"none",margin:"0px"}}>Add To Cart</button>
         }
         <div className="canvas_container">
           <product_options>
@@ -151,10 +149,6 @@ class ProductList extends React.Component {
           </product_options>
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
         </div>
-        <div className="component_spacer"/>
-        <Tabs className="components">
-          {components}
-        </Tabs>
       </customize>
     );
   }
@@ -310,8 +304,7 @@ class ProductList extends React.Component {
       };
       if (options.length) {
         product_options.push(
-//          <select onChange={(event)=>{this.handleOptionChange(depth, event.target.value)}} key={Math.random()} value={selected_option}>{options}</select>
-  <Switch onChange={(value)=>{this.handleOptionChange(depth, value)}} value={selected_option} key={product_options.length}>{options}</Switch>
+          <Switch onChange={(value)=>{this.handleOptionChange(depth, value)}} value={selected_option} key={product_options.length}>{options}</Switch>
         )
       }
       if (selected_option=="no option selected") {
@@ -332,15 +325,6 @@ class ProductList extends React.Component {
     return {product, product_options};
   } // populateProductOptions
 
-  handleAddComponent(component) {
-    this.refs.ProductCanvas.handleAddComponent(component);
-  }
-  handlePopComponent() {
-    this.refs.ProductCanvas.handlePopComponent();
-  }
-  handleSelectComponent(component) {
-    this.refs.ProductCanvas.handleSelectComponent(component);
-  }
   handleUpdateProduct() {
     // call this whenever there was an update to base_product or assembly
     // TODO only do the following when done with a component drag!
@@ -360,94 +344,6 @@ class ProductList extends React.Component {
       history.replaceState(history.state, "", url);
     });
   }
-
-  populateComponents(product) {
-    // populate components
-    let components = [];
-    let misc_components = [];
-    for (let i=0; product.compatible_components && i<product.compatible_components.length; i++) {
-      if (product.compatible_components[i].options) {
-        // handle if keyboard
-        if (product.compatible_components[i].props.is_letters) {
-          // array => map
-          let component_letters = {};
-          let tab_components = [];
-          for (let j=0; j<product.compatible_components[i].options.length; j++) {
-            let letter = product.compatible_components[i].options[j];
-            let toks = letter.props.name.split('_');
-            let character = toks[toks.length-1].toLowerCase();
-            if (character.match(/^[a-z]$/))
-              component_letters[character] = letter;
-            else {
-              component_letters[character] = letter;
-              tab_components.push(
-                <div key={i+'_'+j} style={{backgroundImage:`url(${letter.props.image})`,backgroundSize:`${letter.props.imagewidth/letter.props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, letter)}/>
-              );
-            }
-          }
-          components.push(
-            <div key={components.length} name={product.compatible_components[i].props.name} className="component_keyboard_container">
-              <row>{['q','w','e','r','t','y','u','i','o','p'].map((character)=>{
-                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
-              })}</row>
-              <row>
-                <div key="spacer0" className="halfgap"/>
-                {['a','s','d','f','g','h','j','k','l'].map((character)=>{
-                  return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
-                })}
-                <div key="spacer1" className="halfgap"/>
-              </row>
-              <row>
-                <div key="spacer2" className="halfgap"/>
-                <div key="spacer2a" className="halfgap"/>
-                {['z','x','c','v','b','n','m'].map((character)=>{
-                  return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
-                })}
-                <div key="spacer3" className="halfgap"/>
-                <div key="backspace" className="backspace" onClick={this.handlePopComponent.bind(this)}/>
-              </row>
-              <row>
-                <div key="spacer3a" className="halfgap"/>
-                <div key="spacer3b" className="halfgap"/>
-                <div key="spacebar" className="spacebar" onClick={this.handleAddComponent.bind(this, component_letters["space"])}/>
-                <div key="spacer3c" className="halfgap"/>
-                <div key="enter" className="enter" onClick={this.handleSelectComponent.bind(this, -1)}/>
-              </row>
-            </div>
-          );
-          components.push(
-            <div key={components.length} name={product.compatible_components[i].props.name+"_cont"} className="component_container">{tab_components}</div>
-          );
-          continue;
-        }
-        // otherwise just list them
-        let tab_components = [];
-        for (let j=0; j<product.compatible_components[i].options.length; j++) {
-          tab_components.push(
-            <div key={i+'_'+j} style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}} onClick={this.handleAddComponent.bind(this, product.compatible_components[i].options[j])}/>
-          );
-        }
-        components.push(
-          <div key={components.length} name={product.compatible_components[i].props.name} className="component_container">
-            {tab_components}
-          </div>
-        );
-        continue;
-      }
-      misc_components.push(
-        <div key={i+'_0'}  style={{backgroundImage:`url(${product.compatible_components[i].props.image})`}}/>
-      );
-    }
-
-    if (misc_components.length) {
-      components.push(
-        <div key={components.length} name="misc sparkles" className="component_container">
-          {misc_components}
-        </div>
-      );
-    }
-    return components;
-  } // populateComponents()
 
 }
 

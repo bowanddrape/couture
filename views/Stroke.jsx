@@ -79,6 +79,9 @@ class Stroke extends React.Component {
           this.setVisible(true);
         }, 20);
       }
+      object.touchStart = (event) => {
+        event.preventDefault();
+      }
     }
     object.data = this.props.data || "/logo_stroke.svg";
   }

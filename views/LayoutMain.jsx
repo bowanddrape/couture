@@ -67,14 +67,17 @@ class LayoutMain extends React.Component {
     });
 
     // bind resize
-    let self = this;
-    function resize() {
-      self.setState({viewport_width:window.innerWidth});
-    }
-    window.addEventListener("resize", resize);
-    resize();
+    window.addEventListener("resize", this.handleResize.bind(this));
+    window.addEventListener("touchend", this.handleResize.bind(this));
+    this.handleResize();
 
     BowAndDrape.dispatcher.emit("loaded");
+  }
+
+  handleResize() {
+    this.setState({
+      viewport_width:window.innerWidth
+    });
   }
 
   render() {

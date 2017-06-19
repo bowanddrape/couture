@@ -1,6 +1,24 @@
 
 const React = require('react');
 const Swipeable = require('react-swipeable');
+const ProductComponentPicker = require('./ProductComponentPicker.jsx');
+
+// lookup table to find skus corresponding to certain characters
+let character_to_skutext = {
+  " ":"space",
+  "#":"hashtag",
+  "?":"question",
+  "!":"exclamation",
+  "&":"and",
+  "\"":"quote",
+  "\'":"quote",
+  ",":"comma",
+  ".":"dot",
+};
+let skutext_to_character = {};
+Object.keys(character_to_skutext).forEach((key) => {
+  skutext_to_character[character_to_skutext[key]] = [key];
+});
 
 /***
 Drawn by ProductList and contains the Customizer
@@ -17,6 +35,7 @@ class ProductCanvas extends React.Component {
       selected_component: -1,
     }
     this.handleUpdateProduct = props.handleUpdateProduct;
+
   }
 
   componentDidMount() {
@@ -25,6 +44,60 @@ class ProductCanvas extends React.Component {
     this.customizer = new BowAndDrape.Customizer({canvas: this.canvas});
     this.customizer.init();
     this.forceUpdate();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.customizer.resizeViewport();
+  }
+
+  // get a text version of a component
+  getComponentText() {
+    let ret = "";
+    let selected = this.state.assembly[this.state.selected_component];
+    if (!selected) return ret;
+    selected.assembly.forEach((component) => {
+      let toks = component.props.name.split('_');
+      let character = toks[toks.length-1].toLowerCase();
+      character = skutext_to_character[character] || character;
+      ret += character;
+    });
+    return ret;
+  }
+  // set a component with a string and componentMap
+  handleSetComponentText(text, componentMap) {
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      let selected_component = prevState.selected_component;
+      let selected = assembly[prevState.selected_component];
+      if (!selected) {
+        // if nothing is selected make a new selected component
+        // facing the camera for now TODO get normal of intersected tri
+        selected = {
+          props: {
+            position: [0,0,0],
+            rotation: {
+              angle: -this.customizer.camera.rotation.angle,
+              axis: this.customizer.camera.rotation.axis,
+            },
+          },
+          assembly: [],
+        };
+        assembly.push(selected);
+        selected_component = assembly.length-1;
+      }
+      if (!text || !text.trim()) {
+        assembly.splice(selected_component, 1);
+        return {assembly, selected_component: -1};
+      }
+      selected.assembly = text.split("").map((letter) => {
+        letter = letter.toLowerCase();
+        letter = character_to_skutext[letter] || letter;
+        return componentMap[letter];
+      }).filter((component) => {
+        return component;
+      });
+      return {assembly, selected_component};
+    });
   }
 
   handleAddComponent(component) {
@@ -36,8 +109,8 @@ class ProductCanvas extends React.Component {
         return {assembly};
       }
       // if nothing is selected make a new selected component
-      let position = [0,0,0];
       // facing the camera for now TODO get normal of intersected tri
+      let position = [0,0,0];
       let rotation = {
         angle: -this.customizer.camera.rotation.angle,
         axis: this.customizer.camera.rotation.axis,
@@ -77,8 +150,9 @@ class ProductCanvas extends React.Component {
       node.onmousemove = this.handleComponentMove.bind(this, node.getAttribute("data"));
     });
     this.handleUpdateProduct();
-  }
 
+    this.customizer.updateCanvasScreenPosition();
+  }
 
   handleComponentMove(index, event) {
     event.preventDefault();
@@ -89,6 +163,8 @@ class ProductCanvas extends React.Component {
     let client_pos = event.touches ?
       [event.touches[0].pageX, event.touches[0].pageY] :
       [event.clientX, event.clientY+(document.body.scrollTop?document.body.scrollTop:document.documentElement.scrollTop)];
+
+    // safari ipad touch is fucked
 
     // update the component position
     this.setState((prevState, props) => {
@@ -181,12 +257,13 @@ class ProductCanvas extends React.Component {
 
     return (
       <div style={{position:"relative"}}>
-        <canvas height="300" style={{position:"relative"}}>
+        <canvas style={{position:"relative",height:"300px",width:"100%"}}>
         </canvas>
         {component_hitboxes}
         <hud_controls style={{position:"absolute",right:"0",top:"0"}}>
           {camera_switcher}
         </hud_controls>
+        <ProductComponentPicker product={this.props.product} productCanvas={this}/>
       </div>
     );
   }

@@ -24,19 +24,20 @@ class Switch extends React.Component {
       if (child.type!="option") continue;
       options.push(
         <switch_option ref={index} key={index} {...child.props} style={{
+          zIndex: "2",
           position: "relative",
           margin: "0 10px",
           color:this.props.value==child.props.value?"#000":"#f7afc9"
         }} onClick={
           ()=>{this.props.onChange(child.props.value)}
         }>
-          <div style={{zIndex:"2",textAlign:"center",width:"160px"}}>
+          <div style={{textAlign:"center",width:"160px"}}>
             {child.props.children}
           </div>
           {
             (child.props.value==this.props.value) ?
               <Stroke data="/select_stroke.svg" style={{
-                zIndex: "1",
+                zIndex: "-1",
                 width: "200px",
                 height: "100px",
                 position: "absolute",

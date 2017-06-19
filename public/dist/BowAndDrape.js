@@ -90849,7 +90849,7 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 }).call(this,require('_process'))
-},{"../models/PayBraintree.js":2,"./InputAddress.jsx":689,"./Items.jsx":691,"./PayBraintreeClient.js":696,"./ThanksPurchaseComplete.jsx":706,"_process":446,"react":609}],681:[function(require,module,exports){
+},{"../models/PayBraintree.js":2,"./InputAddress.jsx":689,"./Items.jsx":691,"./PayBraintreeClient.js":696,"./ThanksPurchaseComplete.jsx":707,"_process":446,"react":609}],681:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -91003,8 +91003,8 @@ var Component = function () {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         // mipmapping the sequins looks bad?
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.generateMipmap(gl.TEXTURE_2D);
@@ -91691,21 +91691,11 @@ var Customizer = function () {
   }, {
     key: 'updateCanvasScreenPosition',
     value: function updateCanvasScreenPosition() {
-      var position = [0, 0];
-      var element = this.options.canvas;
-      while (element) {
-        if (element.tagName.toLowerCase() == "body") {
-          // deal with body scroll seperately
-          position[0] += element.offsetLeft + element.clientLeft;
-          position[1] += element.offsetTop + element.clientTop;
-        } else {
-          // for all other non-BODY elements
-          position[0] += element.offsetLeft - element.scrollLeft + element.clientLeft;
-          position[1] += element.offsetTop - element.scrollTop + element.clientTop;
-        }
-        element = element.offsetParent;
-      }
+      if (!this.options.canvas) return;
+      var rect = this.options.canvas.getBoundingClientRect();
+      var position = [rect.left + window.scrollX, rect.top + window.scrollY];
       this.canvas_offset = position;
+      return position;
     }
   }, {
     key: 'init',
@@ -92053,7 +92043,7 @@ var FacebookLogin = function (_React$Component) {
 
 module.exports = FacebookLogin;
 
-},{"./UserProfile.jsx":710,"https":372,"react":609}],688:[function(require,module,exports){
+},{"./UserProfile.jsx":711,"https":372,"react":609}],688:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -92208,7 +92198,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./Scrollable.jsx":701,"./Shipment.jsx":702,"./Tabs.jsx":705,"react":609}],689:[function(require,module,exports){
+},{"./Scrollable.jsx":702,"./Shipment.jsx":703,"./Tabs.jsx":706,"react":609}],689:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -92791,14 +92781,18 @@ var LayoutMain = function (_React$Component) {
       });
 
       // bind resize
-      var self = this;
-      function resize() {
-        self.setState({ viewport_width: window.innerWidth });
-      }
-      window.addEventListener("resize", resize);
-      resize();
+      window.addEventListener("resize", this.handleResize.bind(this));
+      window.addEventListener("touchend", this.handleResize.bind(this));
+      this.handleResize();
 
       BowAndDrape.dispatcher.emit("loaded");
+    }
+  }, {
+    key: 'handleResize',
+    value: function handleResize() {
+      this.setState({
+        viewport_width: window.innerWidth
+      });
     }
   }, {
     key: 'render',
@@ -92838,7 +92832,7 @@ var LayoutMain = function (_React$Component) {
 
 module.exports = LayoutMain;
 
-},{"./UserMenu.jsx":708,"react":609,"react-dom/server":462,"react-swipeable":463}],694:[function(require,module,exports){
+},{"./UserMenu.jsx":709,"react":609,"react-dom/server":462,"react-swipeable":463}],694:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -93048,7 +93042,7 @@ var PageList = function (_React$Component) {
 
 module.exports = PageList;
 
-},{"./PageEdit.jsx":694,"./Scrollable.jsx":701,"react":609}],696:[function(require,module,exports){
+},{"./PageEdit.jsx":694,"./Scrollable.jsx":702,"react":609}],696:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -93127,7 +93121,6 @@ var Placeholder = function (_React$Component) {
     value: function handleClick() {
       var _this2 = this;
 
-      console.log("click");
       this.refs.logo.setVisible(false);
       setTimeout(function () {
         _this2.refs.logo.setVisible(true);
@@ -93145,7 +93138,7 @@ var Placeholder = function (_React$Component) {
 
 module.exports = Placeholder;
 
-},{"./Stroke.jsx":703,"react":609}],698:[function(require,module,exports){
+},{"./Stroke.jsx":704,"react":609}],698:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -93158,6 +93151,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var Swipeable = require('react-swipeable');
+var ProductComponentPicker = require('./ProductComponentPicker.jsx');
+
+// lookup table to find skus corresponding to certain characters
+var character_to_skutext = {
+  " ": "space",
+  "#": "hashtag",
+  "?": "question",
+  "!": "exclamation",
+  "&": "and",
+  "\"": "quote",
+  "\'": "quote",
+  ",": "comma",
+  ".": "dot"
+};
+var skutext_to_character = {};
+Object.keys(character_to_skutext).forEach(function (key) {
+  skutext_to_character[character_to_skutext[key]] = [key];
+});
 
 /***
 Drawn by ProductList and contains the Customizer
@@ -93180,6 +93191,7 @@ var ProductCanvas = function (_React$Component) {
       selected_component: -1
     };
     _this.handleUpdateProduct = props.handleUpdateProduct;
+
     return _this;
   }
 
@@ -93193,9 +93205,72 @@ var ProductCanvas = function (_React$Component) {
       this.forceUpdate();
     }
   }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      this.customizer.resizeViewport();
+    }
+
+    // get a text version of a component
+
+  }, {
+    key: 'getComponentText',
+    value: function getComponentText() {
+      var ret = "";
+      var selected = this.state.assembly[this.state.selected_component];
+      if (!selected) return ret;
+      selected.assembly.forEach(function (component) {
+        var toks = component.props.name.split('_');
+        var character = toks[toks.length - 1].toLowerCase();
+        character = skutext_to_character[character] || character;
+        ret += character;
+      });
+      return ret;
+    }
+    // set a component with a string and componentMap
+
+  }, {
+    key: 'handleSetComponentText',
+    value: function handleSetComponentText(text, componentMap) {
+      var _this2 = this;
+
+      this.setState(function (prevState, props) {
+        var assembly = JSON.parse(JSON.stringify(prevState.assembly));
+        var selected_component = prevState.selected_component;
+        var selected = assembly[prevState.selected_component];
+        if (!selected) {
+          // if nothing is selected make a new selected component
+          // facing the camera for now TODO get normal of intersected tri
+          selected = {
+            props: {
+              position: [0, 0, 0],
+              rotation: {
+                angle: -_this2.customizer.camera.rotation.angle,
+                axis: _this2.customizer.camera.rotation.axis
+              }
+            },
+            assembly: []
+          };
+          assembly.push(selected);
+          selected_component = assembly.length - 1;
+        }
+        if (!text || !text.trim()) {
+          assembly.splice(selected_component, 1);
+          return { assembly: assembly, selected_component: -1 };
+        }
+        selected.assembly = text.split("").map(function (letter) {
+          letter = letter.toLowerCase();
+          letter = character_to_skutext[letter] || letter;
+          return componentMap[letter];
+        }).filter(function (component) {
+          return component;
+        });
+        return { assembly: assembly, selected_component: selected_component };
+      });
+    }
+  }, {
     key: 'handleAddComponent',
     value: function handleAddComponent(component) {
-      var _this2 = this;
+      var _this3 = this;
 
       this.setState(function (prevState, props) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
@@ -93205,11 +93280,11 @@ var ProductCanvas = function (_React$Component) {
           return { assembly: assembly };
         }
         // if nothing is selected make a new selected component
-        var position = [0, 0, 0];
         // facing the camera for now TODO get normal of intersected tri
+        var position = [0, 0, 0];
         var rotation = {
-          angle: -_this2.customizer.camera.rotation.angle,
-          axis: _this2.customizer.camera.rotation.axis
+          angle: -_this3.customizer.camera.rotation.angle,
+          axis: _this3.customizer.camera.rotation.axis
         };
         assembly.push({
           props: {
@@ -93241,21 +93316,23 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      var _this3 = this;
+      var _this4 = this;
 
       // handle actions on hitboxes
       this.canvas.parentNode.childNodes.forEach(function (node) {
         if (node.tagName.toLowerCase() != "component_hitbox") return;
         // this overrides the synthetic react events so we don't scroll
-        node.ontouchmove = _this3.handleComponentMove.bind(_this3, node.getAttribute("data"));
-        node.onmousemove = _this3.handleComponentMove.bind(_this3, node.getAttribute("data"));
+        node.ontouchmove = _this4.handleComponentMove.bind(_this4, node.getAttribute("data"));
+        node.onmousemove = _this4.handleComponentMove.bind(_this4, node.getAttribute("data"));
       });
       this.handleUpdateProduct();
+
+      this.customizer.updateCanvasScreenPosition();
     }
   }, {
     key: 'handleComponentMove',
     value: function handleComponentMove(index, event) {
-      var _this4 = this;
+      var _this5 = this;
 
       event.preventDefault();
       event.stopPropagation();
@@ -93264,12 +93341,14 @@ var ProductCanvas = function (_React$Component) {
       if (event.type == "mousemove" && !event.buttons & 0x1) return;
       var client_pos = event.touches ? [event.touches[0].pageX, event.touches[0].pageY] : [event.clientX, event.clientY + (document.body.scrollTop ? document.body.scrollTop : document.documentElement.scrollTop)];
 
+      // safari ipad touch is fucked
+
       // update the component position
       this.setState(function (prevState, props) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[index];
         if (selected) {
-          selected.props.position = _this4.customizer.browserToWorld(client_pos);
+          selected.props.position = _this5.customizer.browserToWorld(client_pos);
         }
         return { assembly: assembly, selected_component: index };
       });
@@ -93321,7 +93400,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this6 = this;
 
       var component_hitboxes = [];
 
@@ -93352,7 +93431,7 @@ var ProductCanvas = function (_React$Component) {
         this.cameras.forEach(function (camera) {
           camera_switcher.push(React.createElement(
             'button',
-            { key: camera_switcher.length, onClick: _this5.handleChangeCamera.bind(_this5, camera_switcher.length) },
+            { key: camera_switcher.length, onClick: _this6.handleChangeCamera.bind(_this6, camera_switcher.length) },
             'Camera ',
             camera_switcher.length
           ));
@@ -93362,13 +93441,14 @@ var ProductCanvas = function (_React$Component) {
       return React.createElement(
         'div',
         { style: { position: "relative" } },
-        React.createElement('canvas', { height: '300', style: { position: "relative" } }),
+        React.createElement('canvas', { style: { position: "relative", height: "300px", width: "100%" } }),
         component_hitboxes,
         React.createElement(
           'hud_controls',
           { style: { position: "absolute", right: "0", top: "0" } },
           camera_switcher
-        )
+        ),
+        React.createElement(ProductComponentPicker, { product: this.props.product, productCanvas: this })
       );
     }
   }]);
@@ -93378,7 +93458,219 @@ var ProductCanvas = function (_React$Component) {
 
 module.exports = ProductCanvas;
 
-},{"react":609,"react-swipeable":463}],699:[function(require,module,exports){
+},{"./ProductComponentPicker.jsx":699,"react":609,"react-swipeable":463}],699:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+var Tabs = require('./Tabs.jsx');
+
+/***
+Draws controls for adding components to a product
+***/
+
+var ProductComponentPicker = function (_React$Component) {
+  _inherits(ProductComponentPicker, _React$Component);
+
+  function ProductComponentPicker(props) {
+    _classCallCheck(this, ProductComponentPicker);
+
+    return _possibleConstructorReturn(this, (ProductComponentPicker.__proto__ || Object.getPrototypeOf(ProductComponentPicker)).call(this, props));
+  }
+
+  _createClass(ProductComponentPicker, [{
+    key: 'handleTabClick',
+    value: function handleTabClick() {
+      document.querySelector(".component_spacer").style.height = document.querySelector(".components").offsetHeight + "px";
+      var text_input = document.querySelector(".components").querySelector('input[type="text"]');
+      if (text_input) text_input.focus();
+      // scroll so canvas is just below "add to cart" button
+      document.querySelector("canvas").scrollIntoView();
+      document.scrollY -= 20;
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      // init size of default selected tab
+      document.querySelector(".component_spacer").style.height = document.querySelector(".components").offsetHeight + "px";
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var components = this.populateComponents(this.props.product);
+      return React.createElement(
+        'div',
+        null,
+        React.createElement('div', { className: 'component_spacer' }),
+        React.createElement(
+          Tabs,
+          { className: 'components', onChange: this.handleTabClick.bind(this) },
+          components
+        )
+      );
+    }
+  }, {
+    key: 'handleAddComponent',
+    value: function handleAddComponent(component) {
+      this.props.productCanvas.handleAddComponent(component);
+    }
+  }, {
+    key: 'handleSetComponentText',
+    value: function handleSetComponentText(text, componentMap) {
+      this.props.productCanvas.handleSetComponentText(text, componentMap);
+    }
+  }, {
+    key: 'handlePopComponent',
+    value: function handlePopComponent() {
+      this.props.productCanvas.handlePopComponent();
+    }
+  }, {
+    key: 'handleSelectComponent',
+    value: function handleSelectComponent(component) {
+      this.props.productCanvas.handleSelectComponent(component);
+    }
+  }, {
+    key: 'populateComponents',
+    value: function populateComponents(product) {
+      var _this2 = this;
+
+      // populate components
+      var components = [];
+      var misc_components = [];
+      for (var i = 0; product.compatible_components && i < product.compatible_components.length; i++) {
+        if (product.compatible_components[i].options) {
+          // handle if virtual keyboard
+          if (false && product.compatible_components[i].props.is_letters) {
+            var _ret = function () {
+              // array => map
+              var component_letters = {};
+              var tab_components = [];
+              for (var j = 0; j < product.compatible_components[i].options.length; j++) {
+                var letter = product.compatible_components[i].options[j];
+                var toks = letter.props.name.split('_');
+                var character = toks[toks.length - 1].toLowerCase();
+                if (character.match(/^[a-z]$/)) component_letters[character] = letter;else {
+                  component_letters[character] = letter;
+                  tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + letter.props.image + ')', backgroundSize: letter.props.imagewidth / letter.props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, letter) }));
+                }
+              }
+              components.push(React.createElement(
+                'div',
+                { key: components.length, name: product.compatible_components[i].props.name, className: 'component_virtual_keyboard_container' },
+                React.createElement(
+                  'row',
+                  null,
+                  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'].map(function (character) {
+                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                  })
+                ),
+                React.createElement(
+                  'row',
+                  null,
+                  React.createElement('div', { key: 'spacer0', className: 'halfgap' }),
+                  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'].map(function (character) {
+                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                  }),
+                  React.createElement('div', { key: 'spacer1', className: 'halfgap' })
+                ),
+                React.createElement(
+                  'row',
+                  null,
+                  React.createElement('div', { key: 'spacer2', className: 'halfgap' }),
+                  React.createElement('div', { key: 'spacer2a', className: 'halfgap' }),
+                  ['z', 'x', 'c', 'v', 'b', 'n', 'm'].map(function (character) {
+                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                  }),
+                  React.createElement('div', { key: 'spacer3', className: 'halfgap' }),
+                  React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this2.handlePopComponent.bind(_this2) })
+                ),
+                React.createElement(
+                  'row',
+                  null,
+                  React.createElement('div', { key: 'spacer3a', className: 'halfgap' }),
+                  React.createElement('div', { key: 'spacer3b', className: 'halfgap' }),
+                  React.createElement('div', { key: 'spacebar', className: 'spacebar', onClick: _this2.handleAddComponent.bind(_this2, component_letters["space"]) }),
+                  React.createElement('div', { key: 'spacer3c', className: 'halfgap' }),
+                  React.createElement('div', { key: 'enter', className: 'enter', onClick: _this2.handleSelectComponent.bind(_this2, -1) })
+                )
+              ));
+              components.push(React.createElement(
+                'div',
+                { key: components.length, name: product.compatible_components[i].props.name + "_cont", className: 'component_container' },
+                tab_components
+              ));
+              return 'continue';
+            }();
+
+            if (_ret === 'continue') continue;
+          } // is_letters
+
+          // handle if native keyboard
+          if (product.compatible_components[i].props.is_letters) {
+            var _ret2 = function () {
+              // array => map
+              var component_letters = {};
+              for (var j = 0; j < product.compatible_components[i].options.length; j++) {
+                var letter = product.compatible_components[i].options[j];
+                var toks = letter.props.name.split('_');
+                var character = toks[toks.length - 1].toLowerCase();
+                component_letters[character] = letter;
+              }
+              components.push(React.createElement(
+                'div',
+                { key: components.length, name: product.compatible_components[i].props.name, style: { height: "auto" }, className: 'component_container' },
+                React.createElement('input', { type: 'text', style: { width: "90%" }, onChange: function onChange(event) {
+                    _this2.handleSetComponentText(event.target.value, component_letters);
+                  },
+                  value: _this2.props.productCanvas.getComponentText()
+                })
+              ));
+              return 'continue';
+            }();
+
+            if (_ret2 === 'continue') continue;
+          } // is_native_keyboard
+
+          // otherwise just list them
+          var tab_components = [];
+          for (var j = 0; j < product.compatible_components[i].options.length; j++) {
+            tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' }, onClick: this.handleAddComponent.bind(this, product.compatible_components[i].options[j]) }));
+          }
+          components.push(React.createElement(
+            'div',
+            { key: components.length, name: product.compatible_components[i].props.name, className: 'component_container' },
+            tab_components
+          ));
+          continue;
+        }
+        misc_components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + product.compatible_components[i].props.image + ')' } }));
+      }
+
+      if (misc_components.length) {
+        components.push(React.createElement(
+          'div',
+          { key: components.length, name: 'misc sparkles', className: 'component_container' },
+          misc_components
+        ));
+      }
+      return components;
+    } // populateComponents()
+
+  }]);
+
+  return ProductComponentPicker;
+}(React.Component);
+
+module.exports = ProductComponentPicker;
+
+},{"./Tabs.jsx":706,"react":609}],700:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -93400,7 +93692,6 @@ var querystring = require('querystring');
 var ProductCanvas = require('./ProductCanvas.jsx');
 var ProductListEdit = require('./ProductListEdit.jsx');
 var ComponentEdit = require('./ComponentEdit.jsx');
-var Tabs = require('./Tabs.jsx');
 var Switch = require('./Switch.jsx');
 var ComponentSerializer = require('./ComponentSerializer.js');
 
@@ -93483,7 +93774,7 @@ var ProductList = function (_React$Component) {
           });
           // fill in things we just have the sku for
           traverse_item_options(initial_assembly, function (component) {
-            if (component && component.sku) {
+            if (component && component.sku && components[component.sku]) {
               component.props = JSON.parse(JSON.stringify(components[component.sku].props));
             }
           });
@@ -93504,7 +93795,6 @@ var ProductList = function (_React$Component) {
 
       if (!product) return this.renderProductList();
 
-      var components = this.populateComponents(product);
       var product_raw = this.getSelectedProductRaw();
 
       return React.createElement(
@@ -93512,7 +93802,7 @@ var ProductList = function (_React$Component) {
         null,
         this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : React.createElement(
           'button',
-          { onClick: this.handleAddToCart.bind(this, product), style: { position: "fixed", top: "0px", right: "0px", zIndex: "1", maxWidth: "none", margin: "0px" } },
+          { onClick: this.handleAddToCart.bind(this, product), style: { position: "fixed", top: "0px", right: "0px", zIndex: "3", maxWidth: "none", margin: "0px" } },
           'Add To Cart'
         ),
         React.createElement(
@@ -93524,12 +93814,6 @@ var ProductList = function (_React$Component) {
             product_options
           ),
           React.createElement(ProductCanvas, { ref: 'ProductCanvas', product: product, handleUpdateProduct: this.handleUpdateProduct.bind(this), assembly: this.initial_assembly })
-        ),
-        React.createElement('div', { className: 'component_spacer' }),
-        React.createElement(
-          Tabs,
-          { className: 'components' },
-          components
         )
       );
     }
@@ -93722,9 +94006,7 @@ var ProductList = function (_React$Component) {
           ));
         };
         if (options.length) {
-          product_options.push(
-          //          <select onChange={(event)=>{this.handleOptionChange(depth, event.target.value)}} key={Math.random()} value={selected_option}>{options}</select>
-          React.createElement(
+          product_options.push(React.createElement(
             Switch,
             { onChange: function onChange(value) {
                 _this4.handleOptionChange(depth, value);
@@ -93748,21 +94030,6 @@ var ProductList = function (_React$Component) {
     } // populateProductOptions
 
   }, {
-    key: 'handleAddComponent',
-    value: function handleAddComponent(component) {
-      this.refs.ProductCanvas.handleAddComponent(component);
-    }
-  }, {
-    key: 'handlePopComponent',
-    value: function handlePopComponent() {
-      this.refs.ProductCanvas.handlePopComponent();
-    }
-  }, {
-    key: 'handleSelectComponent',
-    value: function handleSelectComponent(component) {
-      this.refs.ProductCanvas.handleSelectComponent(component);
-    }
-  }, {
     key: 'handleUpdateProduct',
     value: function handleUpdateProduct() {
       // call this whenever there was an update to base_product or assembly
@@ -93783,106 +94050,6 @@ var ProductList = function (_React$Component) {
         history.replaceState(history.state, "", url);
       });
     }
-  }, {
-    key: 'populateComponents',
-    value: function populateComponents(product) {
-      var _this5 = this;
-
-      // populate components
-      var components = [];
-      var misc_components = [];
-      for (var i = 0; product.compatible_components && i < product.compatible_components.length; i++) {
-        if (product.compatible_components[i].options) {
-          // handle if keyboard
-          if (product.compatible_components[i].props.is_letters) {
-            var _ret2 = function () {
-              // array => map
-              var component_letters = {};
-              var tab_components = [];
-              for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-                var letter = product.compatible_components[i].options[j];
-                var toks = letter.props.name.split('_');
-                var character = toks[toks.length - 1].toLowerCase();
-                if (character.match(/^[a-z]$/)) component_letters[character] = letter;else {
-                  component_letters[character] = letter;
-                  tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + letter.props.image + ')', backgroundSize: letter.props.imagewidth / letter.props.imageheight * 100 + '% 100%' }, onClick: _this5.handleAddComponent.bind(_this5, letter) }));
-                }
-              }
-              components.push(React.createElement(
-                'div',
-                { key: components.length, name: product.compatible_components[i].props.name, className: 'component_keyboard_container' },
-                React.createElement(
-                  'row',
-                  null,
-                  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this5.handleAddComponent.bind(_this5, component_letters[character]) });
-                  })
-                ),
-                React.createElement(
-                  'row',
-                  null,
-                  React.createElement('div', { key: 'spacer0', className: 'halfgap' }),
-                  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this5.handleAddComponent.bind(_this5, component_letters[character]) });
-                  }),
-                  React.createElement('div', { key: 'spacer1', className: 'halfgap' })
-                ),
-                React.createElement(
-                  'row',
-                  null,
-                  React.createElement('div', { key: 'spacer2', className: 'halfgap' }),
-                  React.createElement('div', { key: 'spacer2a', className: 'halfgap' }),
-                  ['z', 'x', 'c', 'v', 'b', 'n', 'm'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this5.handleAddComponent.bind(_this5, component_letters[character]) });
-                  }),
-                  React.createElement('div', { key: 'spacer3', className: 'halfgap' }),
-                  React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this5.handlePopComponent.bind(_this5) })
-                ),
-                React.createElement(
-                  'row',
-                  null,
-                  React.createElement('div', { key: 'spacer3a', className: 'halfgap' }),
-                  React.createElement('div', { key: 'spacer3b', className: 'halfgap' }),
-                  React.createElement('div', { key: 'spacebar', className: 'spacebar', onClick: _this5.handleAddComponent.bind(_this5, component_letters["space"]) }),
-                  React.createElement('div', { key: 'spacer3c', className: 'halfgap' }),
-                  React.createElement('div', { key: 'enter', className: 'enter', onClick: _this5.handleSelectComponent.bind(_this5, -1) })
-                )
-              ));
-              components.push(React.createElement(
-                'div',
-                { key: components.length, name: product.compatible_components[i].props.name + "_cont", className: 'component_container' },
-                tab_components
-              ));
-              return 'continue';
-            }();
-
-            if (_ret2 === 'continue') continue;
-          }
-          // otherwise just list them
-          var tab_components = [];
-          for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-            tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' }, onClick: this.handleAddComponent.bind(this, product.compatible_components[i].options[j]) }));
-          }
-          components.push(React.createElement(
-            'div',
-            { key: components.length, name: product.compatible_components[i].props.name, className: 'component_container' },
-            tab_components
-          ));
-          continue;
-        }
-        misc_components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + product.compatible_components[i].props.image + ')' } }));
-      }
-
-      if (misc_components.length) {
-        components.push(React.createElement(
-          'div',
-          { key: components.length, name: 'misc sparkles', className: 'component_container' },
-          misc_components
-        ));
-      }
-      return components;
-    } // populateComponents()
-
   }], [{
     key: 'preprocessProps',
     value: function preprocessProps(options, callback) {
@@ -93930,7 +94097,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ComponentEdit.jsx":683,"./ComponentSerializer.js":684,"./ProductCanvas.jsx":698,"./ProductListEdit.jsx":700,"./Switch.jsx":704,"./Tabs.jsx":705,"async":20,"querystring":457,"react":609}],700:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ComponentEdit.jsx":683,"./ComponentSerializer.js":684,"./ProductCanvas.jsx":698,"./ProductListEdit.jsx":701,"./Switch.jsx":705,"async":20,"querystring":457,"react":609}],701:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94060,7 +94227,7 @@ var ProductListEdit = function (_React$Component) {
 
 module.exports = ProductListEdit;
 
-},{"async":20,"react":609,"react-autocomplete":460}],701:[function(require,module,exports){
+},{"async":20,"react":609,"react-autocomplete":460}],702:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94159,7 +94326,7 @@ var Scrollable = function (_React$Component) {
 
 module.exports = Scrollable;
 
-},{"react":609}],702:[function(require,module,exports){
+},{"react":609}],703:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -94542,7 +94709,7 @@ var Shipment = function (_React$Component) {
 
 module.exports = Shipment;
 
-},{"./Address.jsx":679,"./Item.jsx":690,"./Timestamp.jsx":707,"react":609}],703:[function(require,module,exports){
+},{"./Address.jsx":679,"./Item.jsx":690,"./Timestamp.jsx":708,"react":609}],704:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94633,6 +94800,9 @@ var Stroke = function (_React$Component) {
             _this2.setVisible(true);
           }, 20);
         }
+        object.touchStart = function (event) {
+          event.preventDefault();
+        };
       };
       object.data = this.props.data || "/logo_stroke.svg";
     }
@@ -94657,7 +94827,7 @@ var Stroke = function (_React$Component) {
 
 module.exports = Stroke;
 
-},{"react":609}],704:[function(require,module,exports){
+},{"react":609}],705:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -94705,6 +94875,7 @@ var Switch = function (_React$Component) {
         options.push(React.createElement(
           'switch_option',
           _extends({ ref: index, key: index }, child.props, { style: {
+              zIndex: "2",
               position: "relative",
               margin: "0 10px",
               color: _this2.props.value == child.props.value ? "#000" : "#f7afc9"
@@ -94713,11 +94884,11 @@ var Switch = function (_React$Component) {
             } }),
           React.createElement(
             'div',
-            { style: { zIndex: "2", textAlign: "center", width: "160px" } },
+            { style: { textAlign: "center", width: "160px" } },
             child.props.children
           ),
           child.props.value == _this2.props.value ? React.createElement(Stroke, { data: '/select_stroke.svg', style: {
-              zIndex: "1",
+              zIndex: "-1",
               width: "200px",
               height: "100px",
               position: "absolute",
@@ -94749,7 +94920,7 @@ var Switch = function (_React$Component) {
 
 module.exports = Switch;
 
-},{"./Stroke.jsx":703,"react":609}],705:[function(require,module,exports){
+},{"./Stroke.jsx":704,"react":609}],706:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94788,15 +94959,26 @@ var Tabs = function (_React$Component) {
   }
 
   _createClass(Tabs, [{
+    key: 'handleTabChange',
+    value: function handleTabChange(value) {
+      this.setState({ selected_tab: value });
+      // fire an onChange on click as well as on change?
+      if (typeof this.props.onChange == "function") this.props.onChange();
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      if (typeof this.props.onChange == "function" && prevState.selected_tab != this.state.selected_tab) {
+        this.props.onChange();
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
-
       var tabs = [];
 
       var children = React.Children.toArray(this.props.children);
-
-      var _loop = function _loop(index) {
+      for (var index = 0; index < children.length; index++) {
         var child = children[index];
 
         var grandchildren = React.Children.toArray(child.props.children);
@@ -94806,15 +94988,9 @@ var Tabs = function (_React$Component) {
         var tab_name = initDefaultFallback.apply(undefined, tab_name_options.concat(["Tab"]));
         tabs.push(React.createElement(
           'option',
-          { key: tabs.length, onClick: function onClick() {
-              _this2.setState({ selected_tab: index });
-            }, value: tabs.length },
+          { key: tabs.length, value: tabs.length },
           tab_name
         ));
-      };
-
-      for (var index = 0; index < children.length; index++) {
-        _loop(index);
       };
 
       return React.createElement(
@@ -94822,9 +94998,7 @@ var Tabs = function (_React$Component) {
         { className: this.props.className },
         React.createElement(
           Switch,
-          { style: {}, value: this.state.selected_tab, onChange: function onChange(value) {
-              _this2.setState({ selected_tab: value });
-            } },
+          { style: {}, value: this.state.selected_tab, onChange: this.handleTabChange.bind(this) },
           tabs
         ),
         React.createElement(
@@ -94850,7 +95024,7 @@ var initDefaultFallback = function initDefaultFallback() {
 
 module.exports = Tabs;
 
-},{"./Switch.jsx":704,"fs":273,"react":609}],706:[function(require,module,exports){
+},{"./Switch.jsx":705,"fs":273,"react":609}],707:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94896,7 +95070,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"react":609}],707:[function(require,module,exports){
+},{"react":609}],708:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94941,7 +95115,7 @@ var Timestamp = function (_React$Component) {
 
 module.exports = Timestamp;
 
-},{"react":609}],708:[function(require,module,exports){
+},{"react":609}],709:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -95040,7 +95214,7 @@ var UserMenu = function (_React$Component) {
 
 module.exports = UserMenu;
 
-},{"./CartMenu.jsx":681,"./FacebookLogin.jsx":687,"./UserProfile.jsx":710,"react":609}],709:[function(require,module,exports){
+},{"./CartMenu.jsx":681,"./FacebookLogin.jsx":687,"./UserProfile.jsx":711,"react":609}],710:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -95143,7 +95317,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserProfile.jsx":710,"jwt-decode":384,"react":609}],710:[function(require,module,exports){
+},{"./UserProfile.jsx":711,"jwt-decode":384,"react":609}],711:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -95415,4 +95589,4 @@ module.exports = {
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":680,"./ComponentsEdit.jsx":685,"./Customizer.js":686,"./FulfillShipments.jsx":688,"./Items.jsx":691,"./LayoutBasic.jsx":692,"./LayoutMain.jsx":693,"./PageList.jsx":695,"./Placeholder.jsx":697,"./ProductList.jsx":699,"./UserPasswordReset.jsx":709,"events":332,"jwt-decode":384,"react":609,"react-dom":461}]},{},[]);
+},{"./Cart.jsx":680,"./ComponentsEdit.jsx":685,"./Customizer.js":686,"./FulfillShipments.jsx":688,"./Items.jsx":691,"./LayoutBasic.jsx":692,"./LayoutMain.jsx":693,"./PageList.jsx":695,"./Placeholder.jsx":697,"./ProductList.jsx":700,"./UserPasswordReset.jsx":710,"events":332,"jwt-decode":384,"react":609,"react-dom":461}]},{},[]);

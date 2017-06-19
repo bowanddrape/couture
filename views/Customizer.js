@@ -90,21 +90,11 @@ class Customizer {
 
   // call this after appending a child before our canvas!
   updateCanvasScreenPosition() {
-    let position = [0, 0];
-    let element = this.options.canvas;
-    while (element) {
-      if (element.tagName.toLowerCase() == "body") {
-        // deal with body scroll seperately
-        position[0] += (element.offsetLeft + element.clientLeft);
-        position[1] += (element.offsetTop + element.clientTop);
-      } else {
-        // for all other non-BODY elements
-        position[0] += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-        position[1] += (element.offsetTop - element.scrollTop + element.clientTop);
-      }
-      element = element.offsetParent;
-    }
+    if (!this.options.canvas) return;
+    let rect = this.options.canvas.getBoundingClientRect();
+    let position = [rect.left + window.scrollX, rect.top + window.scrollY];
     this.canvas_offset = position;
+    return position;
   }
 
   init() {

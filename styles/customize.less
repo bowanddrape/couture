@@ -1,7 +1,7 @@
 
 @customize_emoji_key_height: 40px;
 @customize_emoji_key_width: 40px;
-@customize_emoji_key_margin: 5px;
+@customize_emoji_key_margin: 4px;
 customize {
   product_options {
     display: flex;
@@ -31,15 +31,14 @@ customize {
       max-height: 100%;
     }
   }
-  .component_spacer {
-    height: (@customize_emoji_key_height + @customize_emoji_key_margin * 2) * 4 + 15px + 22px;
-  }
   tabs.components {
     position: fixed;
-    height: (@customize_emoji_key_height + @customize_emoji_key_margin * 2) * 4 + 15px + 22px;
     bottom: 0;
     left: 0;
     right: 0;
+    switch {
+      margin-bottom: 0px;
+    }
   }
 
   .component_container {
@@ -48,10 +47,6 @@ customize {
     flex-wrap: wrap;
     align-content: flex-start;
     height: (@customize_emoji_key_height + @customize_emoji_key_margin * 2) * 4 + 15px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     max-width: 100%;
     overflow-x: scroll;
 
@@ -63,10 +58,16 @@ customize {
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
+      border: solid 1px #fff;
+      border-radius: 10px;
+      cursor: pointer;
     }
   }
-  .component_keyboard_container {
+  .component_virtual_keyboard_container {
     .component_container;
+    div {
+      margin: @customize_emoji_key_margin;
+    }
     align-content: center;
     row {
       display: flex;
@@ -81,23 +82,27 @@ customize {
       .sprite(@backspace);
       background-size: auto;
       margin: 0;
+      border: none;
     }
     div.enter {
       .icon;
       .sprite(@enter);
       background-size: auto;
       margin: 0;
+      border: none;
     }
     div.spacebar {
       .icon;
       .sprite(@spacebar);
       background-size: auto;
       margin: 0;
+      border: none;
     }
     div.halfgap {
       height: @customize_emoji_key_height;
       width: @customize_emoji_key_width/2;
       margin: 0 @customize_emoji_key_margin;
+      border: none;
     }
   }
 }
