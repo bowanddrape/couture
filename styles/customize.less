@@ -46,7 +46,7 @@ customize {
     flex-direction: column;
     flex-wrap: wrap;
     align-content: flex-start;
-    height: (@customize_emoji_key_height + @customize_emoji_key_margin * 2) * 4 + 15px;
+    height: (@customize_emoji_key_height + (@customize_emoji_key_margin + 2) * 2) * 4 + 15px;
     max-width: 100%;
     overflow-x: scroll;
 
@@ -62,6 +62,20 @@ customize {
       border-radius: 10px;
       cursor: pointer;
     }
+    div.backspace {
+      .icon;
+      .sprite(@backspace);
+      background-size: auto;
+      margin: 0;
+      border: none;
+    }
+    div.enter {
+      .icon;
+      .sprite(@enter);
+      background-size: auto;
+      margin: 0;
+      border: none;
+    }
   }
   .component_virtual_keyboard_container {
     .component_container;
@@ -76,20 +90,6 @@ customize {
         display: inline-block;
         flex: 0 1 auto;
       }
-    }
-    div.backspace {
-      .icon;
-      .sprite(@backspace);
-      background-size: auto;
-      margin: 0;
-      border: none;
-    }
-    div.enter {
-      .icon;
-      .sprite(@enter);
-      background-size: auto;
-      margin: 0;
-      border: none;
     }
     div.spacebar {
       .icon;

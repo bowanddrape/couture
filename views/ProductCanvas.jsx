@@ -13,7 +13,7 @@ let character_to_skutext = {
   "\"":"quote",
   "\'":"quote",
   ",":"comma",
-  ".":"dot",
+  ".":"period",
 };
 let skutext_to_character = {};
 Object.keys(character_to_skutext).forEach((key) => {
@@ -257,7 +257,7 @@ class ProductCanvas extends React.Component {
 
     return (
       <div style={{position:"relative"}}>
-        <canvas style={{position:"relative",height:"300px",width:"100%"}}>
+        <canvas style={{position:"relative",height:"300px",width:"100%",minWidth:"400px"}}>
         </canvas>
         {component_hitboxes}
         <hud_controls style={{position:"absolute",right:"0",top:"0"}}>

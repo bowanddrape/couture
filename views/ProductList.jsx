@@ -325,24 +325,29 @@ class ProductList extends React.Component {
     return {product, product_options};
   } // populateProductOptions
 
+  // call this to regenerate our path to point to the updated product
   handleUpdateProduct() {
-    // call this whenever there was an update to base_product or assembly
-    // TODO only do the following when done with a component drag!
-    let item = {
-      selected_product: this.state.selected_product,
-      assembly: this.refs.ProductCanvas.state.assembly,
-    };
-    ComponentSerializer.stringify(item, (err, serialized) => {
-      let toks = location.href.split('?');
-      let url = toks[0];
-      let query_params = {}
-      if (toks.length>1) {
-        query_params = querystring.parse(toks.slice(1).join('?'));
-      }
-      query_params.c = serialized;
-      url += '?' + querystring.stringify(query_params);
-      history.replaceState(history.state, "", url);
-    });
+    // this is slow on crappy computers, so don't update coninuously
+    window.clearTimeout(this.updateProductTimeout);
+    this.updateProductTimeout = window.setTimeout(() => {
+      // call this whenever there was an update to base_product or assembly
+      // TODO only do the following when done with a component drag!
+      let item = {
+        selected_product: this.state.selected_product,
+        assembly: this.refs.ProductCanvas.state.assembly,
+      };
+      ComponentSerializer.stringify(item, (err, serialized) => {
+        let toks = location.href.split('?');
+        let url = toks[0];
+        let query_params = {}
+        if (toks.length>1) {
+          query_params = querystring.parse(toks.slice(1).join('?'));
+        }
+        query_params.c = serialized;
+        url += '?' + querystring.stringify(query_params);
+        history.replaceState(history.state, "", url);
+      });
+    }, 100);
   }
 
 }

@@ -91003,7 +91003,8 @@ var Component = function () {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         // mipmapping the sequins looks bad?
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
         //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -91058,6 +91059,11 @@ var Component = function () {
         // server side image load
         var getPixels = require("get-pixels");
         getPixels(state.props.image, function (err, loaded_image) {
+          if (err) {
+            console.log("error loading image " + err);
+            if (callback) callback(err);
+            return;
+          }
           if (typeof ImageData != "undefined") imageLoadedCallback(gl, new ImageData(new Uint8ClampedArray(loaded_image.data), loaded_image.shape[0], loaded_image.shape[1]));else imageLoadedCallback(gl, { data: new Uint8ClampedArray(loaded_image.data), width: loaded_image.shape[0], height: loaded_image.shape[1] });
           if (callback) callback(null);
         });
@@ -91205,7 +91211,7 @@ var Component = function () {
   }, {
     key: 'getWorldDims',
     value: function getWorldDims() {
-      if (!this.assembly || !this.assembly.length) return [this.scale[0] * this.texture_scale[0], this.scale[1] * this.texture_scale[1]];
+      if (!this.assembly || !this.assembly.length) return [this.scale[0], this.scale[1]];
       var width = 0;
       var height = 0;
       var samples = 0;
@@ -93163,7 +93169,7 @@ var character_to_skutext = {
   "\"": "quote",
   "\'": "quote",
   ",": "comma",
-  ".": "dot"
+  ".": "period"
 };
 var skutext_to_character = {};
 Object.keys(character_to_skutext).forEach(function (key) {
@@ -93441,7 +93447,7 @@ var ProductCanvas = function (_React$Component) {
       return React.createElement(
         'div',
         { style: { position: "relative" } },
-        React.createElement('canvas', { style: { position: "relative", height: "300px", width: "100%" } }),
+        React.createElement('canvas', { style: { position: "relative", height: "300px", width: "100%", minWidth: "400px" } }),
         component_hitboxes,
         React.createElement(
           'hud_controls',
@@ -93643,6 +93649,7 @@ var ProductComponentPicker = function (_React$Component) {
           for (var j = 0; j < product.compatible_components[i].options.length; j++) {
             tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' }, onClick: this.handleAddComponent.bind(this, product.compatible_components[i].options[j]) }));
           }
+          tab_components.push(React.createElement('div', { key: 'backspace', className: 'backspace', onClick: this.handlePopComponent.bind(this) }));
           components.push(React.createElement(
             'div',
             { key: components.length, name: product.compatible_components[i].props.name, className: 'component_container' },
@@ -94029,26 +94036,34 @@ var ProductList = function (_React$Component) {
       return { product: product, product_options: product_options };
     } // populateProductOptions
 
+    // call this to regenerate our path to point to the updated product
+
   }, {
     key: 'handleUpdateProduct',
     value: function handleUpdateProduct() {
-      // call this whenever there was an update to base_product or assembly
-      // TODO only do the following when done with a component drag!
-      var item = {
-        selected_product: this.state.selected_product,
-        assembly: this.refs.ProductCanvas.state.assembly
-      };
-      ComponentSerializer.stringify(item, function (err, serialized) {
-        var toks = location.href.split('?');
-        var url = toks[0];
-        var query_params = {};
-        if (toks.length > 1) {
-          query_params = querystring.parse(toks.slice(1).join('?'));
-        }
-        query_params.c = serialized;
-        url += '?' + querystring.stringify(query_params);
-        history.replaceState(history.state, "", url);
-      });
+      var _this5 = this;
+
+      // this is slow on crappy computers, so don't update coninuously
+      window.clearTimeout(this.updateProductTimeout);
+      this.updateProductTimeout = window.setTimeout(function () {
+        // call this whenever there was an update to base_product or assembly
+        // TODO only do the following when done with a component drag!
+        var item = {
+          selected_product: _this5.state.selected_product,
+          assembly: _this5.refs.ProductCanvas.state.assembly
+        };
+        ComponentSerializer.stringify(item, function (err, serialized) {
+          var toks = location.href.split('?');
+          var url = toks[0];
+          var query_params = {};
+          if (toks.length > 1) {
+            query_params = querystring.parse(toks.slice(1).join('?'));
+          }
+          query_params.c = serialized;
+          url += '?' + querystring.stringify(query_params);
+          history.replaceState(history.state, "", url);
+        });
+      }, 100);
     }
   }], [{
     key: 'preprocessProps',

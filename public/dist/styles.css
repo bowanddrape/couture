@@ -277,7 +277,7 @@ customize .component_container {
   flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
-  height: 207px;
+  height: 223px;
   max-width: 100%;
   overflow-x: scroll;
   background-color: rgba(200, 200, 200, 0.9);
@@ -293,12 +293,36 @@ customize .component_container div {
   border-radius: 10px;
   cursor: pointer;
 }
+customize .component_container div.backspace {
+  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-position: 0px -155px;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  display: block;
+  width: 48px;
+  height: 48px;
+  background-size: auto;
+  margin: 0;
+  border: none;
+}
+customize .component_container div.enter {
+  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-position: 0px -203px;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  display: block;
+  width: 48px;
+  height: 48px;
+  background-size: auto;
+  margin: 0;
+  border: none;
+}
 customize .component_virtual_keyboard_container {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
-  height: 207px;
+  height: 223px;
   max-width: 100%;
   overflow-x: scroll;
   background-color: rgba(200, 200, 200, 0.9);
@@ -314,17 +338,6 @@ customize .component_virtual_keyboard_container div {
   border: solid 1px #fff;
   border-radius: 10px;
   cursor: pointer;
-}
-customize .component_virtual_keyboard_container div {
-  margin: 4px;
-}
-customize .component_virtual_keyboard_container row {
-  display: flex;
-  justify-content: center;
-}
-customize .component_virtual_keyboard_container row div {
-  display: inline-block;
-  flex: 0 1 auto;
 }
 customize .component_virtual_keyboard_container div.backspace {
   background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
@@ -349,6 +362,17 @@ customize .component_virtual_keyboard_container div.enter {
   background-size: auto;
   margin: 0;
   border: none;
+}
+customize .component_virtual_keyboard_container div {
+  margin: 4px;
+}
+customize .component_virtual_keyboard_container row {
+  display: flex;
+  justify-content: center;
+}
+customize .component_virtual_keyboard_container row div {
+  display: inline-block;
+  flex: 0 1 auto;
 }
 customize .component_virtual_keyboard_container div.spacebar {
   background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');

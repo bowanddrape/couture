@@ -138,6 +138,9 @@ class ProductComponentPicker extends React.Component {
             <div key={i+'_'+j} style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}} onClick={this.handleAddComponent.bind(this, product.compatible_components[i].options[j])}/>
           );
         }
+        tab_components.push(
+          <div key="backspace" className="backspace" onClick={this.handlePopComponent.bind(this)}/>
+        );
         components.push(
           <div key={components.length} name={product.compatible_components[i].props.name} className="component_container">
             {tab_components}

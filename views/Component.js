@@ -34,7 +34,8 @@ class Component {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       // mipmapping the sequins looks bad?
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
       //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -83,6 +84,11 @@ class Component {
       // server side image load
       const getPixels = require("get-pixels")
       getPixels(state.props.image, (err, loaded_image) => {
+        if (err) {
+          console.log("error loading image "+err);
+          if (callback) callback(err);
+          return;
+        }
         if (typeof(ImageData)!="undefined")
           imageLoadedCallback(gl, new ImageData(new Uint8ClampedArray(loaded_image.data), loaded_image.shape[0], loaded_image.shape[1]));
         else
@@ -262,8 +268,8 @@ class Component {
   getWorldDims() {
     if (!this.assembly || !this.assembly.length)
       return [
-        this.scale[0]*this.texture_scale[0],
-        this.scale[1]*this.texture_scale[1]
+        this.scale[0],
+        this.scale[1]
       ];
     let width = 0;
     let height = 0;
