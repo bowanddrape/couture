@@ -91608,6 +91608,7 @@ var Customizer = function () {
 
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
+    this.options.resolution = 2;
 
     this.camera = {
       position: [0, 0, -1],
@@ -91672,7 +91673,6 @@ var Customizer = function () {
       this.focal_length_pixels = this.options.height / 2 / Math.tan(this.options.vfov * Math.PI / 360);
 
       this.updatePMatrix();
-      this.updateCanvasScreenPosition();
     }
 
     // compute pMatrix, call whenever changing camera or viewport!
@@ -91690,18 +91690,6 @@ var Customizer = function () {
       // rotate camera around origin
       this.pMatrix = this.rotate(this.pMatrix, this.camera.rotation.angle, this.camera.rotation.axis);
       if (typeof window != 'undefined') window.requestAnimationFrame(this.render.bind(this));
-    }
-
-    // call this after appending a child before our canvas!
-
-  }, {
-    key: 'updateCanvasScreenPosition',
-    value: function updateCanvasScreenPosition() {
-      if (!this.options.canvas) return;
-      var rect = this.options.canvas.getBoundingClientRect();
-      var position = [rect.left + window.scrollX, rect.top + window.scrollY];
-      this.canvas_offset = position;
-      return position;
     }
   }, {
     key: 'init',
@@ -91728,14 +91716,20 @@ var Customizer = function () {
   }, {
     key: 'browserToWorld',
     value: function browserToWorld(browser) {
+      // find out the position of canvas element in browser
+      if (!this.options.canvas) return;
+      var rect = this.options.canvas.getBoundingClientRect();
+      var position = [rect.left + window.scrollX, rect.top + window.scrollY];
+      this.canvas_offset = position;
+
       return this.screenToWorld([browser[0] - this.canvas_offset[0], browser[1] - this.canvas_offset[1]]);
     }
   }, {
     key: 'screenToWorld',
     value: function screenToWorld(screen) {
       // get a unit directional vector from camera origin through screen pixel
-      var rotY = Math.atan2(screen[0] - this.options.canvas.offsetWidth / 2, this.focal_length_pixels);
-      var rotX = Math.atan2(screen[1] - this.options.canvas.offsetHeight / 2, this.focal_length_pixels);
+      var rotY = Math.atan2((screen[0] - this.options.canvas.offsetWidth / 2) * this.options.resolution, this.focal_length_pixels);
+      var rotX = Math.atan2((screen[1] - this.options.canvas.offsetHeight / 2) * this.options.resolution, this.focal_length_pixels);
       var screen_direction_world = new Vector([0, 0, 1]);
       // rotate by pixel offset
       screen_direction_world = Matrix.Rotation(rotX, new Vector([1, 0, 0])).x(screen_direction_world);
@@ -91800,8 +91794,8 @@ var Customizer = function () {
       try {
         if (this.options.canvas) {
           gl = this.options.canvas.getContext("webgl");
-          this.options.canvas.width = this.options.canvas.offsetWidth;
-          this.options.canvas.height = this.options.canvas.offsetHeight;
+          this.options.canvas.width = this.options.resolution * this.options.canvas.offsetWidth;
+          this.options.canvas.height = this.options.resolution * this.options.canvas.offsetHeight;
           this.options.width = this.options.canvas.width;
           this.options.height = this.options.canvas.height;
         } else {
@@ -92811,6 +92805,9 @@ var LayoutMain = function (_React$Component) {
         content = React.createElement(BowAndDrape.views[this.props.content_name], JSON.parse(this.props.content_props));
       }
 
+      var zoom = 1;
+      if (typeof document != "undefined") zoom = document.body.clientWidth / window.innerWidth;
+
       return React.createElement(
         Swipeable,
         {
@@ -92824,7 +92821,7 @@ var LayoutMain = function (_React$Component) {
         content,
         React.createElement(
           'div',
-          { style: { position: "fixed", left: this.state.viewport_width - this.state.viewport_width * 0.01 + this.state.menu.offset + "px", top: "0px", backgroundColor: "#aaa", width: "100%", height: "100%", transition: "left 0.1s", zIndex: "10" } },
+          { style: { position: "fixed", left: this.state.viewport_width * zoom * 0.99 + this.state.menu.offset + "px", top: "0px", backgroundColor: "#aaa", width: "100%", height: "100%", transition: "left 0.1s", zIndex: "10" } },
           React.createElement(UserMenu, _extends({ handleToggleMenu: this.handleToggleMenuState.bind(this) }, this.state))
         ),
         React.createElement('script', { src: '/BowAndDrape.js' }),
@@ -93157,6 +93154,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var Swipeable = require('react-swipeable');
+var SylvestorGlUtils = require('sylvester-es6');
+var Matrix = SylvestorGlUtils.Matrix;
+var Vector = SylvestorGlUtils.Vector;
 var ProductComponentPicker = require('./ProductComponentPicker.jsx');
 
 // lookup table to find skus corresponding to certain characters
@@ -93197,7 +93197,6 @@ var ProductCanvas = function (_React$Component) {
       selected_component: -1
     };
     _this.handleUpdateProduct = props.handleUpdateProduct;
-
     return _this;
   }
 
@@ -93271,7 +93270,7 @@ var ProductCanvas = function (_React$Component) {
           return component;
         });
         return { assembly: assembly, selected_component: selected_component };
-      });
+      }, this.autoLayout);
     }
   }, {
     key: 'handleAddComponent',
@@ -93320,25 +93319,9 @@ var ProductCanvas = function (_React$Component) {
       });
     }
   }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate(prevProps, prevState) {
-      var _this4 = this;
-
-      // handle actions on hitboxes
-      this.canvas.parentNode.childNodes.forEach(function (node) {
-        if (node.tagName.toLowerCase() != "component_hitbox") return;
-        // this overrides the synthetic react events so we don't scroll
-        node.ontouchmove = _this4.handleComponentMove.bind(_this4, node.getAttribute("data"));
-        node.onmousemove = _this4.handleComponentMove.bind(_this4, node.getAttribute("data"));
-      });
-      this.handleUpdateProduct();
-
-      this.customizer.updateCanvasScreenPosition();
-    }
-  }, {
     key: 'handleComponentMove',
     value: function handleComponentMove(index, event) {
-      var _this5 = this;
+      var _this4 = this;
 
       event.preventDefault();
       event.stopPropagation();
@@ -93347,14 +93330,12 @@ var ProductCanvas = function (_React$Component) {
       if (event.type == "mousemove" && !event.buttons & 0x1) return;
       var client_pos = event.touches ? [event.touches[0].pageX, event.touches[0].pageY] : [event.clientX, event.clientY + (document.body.scrollTop ? document.body.scrollTop : document.documentElement.scrollTop)];
 
-      // safari ipad touch is fucked
-
       // update the component position
       this.setState(function (prevState, props) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[index];
         if (selected) {
-          selected.props.position = _this5.customizer.browserToWorld(client_pos);
+          selected.props.position = _this4.customizer.browserToWorld(client_pos);
         }
         return { assembly: assembly, selected_component: index };
       });
@@ -93363,6 +93344,116 @@ var ProductCanvas = function (_React$Component) {
     key: 'handleSelectComponent',
     value: function handleSelectComponent(index) {
       this.setState({ selected_component: index });
+    }
+  }, {
+    key: 'handleChangeCamera',
+    value: function handleChangeCamera(index) {
+      this.customizer.updatePMatrix(this.cameras[index]);
+      this.handleSelectComponent(-1);
+    }
+  }, {
+    key: 'autoLayout',
+    value: function autoLayout() {
+      var _this5 = this;
+
+      var reflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      var getComponentsOfInterest = function getComponentsOfInterest(assembly) {
+        return assembly.filter(function (component) {
+          // TODO switch component rotation away from quaternions and to a
+          // rotation matrix?
+          var camera_position_world = Matrix.Rotation(_this5.customizer.camera.rotation.angle, new Vector(_this5.customizer.camera.rotation.axis)).x(new Vector(_this5.customizer.camera.position));
+          var relative_camera_direction = Matrix.Rotation(component.props.rotation.angle, new Vector(component.props.rotation.axis)).x(camera_position_world).elements;
+          return relative_camera_direction[2] <= 0;
+          // TODO don't affect components that have been positioned manually
+          // unless the reflow flag is flipped?
+        });
+      };
+
+      this.setState(function (prevState, prevProps) {
+        var assembly = JSON.parse(JSON.stringify(prevState.assembly));
+        var selected_component = prevState.selected_component;
+        // TODO rectangular design areas for now
+        var design_area = _this5.props.product.props.design_area && _this5.props.product.props.design_area.width ? _this5.props.product.props.design_area : {
+          top: _this5.props.product.props.imageheight / 2,
+          left: -_this5.props.product.props.imagewidth / 2,
+          width: _this5.props.product.props.imagewidth,
+          height: _this5.props.product.props.imageheight,
+          gravity: [0, _this5.props.product.props.imageheight / 4]
+        };
+        // only work on visible components
+        var components = getComponentsOfInterest(assembly);
+
+        // TODO reorder component map to match current positions
+
+        // TODO go through and break up phrases that are too long
+        if (reflow) {
+          components.forEach(function (component, index) {
+            var total_width = 0;
+            component.assembly.forEach(function (assembly_component) {
+              total_width += parseFloat(assembly_component.props.imagewidth);
+            });
+            if (total_width <= design_area.width) return;
+            // try to find a breakpoint
+            for (var i = 0; i < component.assembly.length - 1; i++) {
+              var assembly_component_toks = component.assembly[i].sku.split('_');
+              var is_space = assembly_component_toks[assembly_component_toks.length - 1] == "space";
+
+              if (is_space || i > 0 && assembly_component_toks[0] != component.assembly[i - 1].sku.split('_')[0]) {
+                // add a new component line with what we cut off
+                var new_assembly = is_space ? component.assembly.slice(i + 1) : component.assembly.slice(i);
+                assembly.splice(assembly.indexOf(component) + 1, 0, {
+                  assembly: new_assembly,
+                  props: JSON.parse(JSON.stringify(component.props))
+                });
+                // remove the rest of this line
+                component.assembly = component.assembly.slice(0, i);
+                selected_component += 1;
+              }
+            }
+          });
+          // update the array of components we're working on
+          components = getComponentsOfInterest(assembly);
+        } // break up long phrases
+
+        var line_count = 0;
+        var total_height = 0;
+        // get total height
+        components.forEach(function (component) {
+          line_count += 1;
+          component.max_height = 0;
+          component.assembly.forEach(function (assembly_component) {
+            component.max_height = Math.max(component.max_height, assembly_component.props.imageheight);
+          });
+          total_height += component.max_height;
+        });
+        if (!line_count) return {};
+        // line spacing is as large as possible between 0 and mean_lineheight/2
+        var line_spacing = Math.max(Math.min((design_area.height - total_height) / (line_count - 1), total_height / line_count / 2), 0);
+        var line_position = Math.min(design_area.top, design_area.gravity[1] + (total_height + line_spacing * (line_count - 1)) / 2);
+        components.forEach(function (component, index) {
+          component.props.position = component.props.position || [0, 0, 0];
+          // center
+          component.props.position[0] = 0;
+          component.props.position[1] = line_position - component.max_height / 2;
+          line_position -= component.max_height + line_spacing;
+        });
+        return { assembly: assembly, selected_component: selected_component };
+      });
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      var _this6 = this;
+
+      // handle actions on hitboxes
+      this.canvas.parentNode.childNodes.forEach(function (node) {
+        if (node.tagName.toLowerCase() != "component_hitbox") return;
+        // this overrides the synthetic react events so we don't scroll
+        node.ontouchmove = _this6.handleComponentMove.bind(_this6, node.getAttribute("data"));
+        node.onmousemove = _this6.handleComponentMove.bind(_this6, node.getAttribute("data"));
+      });
+      this.handleUpdateProduct();
     }
   }, {
     key: 'componentWillUpdate',
@@ -93398,15 +93489,9 @@ var ProductCanvas = function (_React$Component) {
       }
     }
   }, {
-    key: 'handleChangeCamera',
-    value: function handleChangeCamera(index) {
-      this.customizer.updatePMatrix(this.cameras[index]);
-      this.handleSelectComponent(-1);
-    }
-  }, {
     key: 'render',
     value: function render() {
-      var _this6 = this;
+      var _this7 = this;
 
       var component_hitboxes = [];
 
@@ -93437,7 +93522,7 @@ var ProductCanvas = function (_React$Component) {
         this.cameras.forEach(function (camera) {
           camera_switcher.push(React.createElement(
             'button',
-            { key: camera_switcher.length, onClick: _this6.handleChangeCamera.bind(_this6, camera_switcher.length) },
+            { key: camera_switcher.length, onClick: _this7.handleChangeCamera.bind(_this7, camera_switcher.length) },
             'Camera ',
             camera_switcher.length
           ));
@@ -93452,7 +93537,12 @@ var ProductCanvas = function (_React$Component) {
         React.createElement(
           'hud_controls',
           { style: { position: "absolute", right: "0", top: "0" } },
-          camera_switcher
+          camera_switcher,
+          React.createElement(
+            'button',
+            { onClick: this.autoLayout.bind(this, true) },
+            'Auto'
+          )
         ),
         React.createElement(ProductComponentPicker, { product: this.props.product, productCanvas: this })
       );
@@ -93464,7 +93554,7 @@ var ProductCanvas = function (_React$Component) {
 
 module.exports = ProductCanvas;
 
-},{"./ProductComponentPicker.jsx":699,"react":609,"react-swipeable":463}],699:[function(require,module,exports){
+},{"./ProductComponentPicker.jsx":699,"react":609,"react-swipeable":463,"sylvester-es6":659}],699:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -93632,8 +93722,14 @@ var ProductComponentPicker = function (_React$Component) {
               components.push(React.createElement(
                 'div',
                 { key: components.length, name: product.compatible_components[i].props.name, style: { height: "auto" }, className: 'component_container' },
-                React.createElement('input', { type: 'text', style: { width: "90%" }, onChange: function onChange(event) {
+                React.createElement('input', { type: 'text', style: { width: "90%" },
+                  onChange: function onChange(event) {
                     _this2.handleSetComponentText(event.target.value, component_letters);
+                  },
+                  onKeyUp: function onKeyUp(event) {
+                    if (event.which != 13) return;
+                    _this2.handleSetComponentText(event.target.value, component_letters);
+                    _this2.props.productCanvas.handleSelectComponent(-1);
                   },
                   value: _this2.props.productCanvas.getComponentText()
                 })
@@ -93647,7 +93743,10 @@ var ProductComponentPicker = function (_React$Component) {
           // otherwise just list them
           var tab_components = [];
           for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-            tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + product.compatible_components[i].options[j].props.image + ')' }, onClick: this.handleAddComponent.bind(this, product.compatible_components[i].options[j]) }));
+            var backgroundImage = 'url(' + product.compatible_components[i].options[j].props.image + ')';
+            var backgroundSize = product.compatible_components[i].options[j].props.imagewidth / product.compatible_components[i].options[j].props.imageheight * 100 + '% 100%';
+            if (product.compatible_components[i].options[j].props.imagewidth > product.compatible_components[i].options[j].props.imageheight) backgroundSize = '100% ' + product.compatible_components[i].options[j].props.imageheight / product.compatible_components[i].options[j].props.imagewidth * 100 + '%';
+            tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: backgroundImage, backgroundSize: backgroundSize }, onClick: this.handleAddComponent.bind(this, product.compatible_components[i].options[j]) }));
           }
           tab_components.push(React.createElement('div', { key: 'backspace', className: 'backspace', onClick: this.handlePopComponent.bind(this) }));
           components.push(React.createElement(

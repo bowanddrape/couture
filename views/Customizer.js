@@ -15,6 +15,7 @@ class Customizer {
   constructor(options) {
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
+    this.options.resolution = 2;
 
     this.camera = {
       position: [0, 0, -1],
@@ -73,7 +74,6 @@ class Customizer {
     this.focal_length_pixels = this.options.height/2/Math.tan(this.options.vfov*Math.PI/360);
 
     this.updatePMatrix();
-    this.updateCanvasScreenPosition();
   }
 
   // compute pMatrix, call whenever changing camera or viewport!
@@ -86,15 +86,6 @@ class Customizer {
     // rotate camera around origin
     this.pMatrix = this.rotate(this.pMatrix, this.camera.rotation.angle, this.camera.rotation.axis);
     if (typeof(window)!='undefined') window.requestAnimationFrame(this.render.bind(this));
-  }
-
-  // call this after appending a child before our canvas!
-  updateCanvasScreenPosition() {
-    if (!this.options.canvas) return;
-    let rect = this.options.canvas.getBoundingClientRect();
-    let position = [rect.left + window.scrollX, rect.top + window.scrollY];
-    this.canvas_offset = position;
-    return position;
   }
 
   init() {
@@ -119,6 +110,12 @@ class Customizer {
   }
 
   browserToWorld(browser) {
+    // find out the position of canvas element in browser
+    if (!this.options.canvas) return;
+    let rect = this.options.canvas.getBoundingClientRect();
+    let position = [rect.left + window.scrollX, rect.top + window.scrollY];
+    this.canvas_offset = position;
+
     return this.screenToWorld([
       browser[0]-this.canvas_offset[0],
       browser[1]-this.canvas_offset[1],
@@ -126,8 +123,8 @@ class Customizer {
   }
   screenToWorld(screen) {
     // get a unit directional vector from camera origin through screen pixel
-    let rotY = Math.atan2(screen[0]-(this.options.canvas.offsetWidth/2), this.focal_length_pixels);
-    let rotX = Math.atan2(screen[1]-(this.options.canvas.offsetHeight/2), this.focal_length_pixels);
+    let rotY = Math.atan2((screen[0]-(this.options.canvas.offsetWidth/2))*this.options.resolution, this.focal_length_pixels);
+    let rotX = Math.atan2((screen[1]-(this.options.canvas.offsetHeight/2))*this.options.resolution, this.focal_length_pixels);
     let screen_direction_world = new Vector([0, 0, 1]);
     // rotate by pixel offset
     screen_direction_world = Matrix.Rotation(rotX, new Vector([1,0,0])).x(screen_direction_world);
@@ -190,8 +187,8 @@ class Customizer {
     try {
       if (this.options.canvas) {
         gl = this.options.canvas.getContext("webgl");
-        this.options.canvas.width = this.options.canvas.offsetWidth;
-        this.options.canvas.height = this.options.canvas.offsetHeight;
+        this.options.canvas.width = this.options.resolution * this.options.canvas.offsetWidth;
+        this.options.canvas.height = this.options.resolution * this.options.canvas.offsetHeight;
         this.options.width = this.options.canvas.width;
         this.options.height = this.options.canvas.height;
       } else {

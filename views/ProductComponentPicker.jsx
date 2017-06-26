@@ -121,8 +121,14 @@ class ProductComponentPicker extends React.Component {
           }
           components.push(
             <div key={components.length} name={product.compatible_components[i].props.name} style={{height:"auto"}} className="component_container">
-              <input type="text" style={{width:"90%"}} onChange={(event)=>{
-                this.handleSetComponentText(event.target.value, component_letters);
+              <input type="text" style={{width:"90%"}}
+                onChange={(event) => {
+                  this.handleSetComponentText(event.target.value, component_letters);
+                }}
+                onKeyUp={(event) => {
+                  if (event.which!=13) return;
+                  this.handleSetComponentText(event.target.value, component_letters);
+                  this.props.productCanvas.handleSelectComponent(-1);
                 }}
                 value={this.props.productCanvas.getComponentText()}
               />
@@ -134,8 +140,12 @@ class ProductComponentPicker extends React.Component {
         // otherwise just list them
         let tab_components = [];
         for (let j=0; j<product.compatible_components[i].options.length; j++) {
+          let backgroundImage = `url(${product.compatible_components[i].options[j].props.image})`;
+          let backgroundSize = `${product.compatible_components[i].options[j].props.imagewidth/product.compatible_components[i].options[j].props.imageheight*100}% 100%`;
+          if (product.compatible_components[i].options[j].props.imagewidth>product.compatible_components[i].options[j].props.imageheight)
+            backgroundSize = `100% ${product.compatible_components[i].options[j].props.imageheight/product.compatible_components[i].options[j].props.imagewidth*100}%`;
           tab_components.push(
-            <div key={i+'_'+j} style={{backgroundImage:`url(${product.compatible_components[i].options[j].props.image})`}} onClick={this.handleAddComponent.bind(this, product.compatible_components[i].options[j])}/>
+            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={this.handleAddComponent.bind(this, product.compatible_components[i].options[j])}/>
           );
         }
         tab_components.push(

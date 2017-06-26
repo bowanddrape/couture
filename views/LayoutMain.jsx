@@ -92,6 +92,10 @@ class LayoutMain extends React.Component {
       );
     }
 
+    let zoom = 1;
+    if (typeof(document)!="undefined")
+      zoom = document.body.clientWidth / window.innerWidth;
+
     return (
       <Swipeable
         onSwiping={this.onSwiping}
@@ -102,7 +106,7 @@ class LayoutMain extends React.Component {
           <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
           <link rel="stylesheet" href="/styles.css" type="text/css"></link>
           {content}
-          <div style={{position:"fixed",left:(this.state.viewport_width - (this.state.viewport_width*0.01) + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s",zIndex:"10"}}>
+          <div style={{position:"fixed",left:(this.state.viewport_width*zoom*0.99 + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s",zIndex:"10"}}>
             <UserMenu handleToggleMenu={this.handleToggleMenuState.bind(this)} {...this.state}/>
           </div>
 

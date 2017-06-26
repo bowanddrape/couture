@@ -1,6 +1,9 @@
 
 const React = require('react');
 const Swipeable = require('react-swipeable');
+const SylvestorGlUtils = require('sylvester-es6');
+const Matrix = SylvestorGlUtils.Matrix;
+const Vector = SylvestorGlUtils.Vector;
 const ProductComponentPicker = require('./ProductComponentPicker.jsx');
 
 // lookup table to find skus corresponding to certain characters
@@ -35,7 +38,6 @@ class ProductCanvas extends React.Component {
       selected_component: -1,
     }
     this.handleUpdateProduct = props.handleUpdateProduct;
-
   }
 
   componentDidMount() {
@@ -97,7 +99,7 @@ class ProductCanvas extends React.Component {
         return component;
       });
       return {assembly, selected_component};
-    });
+    }, this.autoLayout);
   }
 
   handleAddComponent(component) {
@@ -141,19 +143,6 @@ class ProductCanvas extends React.Component {
     });
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    // handle actions on hitboxes
-    this.canvas.parentNode.childNodes.forEach((node) => {
-      if (node.tagName.toLowerCase()!="component_hitbox") return;
-      // this overrides the synthetic react events so we don't scroll
-      node.ontouchmove = this.handleComponentMove.bind(this, node.getAttribute("data"));
-      node.onmousemove = this.handleComponentMove.bind(this, node.getAttribute("data"));
-    });
-    this.handleUpdateProduct();
-
-    this.customizer.updateCanvasScreenPosition();
-  }
-
   handleComponentMove(index, event) {
     event.preventDefault();
     event.stopPropagation();
@@ -164,8 +153,6 @@ class ProductCanvas extends React.Component {
       [event.touches[0].pageX, event.touches[0].pageY] :
       [event.clientX, event.clientY+(document.body.scrollTop?document.body.scrollTop:document.documentElement.scrollTop)];
 
-    // safari ipad touch is fucked
-
     // update the component position
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
@@ -175,11 +162,116 @@ class ProductCanvas extends React.Component {
       }
       return {assembly, selected_component: index};
     });
-
   }
+
   handleSelectComponent(index) {
     this.setState({selected_component: index});
   }
+
+  handleChangeCamera(index) {
+    this.customizer.updatePMatrix(this.cameras[index]);
+    this.handleSelectComponent(-1);
+  }
+
+  autoLayout(reflow=false) {
+    let getComponentsOfInterest = (assembly) => {
+      return assembly.filter((component) => {
+        // TODO switch component rotation away from quaternions and to a
+        // rotation matrix?
+        let camera_position_world = Matrix.Rotation(this.customizer.camera.rotation.angle, new Vector(this.customizer.camera.rotation.axis)).x(new Vector(this.customizer.camera.position))
+        let relative_camera_direction = Matrix.Rotation(component.props.rotation.angle, new Vector(component.props.rotation.axis)).x(camera_position_world).elements;
+        return relative_camera_direction[2] <= 0;
+        // TODO don't affect components that have been positioned manually
+        // unless the reflow flag is flipped?
+      });
+    }
+
+    this.setState((prevState, prevProps) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      let selected_component = prevState.selected_component;
+      // TODO rectangular design areas for now
+      let design_area = this.props.product.props.design_area&&this.props.product.props.design_area.width ? this.props.product.props.design_area : {
+        top: this.props.product.props.imageheight/2,
+        left: -this.props.product.props.imagewidth/2,
+        width: this.props.product.props.imagewidth,
+        height: this.props.product.props.imageheight,
+        gravity: [0,this.props.product.props.imageheight/4],
+      };
+      // only work on visible components
+      let components = getComponentsOfInterest(assembly);
+
+      // TODO reorder component map to match current positions
+
+      // TODO go through and break up phrases that are too long
+      if (reflow) {
+        components.forEach((component, index) => {
+          let total_width = 0;
+          component.assembly.forEach((assembly_component) => {
+            total_width += parseFloat(assembly_component.props.imagewidth);
+          });
+          if (total_width<=design_area.width) return;
+          // try to find a breakpoint
+          for (let i=0; i<component.assembly.length-1; i++) {
+            let assembly_component_toks = component.assembly[i].sku.split('_');
+            let is_space = assembly_component_toks[assembly_component_toks.length-1]=="space";
+
+            if (
+              is_space ||
+              (i>0 && assembly_component_toks[0]!=component.assembly[i-1].sku.split('_')[0])
+            ) {
+              // add a new component line with what we cut off
+              let new_assembly = is_space ? component.assembly.slice(i+1) : component.assembly.slice(i);
+              assembly.splice(assembly.indexOf(component)+1, 0, {
+                assembly: new_assembly,
+                props: JSON.parse(JSON.stringify(component.props)),
+              });
+              // remove the rest of this line
+              component.assembly = component.assembly.slice(0,i);
+              selected_component += 1;
+            }
+          }
+        });
+        // update the array of components we're working on
+        components = getComponentsOfInterest(assembly);
+      } // break up long phrases
+
+      let line_count = 0;
+      let total_height = 0;
+      // get total height
+      components.forEach((component) => {
+        line_count += 1;
+        component.max_height = 0;
+        component.assembly.forEach((assembly_component) => {
+          component.max_height = Math.max(component.max_height, assembly_component.props.imageheight);
+        });
+        total_height += component.max_height;
+      });
+      if (!line_count) return {};
+      // line spacing is as large as possible between 0 and mean_lineheight/2
+      let line_spacing = Math.max(Math.min((design_area.height-total_height)/(line_count-1), total_height/line_count/2), 0);
+      let line_position = Math.min(design_area.top, design_area.gravity[1] + (total_height+line_spacing*(line_count-1))/2);
+      components.forEach((component, index) => {
+        component.props.position = component.props.position || [0,0,0];
+        // center
+        component.props.position[0] = 0;
+        component.props.position[1] = line_position - component.max_height/2;
+        line_position -= component.max_height + line_spacing;
+      });
+      return {assembly, selected_component};
+    });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // handle actions on hitboxes
+    this.canvas.parentNode.childNodes.forEach((node) => {
+      if (node.tagName.toLowerCase()!="component_hitbox") return;
+      // this overrides the synthetic react events so we don't scroll
+      node.ontouchmove = this.handleComponentMove.bind(this, node.getAttribute("data"));
+      node.onmousemove = this.handleComponentMove.bind(this, node.getAttribute("data"));
+    });
+    this.handleUpdateProduct();
+  }
+
   componentWillUpdate(nextProps, nextState) {
     // send state to gl
     this.customizer.set(nextProps.product, nextState);
@@ -210,11 +302,6 @@ class ProductCanvas extends React.Component {
         }
       });
     }
-  }
-
-  handleChangeCamera(index) {
-    this.customizer.updatePMatrix(this.cameras[index]);
-    this.handleSelectComponent(-1);
   }
 
   render() {
@@ -262,6 +349,7 @@ class ProductCanvas extends React.Component {
         {component_hitboxes}
         <hud_controls style={{position:"absolute",right:"0",top:"0"}}>
           {camera_switcher}
+          <button onClick={this.autoLayout.bind(this, true)}>Auto</button>
         </hud_controls>
         <ProductComponentPicker product={this.props.product} productCanvas={this}/>
       </div>
