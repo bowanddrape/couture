@@ -20,6 +20,18 @@ class Scrollable extends React.Component {
     this.handleScroll = this.handleScroll.bind(this);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    // if some fundamental prop changed, flush our data
+    if (
+      prevProps.component!=this.props.component ||
+      prevProps.endpoint!=this.props.endpoint ||
+      prevProps.component_props!=this.props.component_props
+    ) {
+      this.setState({data:[]});
+    }
+    this.handleScroll();
+  }
+
   componentDidMount() {
     this.handleScroll();
     BowAndDrape.dispatcher.on("authenticated", this.handleScroll.bind(this));
@@ -63,7 +75,8 @@ class Scrollable extends React.Component {
         page.start = this.state.data[this.state.data.length-1][this.props.page.sort];
       BowAndDrape.api('GET', this.props.endpoint+(this.props.endpoint.indexOf('?')==-1?'?':'&')+"page="+JSON.stringify(page), null, (err, resp) => {
         this.querying = false;
-        this.setState({data: this.state.data.concat(resp)});
+        if (resp.length)
+          this.setState({data: this.state.data.concat(resp)});
       });
     }
   }

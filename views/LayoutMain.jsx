@@ -111,6 +111,7 @@ class LayoutMain extends React.Component {
           </div>
 
         <script src="/BowAndDrape.js"></script>
+        <script src="/masonry.pkgd.min.js"></script>
 
         <script dangerouslySetInnerHTML={{__html:`
 

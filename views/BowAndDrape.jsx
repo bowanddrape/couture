@@ -117,6 +117,7 @@ module.exports = {
     PageList: require('./PageList.jsx'),
     Items: require('./Items.jsx'),
     ComponentsEdit: require('./ComponentsEdit.jsx'),
+    Gallery: require('./Gallery.jsx'),
   },
   dispatcher,
   api,

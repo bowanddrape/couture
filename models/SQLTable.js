@@ -123,12 +123,15 @@ class SQLTable {
       if (column == "page") continue;
       // special handling for search object
       if (column == "search") {
-        if (sql.fields.indexOf("props")>=0) {
-          values.push(`.*${constraints[column]}.*`);
-          where = where ?
-            where + ` AND (props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})`:
-            `WHERE (props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})`;
-        }
+        values.push(`.*${constraints[column]}.*`);
+        // if we have props, search that too
+        let sql_constraint = (sql.fields.indexOf("props") >= 0) ?
+          `(props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})` :
+          `${sql.pkey} ~* $${values.length}`;
+
+        where = where ?
+          where + ` AND ${sql_constraint}`:
+          `WHERE ${sql_constraint}`;
         continue;
       }
       // parse the rest of constraints into a query

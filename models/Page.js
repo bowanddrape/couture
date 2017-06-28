@@ -21,6 +21,7 @@ const whitelisted_components = [
   "ItemProductionChecklist",
   "ItemProductionChecklistLegacy",
   "Cart",
+  "Gallery",
 ]
 
 /***

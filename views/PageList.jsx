@@ -11,6 +11,7 @@ class PageList extends React.Component {
     super(props);
     this.state = {
       errors: [],
+      filter: "",
     };
   }
 
@@ -25,10 +26,13 @@ class PageList extends React.Component {
       <div>
         Page List
         {this.state.errors.length?<errors>{this.state.errors}</errors>:null}
+        <input type="text" placeholder="filter" style={{marginLeft:"10px"}} onChange={(event)=>{this.setState({filter:event.target.value});}} value={this.state.filter} />
+      {this.state.filter?null:
       <PageEdit path="" elements={[]} whitelisted_components={this.props.whitelisted_components}/>
+      }
       <Scrollable
         component={PageEdit}
-        endpoint={"/page"}
+        endpoint={this.state.filter?`/page?search=${this.state.filter}`:"/page"}
         component_props={{whitelisted_components:this.props.whitelisted_components}}
         page = {{sort:"path", direction:"ASC"}}
       />
