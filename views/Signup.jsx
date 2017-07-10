@@ -70,10 +70,10 @@ class Signup extends React.Component {
 
     return (
       <div>
-        <signup>
+        <signup style={{textAlign:"center",margin:"0 10px"}}>
           {unique_keys}
           {misc_keys}
-          <button onClick={this.handleSubmit.bind(this)}>Submit</button>
+          <button onClick={this.handleSubmit.bind(this)} style={{margin:"auto"}}>Submit</button>
         </signup>
       </div>
     );

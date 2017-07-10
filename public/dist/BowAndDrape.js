@@ -95278,12 +95278,12 @@ var Signup = function (_React$Component) {
         null,
         React.createElement(
           "signup",
-          null,
+          { style: { textAlign: "center", margin: "0 10px" } },
           unique_keys,
           misc_keys,
           React.createElement(
             "button",
-            { onClick: this.handleSubmit.bind(this) },
+            { onClick: this.handleSubmit.bind(this), style: { margin: "auto" } },
             "Submit"
           )
         )
