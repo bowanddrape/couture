@@ -116,6 +116,7 @@ module.exports = {
     ComponentsEdit: require('./ComponentsEdit.jsx'),
     Gallery: require('./Gallery.jsx'),
     Signup: require('./Signup.jsx'),
+    TextContent: require('./TextContent.jsx'),
   },
   dispatcher,
   api,

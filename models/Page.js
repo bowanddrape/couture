@@ -23,6 +23,7 @@ const whitelisted_components = [
   "Cart",
   "Gallery",
   "Signup",
+  "TextContent",
 ]
 
 /***

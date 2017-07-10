@@ -94,14 +94,14 @@ class LayoutMain extends React.Component {
       let props_contents = this.props.content
       if (typeof(props_contents)=='string')
         props_contents = JSON.parse(props_contents);
-      props_contents.forEach((props_content) => {
-        let props = props_content.props;
+      for (let i=0; i<props_contents.length; i++) {
+        let props = props_contents[i].props;
         props.key = content.length;
         content.push(React.createElement(
-          BowAndDrape.views[props_content.name],
+          BowAndDrape.views[props_contents[i].name],
           props
         ));
-      });
+      };
     }
 
     let zoom = 1;
@@ -133,7 +133,7 @@ class LayoutMain extends React.Component {
             var ReactDOM = BowAndDrape.ReactDOM;
             var layout = React.createElement(BowAndDrape.views.LayoutMain, {
               content_string: \`${escape(this.props.content_string)}\`,
-              content: \`${JSON.stringify(this.props.content)}\`,
+              content: \`${JSON.stringify(this.props.content).replace(/\\n/g, "")}\`,
             });
             ReactDOM.render(
               layout,

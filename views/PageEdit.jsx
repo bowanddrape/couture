@@ -2,6 +2,7 @@
 const React = require('react');
 const PageEditGallery = require("./PageEditGallery.jsx");
 const PageEditSignup = require("./PageEditSignup.jsx");
+const PageEditTextContent = require("./PageEditTextContent.jsx");
 
 /***
 Admin widget for managing CMS pages
@@ -73,6 +74,11 @@ class PageEdit extends React.Component {
         case "Signup":
           edit_props = (
             <PageEditSignup onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
+          );
+          break;
+        case "TextContent":
+          edit_props = (
+            <PageEditTextContent onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
           );
           break;
         default:
