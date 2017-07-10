@@ -12,8 +12,12 @@ The most common of layout. Renders a react component
 
 renders any react component but also the menu and any header elements
 props:
-  content_name:"" // react component
-  content_props:{} // properties for react component
+  content: [
+    {
+      name:"" // react component
+      props:{} // properties for react component
+    }
+  ]
   content_string:"" // page as server-side rendered string
 ***/
 class LayoutMain extends React.Component {
@@ -83,13 +87,21 @@ class LayoutMain extends React.Component {
   render() {
     let content = null;
 
-    if (typeof(document)=='undefined' || typeof(BowAndDrape.views[this.props.content_name])=='undefined') {
+    if (typeof(document)=='undefined') {
       content = (<div dangerouslySetInnerHTML={{__html:unescape(this.props.content_string)}} />);
     } else {
-      content = React.createElement(
-        BowAndDrape.views[this.props.content_name],
-        JSON.parse(this.props.content_props)
-      );
+      content = [];
+      let props_contents = this.props.content
+      if (typeof(props_contents)=='string')
+        props_contents = JSON.parse(props_contents);
+      props_contents.forEach((props_content) => {
+        let props = props_content.props;
+        props.key = content.length;
+        content.push(React.createElement(
+          BowAndDrape.views[props_content.name],
+          props
+        ));
+      });
     }
 
     let zoom = 1;
@@ -97,41 +109,42 @@ class LayoutMain extends React.Component {
       zoom = document.body.clientWidth / window.innerWidth;
 
     return (
-      <Swipeable
-        onSwiping={this.onSwiping}
-        onSwiped={this.onSwiped}
-        style={{width:"100%",height:"100%",marginLeft:this.state.menu.offset+"px",transition:"margin-left 0.1s"}}
-        trackMouse={true}
-      >
-          <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
-          <link rel="stylesheet" href="/styles.css" type="text/css"></link>
-          {content}
-          <div style={{position:"fixed",left:(this.state.viewport_width*zoom*0.99 + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s",zIndex:"10"}}>
-            <UserMenu handleToggleMenu={this.handleToggleMenuState.bind(this)} {...this.state}/>
-          </div>
+      <div className="layout">
+        <Swipeable
+          onSwiping={this.onSwiping}
+          onSwiped={this.onSwiped}
+          style={{width:"100%",height:"100%",marginLeft:this.state.menu.offset+"px",transition:"margin-left 0.1s"}}
+          trackMouse={true}
+        >
+            <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
+            <link rel="stylesheet" href="/styles.css" type="text/css"></link>
+            {content}
+            <div style={{position:"fixed",left:(this.state.viewport_width*zoom*0.99 + this.state.menu.offset)+"px",top:"0px",backgroundColor:"#aaa",width:"100%",height:"100%",transition:"left 0.1s",zIndex:"10"}}>
+              <UserMenu handleToggleMenu={this.handleToggleMenuState.bind(this)} {...this.state}/>
+            </div>
 
-        <script src="/BowAndDrape.js"></script>
-        <script src="/masonry.pkgd.min.js"></script>
+          <script src="/BowAndDrape.js"></script>
+          <script src="/masonry.pkgd.min.js"></script>
 
-        <script dangerouslySetInnerHTML={{__html:`
+          <script dangerouslySetInnerHTML={{__html:`
 
-          var BowAndDrape = require("BowAndDrape");
-          var React = BowAndDrape.React;
-          var ReactDOM = BowAndDrape.ReactDOM;
-          var layout = React.createElement(BowAndDrape.views.LayoutMain, {
-            content_string: \`${escape(this.props.content_string)}\`,
-            content_name: \`${this.props.content_name}\`,
-            content_props: \`${this.props.content_props}\`}
-          );
-          ReactDOM.render(
-            layout,
-            document.body
-          );
+            var BowAndDrape = require("BowAndDrape");
+            var React = BowAndDrape.React;
+            var ReactDOM = BowAndDrape.ReactDOM;
+            var layout = React.createElement(BowAndDrape.views.LayoutMain, {
+              content_string: \`${escape(this.props.content_string)}\`,
+              content: \`${JSON.stringify(this.props.content)}\`,
+            });
+            ReactDOM.render(
+              layout,
+              document.querySelector(".layout")
+            );
 
-        `}} >
-        </script>
+          `}} >
+          </script>
 
-      </Swipeable>
+        </Swipeable>
+      </div>
     )
   }
 }
