@@ -57,13 +57,19 @@ class CartMenu extends React.Component {
   }
 
   render() {
-    if (!this.state.contents.length)
+    let num_cart_items = 0;
+    this.state.contents.forEach((item) => {
+      if (item.sku)
+        num_cart_items += 1;
+    });
+
+    if (!num_cart_items)
       return null;
 
     return (
       <a href="/cart">
         Cart
-        <cart_bug>{this.state.contents.length}</cart_bug>
+        <cart_bug>{num_cart_items}</cart_bug>
       </a>
     );
   }

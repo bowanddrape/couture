@@ -90615,11 +90615,31 @@ var Cart = function (_React$Component) {
   } // constructor()
 
   _createClass(Cart, [{
-    key: 'componentDidMount',
+    key: 'initShipping',
     // preprocessProps()
 
+    // fill in inital placeholder shipping cost
+    value: function initShipping(items) {
+      items.forEach(function (item, index) {
+        if (item.props.name == "Shipping & Handling") return items.splice(index, 1);
+      });
+      if (items.length) {
+        var total_price = 0;
+        items.forEach(function (item, index) {
+          total_price += parseFloat(item.props.price);
+        });
+        var shipping_cost = total_price < 75 ? 7 : 0;
+        items.push({
+          props: {
+            name: "Shipping & Handling",
+            price: shipping_cost
+          }
+        });
+      }
+    }
+  }, {
+    key: 'componentDidMount',
     value: function componentDidMount() {
-      // TODO fill in shipping info if we know it
       if (BowAndDrape.cart_menu) {
         this.updateContents(BowAndDrape.cart_menu.state.contents);
       }
@@ -90629,8 +90649,9 @@ var Cart = function (_React$Component) {
     key: 'updateContents',
     value: function updateContents(items) {
       items = items || [];
+      this.initShipping(items);
       this.refs.Items.updateContents(items);
-      this.forceUpdate(); // TODO I may not need this? remove if not needed!
+      this.setState({ items: items });
     }
   }, {
     key: 'handleSameBillingToggle',
@@ -90933,7 +90954,12 @@ var CartMenu = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      if (!this.state.contents.length) return null;
+      var num_cart_items = 0;
+      this.state.contents.forEach(function (item) {
+        if (item.sku) num_cart_items += 1;
+      });
+
+      if (!num_cart_items) return null;
 
       return React.createElement(
         "a",
@@ -90942,7 +90968,7 @@ var CartMenu = function (_React$Component) {
         React.createElement(
           "cart_bug",
           null,
-          this.state.contents.length
+          num_cart_items
         )
       );
     }
@@ -92565,8 +92591,7 @@ var Item = function (_React$Component) {
           React.createElement(
             "div",
             { className: "price" },
-            this.props.props.price,
-            "$"
+            this.props.props.price ? this.props.props.price + "$" : "Free!"
           ),
           this.props.onRemove ? React.createElement(
             "button",
@@ -92662,9 +92687,8 @@ var Items = function (_React$Component) {
     value: function render() {
       var items = [];
       for (var i = 0; i < this.state.contents.length; i++) {
-        items.push(React.createElement(Item, _extends({ key: items.length }, this.state.contents[i], { onRemove: BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length) })));
+        items.push(React.createElement(Item, _extends({ key: items.length }, this.state.contents[i], { onRemove: this.state.contents[i].sku ? BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length) : null })));
       }
-      if (this.props.is_cart) {}
 
       if (typeof window != "undefined" && !items.length) return React.createElement(
         'errors',
