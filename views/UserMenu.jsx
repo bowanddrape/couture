@@ -35,7 +35,7 @@ class UserMenu extends React.Component {
     }
     if (this.props.user&&this.props.user.roles&&this.props.user.roles.indexOf("bowanddrape")>=0) {
       menu_items.push(<a href="/page" key={key++} disabled>Admin Pages</a>);
-
+      menu_items.push(<a href="/vss/admin" key={key++} disabled>VSS Admin</a>);
     }
     if (this.props.user&&this.props.user.email)
       menu_items.push(<button key={key++} onClick={this.logout.bind(this)}>Logout</button>);
