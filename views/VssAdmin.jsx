@@ -43,6 +43,12 @@ class VssAdmin extends React.Component {
             alert("Error on POSTing");
             return this.handleSetSectionState("card", {errors: [err.error]});
           }
+
+          //console.log(resp.shipment.contents[0])
+          let querySKU = resp.shipment.contents[0].sku
+          let redirectURL = "//localhost/vss?sku=" + querySKU
+          //redirect to cart url
+          location.href = redirectURL
       });
     }
 
