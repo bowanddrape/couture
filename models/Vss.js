@@ -8,16 +8,17 @@ class Vss{
 
     static handleHTTP(req, res, next){
 
+      // Skip if nothing after /
       if(req.path_tokens.length < 1)
         return next();
+      // Skip if we're going to any page other than /
       if(req.path_tokens[0].toLowerCase() !== 'vss')
         return next();
-      //goto vss/admin
+      // goto /vss/admin page
       if(req.path_tokens.length > 1 && req.path_tokens[1].toLowerCase() === 'admin')
         return Page.render(req, res, VssAdmin, {});
       //handle POST request from vss/admin
       if (req.method == 'POST'){
-          console.log(req.body);
           if (typeof(req.body) == 'string') {
               try {
                   req.body = JSON.parse(req.body);
@@ -44,12 +45,12 @@ class Vss{
               return res.status(500).json({error: "Could not save shipment info"}).end();
             // log that a new vss item has been added
             console.log("Uploaded");
-            res.json({ok: "ok"}).end();
+            res.json({ok: "ok", shipment: shipment}).end();
           }); // shipment.upsert()
 
-          //return vss url that directs to a cart
+          return true
       }
-
+      console.log(req.query)
       //goto vss page
       return Page.render(req, res, Cart, {
           store: [{id: 'd955f9f3-e9ae-475a-a944-237862b589b3'}]});
