@@ -7,6 +7,7 @@ const Store = require('./Store');
 const Shipment = require('./Shipment');
 const Address = require('./Address');
 const Log = require('./Log');
+const TaxCloud = require('./TaxCloud');
 
 //const payment_method = require('./PayStripe.js');
 const payment_method = require('./PayBraintree.js');
@@ -90,6 +91,16 @@ class Order {
               // log that a purchase was made
               console.log(email+ " purchased $"+total_price+" with "+charge.type);
               res.json({ok: "ok"}).end();
+
+              // tell taxcloud about it
+              TaxCloud.quote(shipment, (err, data) => {
+                if (err) return console.log("Tax cloud error"+err);
+                console.log("registering tax of "+data.tax+" with taxcloud");
+                TaxCloud.authorizeWithCapture(data.customer_id, data.cart_id, data.order_id, (err, data) => {
+                  if (err) return console.log("Tax cloud error"+err);
+                });
+              });
+
             }); // shipment.upsert()
           }); // payment_method.charge()
         }

@@ -5,8 +5,6 @@ const ReactDOM = require('react-dom');
 const EventEmitter = require('events');
 const jwt_decode = require('jwt-decode');
 
-const LayoutBasic = require('./LayoutBasic.jsx');
-const LayoutMain = require('./LayoutMain.jsx');
 const Customizer = require('./Customizer.js');
 
 /***
@@ -107,8 +105,7 @@ module.exports = {
   // any interactable view MUST be listed here
   // FIXME script this?
   views: {
-    LayoutMain: LayoutMain,
-    LayoutBasic: LayoutBasic,
+    LayoutMain: require('./LayoutMain.jsx'),
     UserPasswordReset: require('./UserPasswordReset.jsx'),
     FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),
@@ -119,6 +116,9 @@ module.exports = {
     ComponentsEdit: require('./ComponentsEdit.jsx'),
     Vss: require('./Vss.jsx'),
     VssAdmin: require('./VssAdmin.jsx')
+    Gallery: require('./Gallery.jsx'),
+    Signup: require('./Signup.jsx'),
+    TextContent: require('./TextContent.jsx'),
   },
   dispatcher,
   api,

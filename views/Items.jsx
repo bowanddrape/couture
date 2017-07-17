@@ -33,9 +33,7 @@ class Items extends React.Component {
   render() {
     let items = [];
     for (let i=0; i<this.state.contents.length; i++) {
-      items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length)}/>);
-    }
-    if (this.props.is_cart) {
+      items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={this.state.contents[i].sku?BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length):null}/>);
     }
 
     if (typeof(window)!="undefined" && !items.length)

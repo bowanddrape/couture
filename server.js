@@ -65,6 +65,7 @@ let upload = multer({
   })
 })
 
+const Signup = require('./models/Signup.js');
 const User = require('./models/User.js');
 const Order = require('./models/Order.js');
 const Fulfillment = require('./models/Fulfillment.js');
@@ -144,6 +145,7 @@ app.use(User.handleHTTP);
 app.use(Order.handleHTTP);
 app.use(Fulfillment.handleHTTP);
 app.use(Store.handleHTTP);
+app.use((req, res, next) => {new Signup().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Page().handleHTTP(req, res, next);});

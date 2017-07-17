@@ -191,10 +191,10 @@ class ProductCanvas extends React.Component {
       let selected_component = prevState.selected_component;
       // TODO rectangular design areas for now
       let design_area = this.props.product.props.design_area&&this.props.product.props.design_area.width ? this.props.product.props.design_area : {
-        top: this.props.product.props.imageheight/2,
+        top: this.props.product.props.imageheight/2 - 0.05,
         left: -this.props.product.props.imagewidth/2,
-        width: this.props.product.props.imagewidth,
-        height: this.props.product.props.imageheight,
+        width: this.props.product.props.imagewidth*5/9,
+        height: this.props.product.props.imageheight*3/4,
         gravity: [0,this.props.product.props.imageheight/4],
       };
       // only work on visible components

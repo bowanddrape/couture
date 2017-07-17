@@ -118,6 +118,12 @@ a.card {
 a.card:hover label {
   opacity: 1;
 }
+a.card.not_link {
+  cursor: default;
+}
+.gallery a.card:not(.not_link):hover {
+  transform: scale(1.01);
+}
 shipments {
   display: block;
   padding: 10px;
@@ -493,20 +499,32 @@ input_credit [name="exp_year"] {
 }
 page_edit {
   display: block;
-  border: solid 3px #c79e6a;
+  border: solid 3px #ff87eb;
   padding: 5px;
   margin-top: 5px;
 }
 page_edit element {
   display: block;
-  background-color: #ffdd5c;
+  background-color: #ff87eb;
   padding: 3px;
+  border-bottom: solid 3px #76d300;
 }
-page_edit element:nth-child(2n) {
-  background-color: #c79e6a;
+page_edit element:last-of-type {
+  border-bottom: none;
 }
-page_edit element input[type="text"] {
-  width: 100%;
+page_edit element card img {
+  width: 150px;
+}
+page_edit element card fields {
+  width: 300px;
+  margin-left: 75px;
+}
+page_edit element card fields div {
+  position: relative;
+}
+page_edit element card fields label {
+  position: absolute;
+  right: 305px;
 }
 component_edit {
   display: flex;
@@ -623,6 +641,11 @@ menu a cart_bug {
   background-color: #fff;
   font-size: 16px;
   right: -9px;
+}
+h1,
+h2 {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
 }
 address *:not(:first-child) {
   margin-left: 7px;

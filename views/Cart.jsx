@@ -82,8 +82,28 @@ class Cart extends React.Component {
     callback(null, options);
   } // preprocessProps()
 
+  // fill in inital placeholder shipping cost
+  initShipping(items) {
+    items.forEach((item, index) => {
+      if (item.props.name == "Shipping & Handling")
+        return items.splice(index, 1);
+    });
+    if (items.length) {
+      let total_price = 0;
+      items.forEach((item, index) => {
+        total_price += parseFloat(item.props.price);
+      });
+      let shipping_cost = total_price<75 ? 7 : 0;
+      items.push({
+        props: {
+          name: "Shipping & Handling",
+          price: shipping_cost
+        }
+      });
+    }
+  }
+
   componentDidMount() {
-    // TODO fill in shipping info if we know it
     if (BowAndDrape.cart_menu) {
       this.updateContents(BowAndDrape.cart_menu.state.contents);
     }
@@ -92,8 +112,9 @@ class Cart extends React.Component {
 
   updateContents(items) {
     items = items || [];
+    this.initShipping(items);
     this.refs.Items.updateContents(items);
-    this.forceUpdate(); // TODO I may not need this? remove if not needed!
+    this.setState({items});
   }
 
   handleSameBillingToggle(e) {
@@ -206,7 +227,7 @@ class Cart extends React.Component {
 
     return (
       <div>
-        <Items ref="Items" contents={this.state.items} is_cart="true"/>
+        <Items ref="Items" contents={this.state.items} is_cart="true" />
         {this.state.errors.length?<errors>{this.state.errors}</errors>:null}
         <InputAddress section_title="Shipping Address" handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
         same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} />

@@ -10,13 +10,13 @@ class ShipProvider {
 
   static quote(shipment, callback) {
     var addressFrom  = {
-      name: "Andrea",
+      name: "Shelly",
       company: "Bow & Drape",
-      street1: "54 Front St",
-      street2: "",
-      city: "Fall River",
-      state: "MA",
-      zip: "02721",
+      street1: "67 West St",
+      street2: "209",
+      city: "Brooklyn",
+      state: "NY",
+      zip: "11222",
       country: "US", //iso2 country code
       phone: "+1 917-515-4332",
       email: "peter@bowanddrape.com",

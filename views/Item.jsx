@@ -48,7 +48,7 @@ class Item extends React.Component {
           <a href={this.props.props.url}>
             <div className="name">{this.props.props.name}</div>
           </a>
-          <div className="price">{this.props.props.price}$</div>
+          <div className="price">{this.props.props.price?this.props.props.price+"$":"Free!"}</div>
           {this.props.onRemove?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
         </deets>
         <assembly>
