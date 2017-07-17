@@ -115,7 +115,7 @@ module.exports = {
     Items: require('./Items.jsx'),
     ComponentsEdit: require('./ComponentsEdit.jsx'),
     Vss: require('./Vss.jsx'),
-    VssAdmin: require('./VssAdmin.jsx')
+    VssAdmin: require('./VssAdmin.jsx'),
     Gallery: require('./Gallery.jsx'),
     Signup: require('./Signup.jsx'),
     TextContent: require('./TextContent.jsx'),
