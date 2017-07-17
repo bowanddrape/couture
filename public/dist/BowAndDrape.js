@@ -92839,8 +92839,14 @@ var LayoutMain = function (_React$Component) {
       } else {
         content = [];
         var props_contents = this.props.content;
+        var static_server_render = false;
         if (typeof props_contents == 'string') props_contents = JSON.parse(props_contents);
         for (var i = 0; i < props_contents.length; i++) {
+          // if we didn't get a client-side component, use the server-side render
+          if (!BowAndDrape.views[props_contents[i].name]) {
+            content = React.createElement('div', { dangerouslySetInnerHTML: { __html: unescape(this.props.content_string) } });
+            break;
+          }
           var props = props_contents[i].props;
           props.key = content.length;
           content.push(React.createElement(BowAndDrape.views[props_contents[i].name], props));
@@ -92871,7 +92877,7 @@ var LayoutMain = function (_React$Component) {
           ),
           React.createElement('script', { src: '/BowAndDrape.js' }),
           React.createElement('script', { src: '/masonry.pkgd.min.js' }),
-          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n            var BowAndDrape = require("BowAndDrape");\n            var React = BowAndDrape.React;\n            var ReactDOM = BowAndDrape.ReactDOM;\n            var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n              content_string: `' + escape(this.props.content_string) + '`,\n              content: `' + JSON.stringify(this.props.content).replace(/\\n/g, "") + '`,\n            });\n            ReactDOM.render(\n              layout,\n              document.querySelector(".layout")\n            );\n\n          ' } })
+          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n            var BowAndDrape = require("BowAndDrape");\n            var React = BowAndDrape.React;\n            var ReactDOM = BowAndDrape.ReactDOM;\n            var content = `' + JSON.stringify(this.props.content) + '`;\n            if (content != "undefined") {\n              content = content.replace(/\\n/g, "");\n              var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n                content_string: `' + escape(this.props.content_string) + '`,\n                content,\n              });\n              ReactDOM.render(\n                layout,\n                document.querySelector(".layout")\n              );\n            }\n          ' } })
         )
       );
     }
@@ -95230,6 +95236,20 @@ var Shipment = function (_React$Component) {
             ),
             React.createElement(Address, this.props.address)
           ) : null,
+          this.state.shipping_label ? React.createElement(
+            'div',
+            null,
+            React.createElement(
+              'label',
+              null,
+              'Shipping: '
+            ),
+            React.createElement(
+              'a',
+              { href: this.state.shipping_label, target: '_blank' },
+              'Label'
+            )
+          ) : null,
           React.createElement(
             'div',
             null,
@@ -96249,6 +96269,14 @@ dispatcher.on("loaded", function () {
   if (token) {
     dispatcher.handleAuth({ token: token });
   }
+  // google analytics
+  (function (i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r;i[r] = i[r] || function () {
+      (i[r].q = i[r].q || []).push(arguments);
+    }, i[r].l = 1 * new Date();a = s.createElement(o), m = s.getElementsByTagName(o)[0];a.async = 1;a.src = g;m.parentNode.insertBefore(a, m);
+  })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+  ga('create', 'UA-52623236-1', 'auto');
+  ga('send', 'pageview');
 });
 
 // helper function mostly for making XHR calls. Our API expects multipart form

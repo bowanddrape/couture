@@ -161,8 +161,7 @@ class Page extends JSONAPI {
   static renderNotFound(req, res) {
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.status(404).json({error:"Not Found"}).end();
-    let page = React.createElement(NotFound, {});
-    return res.status(404).end(ReactDOMServer.renderToString(page));
+    return res.status(404).end(Page.renderString([{component: NotFound, props:{}}], LayoutMain));
   }
 
   // helper functions to get <head> stuff, usually used to popoulate meta tags
