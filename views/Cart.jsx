@@ -104,11 +104,15 @@ class Cart extends React.Component {
   }
 
   componentDidMount() {
-    if (BowAndDrape.cart_menu) {
-      this.updateContents(BowAndDrape.cart_menu.state.contents);
+    // For conditions like a Virtual Sample Sale
+    // Ignore anything a user might have in an existing cart
+    if (this.props.includeWebCart) {
+        if (BowAndDrape.cart_menu) {
+          this.updateContents(BowAndDrape.cart_menu.state.contents);
+        }
+        BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
-    BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
-  }
+}
 
   updateContents(items) {
     items = items || [];
