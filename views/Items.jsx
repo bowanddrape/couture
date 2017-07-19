@@ -15,7 +15,7 @@ class Items extends React.Component {
       contents: this.props.contents || [],
     }
   }
-
+/*
   componentDidMount() {
     if (this.props.is_cart) {
       if (BowAndDrape.cart_menu) {
@@ -24,7 +24,7 @@ class Items extends React.Component {
       BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
   }
-
+*/
   updateContents(contents) {
     contents = contents || [];
     this.setState({contents});
