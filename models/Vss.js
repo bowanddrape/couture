@@ -1,8 +1,9 @@
 const Cart = require('../views/Cart.jsx');
 const VssAdmin = require('../views/VssAdmin.jsx');
 const Page = require('./Page.js');
-const Item = require('./Item');
-const Shipment = require('./Shipment');
+const Item = require('./Item.js');
+const Shipment = require('./Shipment.js');
+const Component = require('./Component.js');
 
 /*
  ██████╗  ██████╗ ██╗    ██╗       ██╗       ██████╗ ██████╗  █████╗ ██████╗ ███████╗
@@ -47,10 +48,23 @@ class Vss{
             if (Object.keys(req.query).length < 1)
                 return Page.renderNotFound(req, res)
             // Get cart stuff from table
+            Component.get(req.query["sku"], (err, result) => {
+                if (err){
+                    console.log("Error: " + err);
+                    return Page.renderNotFound(req, res)
+                }
+                // Check for a null result if no sku, props were found in the table
+                if (result){
+                  // Do stuff with results
+                  return Page.render(req, res, Cart, {
+                    store: [ { id: store_id } ],
+                    items: [{props: result.props}],
+                    includeWebCart: false,
+                  });
+                }
 
-            
-            return Page.render(req, res, Cart, {
-                store: [{ id: store_id }]});
+                return Page.renderNotFound(req, res)
+            }); // Component.get()
         }
         //handle POST request
         if (req.method == 'POST'){
@@ -62,20 +76,24 @@ class Vss{
                   return res.json({error: "Malformed payload"});
               }
           }
-          //Pull from the body and add to a new Shipment
+          //error handling of contents and shipment
+
+
+          // Create a new shipment and component
+          let newComponent = new Component(req.body);
           let contents = new Item(req.body);
           let shipment = new Shipment({
             store_id,
             contents,
           });
-          //error handling of contents and shipment
-
-          //upsert to db
-          shipment.upsert((err)=> {
-            if (err)
-              return res.status(500).json({error: "Could not save shipment info"}).end();
-            res.json({ok: "ok", shipment: shipment}).end();
-          }); // shipment.upsert()
+          // Upsert to component and shipment tables
+          newComponent.upsert((err, result) => {
+              shipment.upsert((err)=> {
+                if (err)
+                  return res.status(500).json({error: "Could not save shipment info"}).end();
+                res.json({ok: "ok", shipment: shipment}).end();
+              }); // shipment.upsert()
+          }); // newComponent.upsert()
         }
       }
   }
