@@ -16,6 +16,7 @@ const ReactDOMServer = require('react-dom/server');
 const multer = require('multer');
 const compression = require('compression');
 const Log = require('./models/Log.js');
+const responseTime = require('response-time');
 if (["stag", "prod"].indexOf(process.env.ENV)!=-1) {
   // override console.log and console.error
   ["log", "error"].forEach(function(level) {
@@ -93,6 +94,11 @@ Store.initMandatory([
     process.env.store_ids = JSON.stringify(ids);
 });
 
+// log everything
+app.use(responseTime((req, res, time) => {
+  Log.webserverResponse(req, res, time);
+}));
+
 // enable gzip compression
 app.use(compression());
 
@@ -141,6 +147,7 @@ app.use(User.handleHTTP);
 app.use(Order.handleHTTP);
 app.use(Fulfillment.handleHTTP);
 app.use(Store.handleHTTP);
+app.use(Log.handleHTTP);
 app.use((req, res, next) => {new Signup().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
