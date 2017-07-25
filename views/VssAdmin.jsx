@@ -43,7 +43,7 @@ class VssAdmin extends React.Component {
             alert("Error on POSTing");
             return this.handleSetSectionState("card", {errors: [err.error]});
           }
-          console.log(resp.shipment)
+          //console.log(resp.shipment)
           let querySKU = resp.shipment.contents[0].sku
           let redirectURL = "//localhost/vss?sku=" + querySKU
           //redirect to cart url
@@ -71,7 +71,7 @@ class VssAdmin extends React.Component {
                     <input
                         type="text"
                         onChange={this.handleChange.bind(this, "props")}
-                        value={this.state.props.description}
+                        value={this.state.props.name}
                         name="name"/>
                     </ div>
                 </ row>
@@ -79,8 +79,9 @@ class VssAdmin extends React.Component {
                     <div>
                     <label>Size:</ label>
                     <select
-                        value={this.state.props.size}
+                        type="text"
                         onChange={this.handleChange.bind(this, "props")}
+                        value={this.state.props.size}
                         name="size">
                         <option>S</option>
                         <option>M</option>
