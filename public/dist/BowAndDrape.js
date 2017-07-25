@@ -92183,6 +92183,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
+              component_props: { picklist: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&in_production=not_null&packed=null',
               page: { sort: "requested", direction: "ASC" }
             })
@@ -92531,8 +92532,6 @@ var Item = function (_React$Component) {
   _createClass(Item, [{
     key: "render",
     value: function render() {
-      var _this2 = this;
-
       if (!this.props.props) {
         return React.createElement(
           "item",
@@ -92541,31 +92540,49 @@ var Item = function (_React$Component) {
         );
       }
       var assembly = [];
+      var assembly_contents = {};
       if (this.props.picklist && this.props.assembly) {
-        var _loop = function _loop(i) {
-          var assembly_row = [];
-          recurse_assembly(_this2.props.assembly[i], function (component) {
-            if (component.props && component.props.image && component.text) assembly_row.push(React.createElement(
-              "span",
-              { key: assembly_row.length },
-              React.createElement("img", { src: component.props.image }),
-              component.text
-            ));else if (component.props && component.props.image) assembly_row.push(React.createElement("img", { key: assembly_row.length, src: component.props.image }));else if (!component.assembly) assembly_row.push(React.createElement(
-              "span",
-              { key: assembly_row.length },
-              JSON.stringify(component)
-            ));
-          });
-          assembly.push(React.createElement(
-            "div",
-            { key: assembly.length },
-            assembly_row
-          ));
-        };
-
         for (var i = 0; i < this.props.assembly.length; i++) {
-          _loop(i);
-        }
+          recurse_assembly(this.props.assembly[i], function (component) {
+            // haute imported entries will have "text" set
+            if (component.props && component.props.image && component.text) {
+              (function () {
+                var letters = {};
+                component.text.split("").forEach(function (letter) {
+                  if (letters[letter]) return letters[letter].quantity += 1;
+                  letters[letter] = { letter: letter, quantity: 1 };
+                });
+                var letter_strings = [];
+                Object.keys(letters).sort().forEach(function (letter) {
+                  if (letters[letter].quantity == 1) return letter_strings.push(letters[letter].letter);
+                  letter_strings.push(letters[letter].letter + "x" + letters[letter].quantity);
+                });
+                assembly.push(React.createElement(
+                  "div",
+                  { key: assembly.length },
+                  React.createElement("img", { src: component.props.image }),
+                  letter_strings.join(" ")
+                ));
+              })();
+            } else if (component.props && component.props.image) {
+              var sku = component.sku || component.props.name;
+              assembly_contents[sku] = assembly_contents[sku] || component;
+              assembly_contents[sku].quantity = assembly_contents[sku].quantity ? assembly_contents[sku].quantity + 1 : 1;
+            }
+          }); // recurse_assembly
+        } // this.props.assembly.forEach
+        Object.keys(assembly_contents).sort().forEach(function (sku) {
+          var backgroundImage = "url(" + assembly_contents[sku].props.image + ")";
+          var backgroundSize = "contain";
+          if (assembly_contents[sku].props.imagewidth < assembly_contents[sku].props.imageheight) backgroundSize = assembly_contents[sku].props.imagewidth / assembly_contents[sku].props.imageheight * 100 + "% 100%";
+          if (assembly_contents[sku].props.imagewidth > assembly_contents[sku].props.imageheight) backgroundSize = "100% " + assembly_contents[sku].props.imageheight / assembly_contents[sku].props.imagewidth * 100 + "%";
+          assembly.push(React.createElement(
+            "span",
+            { key: assembly.length },
+            React.createElement("span", { style: { display: "inline-block", width: "20px", height: "20px", backgroundPosition: "center", backgroundRepeat: "no-repeat", backgroundImage: backgroundImage, backgroundSize: backgroundSize } }),
+            assembly_contents[sku].quantity > 1 ? "x" + assembly_contents[sku].quantity : null
+          ));
+        });
       }
 
       return React.createElement(
@@ -93268,7 +93285,7 @@ var PageEditSignup = function (_React$Component) {
       if (is_unique) {
         update.unique_keys.splice(index, 1);
       } else {
-        update.misc_keys.push(index, 1);
+        update.misc_keys.splice(index, 1);
       }
       this.props.onChange(update);
     }
@@ -94921,6 +94938,7 @@ var Shipment = function (_React$Component) {
       packed: _this.props.packed,
       approved: _this.props.approved,
       on_hold: _this.props.on_hold,
+      in_production: _this.props.in_production,
       received: _this.props.received,
       tracking_code: _this.props.tracking_code,
       shipping_label: _this.props.shipping_label
@@ -95025,7 +95043,7 @@ var Shipment = function (_React$Component) {
       var line_items = [];
       if (this.props.contents) {
         var item_array = typeof this.props.contents.items != 'undefined' ? this.props.contents.items : this.props.contents;
-        var picklist = this.state.approved && !this.state.in_production && !this.state.packed && !this.state.received;
+        var picklist = !this.state.packed && !this.state.received;
         for (var i = 0; i < item_array.length; i++) {
           line_items.push(React.createElement(Item, _extends({ key: line_items.length, picklist: picklist }, item_array[i])));
         }

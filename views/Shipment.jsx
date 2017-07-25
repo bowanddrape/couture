@@ -18,6 +18,7 @@ class Shipment extends React.Component {
       packed: this.props.packed,
       approved: this.props.approved,
       on_hold: this.props.on_hold,
+      in_production: this.props.in_production,
       received: this.props.received,
       tracking_code: this.props.tracking_code,
       shipping_label: this.props.shipping_label,
@@ -101,7 +102,7 @@ class Shipment extends React.Component {
     let line_items = [];
     if (this.props.contents) {
       let item_array = typeof(this.props.contents.items)!='undefined'?this.props.contents.items:this.props.contents;
-      let picklist = this.state.approved && !this.state.in_production && !this.state.packed && !this.state.received;
+      let picklist = !this.state.packed && !this.state.received;
       for (let i=0; i<item_array.length; i++) {
         line_items.push(<Item key={line_items.length} picklist={picklist} {...item_array[i]} />);
       }

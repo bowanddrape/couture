@@ -3,6 +3,7 @@ require('node-jsx-babel').install();
 require('dotenv').config();
 const mysql = require('mysql');
 const async = require('async');
+const equal = require('deep-equal');
 
 const Shipment = require('../models/Shipment.js');
 const Facility = require('../models/Facility.js');
@@ -75,7 +76,7 @@ function getLegacyItems(mysql_connection, order_id, callback) {
     async.series(assembly_queries, function(err, assembly) {
       for (let i=0; i<rows.length; i++) {
         rows[i].assembly = assembly[i];
-        rows[i].props = {image:"http://www.bowanddrape.com/"+rows[i].directory_local.split('/').slice(4).join('/')+rows[i].canvas_file_name,price:rows[i].price};
+        rows[i].props = {name:rows[i].name,image:"http://www.bowanddrape.com/"+rows[i].directory_local.split('/').slice(4).join('/')+rows[i].canvas_file_name,price:rows[i].price};
       }
       // return an array with a number of rows corresponding to the quantity
       var ret = [];
@@ -159,14 +160,17 @@ Store.initMandatory(["haute"], (err, store_ids) => {
           try {
             imported_shipment.address = new Address(JSON.parse(order_object.address.replace(/\s+/g," ")));
           } catch (error) {
-            console.log(order_object.address);
+            imported_shipment.address = new Address({});
+            console.log(order_object.order_id+" address error: "+order_object.address);
           }
-          let serialized_old_shipment = JSON.stringify(shipment);
-          shipment = Object.assign(shipment, imported_shipment);
+          imported_shipment.address.email = order_object.email;
+
           shipment = new Shipment(shipment);
+          let old_shipment = JSON.parse(JSON.stringify(shipment));
+          shipment = Object.assign(shipment, imported_shipment);
+          let new_shipment = JSON.parse(JSON.stringify(shipment));
           shipment.lookupTracking((err) => {
-            let serialized_new_shipment = JSON.stringify(shipment);
-            if (serialized_old_shipment != serialized_new_shipment) {
+            if (!equal(old_shipment, new_shipment)) {
               shipment.upsert((err)=> {
                 if (err) console.log(err);
               });
