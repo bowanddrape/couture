@@ -106,12 +106,16 @@ class Cart extends React.Component {
   componentDidMount() {
     // For conditions like a Virtual Sample Sale
     // Ignore anything a user might have in an existing cart
-    if (this.props.includeWebCart) {
+    if ("undefined" === typeof this.props.ignoreWebCart) {
+        console.log("DOING THE THING!!!");
         if (BowAndDrape.cart_menu) {
           this.updateContents(BowAndDrape.cart_menu.state.contents);
         }
         BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
+    // TODO: Do we need this for sample sales??
+    //this.updateContents(this.props.items);
+    console.log("NOT DOING THE THING!!");
 }
 
   updateContents(items) {

@@ -62,7 +62,6 @@ class Vss{
                 // Check for a null result if no sku, props were found in the table
                 if (result){
                   //  Error check, don't render a cart if someone already ordered it
-                  console.log(result);
                   Inventory.get(to_id, (err, quantities => {
                       if (err){
                           console.log("Error: " + err);
@@ -78,7 +77,7 @@ class Vss{
                   return Page.render(req, res, Cart, {
                     store: [ { id: store_id } ],
                     items: [{props: result.props}],
-                    includeWebCart: false,
+                    ignoreWebCart: true,
                   });
                 }
                 // Return 404 if no component was found matching the sku
