@@ -17,7 +17,6 @@ class VssAdmin extends React.Component {
                 size: '',
             },
         };
-
         // This binding is necessary to make `this` work in the callback
         this.handleSubmit = this.handleSubmit.bind(this);
     }
