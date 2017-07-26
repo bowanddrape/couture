@@ -8,15 +8,7 @@ const ProductComponentPicker = require('./ProductComponentPicker.jsx');
 
 // lookup table to find skus corresponding to certain characters
 let character_to_skutext = {
-  " ":"space",
-  "#":"hashtag",
-  "?":"question",
-  "!":"exclamation",
-  "&":"and",
-  "\"":"quote",
-  "\'":"quote",
-  ",":"comma",
-  ".":"period",
+  "_":"underscore",
 };
 let skutext_to_character = {};
 Object.keys(character_to_skutext).forEach((key) => {
