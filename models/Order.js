@@ -60,8 +60,11 @@ class Order {
         user.upsert((err)=>{console.log(err)});
       }
 
-      // figure out payment
       return Store.get(req.body.store_id, (err, store) => {
+        // set shipment source
+        shipment.from_id = store.facility_id;
+
+        // figure out payment
         let payments = [];
         let total_payments = 0;
         let total_price = 0;

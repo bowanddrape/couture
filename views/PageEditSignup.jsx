@@ -42,7 +42,7 @@ class PageEditSignup extends React.Component {
     if (is_unique) {
       update.unique_keys.splice(index, 1);
     } else {
-      update.misc_keys.push(index, 1);
+      update.misc_keys.splice(index, 1);
     }
     this.props.onChange(update);
   }

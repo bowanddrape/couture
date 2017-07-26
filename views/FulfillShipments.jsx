@@ -59,6 +59,7 @@ class FulfillShipments extends React.Component {
             <h2>In Production</h2>
             <Scrollable
               component={Shipment}
+              component_props={{picklist:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&in_production=not_null&packed=null`}
               page = {{sort:"requested", direction:"ASC"}}
             />

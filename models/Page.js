@@ -119,7 +119,7 @@ class Page extends JSONAPI {
                     console.log(err); //TODO elevate this
                     return callback(err);
                   }
-                  return callback(null, {component, props});
+                  return callback(null, {component, props:result});
                 });
               }
               return callback(null, {component, props});

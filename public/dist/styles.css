@@ -138,9 +138,13 @@ shipment {
   border-bottom: solid 5px rgba(0, 0, 0, 0.5);
 }
 shipment .time_bar {
-  position: absolute;
-  right: 0;
-  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+shipment .header_menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 shipment .action_bar {
   float: right;
@@ -183,7 +187,7 @@ shipment:last-child {
   width: 180px;
 }
 item {
-  display: block;
+  display: flex;
   position: relative;
   max-width: 700px;
   margin: auto;
@@ -194,8 +198,6 @@ item:last-of-type {
   border-bottom: solid 1px #000;
 }
 item img.preview {
-  display: none;
-  position: absolute;
   max-width: 200px;
   max-height: 200px;
 }
@@ -207,20 +209,16 @@ item.has_image img.preview {
 }
 item deets {
   display: block;
-  margin-left: 210px;
-  margin-right: 10px;
-}
-item deets * {
   color: #000;
-  float: left;
-  display: inline-block;
 }
 item deets .name,
 item deets .price {
   font-weight: bold;
 }
 item deets .price {
-  float: right;
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 item deets .remove {
   clear: both;
@@ -240,7 +238,6 @@ item deets .remove.confirm {
 }
 item assembly {
   clear: both;
-  margin-left: 200px;
 }
 customize product_options {
   display: flex;
