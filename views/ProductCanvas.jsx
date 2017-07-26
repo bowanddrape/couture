@@ -276,28 +276,14 @@ class ProductCanvas extends React.Component {
     // send state to gl
     this.customizer.set(nextProps.product, nextState);
     // update our cameras
-    this.cameras = nextProps.product.cameras;
-    if (!this.cameras || typeof(this.cameras)!='array') {
+    this.cameras = nextProps.product.props.cameras;
+    if (!this.cameras || (typeof(this.cameras)!='array'&&typeof(this.cameras)!='object')) {
       // the default camera, one meter away
       this.cameras = [];
       this.cameras.push({
         position: [0, 0, -1],
         rotation: {
           angle: 0,
-          axis: [0, 1, 0],
-        }
-      });
-      this.cameras.push({
-        position: [0, 0, -1],
-        rotation: {
-          angle: Math.PI/4,
-          axis: [0, 1, 0],
-        }
-      });
-      this.cameras.push({
-        position: [0, 0, -1],
-        rotation: {
-          angle: Math.PI,
           axis: [0, 1, 0],
         }
       });

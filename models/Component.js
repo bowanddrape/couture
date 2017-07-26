@@ -5,7 +5,7 @@ const Page = require('./Page');
 
 const ComponentsEdit = require('../views/ComponentsEdit.jsx');
 
-const inherited_props = ['name', 'image', 'price', 'imagewidth', 'imageheight', 'design_area', 'weight'];
+const inherited_props = ['name', 'image', 'price', 'imagewidth', 'imageheight', 'design_area', 'weight', 'cameras'];
 
 /***
 This is a bit weird and super ad-hoc...
@@ -48,7 +48,9 @@ class Component extends JSONAPI {
       }
     }
     // assemblies are how to build a product, also convert these to Components
-    if (typeof(this.assembly)!='array') {
+    try {
+      this.assembly = Object.values(this.assembly);
+    } catch(err) {
       this.assembly = [];
     }
     this.assembly = this.assembly.map((assembly) => {

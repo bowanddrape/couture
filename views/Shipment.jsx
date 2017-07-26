@@ -18,6 +18,7 @@ class Shipment extends React.Component {
       packed: this.props.packed,
       approved: this.props.approved,
       on_hold: this.props.on_hold,
+      in_production: this.props.in_production,
       received: this.props.received,
       tracking_code: this.props.tracking_code,
       shipping_label: this.props.shipping_label,
@@ -101,7 +102,7 @@ class Shipment extends React.Component {
     let line_items = [];
     if (this.props.contents) {
       let item_array = typeof(this.props.contents.items)!='undefined'?this.props.contents.items:this.props.contents;
-      let picklist = this.state.approved && !this.state.in_production && !this.state.packed && !this.state.received;
+      let picklist = !this.state.packed && !this.state.received;
       for (let i=0; i<item_array.length; i++) {
         line_items.push(<Item key={line_items.length} picklist={picklist} {...item_array[i]} />);
       }
@@ -162,24 +163,25 @@ class Shipment extends React.Component {
     return (
       <shipment>
         <div className="time_bar">
-          requested: <Timestamp time={this.props.requested} />
-          approved: <Timestamp time={this.props.approved} />
-          packed: <Timestamp time={this.state.packed} />
-          received: <Timestamp time={this.state.received} />
+          <div>requested: <Timestamp time={this.props.requested} /></div>
+          <div>approved: <Timestamp time={this.props.approved} /></div>
+          <div>packed: <Timestamp time={this.state.packed} /></div>
+          <div>received: <Timestamp time={this.state.received} /></div>
         </div>
-        <div className="action_bar">
-          {actions}
+        <div className="header_menu">
+          <shipping_details>
+            <div><label>Order_id: </label>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</div>
+            <div><label>Deliver_by: </label><Timestamp time={this.state.delivery_promised} /></div>
+            {to}
+            <div><label>User: </label>{this.props.email}</div>
+            {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
+            {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}
+            <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
+          </shipping_details>
+          <div className="action_bar">
+            {actions}
+          </div>
         </div>
-        <shipping_details>
-          <div><label>Order_id: </label>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</div>
-          <div><label>Deliver_by: </label><Timestamp time={this.state.delivery_promised} /></div>
-          {to}
-          <div><label>User: </label>{this.props.email}</div>
-          {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
-          {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}
-          <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
-        </shipping_details>
-        <div style={{clear:'both'}}/>
         <contents>{line_items}</contents>
       </shipment>
     )

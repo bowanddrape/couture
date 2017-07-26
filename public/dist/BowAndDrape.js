@@ -92183,6 +92183,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
+              component_props: { picklist: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&in_production=not_null&packed=null',
               page: { sort: "requested", direction: "ASC" }
             })
@@ -92531,8 +92532,6 @@ var Item = function (_React$Component) {
   _createClass(Item, [{
     key: "render",
     value: function render() {
-      var _this2 = this;
-
       if (!this.props.props) {
         return React.createElement(
           "item",
@@ -92541,31 +92540,49 @@ var Item = function (_React$Component) {
         );
       }
       var assembly = [];
+      var assembly_contents = {};
       if (this.props.picklist && this.props.assembly) {
-        var _loop = function _loop(i) {
-          var assembly_row = [];
-          recurse_assembly(_this2.props.assembly[i], function (component) {
-            if (component.props && component.props.image && component.text) assembly_row.push(React.createElement(
-              "span",
-              { key: assembly_row.length },
-              React.createElement("img", { src: component.props.image }),
-              component.text
-            ));else if (component.props && component.props.image) assembly_row.push(React.createElement("img", { key: assembly_row.length, src: component.props.image }));else if (!component.assembly) assembly_row.push(React.createElement(
-              "span",
-              { key: assembly_row.length },
-              JSON.stringify(component)
-            ));
-          });
-          assembly.push(React.createElement(
-            "div",
-            { key: assembly.length },
-            assembly_row
-          ));
-        };
-
         for (var i = 0; i < this.props.assembly.length; i++) {
-          _loop(i);
-        }
+          recurse_assembly(this.props.assembly[i], function (component) {
+            // haute imported entries will have "text" set
+            if (component.props && component.props.image && component.text) {
+              (function () {
+                var letters = {};
+                component.text.split("").forEach(function (letter) {
+                  if (letters[letter]) return letters[letter].quantity += 1;
+                  letters[letter] = { letter: letter, quantity: 1 };
+                });
+                var letter_strings = [];
+                Object.keys(letters).sort().forEach(function (letter) {
+                  if (letters[letter].quantity == 1) return letter_strings.push(letters[letter].letter);
+                  letter_strings.push(letters[letter].letter + "x" + letters[letter].quantity);
+                });
+                assembly.push(React.createElement(
+                  "div",
+                  { key: assembly.length },
+                  React.createElement("img", { src: component.props.image }),
+                  letter_strings.join(" ")
+                ));
+              })();
+            } else if (component.props && component.props.image) {
+              var sku = component.sku || component.props.name;
+              component.quantity = component.quantity || 1;
+              if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
+            }
+          }); // recurse_assembly
+        } // this.props.assembly.forEach
+        Object.keys(assembly_contents).sort().forEach(function (sku) {
+          var backgroundImage = "url(" + assembly_contents[sku].props.image + ")";
+          var backgroundSize = "contain";
+          if (assembly_contents[sku].props.imagewidth < assembly_contents[sku].props.imageheight) backgroundSize = assembly_contents[sku].props.imagewidth / assembly_contents[sku].props.imageheight * 100 + "% 100%";
+          if (assembly_contents[sku].props.imagewidth > assembly_contents[sku].props.imageheight) backgroundSize = "100% " + assembly_contents[sku].props.imageheight / assembly_contents[sku].props.imagewidth * 100 + "%";
+          assembly.push(React.createElement(
+            "span",
+            { key: assembly.length },
+            React.createElement("span", { style: { display: "inline-block", width: "20px", height: "20px", backgroundPosition: "center", backgroundRepeat: "no-repeat", backgroundImage: backgroundImage, backgroundSize: backgroundSize } }),
+            assembly_contents[sku].quantity > 1 ? "x" + assembly_contents[sku].quantity : null
+          ));
+        });
       }
 
       return React.createElement(
@@ -92574,7 +92591,15 @@ var Item = function (_React$Component) {
         React.createElement(
           "a",
           { href: this.props.props.url },
-          React.createElement("img", { className: "preview", src: this.props.props.image })
+          React.createElement("img", { className: "preview", src: this.props.props.image, onError: function onError(event) {
+              event.target.style.display = 'none';
+            } }),
+          React.createElement("img", { className: "preview", src: this.props.props.image ? this.props.props.image + "&camera=1" : undefined, onError: function onError(event) {
+              event.target.style.display = 'none';
+            } }),
+          /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement("img", { className: "preview", src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
+              event.target.style.display = 'none';
+            } }) : null
         ),
         React.createElement(
           "deets",
@@ -92597,12 +92622,12 @@ var Item = function (_React$Component) {
             "button",
             { className: "remove", onClick: this.handleRemovePromptConfirm.bind(this), onBlur: this.handleRemoveBlur },
             "Remove"
-          ) : null
-        ),
-        React.createElement(
-          "assembly",
-          null,
-          assembly
+          ) : null,
+          React.createElement(
+            "assembly",
+            null,
+            assembly
+          )
         )
       );
     }
@@ -93268,7 +93293,7 @@ var PageEditSignup = function (_React$Component) {
       if (is_unique) {
         update.unique_keys.splice(index, 1);
       } else {
-        update.misc_keys.push(index, 1);
+        update.misc_keys.splice(index, 1);
       }
       this.props.onChange(update);
     }
@@ -93577,6 +93602,8 @@ module.exports = Placeholder;
 
 },{"./Stroke.jsx":708,"react":609}],701:[function(require,module,exports){
 'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -93895,28 +93922,14 @@ var ProductCanvas = function (_React$Component) {
       // send state to gl
       this.customizer.set(nextProps.product, nextState);
       // update our cameras
-      this.cameras = nextProps.product.cameras;
-      if (!this.cameras || typeof this.cameras != 'array') {
+      this.cameras = nextProps.product.props.cameras;
+      if (!this.cameras || typeof this.cameras != 'array' && _typeof(this.cameras) != 'object') {
         // the default camera, one meter away
         this.cameras = [];
         this.cameras.push({
           position: [0, 0, -1],
           rotation: {
             angle: 0,
-            axis: [0, 1, 0]
-          }
-        });
-        this.cameras.push({
-          position: [0, 0, -1],
-          rotation: {
-            angle: Math.PI / 4,
-            axis: [0, 1, 0]
-          }
-        });
-        this.cameras.push({
-          position: [0, 0, -1],
-          rotation: {
-            angle: Math.PI,
             axis: [0, 1, 0]
           }
         });
@@ -94921,6 +94934,7 @@ var Shipment = function (_React$Component) {
       packed: _this.props.packed,
       approved: _this.props.approved,
       on_hold: _this.props.on_hold,
+      in_production: _this.props.in_production,
       received: _this.props.received,
       tracking_code: _this.props.tracking_code,
       shipping_label: _this.props.shipping_label
@@ -95025,7 +95039,7 @@ var Shipment = function (_React$Component) {
       var line_items = [];
       if (this.props.contents) {
         var item_array = typeof this.props.contents.items != 'undefined' ? this.props.contents.items : this.props.contents;
-        var picklist = this.state.approved && !this.state.in_production && !this.state.packed && !this.state.received;
+        var picklist = !this.state.packed && !this.state.received;
         for (var i = 0; i < item_array.length; i++) {
           line_items.push(React.createElement(Item, _extends({ key: line_items.length, picklist: picklist }, item_array[i])));
         }
@@ -95178,94 +95192,113 @@ var Shipment = function (_React$Component) {
         React.createElement(
           'div',
           { className: 'time_bar' },
-          'requested: ',
-          React.createElement(Timestamp, { time: this.props.requested }),
-          'approved: ',
-          React.createElement(Timestamp, { time: this.props.approved }),
-          'packed: ',
-          React.createElement(Timestamp, { time: this.state.packed }),
-          'received: ',
-          React.createElement(Timestamp, { time: this.state.received })
+          React.createElement(
+            'div',
+            null,
+            'requested: ',
+            React.createElement(Timestamp, { time: this.props.requested })
+          ),
+          React.createElement(
+            'div',
+            null,
+            'approved: ',
+            React.createElement(Timestamp, { time: this.props.approved })
+          ),
+          React.createElement(
+            'div',
+            null,
+            'packed: ',
+            React.createElement(Timestamp, { time: this.state.packed })
+          ),
+          React.createElement(
+            'div',
+            null,
+            'received: ',
+            React.createElement(Timestamp, { time: this.state.received })
+          )
         ),
         React.createElement(
           'div',
-          { className: 'action_bar' },
-          actions
-        ),
-        React.createElement(
-          'shipping_details',
-          null,
+          { className: 'header_menu' },
           React.createElement(
-            'div',
+            'shipping_details',
             null,
             React.createElement(
-              'label',
+              'div',
               null,
-              'Order_id: '
-            ),
-            this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
-          ),
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'Deliver_by: '
-            ),
-            React.createElement(Timestamp, { time: this.state.delivery_promised })
-          ),
-          to,
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'User: '
-            ),
-            this.props.email
-          ),
-          this.props.address ? React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'Address: '
-            ),
-            React.createElement(Address, this.props.address)
-          ) : null,
-          this.state.shipping_label ? React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'Shipping: '
+              React.createElement(
+                'label',
+                null,
+                'Order_id: '
+              ),
+              this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
             ),
             React.createElement(
-              'a',
-              { href: this.state.shipping_label, target: '_blank' },
-              'Label'
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'Deliver_by: '
+              ),
+              React.createElement(Timestamp, { time: this.state.delivery_promised })
+            ),
+            to,
+            React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'User: '
+              ),
+              this.props.email
+            ),
+            this.props.address ? React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'Address: '
+              ),
+              React.createElement(Address, this.props.address)
+            ) : null,
+            this.state.shipping_label ? React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'Shipping: '
+              ),
+              React.createElement(
+                'a',
+                { href: this.state.shipping_label, target: '_blank' },
+                'Label'
+              )
+            ) : null,
+            React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'Tracking: '
+              ),
+              React.createElement(
+                'a',
+                { href: 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' + this.state.tracking_code, target: '_blank' },
+                this.state.tracking_code
+              )
             )
-          ) : null,
+          ),
           React.createElement(
             'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'Tracking: '
-            ),
-            React.createElement(
-              'a',
-              { href: 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' + this.state.tracking_code, target: '_blank' },
-              this.state.tracking_code
-            )
+            { className: 'action_bar' },
+            actions
           )
         ),
-        React.createElement('div', { style: { clear: 'both' } }),
         React.createElement(
           'contents',
           null,
