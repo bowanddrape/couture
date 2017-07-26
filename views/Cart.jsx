@@ -20,7 +20,7 @@ page and the shipping/payment on it.
 class Cart extends React.Component {
   constructor(props) {
     super(props);
-
+    //console.log(props);
     this.state = {
       errors: [],
       items: this.props.items || [],
@@ -106,16 +106,16 @@ class Cart extends React.Component {
   componentDidMount() {
     // For conditions like a Virtual Sample Sale
     // Ignore anything a user might have in an existing cart
+    // Only VSS carts have the ignoreWebCart prop
     if ("undefined" === typeof this.props.ignoreWebCart) {
-        console.log("DOING THE THING!!!");
+        //  Utilize the web cart
         if (BowAndDrape.cart_menu) {
           this.updateContents(BowAndDrape.cart_menu.state.contents);
         }
         BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
     // TODO: Do we need this for sample sales??
-    //this.updateContents(this.props.items);
-    console.log("NOT DOING THE THING!!");
+    this.updateContents(this.props.items);
 }
 
   updateContents(items) {
