@@ -46,8 +46,11 @@ class Item extends React.Component {
             );
           } else if (component.props && component.props.image) {
             let sku = component.sku || component.props.name;
-            assembly_contents[sku] = assembly_contents[sku] || component;
-            assembly_contents[sku].quantity = assembly_contents[sku].quantity ? assembly_contents[sku].quantity+1 : 1;
+            component.quantity = component.quantity || 1;
+            if (!assembly_contents[sku])
+              assembly_contents[sku] = JSON.parse(JSON.stringify(component));
+            else
+              assembly_contents[sku].quantity += component.quantity;
           }
         }); // recurse_assembly
       } // this.props.assembly.forEach
@@ -67,7 +70,14 @@ class Item extends React.Component {
     return (
       <item className={this.props.props.image?"has_image":""}>
         <a href={this.props.props.url}>
-          <img className="preview" src={this.props.props.image}/>
+          <img className="preview" src={this.props.props.image} onError={(event)=>{event.target.style.display='none'}}/>
+          <img className="preview" src={this.props.props.image?this.props.props.image+"&camera=1":undefined} onError={(event)=>{event.target.style.display='none'}}/>
+          {/*for legacy haute orders, draw the back*/}
+          {
+            /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ?
+              <img className="preview" src={this.props.props.image?this.props.props.image.replace("_front","_back").replace("_f.jpg","_b.jpg"):undefined} onError={(event)=>{event.target.style.display='none'}}/>
+              : null
+          }
         </a>
         <deets>
           {/*<div className="sku">{this.props.sku}</div>*/}
@@ -76,10 +86,11 @@ class Item extends React.Component {
           </a>
           <div className="price">{this.props.props.price?this.props.props.price+"$":"Free!"}</div>
           {this.props.onRemove?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
+
+          <assembly>
+            {assembly}
+          </assembly>
         </deets>
-        <assembly>
-          {assembly}
-        </assembly>
       </item>
     )
   }

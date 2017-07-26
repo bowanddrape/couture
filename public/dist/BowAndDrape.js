@@ -92566,8 +92566,8 @@ var Item = function (_React$Component) {
               })();
             } else if (component.props && component.props.image) {
               var sku = component.sku || component.props.name;
-              assembly_contents[sku] = assembly_contents[sku] || component;
-              assembly_contents[sku].quantity = assembly_contents[sku].quantity ? assembly_contents[sku].quantity + 1 : 1;
+              component.quantity = component.quantity || 1;
+              if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
             }
           }); // recurse_assembly
         } // this.props.assembly.forEach
@@ -92591,7 +92591,15 @@ var Item = function (_React$Component) {
         React.createElement(
           "a",
           { href: this.props.props.url },
-          React.createElement("img", { className: "preview", src: this.props.props.image })
+          React.createElement("img", { className: "preview", src: this.props.props.image, onError: function onError(event) {
+              event.target.style.display = 'none';
+            } }),
+          React.createElement("img", { className: "preview", src: this.props.props.image ? this.props.props.image + "&camera=1" : undefined, onError: function onError(event) {
+              event.target.style.display = 'none';
+            } }),
+          /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement("img", { className: "preview", src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
+              event.target.style.display = 'none';
+            } }) : null
         ),
         React.createElement(
           "deets",
@@ -92614,12 +92622,12 @@ var Item = function (_React$Component) {
             "button",
             { className: "remove", onClick: this.handleRemovePromptConfirm.bind(this), onBlur: this.handleRemoveBlur },
             "Remove"
-          ) : null
-        ),
-        React.createElement(
-          "assembly",
-          null,
-          assembly
+          ) : null,
+          React.createElement(
+            "assembly",
+            null,
+            assembly
+          )
         )
       );
     }
@@ -93595,6 +93603,8 @@ module.exports = Placeholder;
 },{"./Stroke.jsx":708,"react":609}],701:[function(require,module,exports){
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -93912,28 +93922,14 @@ var ProductCanvas = function (_React$Component) {
       // send state to gl
       this.customizer.set(nextProps.product, nextState);
       // update our cameras
-      this.cameras = nextProps.product.cameras;
-      if (!this.cameras || typeof this.cameras != 'array') {
+      this.cameras = nextProps.product.props.cameras;
+      if (!this.cameras || typeof this.cameras != 'array' && _typeof(this.cameras) != 'object') {
         // the default camera, one meter away
         this.cameras = [];
         this.cameras.push({
           position: [0, 0, -1],
           rotation: {
             angle: 0,
-            axis: [0, 1, 0]
-          }
-        });
-        this.cameras.push({
-          position: [0, 0, -1],
-          rotation: {
-            angle: Math.PI / 4,
-            axis: [0, 1, 0]
-          }
-        });
-        this.cameras.push({
-          position: [0, 0, -1],
-          rotation: {
-            angle: Math.PI,
             axis: [0, 1, 0]
           }
         });
@@ -95196,94 +95192,113 @@ var Shipment = function (_React$Component) {
         React.createElement(
           'div',
           { className: 'time_bar' },
-          'requested: ',
-          React.createElement(Timestamp, { time: this.props.requested }),
-          'approved: ',
-          React.createElement(Timestamp, { time: this.props.approved }),
-          'packed: ',
-          React.createElement(Timestamp, { time: this.state.packed }),
-          'received: ',
-          React.createElement(Timestamp, { time: this.state.received })
+          React.createElement(
+            'div',
+            null,
+            'requested: ',
+            React.createElement(Timestamp, { time: this.props.requested })
+          ),
+          React.createElement(
+            'div',
+            null,
+            'approved: ',
+            React.createElement(Timestamp, { time: this.props.approved })
+          ),
+          React.createElement(
+            'div',
+            null,
+            'packed: ',
+            React.createElement(Timestamp, { time: this.state.packed })
+          ),
+          React.createElement(
+            'div',
+            null,
+            'received: ',
+            React.createElement(Timestamp, { time: this.state.received })
+          )
         ),
         React.createElement(
           'div',
-          { className: 'action_bar' },
-          actions
-        ),
-        React.createElement(
-          'shipping_details',
-          null,
+          { className: 'header_menu' },
           React.createElement(
-            'div',
+            'shipping_details',
             null,
             React.createElement(
-              'label',
+              'div',
               null,
-              'Order_id: '
-            ),
-            this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
-          ),
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'Deliver_by: '
-            ),
-            React.createElement(Timestamp, { time: this.state.delivery_promised })
-          ),
-          to,
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'User: '
-            ),
-            this.props.email
-          ),
-          this.props.address ? React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'Address: '
-            ),
-            React.createElement(Address, this.props.address)
-          ) : null,
-          this.state.shipping_label ? React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'Shipping: '
+              React.createElement(
+                'label',
+                null,
+                'Order_id: '
+              ),
+              this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
             ),
             React.createElement(
-              'a',
-              { href: this.state.shipping_label, target: '_blank' },
-              'Label'
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'Deliver_by: '
+              ),
+              React.createElement(Timestamp, { time: this.state.delivery_promised })
+            ),
+            to,
+            React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'User: '
+              ),
+              this.props.email
+            ),
+            this.props.address ? React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'Address: '
+              ),
+              React.createElement(Address, this.props.address)
+            ) : null,
+            this.state.shipping_label ? React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'Shipping: '
+              ),
+              React.createElement(
+                'a',
+                { href: this.state.shipping_label, target: '_blank' },
+                'Label'
+              )
+            ) : null,
+            React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'label',
+                null,
+                'Tracking: '
+              ),
+              React.createElement(
+                'a',
+                { href: 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' + this.state.tracking_code, target: '_blank' },
+                this.state.tracking_code
+              )
             )
-          ) : null,
+          ),
           React.createElement(
             'div',
-            null,
-            React.createElement(
-              'label',
-              null,
-              'Tracking: '
-            ),
-            React.createElement(
-              'a',
-              { href: 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' + this.state.tracking_code, target: '_blank' },
-              this.state.tracking_code
-            )
+            { className: 'action_bar' },
+            actions
           )
         ),
-        React.createElement('div', { style: { clear: 'both' } }),
         React.createElement(
           'contents',
           null,
