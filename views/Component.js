@@ -99,6 +99,7 @@ class Component {
   }
   set(gl, state, callback) {
     let sub_tasks = [];
+    if (!state.props) return callback("Component.set() called empty state");
     this.scale[0] = parseFloat(state.props.imagewidth) || 1;
     this.scale[1] = parseFloat(state.props.imageheight) || 1;
     if (state.props.position) {

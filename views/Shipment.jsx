@@ -111,7 +111,7 @@ class Shipment extends React.Component {
       this.state.rates.slice(0).reverse().forEach((rate) => {
         line_items.unshift(
           <item key={line_items.length} style={{minHeight:"65px"}}>
-            <button onClick={this.handleBuyLabel.bind(this, rate.rate_id)} style={{maxWidth:"190px",position:"absolute"}}>Buy Label</button>
+            <button onClick={this.handleBuyLabel.bind(this, rate.rate_id)} style={{maxWidth:"190px"}}>Buy Label</button>
             <deets>
               <div className="name">{rate.provider}</div>
               <div style={{marginLeft:"10px"}}>{rate.service}</div>

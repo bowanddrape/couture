@@ -25,6 +25,7 @@ class ShipProvider {
     // example address_to object dict
     var addressTo = {
       name: shipment.address.name,
+      email: shipment.address.email,
       street1: shipment.address.street,
       street2: shipment.address.apt,
       city: shipment.address.locality,

@@ -91102,6 +91102,7 @@ var Component = function () {
       var _this2 = this;
 
       var sub_tasks = [];
+      if (!state.props) return callback("Component.set() called empty state");
       this.scale[0] = parseFloat(state.props.imagewidth) || 1;
       this.scale[1] = parseFloat(state.props.imageheight) || 1;
       if (state.props.position) {
@@ -95043,7 +95044,7 @@ var Shipment = function (_React$Component) {
             { key: line_items.length, style: { minHeight: "65px" } },
             React.createElement(
               'button',
-              { onClick: _this7.handleBuyLabel.bind(_this7, rate.rate_id), style: { maxWidth: "190px", position: "absolute" } },
+              { onClick: _this7.handleBuyLabel.bind(_this7, rate.rate_id), style: { maxWidth: "190px" } },
               'Buy Label'
             ),
             React.createElement(
