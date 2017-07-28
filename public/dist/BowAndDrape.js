@@ -93719,7 +93719,10 @@ var ProductCanvas = function (_React$Component) {
         selected.assembly = text.split("").map(function (letter) {
           letter = letter.toLowerCase();
           letter = character_to_skutext[letter] || letter;
-          return componentMap[letter];
+          // deep copy and set the quantity of this component to be used to 1
+          var component = JSON.parse(JSON.stringify(componentMap[letter]));
+          component.quantity = 1;
+          return component;
         }).filter(function (component) {
           return component;
         });
@@ -93731,6 +93734,9 @@ var ProductCanvas = function (_React$Component) {
     value: function handleAddComponent(component) {
       var _this3 = this;
 
+      // deep copy and set the quantity of this component to be used to 1
+      component = JSON.parse(JSON.stringify(component));
+      component.quantity = 1;
       this.setState(function (prevState, props) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[prevState.selected_component];

@@ -86,7 +86,10 @@ class ProductCanvas extends React.Component {
       selected.assembly = text.split("").map((letter) => {
         letter = letter.toLowerCase();
         letter = character_to_skutext[letter] || letter;
-        return componentMap[letter];
+        // deep copy and set the quantity of this component to be used to 1
+        let component = JSON.parse(JSON.stringify(componentMap[letter]));
+        component.quantity = 1;
+        return component;
       }).filter((component) => {
         return component;
       });
@@ -95,6 +98,9 @@ class ProductCanvas extends React.Component {
   }
 
   handleAddComponent(component) {
+    // deep copy and set the quantity of this component to be used to 1
+    component = JSON.parse(JSON.stringify(component));
+    component.quantity = 1;
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected = assembly[prevState.selected_component];
