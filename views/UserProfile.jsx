@@ -25,7 +25,7 @@ class UserProfile extends React.Component {
         <login>
           <input id="email" className={errors.email?"error":""} placeholder={errors.email?errors.email:'email address'} type="text"/>
           <br/>
-          <input id="password" className={errors.password?"error":""} placeholder={errors.password?errors.password:"password"} type="password"/>
+          <input id="password" className={errors.password?"error":""} placeholder={errors.password?errors.password:"password"} onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password"/>
           <msg>{typeof(this.props.user.error)=="string"?this.props.user.error:""}</msg>
           <button onClick={this.login}>Login / Register</button>
           <button onClick={this.verify}>Verify / Forgot Pass</button>

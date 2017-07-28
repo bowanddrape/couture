@@ -159,9 +159,7 @@ class Page extends JSONAPI {
 
   // helper function to render 404
   static renderNotFound(req, res) {
-    if (!req.accepts('*/*') && req.accepts('application/json'))
-      return res.status(404).json({error:"Not Found"}).end();
-    return res.status(404).end(Page.renderString([{component: NotFound, props:{}}], LayoutMain));
+    Page.render(req, res, NotFound, {error:"Not Found"});
   }
 
   // helper functions to get <head> stuff, usually used to popoulate meta tags
