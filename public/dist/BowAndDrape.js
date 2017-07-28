@@ -96108,6 +96108,8 @@ var UserProfile = function (_React$Component) {
   _createClass(UserProfile, [{
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       // if we don't have a user, display login area
       if (!this.props.user || !this.props.user.email) {
         var errors = [];
@@ -96120,7 +96122,11 @@ var UserProfile = function (_React$Component) {
           null,
           React.createElement('input', { id: 'email', className: errors.email ? "error" : "", placeholder: errors.email ? errors.email : 'email address', type: 'text' }),
           React.createElement('br', null),
-          React.createElement('input', { id: 'password', className: errors.password ? "error" : "", placeholder: errors.password ? errors.password : "password", type: 'password' }),
+          React.createElement('input', { id: 'password', className: errors.password ? "error" : "", placeholder: errors.password ? errors.password : "password", onKeyUp: function onKeyUp(event) {
+              if (event.which == 13) {
+                _this2.login();
+              }
+            }, type: 'password' }),
           React.createElement(
             'msg',
             null,
