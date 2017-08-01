@@ -90544,6 +90544,7 @@ var React = require('react');
 var InputAddress = require('./InputAddress.jsx');
 var Items = require('./Items.jsx');
 var ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
+var Timestamp = require('./Timestamp.jsx');
 
 //const payment_method_client = require('./PayStripeClient.js');
 var payment_method_client = require('./PayBraintreeClient.js');
@@ -90615,11 +90616,64 @@ var Cart = function (_React$Component) {
   } // constructor()
 
   _createClass(Cart, [{
-    key: 'initShipping',
+    key: 'estimateManufactureTime',
     // preprocessProps()
 
-    // fill in inital placeholder shipping cost
+    // estimate manufacturing time
+    value: function estimateManufactureTime(items) {
+      var days_needed = 1;
+      Items.recurseAssembly(items, function (component) {
+        // hardcoded defaults, if not set.
+        var default_manufacture_time = {
+          parallel: 3,
+          serial: 0
+        };
+        // embroidery and airbrush will take longer, too lazy to update the db
+        if (/letter_embroidery/.test(component.sku) || /letter_airbrush/.test(component.sku)) default_manufacture_time.parallel = 7;
+        // extract the manufacture_time for this component
+        var manufacture_time = component.props.manufacture_time || {};
+        manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
+        manufacture_time.serial = manufacture_time.serial || default_manufacture_time.serial;
+        // update our accumulator
+        days_needed = Math.max(days_needed, manufacture_time.parallel);
+        days_needed += manufacture_time.serial;
+      });
+      return days_needed;
+    }
+
+    // estimate date from now, takes days, returns time in seconds
+
+  }, {
+    key: 'countBusinessDays',
+    value: function countBusinessDays(days) {
+      var floorDate = function floorDate(time_stamp) {
+        time_stamp -= time_stamp % (24 * 60 * 60 * 1000); // subtract amount of time since midnight
+        time_stamp += new Date().getTimezoneOffset() * 60 * 1000; // add on the timezone offset
+        return time_stamp;
+      };
+      // start counting from midnight tonight
+      var ms_per_day = 24 * 60 * 60 * 1000;
+      var time = floorDate(new Date().getTime()) + ms_per_day;
+      for (var i = 0; i < days;) {
+        time += ms_per_day;
+        if (new Date(time).getDay() % 6 != 0) i += 1;
+      }
+      return time / 1000;
+    }
+
+    // fill in shipping cost
+
+  }, {
+    key: 'initShipping',
     value: function initShipping(items) {
+      var shipping_quote = this.state.shipping_quote;
+      // for now, fixed shipping
+      shipping_quote = {
+        days: 5,
+        amount: 7,
+        currency_local: "USD"
+      };
+      // remove any previous shipping line
       items.forEach(function (item, index) {
         if (item.props.name == "Shipping & Handling") return items.splice(index, 1);
       });
@@ -90628,7 +90682,9 @@ var Cart = function (_React$Component) {
         items.forEach(function (item, index) {
           total_price += parseFloat(item.props.price);
         });
-        var shipping_cost = total_price < 75 ? 7 : 0;
+        var shipping_cost = shipping_quote.amount;
+        // free domestic shipping for 75+ orders
+        if (total_price >= 75 && shipping_quote.currency_local.toLowerCase() == "usd") shipping_cost = 0;
         items.push({
           props: {
             name: "Shipping & Handling",
@@ -90803,7 +90859,8 @@ var Cart = function (_React$Component) {
           email: _this2.state.shipping.email,
           contents: _this2.refs.Items.state.contents,
           payment_nonce: payment_nonce,
-          address: _this2.state.shipping
+          address: _this2.state.shipping,
+          delivery_promised: _this2.countBusinessDays((_this2.state.shipping_quote ? _this2.state.shipping_quote.days : 5) + _this2.estimateManufactureTime(_this2.state.items))
         };
         BowAndDrape.api("POST", "/order", payload, function (err, resp) {
           if (err) {
@@ -90823,6 +90880,12 @@ var Cart = function (_React$Component) {
       return React.createElement(
         'div',
         null,
+        React.createElement(
+          'item',
+          null,
+          'Shipping on or before ',
+          React.createElement(Timestamp, { time: this.countBusinessDays(this.estimateManufactureTime(this.state.items)) })
+        ),
         React.createElement(Items, { ref: 'Items', contents: this.state.items, is_cart: 'true' }),
         this.state.errors.length ? React.createElement(
           'errors',
@@ -90871,7 +90934,7 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 }).call(this,require('_process'))
-},{"../models/PayBraintree.js":2,"./InputAddress.jsx":690,"./Items.jsx":692,"./PayBraintreeClient.js":699,"./ThanksPurchaseComplete.jsx":712,"_process":446,"react":609}],681:[function(require,module,exports){
+},{"../models/PayBraintree.js":2,"./InputAddress.jsx":690,"./Items.jsx":692,"./PayBraintreeClient.js":699,"./ThanksPurchaseComplete.jsx":712,"./Timestamp.jsx":713,"_process":446,"react":609}],681:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -92506,16 +92569,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
-var recurse_assembly = function recurse_assembly(component, foreach) {
-  if (!component) return;
-  foreach(component);
-  if (component.assembly) {
-    component.assembly.forEach(function (component) {
-      recurse_assembly(component, foreach);
-    });
-  }
-};
-
 /***
 Draw an Item. Used in views/Items.jsx
 props: will mirror a Component model
@@ -92544,7 +92597,7 @@ var Item = function (_React$Component) {
       var assembly_contents = {};
       if (this.props.picklist && this.props.assembly) {
         for (var i = 0; i < this.props.assembly.length; i++) {
-          recurse_assembly(this.props.assembly[i], function (component) {
+          Item.recurseAssembly(this.props.assembly[i], function (component) {
             // haute imported entries will have "text" set
             if (component.props && component.props.image && component.text) {
               (function () {
@@ -92570,7 +92623,7 @@ var Item = function (_React$Component) {
               component.quantity = component.quantity || 1;
               if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
             }
-          }); // recurse_assembly
+          }); // recurseAssembly
         } // this.props.assembly.forEach
         Object.keys(assembly_contents).sort().forEach(function (sku) {
           var backgroundImage = "url(" + assembly_contents[sku].props.image + ")";
@@ -92648,6 +92701,17 @@ var Item = function (_React$Component) {
     value: function handleRemoveBlur(event) {
       event.target.classList.remove("confirm");
       event.target.innerHTML = "Remove";
+    }
+  }], [{
+    key: "recurseAssembly",
+    value: function recurseAssembly(component, foreach) {
+      if (!component) return;
+      foreach(component);
+      if (component.assembly) {
+        component.assembly.forEach(function (component) {
+          Item.recurseAssembly(component, foreach);
+        });
+      }
     }
   }]);
 
@@ -92731,6 +92795,13 @@ var Items = function (_React$Component) {
         null,
         items
       );
+    }
+  }], [{
+    key: 'recurseAssembly',
+    value: function recurseAssembly(components, foreach) {
+      components.forEach(function (component) {
+        Item.recurseAssembly(component, foreach);
+      });
     }
   }]);
 
@@ -95240,7 +95311,7 @@ var Shipment = function (_React$Component) {
                 null,
                 'Deliver_by: '
               ),
-              React.createElement(Timestamp, { time: this.state.delivery_promised })
+              React.createElement(Timestamp, { time: this.props.delivery_promised })
             ),
             to,
             React.createElement(
@@ -95871,7 +95942,7 @@ var Timestamp = function (_React$Component) {
       return React.createElement(
         "span",
         { className: "timestamp" },
-        this.props.time ? new Date(this.props.time * 1000).toLocaleString() : null
+        this.props.time ? new Date(this.props.time * 1000).toLocaleDateString() : null
       );
     }
   }]);

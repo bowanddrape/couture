@@ -16,6 +16,12 @@ class Items extends React.Component {
     }
   }
 
+  static recurseAssembly(components, foreach) {
+    components.forEach((component) => {
+      Item.recurseAssembly(component, foreach);
+    });
+  }
+
   componentDidMount() {
     if (this.props.is_cart) {
       if (BowAndDrape.cart_menu) {

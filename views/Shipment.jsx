@@ -171,7 +171,7 @@ class Shipment extends React.Component {
         <div className="header_menu">
           <shipping_details>
             <div><label>Order_id: </label>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</div>
-            <div><label>Deliver_by: </label><Timestamp time={this.state.delivery_promised} /></div>
+            <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
             {to}
             <div><label>User: </label>{this.props.email}</div>
             {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}

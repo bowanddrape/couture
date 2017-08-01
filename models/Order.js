@@ -44,6 +44,7 @@ class Order {
         email,
         contents,
         address,
+        delivery_promised: req.body.delivery_promised,
       });
 
       // reject orders for nothing

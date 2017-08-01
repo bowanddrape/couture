@@ -103,8 +103,6 @@ class ShipProvider {
       if(transaction.status != "SUCCESS")
         return callback("There was an error creating transaction: "+JSON.stringify(transaction.messages));
       // print label_url and tracking_number
-console.log("Label URL: %s", transaction.label_url);
-console.log("Tracking Number: %s", transaction.tracking_number);
       shipment.tracking_code = transaction.tracking_number;
       shipment.shipping_label = transaction.label_url;
       shipment.upsert((err) => {
