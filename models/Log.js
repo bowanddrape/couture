@@ -91,7 +91,7 @@ class Log {
         tags: {
           host: os.hostname(),
           status: res.statusCode,
-          user_email: req.user.email,
+          user_email: req.user?req.user.email:null,
         },
         fields: {
           path: req.path,
