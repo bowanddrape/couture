@@ -1,13 +1,15 @@
 
 const React = require('react');
+const jwt_decode = require('jwt-decode');
 
 const Item = require('./Item.jsx');
 const Timestamp = require('./Timestamp.jsx');
 const Address = require('./Address.jsx');
+const Comments = require('./Comments.jsx');
+
 
 /***
 Draw a shipment. Used in lists of orders/shipments
-This is still WiP
 ***/
 class Shipment extends React.Component {
   constructor(props) {
@@ -22,6 +24,7 @@ class Shipment extends React.Component {
       received: this.props.received,
       tracking_code: this.props.tracking_code,
       shipping_label: this.props.shipping_label,
+      comments: (this.props.props?this.props.props.comments:undefined) || [],
     }
     this.handleQueryRates = this.handleQueryRates.bind(this);
   }
@@ -54,6 +57,25 @@ class Shipment extends React.Component {
     shipment[state] = Math.round(new Date().getTime()/1000);
     BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
       this.setState(shipment);
+    });
+  }
+
+  handlePostComment(msg) {
+    let user = jwt_decode(BowAndDrape.token);
+    let comment = {
+      user: user.email,
+      time: new Date().getTime()/1000,
+      msg,
+    };
+    let shipment = {
+      id: this.props.id,
+      props: {
+        comments: JSON.parse(JSON.stringify(this.state.comments)),
+      }
+    };
+    shipment.props.comments.push(comment);
+    BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
+      this.setState({comments: shipment.props.comments});
     });
   }
 
@@ -177,6 +199,8 @@ class Shipment extends React.Component {
             {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
             {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}
             <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
+            <div><label>Comments: </label></div>
+            <Comments comments={this.state.comments} handlePostComment={this.handlePostComment.bind(this)} />
           </shipping_details>
           <div className="action_bar">
             {actions}

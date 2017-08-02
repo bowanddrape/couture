@@ -94,11 +94,6 @@ Store.initMandatory([
     process.env.store_ids = JSON.stringify(ids);
 });
 
-// log everything
-app.use(responseTime((req, res, time) => {
-  Log.webserverResponse(req, res, time);
-}));
-
 // enable gzip compression
 app.use(compression());
 
@@ -139,11 +134,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// handle user and auth endpoints
+// handle auth
 app.use(User.handleAuthentication);
-app.use(User.handleHTTP);
+
+// log everything
+app.use(responseTime((req, res, time) => {
+  Log.webserverResponse(req, res, time);
+}));
 
 // handle API endpoints
+app.use(User.handleHTTP);
 app.use(Order.handleHTTP);
 app.use(Fulfillment.handleHTTP);
 app.use(Store.handleHTTP);

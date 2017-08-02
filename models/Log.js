@@ -41,6 +41,7 @@ const influx = new Influx.InfluxDB({
       tags: [
         'host',
         'status',
+        'user_email',
       ]
     }
   ]
@@ -90,6 +91,7 @@ class Log {
         tags: {
           host: os.hostname(),
           status: res.statusCode,
+          user_email: req.user.email,
         },
         fields: {
           path: req.path,
