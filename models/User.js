@@ -55,19 +55,30 @@ class User extends SQLTable {
 
     if (req.path_tokens[1]=='verify') {
       if (req.method=="POST") {
+
         return User.get(req.body.email, function(err, user) {
           if (err || !user)
-            return res.json({error: {email: "Please register first!"}});
+            return res.json({error:"Please register first!"});
           user.verifying = true;
           User.generateJwtToken(user, (err, token) => {
-            let body = Page.renderString(UserVerifyEmail, {user: user, link:`https://${req.headers.host}/user/verify/${token}`, host:req.headers.host}, LayoutEmail);
+            if (err) return res.json({error: err.toString()});
+            let body = Page.renderString([{
+              component: UserVerifyEmail,
+              props: {
+                user: user,
+                link: `https://${req.headers.host}/user/verify/${token}`,
+                host: JSON.parse(JSON.stringify(req.headers.host)),
+              }
+            }], LayoutEmail);
             Mail.send(user.email, "Verify your Bow & Drape Account", body, (err) => {
-              if (err) return res.json({error: err.toString()});
-
-              res.json({error: 'email sent, please wait a few mins for it to reach your inbox'});
+              // FIXME for some reason this line is giving errors, ignoring for now
+              try {
+                return res.json({error: 'email sent, please check your inbox'});
+              } catch(err) {}
             });
           });
         });
+
       } // POST, send email
       if (req.method=="GET") {
         return jsonwebtoken.verify(req.path_tokens[2], jwt_secret, (err, user) => {
@@ -176,9 +187,9 @@ class User extends SQLTable {
           return User.handleRegister(req, res);
 
         if (!user.passhash)
-          return res.json({error:{password:"Verify your email to set password"}}).end();
+          return res.json({error:"Select 'Forgot Password' to set a password"}).end();
         if (user.passhash!=req.body.passhash)
-          return res.json({error:{password:"Incorrect password"}}).end();
+          return res.json({error:"Incorrect password"}).end();
         User.sendJwtToken(res, user);
       });
     }

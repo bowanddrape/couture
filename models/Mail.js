@@ -35,8 +35,7 @@ class Mail {
 
     sendmail(options, function(err, reply) {
       if (err) {
-        console.log("sendmail error");
-        console.log(err && err.stack);
+        console.log("sendmail error " + err.toString());
       }
       if (callback) callback(err, reply);
     });

@@ -6,6 +6,7 @@ const EventEmitter = require('events');
 const jwt_decode = require('jwt-decode');
 
 const Customizer = require('./Customizer.js');
+const Errors = require('./Errors.jsx');
 
 /***
 Okay, this is a namespace to wrap all the things needed globally on the client-
@@ -38,6 +39,8 @@ class Dispatcher extends EventEmitter {
   handleAuth(auth_object) {
     if (auth_object.error) {
       document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      delete BowAndDrape.token;
+      Errors.emitError("login", auth_object.error.toString());
       return this.emit('user', {error: auth_object.error});
     }
     if (!auth_object.token) {
@@ -76,7 +79,9 @@ dispatcher.on("loaded", () => {
 // helper function mostly for making XHR calls. Our API expects multipart form
 // data and a json request header. Some calls need an auth token to take effect
 let api = function(method, endpoint, body, callback) {
-  var self = this;
+  // clear error messages on POST
+  if (method == "POST")
+    Errors.clear();
   let xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Accept","application/json");

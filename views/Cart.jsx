@@ -4,6 +4,7 @@ const InputAddress = require('./InputAddress.jsx');
 const Items = require('./Items.jsx');
 const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 const Timestamp = require('./Timestamp.jsx');
+const UserLogin = require('./UserLogin.jsx');
 
 //const payment_method_client = require('./PayStripeClient.js');
 const payment_method_client = require('./PayBraintreeClient.js');
