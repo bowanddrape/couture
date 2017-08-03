@@ -20,7 +20,6 @@ page and the shipping/payment on it.
 class Cart extends React.Component {
   constructor(props) {
     super(props);
-    //console.log(props);
     this.state = {
       errors: [],
       items: this.props.items || [],
