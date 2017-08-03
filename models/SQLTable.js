@@ -71,9 +71,69 @@ class SQLTable {
 
   // run a write statement, this will go to master, where
   // as the sqlQuery function will go to a read replica
+  static sqlCheckInventory(goodCallback, badCallback,) {
+      // connect to write pool
+      pg_write_pool.connect((err, client, done) => {
+          // define error handling function
+          const shouldAbort = (err) => {
+              if (err) {
+                  // log error
+                  console.error('Error in transaction', err.stack)
+                  // abort the transaction by calling rollback
+                  client.query('ROLLBACK', (err) => {
+                      if (err) {
+                          // log error
+                          console.error('Error rolling back client', err.stack)
+                      }
+                      // release the client back to the pool
+                      done()
+                  })
+              }
+              // bang, bang, you're a boolean now!
+              return !!err
+          }// shouldAbort()
+
+          // Begin transaction
+          client.query('BEGIN', (err) => {
+              if (shouldAbort(err)) return
+              // start inventory check process
+              // define variables used in checking of inventory
+              let vssFacility = '83bcecf8-6881-4202-bb1c-051f77f27d90';
+              let sql = {
+                  tablename: "inventory",
+                  pkey: "facility_id",
+                  fields: ["inventory"]
+              }
+              let query = `SELECT * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
+              // begin query
+              client.query(query, [vssFacility], (err, result) => {
+                  if (shouldAbort(err)) return
+                  if (!result.length) return callback(null, null);
+
+                  let quantity = result[0]["inventory"][sku]
+                  // which callback is returned depends on the status of the inventory
+                  if (quantity < 1):
+                    badCallback();
+                  goodCallback();
+
+                  // commit transaction
+                  client.query('COMMIT', (err) => {
+                      if (err) {
+                          console.error('Error committing transaction', err.stack)
+                      }
+                      // return client after successful commit
+                      done()
+                  }); // COMMIT
+              });  // Custom query
+          }); // BEGIN
+      });  // pg_write_pool.connect()
+  })  // sqlCheckInventory()
+
   static sqlExec(query, values, callback) {
     pg_write_pool.connect(function(err, client, done) {
-      if(err) return callback(err);
+      if(err) {
+          return callback(err);
+      }
 
       client.query(query, values, function(err, result) {
         done(); // release connection back to pool

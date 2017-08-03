@@ -37,23 +37,19 @@ class Vss{
     }// constructor
 
     static callback(err, result){
-      console.log("CALLBACK CALLED");
       if (err){
         console.log(err);
         return Page.renderNotFound(req, res)
       }
-      console.log(result);
-      console.log("CALLBACK RESULT");
       return result
     }
 
-    static checkInventory(sku){
+    static checkInventory(sku, callback){
         let vssFacility = '83bcecf8-6881-4202-bb1c-051f77f27d90';
         Inventory.get(vssFacility, (err, result) =>{
-            console.log(result)
-            console.log(sku + ": " + result["inventory"][sku]);
+            let quantity = result["inventory"][sku]
+            callback(err, result);
         });
-        return true
     }
 
     static handleGET(req, res){
@@ -68,21 +64,28 @@ class Vss{
               return Page.renderNotFound(req, res)
             }
             // Check if we have inventory before rendering cartProps
-            if (Vss.checkInventory(req.query["sku"])) {
+            let sku = req.query["sku"];
+            Vss.checkInventory(sku, (err, quantity) => {
+                if (err) {
+                    console.log("ERROR checking Inventory")
+                    return Page.renderNotFound(req, res)
+                }
+                if (quantity < 1) {
+                    return Page.renderNotFound(req, res)
+                }
                 // Prep cart
                 let cartProps = {
                   store: [{id: 'd955f9f3-e9ae-475a-a944-237862b589b3'}],
-                  items: [{props: comp.props}],
+                  items: [{sku: sku, props: comp.props}],
+                  //items: [{props: comp.props}],
                   ignoreWebCart: true,
                   is_cart: true
                 }
                 // Render cart
                 return Cart.preprocessProps(cartProps, (err, options) => {
                     return Page.render(req, res, Cart, options);
-                });
-            }
-            // No inventory!
-            return Page.renderNotFound(req, res)
+                });  // Cart.preprocessProps()
+            });  // Vss.checkInventory()
         });// Component.get()
     }
 

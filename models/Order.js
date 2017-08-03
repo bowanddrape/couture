@@ -8,7 +8,9 @@ const Shipment = require('./Shipment');
 const Address = require('./Address');
 const Log = require('./Log');
 const TaxCloud = require('./TaxCloud');
-
+const Vss = require('./Vss');
+const Page = require('./Page');
+//const FacilityIDS= require('./FacilityIDS');
 //const payment_method = require('./PayStripe.js');
 const payment_method = require('./PayBraintree.js');
 
@@ -29,7 +31,28 @@ class Order {
           return res.json({error: "Malformed payload"});
         }
       }
+      Order.handlePOST();
+    }
+  }
 
+  static handlePOST (req, res) {
+      //start postgres transaction
+      SQLTable.sqlCheckInventory(sku, (err, foundInv) => {
+        // begin order process
+        if (!foundInv)
+          return //handle lack of inventory goes here
+
+        Order.createShipment(req, res, (err, shipment) => {
+          //  finish order process
+          Order.initPayment(shipment);
+          //  end postgres transaction
+          });  //  createShipment()
+      });  //  sqlCheckInventory
+  }  //handlePOST
+
+  static createShipment(req, res, callback) {
+      // Ahoy, matey! Let's build a ship!
+      // define some useful variables
       let store_id = req.body.store_id;
       let email = req.body.email;
       let payment_nonce = req.body.payment_nonce;
@@ -46,7 +69,7 @@ class Order {
         address,
       });
 
-      // reject orders for nothing
+      //  Checking and formatting
       if (!contents || !contents.length)
         return res.json({error: "Attempt to place empty order"});
 
@@ -60,10 +83,19 @@ class Order {
         user.upsert((err)=>{console.log(err)});
       }
 
+      callback(err, shipment);
+  }//  createShipment
+
+  static initPayment() {
+
+
+
+  }
       return Store.get(req.body.store_id, (err, store) => {
         // set shipment source
         shipment.from_id = store.facility_id;
-
+        shipment.to_id = '6ee01152-cc5e-49e7-97b7-d676ca7ff108';
+        shipment.received = Math.round(new Date().getTime()/1000);
         // figure out payment
         let payments = [];
         let total_payments = 0;
@@ -84,7 +116,7 @@ class Order {
           // process payment
           payment_method.charge(payment_nonce, total_price-total_payments, (err, charge) => {
             if (err)
-              return res.status(403).json({error: err}).end();
+              return res.st atus(403).json({error: err}).end();
             // update payments, then save shipment
             payments.push({type: charge.type, price: charge.amount});
             shipment.payments = payments;
