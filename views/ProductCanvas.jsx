@@ -38,6 +38,7 @@ class ProductCanvas extends React.Component {
     this.customizer = new BowAndDrape.Customizer({canvas: this.canvas});
     this.customizer.init();
     this.forceUpdate();
+    window.addEventListener("resize", ()=>{this.customizer.resizeViewport()});
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -327,8 +328,8 @@ class ProductCanvas extends React.Component {
     }
 
     return (
-      <div style={{position:"relative"}}>
-        <canvas style={{position:"relative",height:"300px",width:"100%",minWidth:"400px"}}>
+      <div style={{position:"relative",margin:"auto"}}>
+        <canvas style={{display:"block",height:"300px",width:"100%",minWidth:"400px"}}>
         </canvas>
         {component_hitboxes}
         <hud_controls style={{position:"absolute",right:"0",top:"0"}}>
