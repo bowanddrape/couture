@@ -52,7 +52,7 @@ class InputAddress extends React.Component {
     return (
       <input_address>
         <section>{this.props.section_title}</section>
-        {this.props.errors.length?<errors>{this.props.errors}</errors>:null}
+        {this.props.errors?this.props.errors:null}
 
         {this.props.section_title=="Shipping Address" ?
           <row><div>

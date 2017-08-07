@@ -90545,6 +90545,8 @@ var InputAddress = require('./InputAddress.jsx');
 var Items = require('./Items.jsx');
 var ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 var Timestamp = require('./Timestamp.jsx');
+var UserLogin = require('./UserLogin.jsx');
+var Errors = require('./Errors.jsx');
 
 //const payment_method_client = require('./PayStripeClient.js');
 var payment_method_client = require('./PayBraintreeClient.js');
@@ -90569,15 +90571,13 @@ var Cart = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Cart.__proto__ || Object.getPrototypeOf(Cart)).call(this, props));
 
     _this.state = {
-      errors: [],
       items: _this.props.items || [],
       card: {
         number: "",
         cvc: "",
         exp_month: "",
         exp_year: "",
-        address_zip: null,
-        errors: ""
+        address_zip: null
       },
       shipping: {
         email: "",
@@ -90587,8 +90587,7 @@ var Cart = function (_React$Component) {
         locality: "",
         region: "",
         postal: "",
-        country: "",
-        errors: []
+        country: ""
       },
       same_billing: true,
       billing: {
@@ -90598,19 +90597,14 @@ var Cart = function (_React$Component) {
         locality: "",
         region: "",
         postal: "",
-        country: "",
-        errors: []
+        country: ""
       },
       processing_payment: false,
       done: false
     };
 
     if (!_this.props.store[0].id) {
-      _this.state.errors.push(React.createElement(
-        'div',
-        null,
-        'Config Error: Store not set'
-      ));
+      Errors.emitError(null, "Error: Store not set");
     }
     return _this;
   } // constructor()
@@ -90696,10 +90690,28 @@ var Cart = function (_React$Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
+      var _this2 = this;
+
+      // populate cart contents
       if (BowAndDrape.cart_menu) {
         this.updateContents(BowAndDrape.cart_menu.state.contents);
       }
       BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
+      // if the user is signed in, get latest shipping/billing info
+      BowAndDrape.dispatcher.on("user", function (user) {
+        if (!user.email) return;
+        var query = { email: user.email, page: JSON.stringify({ sort: "requested", direction: "DESC", limit: 1 }) };
+        BowAndDrape.api("GET", "/shipment", query, function (err, result) {
+          if (err || !result || !result.length) return;
+          var shipping = result[0].address;
+          var billing = result[0].billing_address;
+          var same_billing = false;
+          if (!billing || JSON.stringify(shipping) == JSON.stringify(billing)) {
+            same_billing = true;
+          }
+          _this2.setState({ shipping: shipping, billing: billing, same_billing: same_billing });
+        });
+      });
     }
   }, {
     key: 'updateContents',
@@ -90732,17 +90744,13 @@ var Cart = function (_React$Component) {
     value: function handleSetSectionState(section, state) {
       var update = {};
       if (section) {
-        update[section] = Object.assign(this.state[section], state);
+        var prev_state = this.state[section] || {};
+        update[section] = Object.assign(prev_state, state);
         // special handling for shipping to display warning about customs
         // TODO put this somewhere else (maybe in render()?)
         if (section == "shipping") {
           if (state.country) {
-            update[section].errors = [];
-            if (update[section].country != "USA") update[section].errors = [React.createElement(
-              'div',
-              null,
-              'Bow & Drape is not responsible for any additional import fees that arise after the item has left the United States'
-            )];
+            if (update[section].country != "USA") Errors.emitError("shipping", "Bow & Drape is not responsible for any additional import fees that arise after the item has left the United States");
           }
         }
         this.setState(update);
@@ -90759,11 +90767,7 @@ var Cart = function (_React$Component) {
           null,
           'Payment Info'
         ),
-        this.state.card.errors.length ? React.createElement(
-          'errors',
-          null,
-          this.state.card.errors
-        ) : null,
+        React.createElement(Errors, { label: 'card' }),
         React.createElement(
           'row',
           null,
@@ -90820,27 +90824,22 @@ var Cart = function (_React$Component) {
   }, {
     key: 'handlePay',
     value: function handlePay() {
-      var _this2 = this;
+      var _this3 = this;
 
+      // clear out errors so we can fill them with new ones
+      Errors.clear();
+
+      // only allow the user to click once
       if (this.state.processing_payment) return;
       this.setState({ processing_payment: true });
 
       // make sure we have all the mandatory data we need
-      var shipping_errors = [];
-      var card_errors = [];
-      if (!this.state.shipping.email) shipping_errors.push(React.createElement(
-        'div',
-        null,
-        'Please enter email address'
-      ));
-      if (!this.state.shipping.street) shipping_errors.push(React.createElement(
-        'div',
-        null,
-        'If you don\'t tell us where to ship it, we\'re keeping it and wearing it'
-      ));
-      this.handleSetSectionState("shipping", { errors: shipping_errors });
-      this.handleSetSectionState("card", { errors: card_errors });
-      if (shipping_errors.length || card_errors.length) {
+      if (!this.state.shipping.email) {
+        Errors.emitError("shipping", "Pease enter email address");
+        return this.setState({ processing_payment: false });
+      }
+      if (!this.state.shipping.street) {
+        Errors.emitError("shipping", "If you don't tell us where to ship it, we're keeping it and wearing it");
         return this.setState({ processing_payment: false });
       }
 
@@ -90850,24 +90849,25 @@ var Cart = function (_React$Component) {
       // initiate the billing
       payment_method_client.getClientNonce(this.props.payment_authorization, this.state, function (err, payment_nonce) {
         if (err) {
-          _this2.setState({ processing_payment: false });
-          _this2.handleSetSectionState("card", { errors: [err] });
+          _this3.setState({ processing_payment: false });
+          Errors.emitError("card", err);
           return;
         }
         var payload = {
-          store_id: _this2.props.store[0].id,
-          email: _this2.state.shipping.email,
-          contents: _this2.refs.Items.state.contents,
+          store_id: _this3.props.store[0].id,
+          email: _this3.state.shipping.email,
+          contents: _this3.refs.Items.state.contents,
           payment_nonce: payment_nonce,
-          address: _this2.state.shipping,
-          delivery_promised: _this2.countBusinessDays((_this2.state.shipping_quote ? _this2.state.shipping_quote.days : 5) + _this2.estimateManufactureTime(_this2.state.items))
+          address: _this3.state.shipping,
+          billing_address: _this3.state.same_billing ? _this3.state.shipping : _this3.state.billing,
+          delivery_promised: _this3.countBusinessDays((_this3.state.shipping_quote ? _this3.state.shipping_quote.days : 5) + _this3.estimateManufactureTime(_this3.state.items))
         };
         BowAndDrape.api("POST", "/order", payload, function (err, resp) {
           if (err) {
-            return _this2.handleSetSectionState("card", { errors: [err.error] });
+            return Errors.emitError("card", err.error);
           }
           BowAndDrape.cart_menu.update([]);
-          _this2.setState({ done: true });
+          _this3.setState({ done: true });
         });
       });
     } // handlePay()
@@ -90880,6 +90880,7 @@ var Cart = function (_React$Component) {
       return React.createElement(
         'div',
         null,
+        React.createElement(Errors, null),
         React.createElement(
           'item',
           null,
@@ -90887,15 +90888,11 @@ var Cart = function (_React$Component) {
           React.createElement(Timestamp, { time: this.countBusinessDays(this.estimateManufactureTime(this.state.items)) })
         ),
         React.createElement(Items, { ref: 'Items', contents: this.state.items, is_cart: 'true' }),
-        this.state.errors.length ? React.createElement(
-          'errors',
-          null,
-          this.state.errors
-        ) : null,
-        React.createElement(InputAddress, _extends({ section_title: 'Shipping Address', handleFieldChange: this.handleFieldChange.bind(this, "shipping"), handleSetSectionState: this.handleSetSectionState.bind(this, "shipping") }, this.state.shipping)),
+        React.createElement(UserLogin, { cta: 'Login or proceed as Guest' }),
+        React.createElement(InputAddress, _extends({ section_title: 'Shipping Address', errors: React.createElement(Errors, { label: 'shipping' }), handleFieldChange: this.handleFieldChange.bind(this, "shipping"), handleSetSectionState: this.handleSetSectionState.bind(this, "shipping") }, this.state.shipping)),
         'same billing address ',
         React.createElement('input', { onChange: this.handleSameBillingToggle.bind(this), type: 'checkbox', checked: this.state.same_billing }),
-        this.state.same_billing ? null : React.createElement(InputAddress, _extends({ section_title: 'Billing Address', handleFieldChange: this.handleFieldChange.bind(this, "billing"), handleSetSectionState: this.handleSetSectionState.bind(this, "billing") }, this.state.billing)),
+        this.state.same_billing ? null : React.createElement(InputAddress, _extends({ section_title: 'Billing Address', errors: React.createElement(Errors, { label: 'billing' }), handleFieldChange: this.handleFieldChange.bind(this, "billing"), handleSetSectionState: this.handleSetSectionState.bind(this, "billing") }, this.state.billing)),
         this.renderInputCredit(),
         React.createElement(
           'button',
@@ -90934,7 +90931,7 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 }).call(this,require('_process'))
-},{"../models/PayBraintree.js":2,"./InputAddress.jsx":692,"./Items.jsx":694,"./PayBraintreeClient.js":701,"./ThanksPurchaseComplete.jsx":714,"./Timestamp.jsx":715,"_process":446,"react":609}],681:[function(require,module,exports){
+},{"../models/PayBraintree.js":2,"./Errors.jsx":688,"./InputAddress.jsx":692,"./Items.jsx":694,"./PayBraintreeClient.js":701,"./ThanksPurchaseComplete.jsx":714,"./Timestamp.jsx":715,"./UserLogin.jsx":716,"_process":446,"react":609}],681:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -91161,7 +91158,6 @@ var Component = function () {
       var _this = this;
 
       var imageLoadedCallback = function imageLoadedCallback(gl, loaded_image) {
-        if (!_this.texture) ;
         _this.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, _this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
@@ -91816,7 +91812,6 @@ var Customizer = function () {
       while (this.components.length < components.length) {
         this.components.push(new Component());
       }
-      // TODO unbind textures here so we don't leak
       this.components.length = components.length;
       for (var i = 0; i < components.length; i++) {
         set_tasks.push(this.components[i].set.bind(this.components[i], this.gl, components[i]));
@@ -91833,6 +91828,12 @@ var Customizer = function () {
     key: 'resizeViewport',
     value: function resizeViewport() {
       // set canvas space to be 1-to-1 with browser space
+      if (this.options.canvas) {
+        this.options.canvas.width = this.options.resolution * this.options.canvas.offsetWidth;
+        this.options.canvas.height = this.options.resolution * this.options.canvas.offsetHeight;
+        this.options.width = this.options.canvas.width;
+        this.options.height = this.options.canvas.height;
+      }
       this.gl.viewport(0, 0, this.options.width, this.options.height);
       // f_pixels is useful for a lot of transforms, remember it
       this.focal_length_pixels = this.options.height / 2 / Math.tan(this.options.vfov * Math.PI / 360);
@@ -91956,21 +91957,15 @@ var Customizer = function () {
     key: 'initWebGL',
     value: function initWebGL() {
       var gl = null;
-      try {
-        if (this.options.canvas) {
-          gl = this.options.canvas.getContext("webgl");
-          this.options.canvas.width = this.options.resolution * this.options.canvas.offsetWidth;
-          this.options.canvas.height = this.options.resolution * this.options.canvas.offsetHeight;
-          this.options.width = this.options.canvas.width;
-          this.options.height = this.options.canvas.height;
-        } else {
-          // if we didn't get passed a canvas, we're doing a server side render
-          gl = require('gl')(this.options.width, this.options.height);
-        }
-      } catch (e) {}
+      if (this.options.canvas) {
+        gl = this.options.canvas.getContext("webgl");
+      } else {
+        // if we didn't get passed a canvas, we're doing a server side render
+        gl = require('gl')(this.options.width, this.options.height);
+      }
 
       if (!gl) {
-        console.log("Unable to initialize WebGL. Your browser may not support it.");
+        alert("Unable to initialize WebGL. Your browser may not support it, please upgrade your browser to a more modern version");
       }
       return gl;
     }
@@ -92144,7 +92139,7 @@ var Errors = function (_React$Component) {
       var appendMessage = function appendMessage(message) {
         _this2.setState(function (prevState) {
           var errors = prevState.errors.slice(0);
-          errors.push(message);
+          if (errors.indexOf(message) < 0) errors.push(message);
           return { errors: errors };
         });
       };
@@ -92612,11 +92607,7 @@ var InputAddress = function (_React$Component) {
           null,
           this.props.section_title
         ),
-        this.props.errors.length ? React.createElement(
-          "errors",
-          null,
-          this.props.errors
-        ) : null,
+        this.props.errors ? this.props.errors : null,
         this.props.section_title == "Shipping Address" ? React.createElement(
           "row",
           null,
@@ -93687,6 +93678,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var Scrollable = require('./Scrollable.jsx');
 var PageEdit = require('./PageEdit.jsx');
+var Errors = require('./Errors.jsx');
 
 /***
 Admin page for CMS pages
@@ -93701,7 +93693,6 @@ var PageList = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (PageList.__proto__ || Object.getPrototypeOf(PageList)).call(this, props));
 
     _this.state = {
-      errors: [],
       filter: ""
     };
     return _this;
@@ -93711,7 +93702,7 @@ var PageList = function (_React$Component) {
     key: 'handleAddPage',
     value: function handleAddPage() {
       BowAndDrape.api("POST", "/page", { path: "", elements: [] }, function (err, result) {
-        if (err) return setState({ errors: [err.error] });
+        if (err) return Errors.emitError(null, err.error);
       });
     }
   }, {
@@ -93723,11 +93714,7 @@ var PageList = function (_React$Component) {
         'div',
         null,
         'Page List',
-        this.state.errors.length ? React.createElement(
-          'errors',
-          null,
-          this.state.errors
-        ) : null,
+        React.createElement(Errors, null),
         React.createElement('input', { type: 'text', placeholder: 'filter', style: { marginLeft: "10px" }, onChange: function onChange(event) {
             _this2.setState({ filter: event.target.value });
           }, value: this.state.filter }),
@@ -93747,7 +93734,7 @@ var PageList = function (_React$Component) {
 
 module.exports = PageList;
 
-},{"./PageEdit.jsx":696,"./Scrollable.jsx":707,"react":609}],701:[function(require,module,exports){
+},{"./Errors.jsx":688,"./PageEdit.jsx":696,"./Scrollable.jsx":707,"react":609}],701:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -93755,6 +93742,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var braintree_client = require('braintree-web').client;
+
+var Errors = require('./Errors.jsx');
 
 var BraintreeClient = function () {
   function BraintreeClient() {
@@ -93766,7 +93755,8 @@ var BraintreeClient = function () {
     value: function getClientNonce(authorization, state, callback) {
       braintree_client.create({ authorization: authorization }, function (err, client) {
         if (err) return callback(err);
-
+        // make sure we have the info required
+        if (!state.same_billing && (!state.billing || !state.billing.postal)) return callback("Please fill in billing address");
         var data = {
           creditCard: {
             number: state.card.number,
@@ -93794,7 +93784,7 @@ var BraintreeClient = function () {
 
 module.exports = BraintreeClient;
 
-},{"braintree-web":61}],702:[function(require,module,exports){
+},{"./Errors.jsx":688,"braintree-web":61}],702:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -93899,11 +93889,16 @@ var ProductCanvas = function (_React$Component) {
   _createClass(ProductCanvas, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      var _this2 = this;
+
       this.canvas = document.querySelector("canvas");
       this.canvas.setAttribute("width", document.body.offsetWidth);
       this.customizer = new BowAndDrape.Customizer({ canvas: this.canvas });
       this.customizer.init();
       this.forceUpdate();
+      window.addEventListener("resize", function () {
+        _this2.customizer.resizeViewport();
+      });
     }
   }, {
     key: 'componentDidUpdate',
@@ -93932,7 +93927,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleSetComponentText',
     value: function handleSetComponentText(text, componentMap) {
-      var _this2 = this;
+      var _this3 = this;
 
       this.setState(function (prevState, props) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
@@ -93945,8 +93940,8 @@ var ProductCanvas = function (_React$Component) {
             props: {
               position: [0, 0, 0],
               rotation: {
-                angle: -_this2.customizer.camera.rotation.angle,
-                axis: _this2.customizer.camera.rotation.axis
+                angle: -_this3.customizer.camera.rotation.angle,
+                axis: _this3.customizer.camera.rotation.axis
               }
             },
             assembly: []
@@ -93974,7 +93969,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleAddComponent',
     value: function handleAddComponent(component) {
-      var _this3 = this;
+      var _this4 = this;
 
       // deep copy and set the quantity of this component to be used to 1
       component = JSON.parse(JSON.stringify(component));
@@ -93990,8 +93985,8 @@ var ProductCanvas = function (_React$Component) {
         // facing the camera for now TODO get normal of intersected tri
         var position = [0, 0, 0];
         var rotation = {
-          angle: -_this3.customizer.camera.rotation.angle,
-          axis: _this3.customizer.camera.rotation.axis
+          angle: -_this4.customizer.camera.rotation.angle,
+          axis: _this4.customizer.camera.rotation.axis
         };
         assembly.push({
           props: {
@@ -94023,7 +94018,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleComponentMove',
     value: function handleComponentMove(index, event) {
-      var _this4 = this;
+      var _this5 = this;
 
       event.preventDefault();
       event.stopPropagation();
@@ -94037,7 +94032,7 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[index];
         if (selected) {
-          selected.props.position = _this4.customizer.browserToWorld(client_pos);
+          selected.props.position = _this5.customizer.browserToWorld(client_pos);
         }
         return { assembly: assembly, selected_component: index };
       });
@@ -94056,7 +94051,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'autoLayout',
     value: function autoLayout() {
-      var _this5 = this;
+      var _this6 = this;
 
       var reflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
@@ -94064,7 +94059,7 @@ var ProductCanvas = function (_React$Component) {
         return assembly.filter(function (component) {
           // TODO switch component rotation away from quaternions and to a
           // rotation matrix?
-          var camera_position_world = Matrix.Rotation(_this5.customizer.camera.rotation.angle, new Vector(_this5.customizer.camera.rotation.axis)).x(new Vector(_this5.customizer.camera.position));
+          var camera_position_world = Matrix.Rotation(_this6.customizer.camera.rotation.angle, new Vector(_this6.customizer.camera.rotation.axis)).x(new Vector(_this6.customizer.camera.position));
           var relative_camera_direction = Matrix.Rotation(component.props.rotation.angle, new Vector(component.props.rotation.axis)).x(camera_position_world).elements;
           return relative_camera_direction[2] <= 0;
           // TODO don't affect components that have been positioned manually
@@ -94076,12 +94071,12 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected_component = prevState.selected_component;
         // TODO rectangular design areas for now
-        var design_area = _this5.props.product.props.design_area && _this5.props.product.props.design_area.width ? _this5.props.product.props.design_area : {
-          top: _this5.props.product.props.imageheight / 2 - 0.05,
-          left: -_this5.props.product.props.imagewidth / 2,
-          width: _this5.props.product.props.imagewidth * 5 / 9,
-          height: _this5.props.product.props.imageheight * 3 / 4,
-          gravity: [0, _this5.props.product.props.imageheight / 4]
+        var design_area = _this6.props.product.props.design_area && _this6.props.product.props.design_area.width ? _this6.props.product.props.design_area : {
+          top: _this6.props.product.props.imageheight / 2 - 0.05,
+          left: -_this6.props.product.props.imagewidth / 2,
+          width: _this6.props.product.props.imagewidth * 5 / 9,
+          height: _this6.props.product.props.imageheight * 3 / 4,
+          gravity: [0, _this6.props.product.props.imageheight / 4]
         };
         // only work on visible components
         var components = getComponentsOfInterest(assembly);
@@ -94146,14 +94141,14 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      var _this6 = this;
+      var _this7 = this;
 
       // handle actions on hitboxes
       this.canvas.parentNode.childNodes.forEach(function (node) {
         if (node.tagName.toLowerCase() != "component_hitbox") return;
         // this overrides the synthetic react events so we don't scroll
-        node.ontouchmove = _this6.handleComponentMove.bind(_this6, node.getAttribute("data"));
-        node.onmousemove = _this6.handleComponentMove.bind(_this6, node.getAttribute("data"));
+        node.ontouchmove = _this7.handleComponentMove.bind(_this7, node.getAttribute("data"));
+        node.onmousemove = _this7.handleComponentMove.bind(_this7, node.getAttribute("data"));
       });
       this.handleUpdateProduct();
     }
@@ -94179,7 +94174,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this7 = this;
+      var _this8 = this;
 
       var component_hitboxes = [];
 
@@ -94210,7 +94205,7 @@ var ProductCanvas = function (_React$Component) {
         this.cameras.forEach(function (camera) {
           camera_switcher.push(React.createElement(
             'button',
-            { key: camera_switcher.length, onClick: _this7.handleChangeCamera.bind(_this7, camera_switcher.length) },
+            { key: camera_switcher.length, onClick: _this8.handleChangeCamera.bind(_this8, camera_switcher.length) },
             'Camera ',
             camera_switcher.length
           ));
@@ -94219,8 +94214,8 @@ var ProductCanvas = function (_React$Component) {
 
       return React.createElement(
         'div',
-        { style: { position: "relative" } },
-        React.createElement('canvas', { style: { position: "relative", height: "300px", width: "100%", minWidth: "400px" } }),
+        { style: { position: "relative", margin: "auto" } },
+        React.createElement('canvas', { style: { display: "block", height: "300px", width: "100%", minWidth: "400px" } }),
         component_hitboxes,
         React.createElement(
           'hud_controls',
@@ -96176,13 +96171,29 @@ var Errors = require('./Errors.jsx');
 var UserLogin = function (_React$Component) {
   _inherits(UserLogin, _React$Component);
 
-  function UserLogin() {
+  function UserLogin(props) {
     _classCallCheck(this, UserLogin);
 
-    return _possibleConstructorReturn(this, (UserLogin.__proto__ || Object.getPrototypeOf(UserLogin)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (UserLogin.__proto__ || Object.getPrototypeOf(UserLogin)).call(this, props));
+
+    _this.state = {
+      user: {}
+    };
+    return _this;
   }
 
   _createClass(UserLogin, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      if (BowAndDrape) {
+        BowAndDrape.dispatcher.on("user", function (user) {
+          _this2.setState({ user: user });
+        });
+      }
+    }
+  }, {
     key: 'login',
     value: function login() {
       Errors.emitError("login_clear");
@@ -96219,7 +96230,9 @@ var UserLogin = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
+
+      if (this.state.user.email) return null;
 
       this.fields = this.fields || {};
       return React.createElement(
@@ -96227,15 +96240,15 @@ var UserLogin = function (_React$Component) {
         null,
         React.createElement(Errors, { label: 'login' }),
         React.createElement('input', { ref: function ref(input) {
-            _this2.fields.email = input;
-          }, placeholder: 'email address', type: 'text' }),
+            _this3.fields.email = input;
+          }, placeholder: 'email address', type: 'text', name: 'email', style: { display: "block" } }),
         React.createElement('input', { ref: function ref(input) {
-            _this2.fields.password = input;
+            _this3.fields.password = input;
           }, placeholder: 'password', onKeyUp: function onKeyUp(event) {
             if (event.which == 13) {
-              _this2.login();
+              _this3.login();
             }
-          }, type: 'password' }),
+          }, type: 'password', name: 'password', style: { display: "block" } }),
         React.createElement(
           'button',
           { onClick: this.login.bind(this) },
@@ -96245,7 +96258,12 @@ var UserLogin = function (_React$Component) {
           'button',
           { onClick: this.verify.bind(this) },
           'Verify / Forgot Pass'
-        )
+        ),
+        this.props.cta ? React.createElement(
+          'div',
+          { className: 'cta' },
+          this.props.cta
+        ) : null
       );
     }
   }], [{
@@ -96502,11 +96520,6 @@ var UserProfile = function (_React$Component) {
     value: function render() {
       // if we don't have a user, display login area
       if (!this.props.user || !this.props.user.email) {
-        var errors = [];
-        if (this.props.user && this.props.user.error) {
-          errors.email = this.props.user.error.email;
-          errors.password = this.props.user.error.password;
-        }
         return React.createElement(UserLogin, null);
       }
 
@@ -96540,6 +96553,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var EventEmitter = require('events');
 var jwt_decode = require('jwt-decode');
+var queryString = require('querystring');
 
 var Customizer = require('./Customizer.js');
 var Errors = require('./Errors.jsx');
@@ -96629,6 +96643,8 @@ dispatcher.on("loaded", function () {
 // helper function mostly for making XHR calls. Our API expects multipart form
 // data and a json request header. Some calls need an auth token to take effect
 var api = function api(method, endpoint, body, callback) {
+  // if we didn't, build GET querystring
+  if (method == "GET" && !/\?/.test(endpoint)) endpoint += "?" + queryString.stringify(body);
   // clear error messages on POST
   if (method == "POST") Errors.clear();
   var xhr = new XMLHttpRequest();
@@ -96679,4 +96695,4 @@ module.exports = {
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":680,"./ComponentsEdit.jsx":686,"./Customizer.js":687,"./Errors.jsx":688,"./FulfillShipments.jsx":690,"./Gallery.jsx":691,"./Items.jsx":694,"./LayoutMain.jsx":695,"./PageList.jsx":700,"./Placeholder.jsx":702,"./ProductList.jsx":705,"./Signup.jsx":709,"./TextContent.jsx":713,"./UserPasswordReset.jsx":718,"events":332,"jwt-decode":384,"react":609,"react-dom":461}]},{},[]);
+},{"./Cart.jsx":680,"./ComponentsEdit.jsx":686,"./Customizer.js":687,"./Errors.jsx":688,"./FulfillShipments.jsx":690,"./Gallery.jsx":691,"./Items.jsx":694,"./LayoutMain.jsx":695,"./PageList.jsx":700,"./Placeholder.jsx":702,"./ProductList.jsx":705,"./Signup.jsx":709,"./TextContent.jsx":713,"./UserPasswordReset.jsx":718,"events":332,"jwt-decode":384,"querystring":457,"react":609,"react-dom":461}]},{},[]);

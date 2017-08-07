@@ -5,6 +5,7 @@ const Items = require('./Items.jsx');
 const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 const Timestamp = require('./Timestamp.jsx');
 const UserLogin = require('./UserLogin.jsx');
+const Errors = require('./Errors.jsx');
 
 //const payment_method_client = require('./PayStripeClient.js');
 const payment_method_client = require('./PayBraintreeClient.js');
@@ -24,7 +25,6 @@ class Cart extends React.Component {
     super(props);
 
     this.state = {
-      errors: [],
       items: this.props.items || [],
       card: {
         number: "",
@@ -32,7 +32,6 @@ class Cart extends React.Component {
         exp_month: "",
         exp_year: "",
         address_zip: null,
-        errors: "",
       },
       shipping: {
         email: "",
@@ -43,7 +42,6 @@ class Cart extends React.Component {
         region: "",
         postal: "",
         country: "",
-        errors: [],
       },
       same_billing: true,
       billing: {
@@ -54,14 +52,13 @@ class Cart extends React.Component {
         region: "",
         postal: "",
         country: "",
-        errors: [],
       },
       processing_payment: false,
       done: false,
     };
 
     if (!this.props.store[0].id) {
-      this.state.errors.push(<div>Config Error: Store not set</div>);
+      Errors.emitError(null, "Error: Store not set");
     }
   } // constructor()
 
@@ -159,10 +156,26 @@ class Cart extends React.Component {
   }
 
   componentDidMount() {
+    // populate cart contents
     if (BowAndDrape.cart_menu) {
       this.updateContents(BowAndDrape.cart_menu.state.contents);
     }
     BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
+    // if the user is signed in, get latest shipping/billing info
+    BowAndDrape.dispatcher.on("user", (user) => {
+      if (!user.email) return;
+      let query = {email:user.email, page:JSON.stringify({sort:"requested", direction:"DESC", limit:1})};
+      BowAndDrape.api("GET", "/shipment", query, (err, result) => {
+        if (err || !result || !result.length) return;
+        let shipping = result[0].address;
+        let billing = result[0].billing_address;
+        let same_billing = false;
+        if (!billing || JSON.stringify(shipping)==JSON.stringify(billing)) {
+          same_billing = true;
+        }
+        this.setState({shipping, billing, same_billing});
+      });
+    });
   }
 
   updateContents(items) {
@@ -189,14 +202,14 @@ class Cart extends React.Component {
   handleSetSectionState(section, state) {
     let update = {};
     if (section) {
-      update[section] = Object.assign(this.state[section], state);
+      let prev_state = this.state[section] || {};
+      update[section] = Object.assign(prev_state, state);
       // special handling for shipping to display warning about customs
       // TODO put this somewhere else (maybe in render()?)
       if (section=="shipping") {
         if (state.country) {
-          update[section].errors = [];
           if (update[section].country!="USA")
-            update[section].errors = [<div>Bow & Drape is not responsible for any additional import fees that arise after the item has left the United States</div>];
+            Errors.emitError("shipping", "Bow & Drape is not responsible for any additional import fees that arise after the item has left the United States");
         }
       }
       this.setState(update);
@@ -207,7 +220,7 @@ class Cart extends React.Component {
     return (
       <input_credit>
         <section>Payment Info</section>
-        {this.state.card.errors.length?<errors>{this.state.card.errors}</errors>:null}
+        <Errors label="card" />
         <row>
           <div>
             <label>Card Number</label>
@@ -233,19 +246,20 @@ class Cart extends React.Component {
 
   // call when payment gets submitted
   handlePay() {
+    // clear out errors so we can fill them with new ones
+    Errors.clear();
+
+    // only allow the user to click once
     if (this.state.processing_payment) return;
     this.setState({processing_payment:true});
 
     // make sure we have all the mandatory data we need
-    let shipping_errors = [];
-    let card_errors = [];
-    if (!this.state.shipping.email)
-      shipping_errors.push(<div>Please enter email address</div>);
-    if (!this.state.shipping.street)
-      shipping_errors.push(<div>If you don't tell us where to ship it, we're keeping it and wearing it</div>);
-    this.handleSetSectionState("shipping", {errors: shipping_errors});
-    this.handleSetSectionState("card", {errors: card_errors});
-    if (shipping_errors.length || card_errors.length) {
+    if (!this.state.shipping.email) {
+      Errors.emitError("shipping", "Pease enter email address");
+      return this.setState({processing_payment:false});
+    }
+    if (!this.state.shipping.street) {
+      Errors.emitError("shipping", "If you don't tell us where to ship it, we're keeping it and wearing it");
       return this.setState({processing_payment:false});
     }
 
@@ -256,7 +270,7 @@ class Cart extends React.Component {
     payment_method_client.getClientNonce(this.props.payment_authorization, this.state, (err, payment_nonce) => {
       if (err) {
         this.setState({processing_payment:false});
-        this.handleSetSectionState("card", {errors: [err]});
+        Errors.emitError("card", err);
         return;
       }
       let payload = {
@@ -265,11 +279,12 @@ class Cart extends React.Component {
         contents: this.refs.Items.state.contents,
         payment_nonce: payment_nonce,
         address: this.state.shipping,
+        billing_address: this.state.same_billing ? this.state.shipping : this.state.billing,
         delivery_promised: this.countBusinessDays((this.state.shipping_quote ? this.state.shipping_quote.days : 5) + this.estimateManufactureTime(this.state.items)),
       }
       BowAndDrape.api("POST", "/order", payload, (err, resp) => {
         if (err) {
-          return this.handleSetSectionState("card", {errors: [err.error]});
+          return Errors.emitError("card", err.error);
         }
         BowAndDrape.cart_menu.update([]);
         this.setState({done:true});
@@ -283,12 +298,15 @@ class Cart extends React.Component {
 
     return (
       <div>
+        <Errors />
         <item>Shipping on or before <Timestamp time={this.countBusinessDays(this.estimateManufactureTime(this.state.items))} /></item>
         <Items ref="Items" contents={this.state.items} is_cart="true" />
-        {this.state.errors.length?<errors>{this.state.errors}</errors>:null}
-        <InputAddress section_title="Shipping Address" handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
+
+        <UserLogin cta="Login or proceed as Guest" />
+
+        <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
         same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} />
-        {this.state.same_billing?null:<InputAddress section_title="Billing Address" handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}
+        {this.state.same_billing?null:<InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}
         {this.renderInputCredit()}
 
         {/* TODO display loading state when this.state.processing_payment */}
