@@ -4,6 +4,7 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const EventEmitter = require('events');
 const jwt_decode = require('jwt-decode');
+const queryString = require('querystring');
 
 const Customizer = require('./Customizer.js');
 const Errors = require('./Errors.jsx');
@@ -79,6 +80,9 @@ dispatcher.on("loaded", () => {
 // helper function mostly for making XHR calls. Our API expects multipart form
 // data and a json request header. Some calls need an auth token to take effect
 let api = function(method, endpoint, body, callback) {
+  // if we didn't, build GET querystring
+  if (method=="GET" && !/\?/.test(endpoint))
+    endpoint += "?"+queryString.stringify(body);
   // clear error messages on POST
   if (method == "POST")
     Errors.clear();

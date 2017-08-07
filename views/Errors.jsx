@@ -33,7 +33,8 @@ class Errors extends React.Component {
     let appendMessage = (message) => {
       this.setState((prevState) => {
         let errors = prevState.errors.slice(0);
-        errors.push(message);
+        if (errors.indexOf(message)<0)
+          errors.push(message);
         return ({errors: errors});
       });
     };

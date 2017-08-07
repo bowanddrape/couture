@@ -44,6 +44,7 @@ class Order {
         email,
         contents,
         address,
+        billing_address: new Address(req.body.billing_address),
         delivery_promised: req.body.delivery_promised,
       });
 

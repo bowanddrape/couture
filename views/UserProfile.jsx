@@ -17,11 +17,6 @@ class UserProfile extends React.Component {
   render() {
     // if we don't have a user, display login area
     if (!this.props.user || !this.props.user.email) {
-      let errors = [];
-      if (this.props.user && this.props.user.error) {
-        errors.email = this.props.user.error.email;
-        errors.password = this.props.user.error.password;
-      }
       return (
         <UserLogin />
       );

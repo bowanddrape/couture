@@ -5,6 +5,20 @@ const bcrypt = require('bcryptjs');
 const Errors = require('./Errors.jsx');
 
 class UserLogin extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: {},
+    }
+  }
+
+  componentDidMount() {
+    if (BowAndDrape) {
+      BowAndDrape.dispatcher.on("user", (user) => {
+        this.setState({user});
+      });
+    }
+  }
 
   login() {
     Errors.emitError("login_clear");
@@ -47,15 +61,20 @@ class UserLogin extends React.Component {
       return Errors.emitError("login", response.error);
     });
   }
+
   render() {
+    if (this.state.user.email)
+      return null;
+
     this.fields = this.fields || {};
     return (
       <login>
         <Errors label="login" />
-        <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text"/>
-        <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password"/>
+        <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text" name="email" style={{display:"block"}}/>
+        <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password" style={{display:"block"}}/>
         <button onClick={this.login.bind(this)}>Login / Register</button>
         <button onClick={this.verify.bind(this)}>Verify / Forgot Pass</button>
+        {this.props.cta ? <div className="cta">{this.props.cta}</div> : null}
       </login>
     );
   }
