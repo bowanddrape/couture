@@ -3,7 +3,6 @@ const React = require('react');
 const InputAddress = require('./InputAddress.jsx');
 const Items = require('./Items.jsx');
 const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
-const Timestamp = require('./Timestamp.jsx');
 const UserLogin = require('./UserLogin.jsx');
 const Errors = require('./Errors.jsx');
 
@@ -81,79 +80,6 @@ class Cart extends React.Component {
     callback(null, options);
   } // preprocessProps()
 
-  // estimate manufacturing time
-  estimateManufactureTime(items) {
-    let days_needed = 1;
-    Items.recurseAssembly(items, (component) => {
-      // hardcoded defaults, if not set.
-      let default_manufacture_time = {
-        parallel: 3,
-        serial: 0,
-      }
-      // embroidery and airbrush will take longer, too lazy to update the db
-      if (/letter_embroidery/.test(component.sku) || /letter_airbrush/.test(component.sku))
-        default_manufacture_time.parallel = 7;
-      // extract the manufacture_time for this component
-      let manufacture_time = component.props.manufacture_time || {};
-      manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
-      manufacture_time.serial = manufacture_time.serial || default_manufacture_time.serial;
-      // update our accumulator
-      days_needed = Math.max(days_needed, manufacture_time.parallel);
-      days_needed += manufacture_time.serial;
-    });
-    return days_needed;
-  }
-
-
-  // estimate date from now, takes days, returns time in seconds
-  countBusinessDays(days) {
-    let floorDate = function(time_stamp) {
-      time_stamp -= time_stamp % (24 * 60 * 60 * 1000); // subtract amount of time since midnight
-      time_stamp += new Date().getTimezoneOffset() * 60 * 1000; // add on the timezone offset
-      return time_stamp;
-    }
-    // start counting from midnight tonight
-    let ms_per_day = (24 * 60 * 60 * 1000);
-    let time = floorDate(new Date().getTime()) + ms_per_day;
-    for (let i=0; i<days; ) {
-      time += ms_per_day;
-      if (new Date(time).getDay()%6!=0)
-        i += 1;
-    }
-    return time/1000;
-  }
-
-  // fill in shipping cost
-  initShipping(items) {
-    let shipping_quote = this.state.shipping_quote;
-    // for now, fixed shipping
-    shipping_quote = {
-      days: 5,
-      amount: 7,
-      currency_local: "USD",
-    }
-    // remove any previous shipping line
-    items.forEach((item, index) => {
-      if (item.props.name == "Shipping & Handling")
-        return items.splice(index, 1);
-    });
-    if (items.length) {
-      let total_price = 0;
-      items.forEach((item, index) => {
-        total_price += parseFloat(item.props.price);
-      });
-      let shipping_cost = shipping_quote.amount;
-      // free domestic shipping for 75+ orders
-      if (total_price>=75 && shipping_quote.currency_local.toLowerCase()=="usd")
-        shipping_cost = 0;
-      items.push({
-        props: {
-          name: "Shipping & Handling",
-          price: shipping_cost
-        }
-      });
-    }
-  }
 
   componentDidMount() {
     // populate cart contents
@@ -180,9 +106,10 @@ class Cart extends React.Component {
 
   updateContents(items) {
     items = items || [];
-    this.initShipping(items);
     this.refs.Items.updateContents(items);
     this.setState({items});
+    if (!items.length)
+      Errors.emitError(null, "Cart is empty");
   }
 
   handleSameBillingToggle(e) {
@@ -280,7 +207,7 @@ class Cart extends React.Component {
         payment_nonce: payment_nonce,
         address: this.state.shipping,
         billing_address: this.state.same_billing ? this.state.shipping : this.state.billing,
-        delivery_promised: this.countBusinessDays((this.state.shipping_quote ? this.state.shipping_quote.days : 5) + this.estimateManufactureTime(this.state.items)),
+        delivery_promised: this.refs.Items.countBusinessDays(this.refs.Items.state.shipping_quote.days + this.refs.Items.estimateManufactureTime(this.state.items)),
       }
       BowAndDrape.api("POST", "/order", payload, (err, resp) => {
         if (err) {
@@ -299,25 +226,26 @@ class Cart extends React.Component {
     return (
       <div>
         <Errors />
-        <item>Shipping on or before <Timestamp time={this.countBusinessDays(this.estimateManufactureTime(this.state.items))} /></item>
         <Items ref="Items" contents={this.state.items} is_cart="true" />
 
-        <UserLogin cta="Login or proceed as Guest" />
+        <UserLogin style={{margin:"10px auto",width:"480px",display:"block"}} cta="Login or proceed as Guest" />
 
         <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
-        same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} />
+        <div style={{margin:"auto",width:"480px"}}>same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} /></div>
         {this.state.same_billing?null:<InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}
         {this.renderInputCredit()}
 
         {/* TODO display loading state when this.state.processing_payment */}
         <button onClick={this.handlePay.bind(this)}>Get it!</button>
 
+{/* Needed by stripe, not needed by braintree
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
         <script dangerouslySetInnerHTML={{__html:`
           if ("${process.env.STRIPE_KEY}"!="undefined")
             Stripe.setPublishableKey("${process.env.STRIPE_KEY}");
         `}} >
         </script>
+*/}
       </div>
     );
   }

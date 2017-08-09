@@ -231,6 +231,12 @@ item deets .price {
   right: 0;
   bottom: 0;
 }
+item deets .price.free {
+  opacity: 0.5;
+}
+item deets .price.negative {
+  color: #d6492a;
+}
 item deets .remove {
   clear: both;
   background-color: #eaeaea;

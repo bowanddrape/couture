@@ -71,6 +71,7 @@ const Store = require('./models/Store.js');
 const Shipment = require('./models/Shipment.js');
 const Facility = require('./models/Facility.js');
 const Component = require('./models/Component.js');
+const PromoCode = require('./models/PromoCode.js');
 const Page = require('./models/Page.js');
 
 const LayoutMain = require('./views/LayoutMain');
@@ -108,7 +109,7 @@ app.use(cookieParser());
 /* // CORS?
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin","*");
-  res.header("Access-Control-Allow-Headers","Origin, X-Rwquested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
   next();
 });*/
 
@@ -151,6 +152,7 @@ app.use(Log.handleHTTP);
 app.use((req, res, next) => {new Signup().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
+app.use((req, res, next) => {new PromoCode().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Page().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new SpreadsheetEmails().handleHTTP(req, res, next);});
 

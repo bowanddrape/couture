@@ -1,21 +1,12 @@
 
 const React = require('react');
+const ItemUtils = require('./ItemUtils.js');
 
 /***
 Draw an Item. Used in views/Items.jsx
 props: will mirror a Component model
 ***/
 class Item extends React.Component {
-
-  static recurseAssembly(component, foreach) {
-    if (!component) return;
-    foreach(component);
-    if (component.assembly) {
-      component.assembly.forEach((component) => {
-        Item.recurseAssembly(component, foreach);
-      });
-    }
-  }
 
   render() {
     if (!this.props.props) {
@@ -27,7 +18,7 @@ class Item extends React.Component {
     let assembly_contents = {};
     if (this.props.picklist && this.props.assembly) {
       for (let i=0; i<this.props.assembly.length; i++) {
-        Item.recurseAssembly(this.props.assembly[i], (component) => {
+        ItemUtils.recurseAssembly(this.props.assembly[i], (component) => {
           // haute imported entries will have "text" set
           if (component.props && component.props.image && component.text) {
             let letters = {};
@@ -85,7 +76,7 @@ class Item extends React.Component {
           <a href={this.props.props.url}>
             <div className="name">{this.props.props.name}</div>
           </a>
-          <div className="price">{this.props.props.price?this.props.props.price+"$":"Free!"}</div>
+          <div className={`price ${this.props.props.price<0?"negative":(this.props.props.price==0?"free":"")}`} >{this.props.props.price?parseFloat(this.props.props.price).toFixed(2)+"$":"Free!"}</div>
           {this.props.onRemove?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
 
           <assembly>

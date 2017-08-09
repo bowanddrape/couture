@@ -68,7 +68,7 @@ class UserLogin extends React.Component {
 
     this.fields = this.fields || {};
     return (
-      <login>
+      <login style={this.props.style}>
         <Errors label="login" />
         <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text" name="email" style={{display:"block"}}/>
         <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password" style={{display:"block"}}/>
