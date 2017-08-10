@@ -34,23 +34,7 @@ class Vss{
             from : '5c637540-d460-4938-ac38-b6d283ea9a6d', // Man adjust facility
             to : '83bcecf8-6881-4202-bb1c-051f77f27d90' // VSS facility
         }
-    }// constructor
-
-    static callback(err, result){
-      if (err){
-        console.log(err);
-        return Page.renderNotFound(req, res)
-      }
-      return result
-    }
-
-    static checkInventory(sku, callback){
-        let vssFacility = '83bcecf8-6881-4202-bb1c-051f77f27d90';
-        Inventory.get(vssFacility, (err, result) =>{
-            let quantity = result["inventory"][sku]
-            callback(err, result);
-        });
-    }
+    }  // constructor
 
     static handleGET(req, res){
         // Check for required query string
@@ -64,16 +48,20 @@ class Vss{
               return Page.renderNotFound(req, res)
             }
             // Check if we have inventory before rendering cartProps
+            let vssFacility = '83bcecf8-6881-4202-bb1c-051f77f27d90';
             let sku = req.query["sku"];
-            Vss.checkInventory(sku, (err, quantity) => {
+
+            Inventory.getInventory(vssFacility, (err, results) => {
+                //  Do stuff in here that depends on positive inventory
                 if (err) {
-                    console.log("ERROR checking Inventory")
+                    console.log("ERROR checking inventory");
                     return Page.renderNotFound(req, res)
                 }
-                if (quantity < 1) {
+                if (results[sku] < 1) {
+                    console.log("No inventory for item")
                     return Page.renderNotFound(req, res)
                 }
-                // Prep cart
+                //  Prep cart
                 let cartProps = {
                   store: [{id: 'd955f9f3-e9ae-475a-a944-237862b589b3'}],
                   items: [{sku: sku, props: comp.props}],
@@ -85,9 +73,9 @@ class Vss{
                 return Cart.preprocessProps(cartProps, (err, options) => {
                     return Page.render(req, res, Cart, options);
                 });  // Cart.preprocessProps()
-            });  // Vss.checkInventory()
+            });  //  Inventory.getInventory
         });// Component.get()
-    }
+    }  //  handleGET()
 
     static handlePOST(req, res){
 

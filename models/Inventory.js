@@ -20,6 +20,16 @@ class Inventory extends SQLTable {
       fields: ["inventory"]
     };
   }
-}
+
+  static getInventory(facility_id, callback) {
+      let sql = Inventory.getSQLSettings()
+      Inventory.sqlTransaction((err, client) => {
+        let query = `SELECT * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
+        client.query(query, [facility_id], (err, result) => {
+          return callback(null, result["rows"][0]["inventory"])
+        });
+     });  //sqlTransaction
+   }  //getInventory()
+}  //Inventory
 
 module.exports = Inventory;

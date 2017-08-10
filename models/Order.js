@@ -13,6 +13,7 @@ const Page = require('./Page');
 //const FacilityIDS= require('./FacilityIDS');
 //const payment_method = require('./PayStripe.js');
 const payment_method = require('./PayBraintree.js');
+const Inventory = require('./Inventory.js');
 
 /***
 Handle requests to the endpoints "/order/"
@@ -31,26 +32,44 @@ class Order {
           return res.json({error: "Malformed payload"});
         }
       }
-      Order.handlePOST();
+      Order.handlePOST(req, res, (err, result) => {
+          // TBD
+      });
     }
   }
 
-  static handlePOST (req, res) {
+  static handlePOST (req, res, callback) {
       //start postgres transaction
-      SQLTable.sqlCheckInventory(sku, (err, foundInv) => {
+      console.log(JSON.stringify(req.body));
+      let sku = req.body.contents.sku
+      let store_id = req.body.store_id
+      let tablename = 'stores'
+      let query = `SELECT * FROM stores WHERE 'store_id' = ${store_id}`;
+      let facility_id = null
+      SQLTable.sqlExec(query, store_id, (err, results) => {
+          console.log(results)
+      })
+      Inventory.getInventory(facility_id, (err, results) => {
         // begin order process
         if (!foundInv)
-          return //handle lack of inventory goes here
-
-        Order.createShipment(req, res, (err, shipment) => {
-          //  finish order process
-          Order.initPayment(shipment);
-          //  end postgres transaction
-          });  //  createShipment()
+          callback(err);
+        console.log("Found " + sku + ": " + foundInv);
+        Order.createShipment(req, (err, shipment) => {
+          if (err)
+            callback(err);
+          //  Process the payment!
+          console.log("Created shipment: " + JSON.stringify(shipment));
+          Order.doPayment(req, res, shipment, (err, store) => {
+            if (err)
+              callback(err);
+            console.log("Store: " + JSON.stringify(store));
+            callback(null, store)
+          });  //  doPayment
+        });  //  createShipment
       });  //  sqlCheckInventory
   }  //handlePOST
 
-  static createShipment(req, res, callback) {
+  static createShipment(req, callback) {
       // Ahoy, matey! Let's build a ship!
       // define some useful variables
       let store_id = req.body.store_id;
@@ -71,7 +90,7 @@ class Order {
 
       //  Checking and formatting
       if (!contents || !contents.length)
-        return res.json({error: "Attempt to place empty order"});
+        callback(new Error ("Attempt to place empty order"));
 
       // if an image was uploaded, set the content's image to the resulting img
       if (req.files && req.files[0] && req.files[0].location)
@@ -80,18 +99,16 @@ class Order {
       // if we got an email subscription, edit/create user
       if (req.body.email && typeof(req.body.contact_me)!='undefined') {
         let user = new User({email:req.body.email, props:{contact_me_kiosk:req.body.contact_me}});
+        //  TODO: This should be managed by the client in the transaction
         user.upsert((err)=>{console.log(err)});
       }
 
-      callback(err, shipment);
-  }//  createShipment
+      callback(null, shipment);
+  }  //  createShipment
 
-  static initPayment() {
+  static doPayment(req, res, shipment, callback) {
 
-
-
-  }
-      return Store.get(req.body.store_id, (err, store) => {
+      let store =  Store.get(req.body.store_id, (err, store) => {
         // set shipment source
         shipment.from_id = store.facility_id;
         shipment.to_id = '6ee01152-cc5e-49e7-97b7-d676ca7ff108';
@@ -110,16 +127,16 @@ class Order {
           payments.push({type:"kiosk",price:total_price});
           total_payments += total_price;
         }
-
         // if it ain't free, charge for it
         if (total_price > total_payments) {
           // process payment
           payment_method.charge(payment_nonce, total_price-total_payments, (err, charge) => {
             if (err)
-              return res.st atus(403).json({error: err}).end();
+              return res.status(403).json({error: err}).end();
             // update payments, then save shipment
             payments.push({type: charge.type, price: charge.amount});
             shipment.payments = payments;
+            // upsert shipment
             shipment.upsert((err)=> {
               if (err)
                 return res.status(500).json({error: "Could not save shipment info"}).end();
@@ -133,17 +150,14 @@ class Order {
                 console.log("registering tax of "+data.tax+" with taxcloud");
                 TaxCloud.authorizeWithCapture(data.customer_id, data.cart_id, data.order_id, (err, data) => {
                   if (err) return console.log("Tax cloud error"+err);
-                });
-              });
-
+                });  //  TaxCloud.authorizeWithCapture
+              });  // TaxCloud.quote
             }); // shipment.upsert()
           }); // payment_method.charge()
-        }
-      }); // get store
-    }
+      }  //  end if
+    }); // get store
     res.json({error: "invalid endpoint"}).end();
-  }
-}
-
+  }  // doPayment
+} //  Order class
 
 module.exports = Order;
