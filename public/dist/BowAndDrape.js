@@ -91058,8 +91058,6 @@ var Component = function () {
       max: [4, 4, -1]
     };
     this.scale = [1, 1, 1];
-    // iff we padded texture to get a power of 2, expand our scale that amount
-    this.texture_scale = [1, 1];
     this.position = [0, 0, 0];
     this.velocity = [0, 0, 0];
     this.rotation = {
@@ -91120,12 +91118,9 @@ var Component = function () {
               var canvas = document.createElement("canvas");
               canvas.width = nextHighestPowerOfTwo(loaded_image.width);
               canvas.height = nextHighestPowerOfTwo(loaded_image.height);
-              _this.texture_scale = [canvas.width / loaded_image.width, canvas.height / loaded_image.height];
               var ctx = canvas.getContext("2d");
-              ctx.drawImage(loaded_image, (canvas.width - loaded_image.width) / 2, (canvas.height - loaded_image.height) / 2, loaded_image.width, loaded_image.height);
+              ctx.drawImage(loaded_image, 0, 0, canvas.width, canvas.height);
               loaded_image = canvas;
-            } else {
-              _this.texture_scale = [1, 1];
             }
             imageLoadedCallback(gl, loaded_image);
             if (callback) callback(null);
@@ -91266,7 +91261,7 @@ var Component = function () {
       var rotation_matrix = Matrix.Rotation(this.rotation.angle, new Vector(this.rotation.axis)).ensure4x4();
       var rotation_matrix_inv = rotation_matrix.inv();
       modelview = modelview.x(rotation_matrix);
-      modelview = modelview.x(Matrix.Diagonal([this.scale[0] * this.texture_scale[0], this.scale[1] * this.texture_scale[1], this.scale[2], 1]));
+      modelview = modelview.x(Matrix.Diagonal([this.scale[0], this.scale[1], this.scale[2], 1]));
       var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
       gl.uniformMatrix4fv(mvUniform, false, new Float32Array(modelview.flatten()));
       if (this.texture) {
@@ -92811,13 +92806,25 @@ var recurseAssembly = function recurseAssembly(component, foreach) {
   }
 };
 
-var applyPromoCode = function applyPromoCode(items, promo, callback) {
+// get price of an item list, optionally only counting ones that pass filter
+var getPrice = function getPrice(items, filter) {
   var total_price = 0;
+  contents.forEach(function (item, index) {
+    if (typeof filter == "function" && !filter(item)) return;
+    var quant = item.quantity || 1;
+    total_price += parseFloat(item.props.price) * quant;
+  });
+  return total_price;
+};
+
+var applyPromoCode = function applyPromoCode(items, promo, callback) {
   // only one promo code at a time, remove any previous ones
   items.forEach(function (item, index) {
     // TODO generalize special line items like these
     if (new RegExp("^promo:", "i").test(item.props.name)) return items.splice(index, 1);
-    if (item.sku && item.props) total_price += parseFloat(item.props.price);
+  });
+  var total_price = getPrice(items, function (item) {
+    return item.sku;
   });
   // TODO see if the promo is applicable
   // figure out value of our promo
@@ -92831,6 +92838,7 @@ var applyPromoCode = function applyPromoCode(items, promo, callback) {
 
 module.exports = {
   recurseAssembly: recurseAssembly,
+  getPrice: getPrice,
   applyPromoCode: applyPromoCode
 };
 
@@ -92895,10 +92903,7 @@ var Items = function (_React$Component) {
         if (!contents.length) {
           return { contents: contents };
         }
-        var total_price = 0;
-        contents.forEach(function (item, index) {
-          total_price += parseFloat(item.props.price);
-        });
+        var total_price = ItemUtils.getPrice(contents);
         var shipping_cost = shipping_quote.amount;
         // free domestic shipping for 75+ orders
         if (total_price >= 75 && shipping_quote.currency_local.toLowerCase() == "usd") shipping_cost = 0;
@@ -93154,13 +93159,17 @@ var LayoutMain = function (_React$Component) {
       BowAndDrape.dispatcher.on("user", function (user) {
         _this2.setState(_defineProperty({ user: user }, 'user', user));
       });
+      BowAndDrape.dispatcher.on("resize", function () {
+        _this2.handleResize();
+      });
 
       // bind resize
-      window.addEventListener("resize", this.handleResize.bind(this));
+      window.addEventListener("resize", BowAndDrape.dispatcher.emit("resize"));
       window.addEventListener("touchend", this.handleResize.bind(this));
       this.handleResize();
 
       BowAndDrape.dispatcher.emit("loaded");
+      BowAndDrape.dispatcher.emit("resize");
     }
   }, {
     key: 'handleResize',
@@ -93970,21 +93979,11 @@ var ProductCanvas = function (_React$Component) {
   _createClass(ProductCanvas, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _this2 = this;
-
       this.canvas = document.querySelector("canvas");
       this.canvas.setAttribute("width", document.body.offsetWidth);
       this.customizer = new BowAndDrape.Customizer({ canvas: this.canvas });
       this.customizer.init();
       this.forceUpdate();
-      window.addEventListener("resize", function () {
-        _this2.customizer.resizeViewport();
-      });
-    }
-  }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate(prevProps, prevState) {
-      this.customizer.resizeViewport();
     }
 
     // get a text version of a component
@@ -94008,7 +94007,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleSetComponentText',
     value: function handleSetComponentText(text, componentMap) {
-      var _this3 = this;
+      var _this2 = this;
 
       this.setState(function (prevState, props) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
@@ -94021,8 +94020,8 @@ var ProductCanvas = function (_React$Component) {
             props: {
               position: [0, 0, 0],
               rotation: {
-                angle: -_this3.customizer.camera.rotation.angle,
-                axis: _this3.customizer.camera.rotation.axis
+                angle: -_this2.customizer.camera.rotation.angle,
+                axis: _this2.customizer.camera.rotation.axis
               }
             },
             assembly: []
@@ -94050,7 +94049,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleAddComponent',
     value: function handleAddComponent(component) {
-      var _this4 = this;
+      var _this3 = this;
 
       // deep copy and set the quantity of this component to be used to 1
       component = JSON.parse(JSON.stringify(component));
@@ -94066,8 +94065,8 @@ var ProductCanvas = function (_React$Component) {
         // facing the camera for now TODO get normal of intersected tri
         var position = [0, 0, 0];
         var rotation = {
-          angle: -_this4.customizer.camera.rotation.angle,
-          axis: _this4.customizer.camera.rotation.axis
+          angle: -_this3.customizer.camera.rotation.angle,
+          axis: _this3.customizer.camera.rotation.axis
         };
         assembly.push({
           props: {
@@ -94099,7 +94098,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleComponentMove',
     value: function handleComponentMove(index, event) {
-      var _this5 = this;
+      var _this4 = this;
 
       event.preventDefault();
       event.stopPropagation();
@@ -94113,7 +94112,7 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[index];
         if (selected) {
-          selected.props.position = _this5.customizer.browserToWorld(client_pos);
+          selected.props.position = _this4.customizer.browserToWorld(client_pos);
         }
         return { assembly: assembly, selected_component: index };
       });
@@ -94132,7 +94131,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'autoLayout',
     value: function autoLayout() {
-      var _this6 = this;
+      var _this5 = this;
 
       var reflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
@@ -94140,7 +94139,7 @@ var ProductCanvas = function (_React$Component) {
         return assembly.filter(function (component) {
           // TODO switch component rotation away from quaternions and to a
           // rotation matrix?
-          var camera_position_world = Matrix.Rotation(_this6.customizer.camera.rotation.angle, new Vector(_this6.customizer.camera.rotation.axis)).x(new Vector(_this6.customizer.camera.position));
+          var camera_position_world = Matrix.Rotation(_this5.customizer.camera.rotation.angle, new Vector(_this5.customizer.camera.rotation.axis)).x(new Vector(_this5.customizer.camera.position));
           var relative_camera_direction = Matrix.Rotation(component.props.rotation.angle, new Vector(component.props.rotation.axis)).x(camera_position_world).elements;
           return relative_camera_direction[2] <= 0;
           // TODO don't affect components that have been positioned manually
@@ -94152,12 +94151,12 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected_component = prevState.selected_component;
         // TODO rectangular design areas for now
-        var design_area = _this6.props.product.props.design_area && _this6.props.product.props.design_area.width ? _this6.props.product.props.design_area : {
-          top: _this6.props.product.props.imageheight / 2 - 0.05,
-          left: -_this6.props.product.props.imagewidth / 2,
-          width: _this6.props.product.props.imagewidth * 5 / 9,
-          height: _this6.props.product.props.imageheight * 3 / 4,
-          gravity: [0, _this6.props.product.props.imageheight / 4]
+        var design_area = _this5.props.product.props.design_area && _this5.props.product.props.design_area.width ? _this5.props.product.props.design_area : {
+          top: _this5.props.product.props.imageheight / 2 - 0.05,
+          left: -_this5.props.product.props.imagewidth / 2,
+          width: _this5.props.product.props.imagewidth * 5 / 9,
+          height: _this5.props.product.props.imageheight * 3 / 4,
+          gravity: [0, _this5.props.product.props.imageheight / 4]
         };
         // only work on visible components
         var components = getComponentsOfInterest(assembly);
@@ -94222,14 +94221,15 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      var _this7 = this;
+      var _this6 = this;
 
+      this.customizer.resizeViewport();
       // handle actions on hitboxes
       this.canvas.parentNode.childNodes.forEach(function (node) {
         if (node.tagName.toLowerCase() != "component_hitbox") return;
         // this overrides the synthetic react events so we don't scroll
-        node.ontouchmove = _this7.handleComponentMove.bind(_this7, node.getAttribute("data"));
-        node.onmousemove = _this7.handleComponentMove.bind(_this7, node.getAttribute("data"));
+        node.ontouchmove = _this6.handleComponentMove.bind(_this6, node.getAttribute("data"));
+        node.onmousemove = _this6.handleComponentMove.bind(_this6, node.getAttribute("data"));
       });
       this.handleUpdateProduct();
     }
@@ -94255,7 +94255,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this8 = this;
+      var _this7 = this;
 
       var component_hitboxes = [];
 
@@ -94286,7 +94286,7 @@ var ProductCanvas = function (_React$Component) {
         this.cameras.forEach(function (camera) {
           camera_switcher.push(React.createElement(
             'button',
-            { key: camera_switcher.length, onClick: _this8.handleChangeCamera.bind(_this8, camera_switcher.length) },
+            { key: camera_switcher.length, onClick: _this7.handleChangeCamera.bind(_this7, camera_switcher.length) },
             'Camera ',
             camera_switcher.length
           ));

@@ -40,10 +40,7 @@ class Items extends React.Component {
       if (!contents.length) {
         return ({contents: contents});
       }
-      let total_price = 0;
-      contents.forEach((item, index) => {
-        total_price += parseFloat(item.props.price);
-      });
+      let total_price = ItemUtils.getPrice(contents);
       let shipping_cost = shipping_quote.amount;
       // free domestic shipping for 75+ orders
       if (total_price>=75 && shipping_quote.currency_local.toLowerCase()=="usd")

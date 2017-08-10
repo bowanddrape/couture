@@ -17,16 +17,25 @@ let recurseAssembly = (component, foreach) => {
   }
 }
 
-let applyPromoCode = (items, promo, callback) => {
+// get price of an item list, optionally only counting ones that pass filter
+let getPrice = (items, filter) => {
   let total_price = 0;
+  contents.forEach((item, index) => {
+    if (typeof(filter)=="function" && !filter(item)) return;
+    let quant = item.quantity || 1;
+    total_price += parseFloat(item.props.price) * quant;
+  });
+  return total_price;
+}
+
+let applyPromoCode = (items, promo, callback) => {
   // only one promo code at a time, remove any previous ones
   items.forEach((item, index) => {
     // TODO generalize special line items like these
     if (new RegExp("^promo:", "i").test(item.props.name))
       return items.splice(index, 1);
-    if (item.sku && item.props)
-      total_price += parseFloat(item.props.price);
   });
+  let total_price = getPrice(items, (item) => {return item.sku});
   // TODO see if the promo is applicable
   // figure out value of our promo
   promo.props.price = -1 * Math.max((Math.round(total_price*promo.props.percent)/100||0), (promo.props.absolute||0));
@@ -39,5 +48,6 @@ let applyPromoCode = (items, promo, callback) => {
 
 module.exports = {
   recurseAssembly,
+  getPrice,
   applyPromoCode,
 };
