@@ -168,13 +168,7 @@ class Cart extends React.Component {
     }
     // TODO: Do we need this for sample sales??
     this.updateContents(this.props.items);
-}
 
-    // populate cart contents
-    if (BowAndDrape.cart_menu) {
-      this.updateContents(BowAndDrape.cart_menu.state.contents);
-    }
-    BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     // if the user is signed in, get latest shipping/billing info
     BowAndDrape.dispatcher.on("user", (user) => {
       if (!user.email) return;
