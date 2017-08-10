@@ -20,7 +20,7 @@ let recurseAssembly = (component, foreach) => {
 // get price of an item list, optionally only counting ones that pass filter
 let getPrice = (items, filter) => {
   let total_price = 0;
-  contents.forEach((item, index) => {
+  items.forEach((item, index) => {
     if (typeof(filter)=="function" && !filter(item)) return;
     let quant = item.quantity || 1;
     total_price += parseFloat(item.props.price) * quant;
