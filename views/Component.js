@@ -14,8 +14,6 @@ class Component {
       max: [4, 4, -1]
     };
     this.scale = [1, 1, 1];
-    // iff we padded texture to get a power of 2, expand our scale that amount
-    this.texture_scale = [1, 1];
     this.position = [0, 0, 0];
     this.velocity = [0, 0, 0];
     this.rotation = {
@@ -67,12 +65,9 @@ class Component {
             let canvas = document.createElement("canvas");
             canvas.width = nextHighestPowerOfTwo(loaded_image.width);
             canvas.height = nextHighestPowerOfTwo(loaded_image.height);
-            this.texture_scale = [canvas.width/loaded_image.width, canvas.height/loaded_image.height];
             let ctx = canvas.getContext("2d");
-            ctx.drawImage(loaded_image, (canvas.width-loaded_image.width)/2, (canvas.height-loaded_image.height)/2, loaded_image.width, loaded_image.height);
+            ctx.drawImage(loaded_image, 0, 0, canvas.width, canvas.height);
             loaded_image = canvas;
-        } else {
-          this.texture_scale = [1, 1];
         }
         imageLoadedCallback(gl, loaded_image);
         if (callback) callback(null);
@@ -242,7 +237,7 @@ class Component {
     let rotation_matrix = Matrix.Rotation(this.rotation.angle, new Vector(this.rotation.axis)).ensure4x4();
     let rotation_matrix_inv = rotation_matrix.inv();
     modelview = modelview.x(rotation_matrix);
-    modelview = modelview.x(Matrix.Diagonal([this.scale[0]*this.texture_scale[0], this.scale[1]*this.texture_scale[1], this.scale[2], 1]));
+    modelview = modelview.x(Matrix.Diagonal([this.scale[0], this.scale[1], this.scale[2], 1]));
     let mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     gl.uniformMatrix4fv(mvUniform, false, new Float32Array(modelview.flatten()));
     if (this.texture) {

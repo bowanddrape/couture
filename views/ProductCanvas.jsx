@@ -38,11 +38,6 @@ class ProductCanvas extends React.Component {
     this.customizer = new BowAndDrape.Customizer({canvas: this.canvas});
     this.customizer.init();
     this.forceUpdate();
-    window.addEventListener("resize", ()=>{this.customizer.resizeViewport()});
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    this.customizer.resizeViewport();
   }
 
   // get a text version of a component
@@ -261,6 +256,7 @@ class ProductCanvas extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    this.customizer.resizeViewport();
     // handle actions on hitboxes
     this.canvas.parentNode.childNodes.forEach((node) => {
       if (node.tagName.toLowerCase()!="component_hitbox") return;

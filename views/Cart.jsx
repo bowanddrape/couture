@@ -3,7 +3,6 @@ const React = require('react');
 const InputAddress = require('./InputAddress.jsx');
 const Items = require('./Items.jsx');
 const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
-const Timestamp = require('./Timestamp.jsx');
 const UserLogin = require('./UserLogin.jsx');
 const Errors = require('./Errors.jsx');
 
@@ -80,6 +79,7 @@ class Cart extends React.Component {
     callback(null, options);
   } // preprocessProps()
 
+<<<<<<< HEAD
   // estimate manufacturing time
   estimateManufactureTime(items) {
     let days_needed = 1;
@@ -188,9 +188,10 @@ class Cart extends React.Component {
 
   updateContents(items) {
     items = items || [];
-    this.initShipping(items);
     this.refs.Items.updateContents(items);
     this.setState({items});
+    if (!items.length)
+      Errors.emitError(null, "Cart is empty");
   }
 
   handleSameBillingToggle(e) {
@@ -288,7 +289,7 @@ class Cart extends React.Component {
         payment_nonce: payment_nonce,
         address: this.state.shipping,
         billing_address: this.state.same_billing ? this.state.shipping : this.state.billing,
-        delivery_promised: this.countBusinessDays((this.state.shipping_quote ? this.state.shipping_quote.days : 5) + this.estimateManufactureTime(this.state.items)),
+        delivery_promised: this.refs.Items.countBusinessDays(this.refs.Items.state.shipping_quote.days + this.refs.Items.estimateManufactureTime(this.state.items)),
       }
       BowAndDrape.api("POST", "/order", payload, (err, resp) => {
         if (err) {
@@ -307,25 +308,26 @@ class Cart extends React.Component {
     return (
       <div>
         <Errors />
-        <item>Shipping on or before <Timestamp time={this.countBusinessDays(this.estimateManufactureTime(this.state.items))} /></item>
         <Items ref="Items" contents={this.state.items} is_cart="true" />
 
-        <UserLogin cta="Login or proceed as Guest" />
+        <UserLogin style={{margin:"10px auto",width:"480px",display:"block"}} cta="Login or proceed as Guest" />
 
         <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
-        same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} />
+        <div style={{margin:"auto",width:"480px"}}>same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} /></div>
         {this.state.same_billing?null:<InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}
         {this.renderInputCredit()}
 
         {/* TODO display loading state when this.state.processing_payment */}
         <button onClick={this.handlePay.bind(this)}>Get it!</button>
 
+{/* Needed by stripe, not needed by braintree
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
         <script dangerouslySetInnerHTML={{__html:`
           if ("${process.env.STRIPE_KEY}"!="undefined")
             Stripe.setPublishableKey("${process.env.STRIPE_KEY}");
         `}} >
         </script>
+*/}
       </div>
     );
   }
