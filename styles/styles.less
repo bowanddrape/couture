@@ -17,6 +17,8 @@ body {
   color: @color_secondary;
 }
 
+@user_img_width: 50px;
+@menu_handle_width: 30px;
 menu {
   position: fixed;
   top: 0;
@@ -25,10 +27,11 @@ menu {
   background-color: @color_tertiary;
   margin: 0;
   padding: 20px;
-  font-size: 28px;
   width: 100%;
+  a {
+    font-size: 28px;
+  }
 }
-@user_img_width: 50px;
 menu user {
   display: block;
   color: @color_primary;
@@ -45,12 +48,6 @@ menu user {
     margin-left: -@user_img_width - 5px;
   }
 }
-menu login msg {
-  display: block;
-  font-size: 20px;
-  color: @color_error;
-}
-@menu_handle_width: 30px;
 menu handle {
   .icon;
   .sprite(@hamburger_menu);

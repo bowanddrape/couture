@@ -35,8 +35,7 @@ class Mail {
 
     sendmail(options, function(err, reply) {
       if (err) {
-        console.log("sendmail error");
-        console.log(err && err.stack);
+        console.log("sendmail error " + err.toString());
       }
       if (callback) callback(err, reply);
     });
@@ -50,7 +49,7 @@ class Mail {
       order_link: "http://www.bowanddrape.com/account/order?id="+shipment.props.legacy_id,
       tracking_link: "https://tools.usps.com/go/TrackConfirmAction.action?tLabels="+shipment.tracking_code
     }
-    let body = Page.renderString(OrderShippedEmail, props, LayoutEmail);
+    let body = Page.renderString([{component:OrderShippedEmail, props}], LayoutEmail);
     Mail.send(null, `Bow & Drape order ${props.order_id}`, body, (err) => {
       if (err) console.log(err);
       callback();
@@ -62,7 +61,7 @@ class Mail {
       order_id: shipment.props.legacy_id,
       username: shipment.address.name,
     }
-    let body = Page.renderString(OrderSurveyEmail, props, LayoutEmail);
+    let body = Page.renderString([{component:OrderSurveyEmail, props}], LayoutEmail);
     Mail.send(null, `Bow & Drape order ${props.order_id}`, body, (err) => {
       if (err) console.log(err);
       callback();

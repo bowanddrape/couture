@@ -40,6 +40,7 @@
     "node-uuid": "^1.4.8",
     "pg": "^6.1.0",
     "pg-native": "^1.10.0",
+    "querystring": "^0.2.0",
     "ray-triangle-intersection": "^1.0.3",
     "react": "~15.3.2",
     "react-autocomplete": "^1.4.0",

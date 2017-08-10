@@ -25,6 +25,7 @@ class ShipProvider {
     // example address_to object dict
     var addressTo = {
       name: shipment.address.name,
+      email: shipment.address.email,
       street1: shipment.address.street,
       street2: shipment.address.apt,
       city: shipment.address.locality,
@@ -102,8 +103,6 @@ class ShipProvider {
       if(transaction.status != "SUCCESS")
         return callback("There was an error creating transaction: "+JSON.stringify(transaction.messages));
       // print label_url and tracking_number
-console.log("Label URL: %s", transaction.label_url);
-console.log("Tracking Number: %s", transaction.tracking_number);
       shipment.tracking_code = transaction.tracking_number;
       shipment.shipping_label = transaction.label_url;
       shipment.upsert((err) => {

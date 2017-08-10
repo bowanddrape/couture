@@ -1,11 +1,15 @@
 
 const braintree_client = require('braintree-web').client;
 
+const Errors = require('./Errors.jsx');
+
 class BraintreeClient {
   static getClientNonce(authorization, state, callback) {
     braintree_client.create({authorization}, (err, client) => {
       if (err) return callback(err);
-
+      // make sure we have the info required
+      if (!state.same_billing && (!state.billing || !state.billing.postal))
+        return callback("Please fill in billing address");
       let data = {
         creditCard: {
           number: state.card.number,

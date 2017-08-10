@@ -1,21 +1,22 @@
 
 const React = require('react');
 
-let recurse_assembly = (component, foreach) => {
-  if (!component) return;
-  foreach(component);
-  if (component.assembly) {
-    component.assembly.forEach((component) => {
-      recurse_assembly(component, foreach);
-    });
-  }
-}
-
 /***
 Draw an Item. Used in views/Items.jsx
 props: will mirror a Component model
 ***/
 class Item extends React.Component {
+
+  static recurseAssembly(component, foreach) {
+    if (!component) return;
+    foreach(component);
+    if (component.assembly) {
+      component.assembly.forEach((component) => {
+        Item.recurseAssembly(component, foreach);
+      });
+    }
+  }
+
   render() {
     if (!this.props.props) {
       return (
@@ -26,7 +27,7 @@ class Item extends React.Component {
     let assembly_contents = {};
     if (this.props.picklist && this.props.assembly) {
       for (let i=0; i<this.props.assembly.length; i++) {
-        recurse_assembly(this.props.assembly[i], (component) => {
+        Item.recurseAssembly(this.props.assembly[i], (component) => {
           // haute imported entries will have "text" set
           if (component.props && component.props.image && component.text) {
             let letters = {};
@@ -52,7 +53,7 @@ class Item extends React.Component {
             else
               assembly_contents[sku].quantity += component.quantity;
           }
-        }); // recurse_assembly
+        }); // recurseAssembly
       } // this.props.assembly.forEach
       Object.keys(assembly_contents).sort().forEach((sku) => {
         let backgroundImage = `url(${assembly_contents[sku].props.image})`;

@@ -40,7 +40,7 @@ errors {
   background-color: #a00;
   padding: 5px;
   border-radius: 5px;
-  display: block;
+  display: inline-block;
 }
 input.error {
   box-shadow: 0 0 10px #a00;
@@ -179,6 +179,17 @@ shipment assembly img {
 }
 shipment:last-child {
   border-bottom: none;
+}
+comments {
+  margin-top: -20px;
+  display: block;
+}
+comments metadata {
+  display: block;
+  font-size: 7px;
+}
+comments message {
+  display: block;
 }
 .timestamp {
   display: inline-block;
@@ -571,8 +582,10 @@ menu {
   background-color: #c79e6a;
   margin: 0;
   padding: 20px;
-  font-size: 28px;
   width: 100%;
+}
+menu a {
+  font-size: 28px;
 }
 menu user {
   display: block;
@@ -594,11 +607,6 @@ menu user img {
   width: 50px;
   height: 50px;
   margin-left: -55px;
-}
-menu login msg {
-  display: block;
-  font-size: 20px;
-  color: #a00;
 }
 menu handle {
   background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
