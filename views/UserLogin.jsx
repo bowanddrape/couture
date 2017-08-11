@@ -38,6 +38,8 @@ class UserLogin extends React.Component {
         passhash: passhash,
       }
       BowAndDrape.api("POST", "/user/login", payload, (err, response) => {
+        if (err)
+          Errors.emitError("login", err);
         BowAndDrape.dispatcher.handleAuth(response);
       });
     });
@@ -58,7 +60,8 @@ class UserLogin extends React.Component {
       return Errors.emitError("login", "Must enter email");
     let payload = {email: email};
     BowAndDrape.api("POST", "/user/verify", payload, (err, response) => {
-      return Errors.emitError("login", response.error);
+      // okay, so this endpoint is weird and uses an error to talk back =(
+      return Errors.emitError("login", err);
     });
   }
 
