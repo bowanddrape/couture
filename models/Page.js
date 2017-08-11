@@ -52,6 +52,21 @@ class Page extends JSONAPI {
     if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
       return Page.renderNotFound(req, res);
 
+    // if path is specified
+    if (req.path_tokens.length > 1) {
+      let path = `/${req.path_tokens.slice(1).join('/')}`;
+      return Page.get(path, (err, page) => {
+        if (err) return res.status(500).json(err);
+        if (!page) return Page.renderNotFound(req, res);
+        Page.render(req, res, require(`../views/PageEdit.jsx`), {
+          whitelisted_models,
+          whitelisted_components,
+          path: page.path,
+          elements: page.elements,
+        });
+      });
+    }
+
     Page.render(req, res, require(`../views/PageList.jsx`), {whitelisted_models, whitelisted_components});
   }
 

@@ -92444,15 +92444,23 @@ var Gallery = function (_React$Component) {
       var gallery_cards = [];
 
       items.forEach(function (item) {
-        gallery_cards.push(React.createElement("a", { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
-            margin: "0px",
-            border: "solid " + _this2.props.border + " #fff",
-            boxSizing: "border-box",
-            width: item.width || "300px",
-            height: item.height || "400px",
-            backgroundImage: "url(" + item.image + ")",
-            backgroundSize: "cover"
-          } }));
+        gallery_cards.push(React.createElement(
+          "a",
+          { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
+              margin: "0px",
+              border: "solid " + _this2.props.border + " #fff",
+              boxSizing: "border-box",
+              width: item.width || "300px",
+              height: item.height || "400px",
+              backgroundImage: "url(" + item.image + ")",
+              backgroundSize: "cover"
+            } },
+          item.caption ? React.createElement(
+            "div",
+            { className: "caption", style: { fontSize: "20px", marginTop: item.height ? parseInt(item.height) - 24 + "px" : "376px" } },
+            item.caption
+          ) : null
+        ));
       });
 
       return React.createElement(
@@ -93544,7 +93552,7 @@ var PageEditGallery = function (_React$Component) {
           items.push(React.createElement(
             "card",
             { key: index, style: { display: "flex" } },
-            React.createElement("img", { src: item.image }),
+            React.createElement("div", { className: "preview", style: { backgroundImage: "url(" + item.image + ")" } }),
             React.createElement(
               "fields",
               null,
@@ -93595,6 +93603,18 @@ var PageEditGallery = function (_React$Component) {
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "height", event.target.value);
                   }, value: item.height, placeholder: "400px" })
+              ),
+              React.createElement(
+                "div",
+                null,
+                React.createElement(
+                  "label",
+                  null,
+                  "caption"
+                ),
+                React.createElement("input", { type: "text", onChange: function onChange(event) {
+                    _this2.handleUpdateItem(index, "caption", event.target.value);
+                  }, value: item.caption })
               )
             )
           ));
@@ -96848,6 +96868,7 @@ module.exports = {
     Cart: require('./Cart.jsx'),
     Placeholder: require('./Placeholder.jsx'),
     PageList: require('./PageList.jsx'),
+    PageEdit: require('./PageEdit.jsx'),
     Items: require('./Items.jsx'),
     ComponentsEdit: require('./ComponentsEdit.jsx'),
     Gallery: require('./Gallery.jsx'),
@@ -96859,4 +96880,4 @@ module.exports = {
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":680,"./ComponentsEdit.jsx":686,"./Customizer.js":687,"./Errors.jsx":688,"./FulfillShipments.jsx":690,"./Gallery.jsx":691,"./Items.jsx":695,"./LayoutMain.jsx":696,"./PageList.jsx":701,"./Placeholder.jsx":703,"./ProductList.jsx":706,"./Signup.jsx":710,"./TextContent.jsx":714,"./UserPasswordReset.jsx":719,"events":332,"jwt-decode":384,"querystring":457,"react":609,"react-dom":461}]},{},[]);
+},{"./Cart.jsx":680,"./ComponentsEdit.jsx":686,"./Customizer.js":687,"./Errors.jsx":688,"./FulfillShipments.jsx":690,"./Gallery.jsx":691,"./Items.jsx":695,"./LayoutMain.jsx":696,"./PageEdit.jsx":697,"./PageList.jsx":701,"./Placeholder.jsx":703,"./ProductList.jsx":706,"./Signup.jsx":710,"./TextContent.jsx":714,"./UserPasswordReset.jsx":719,"events":332,"jwt-decode":384,"querystring":457,"react":609,"react-dom":461}]},{},[]);

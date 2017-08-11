@@ -1,5 +1,6 @@
 
 @import "./colors.less";
+@import "./fonts.less";
 
 button, .button {
   .headerfont;
@@ -115,6 +116,15 @@ a.card {
     cursor: default;
   }
 }
-.gallery a.card:not(.not_link):hover {
-  transform: scale(1.01);
+.gallery {
+  a.card:not(.not_link):hover {
+    border: 3px solid @color_secondary;
+  }
+  .caption {
+    .headerfont;
+    z-index: 1;
+    background-color: @color_primary;
+    width: 100%;
+    text-align: center;
+  }
 }

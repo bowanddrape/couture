@@ -123,7 +123,15 @@ a.card.not_link {
   cursor: default;
 }
 .gallery a.card:not(.not_link):hover {
-  transform: scale(1.01);
+  border: 3px solid #000;
+}
+.gallery .caption {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
+  z-index: 1;
+  background-color: #fff;
+  width: 100%;
+  text-align: center;
 }
 shipments {
   display: block;
@@ -527,8 +535,12 @@ page_edit element {
 page_edit element:last-of-type {
   border-bottom: none;
 }
-page_edit element card img {
+page_edit element card .preview {
   width: 150px;
+  height: 150px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 page_edit element card fields {
   width: 300px;

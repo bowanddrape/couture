@@ -135,6 +135,7 @@ module.exports = {
     Cart: require('./Cart.jsx'),
     Placeholder: require('./Placeholder.jsx'),
     PageList: require('./PageList.jsx'),
+    PageEdit: require('./PageEdit.jsx'),
     Items: require('./Items.jsx'),
     ComponentsEdit: require('./ComponentsEdit.jsx'),
     Gallery: require('./Gallery.jsx'),

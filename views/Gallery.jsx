@@ -29,6 +29,10 @@ class Gallery extends React.Component {
           backgroundImage: `url(${item.image})`,
           backgroundSize: "cover",
         }}>
+          {item.caption ?
+            <div className="caption" style={{fontSize:"20px",marginTop:item.height?parseInt(item.height)-24+"px":"376px"}}>{item.caption}</div>
+            : null
+          }
         </a>
       );
     });
