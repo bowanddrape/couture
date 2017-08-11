@@ -79,7 +79,6 @@ class Cart extends React.Component {
     callback(null, options);
   } // preprocessProps()
 
-<<<<<<< HEAD
   // estimate manufacturing time
   estimateManufactureTime(items) {
     let days_needed = 1;
