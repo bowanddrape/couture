@@ -24,10 +24,8 @@ Handle all things related to user auth and settings
 class User extends SQLTable {
   constructor(user) {
     super();
+    Object.assign(this, user);
     this.email = user.email.toLowerCase(); // remember lowercase while selecting
-    this.passhash = user.passhash;
-    this.verified = user.verified;
-    this.props = user.props;
   }
 
   // needed by SQLTable
@@ -35,7 +33,7 @@ class User extends SQLTable {
     return {
       tablename: "users",
       pkey: "email",
-      fields: ["passhash", "verified", "props"]
+      fields: ["passhash", "verified", "props", "credits"]
     };
   }
 
@@ -129,6 +127,19 @@ class User extends SQLTable {
           req.user = null;
           return next();
         }
+        // do a db fetch if we are about to try something
+        if (req.method=='POST') {
+          return User.get(user.email, (err, user) => {
+            if (err) {
+              req.user = null;
+              return next();
+            }
+            req.user = user;
+            req.user.populateRoles();
+            next();
+          });
+        }
+        // otherwise just trust the token
         req.user = new User(user);
         req.user.populateRoles();
         next();
@@ -192,6 +203,9 @@ class User extends SQLTable {
           return res.json({error:"Incorrect password"}).end();
         User.sendJwtToken(res, user);
       });
+    } else if (req.user) {
+      // if the user is already logged in, just issue a new token
+      return User.sendJwtToken(res, req.user);
     }
 
     return res.json({error:"no login credentials"}).end();

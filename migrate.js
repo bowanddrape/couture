@@ -48,8 +48,8 @@ pg_pool.connect(function(err, client, done) {
             if(err) {
               done(); return console.error('error running query', err);
             }
-            client.query('INSERT INTO migrations (filename) VALUES ($$'+migrations[i]+'$$)');
           });
+          client.query('INSERT INTO migrations (filename) VALUES ($$'+migrations[i]+'$$)');
         }
       }
 

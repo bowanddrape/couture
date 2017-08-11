@@ -90542,6 +90542,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var InputAddress = require('./InputAddress.jsx');
 var Items = require('./Items.jsx');
+var ItemUtils = require('./ItemUtils.js');
 var ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 var UserLogin = require('./UserLogin.jsx');
 var Errors = require('./Errors.jsx');
@@ -90569,7 +90570,6 @@ var Cart = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Cart.__proto__ || Object.getPrototypeOf(Cart)).call(this, props));
 
     _this.state = {
-      items: _this.props.items || [],
       card: {
         number: "",
         cvc: "",
@@ -90620,9 +90620,9 @@ var Cart = function (_React$Component) {
         this.updateContents(BowAndDrape.cart_menu.state.contents);
       }
       BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
-      // if the user is signed in, get latest shipping/billing info
       BowAndDrape.dispatcher.on("user", function (user) {
         if (!user.email) return;
+        // if the user is signed in, get latest shipping/billing info
         var query = { email: user.email, page: JSON.stringify({ sort: "requested", direction: "DESC", limit: 1 }) };
         BowAndDrape.api("GET", "/shipment", query, function (err, result) {
           if (err || !result || !result.length) return;
@@ -90634,6 +90634,7 @@ var Cart = function (_React$Component) {
           }
           _this2.setState({ shipping: shipping, billing: billing, same_billing: same_billing });
         });
+        _this2.refs.Items.updateCredit(user.credits);
       });
     }
   }, {
@@ -90641,7 +90642,6 @@ var Cart = function (_React$Component) {
     value: function updateContents(items) {
       items = items || [];
       this.refs.Items.updateContents(items);
-      this.setState({ items: items });
       if (!items.length) Errors.emitError(null, "Cart is empty");
     }
   }, {
@@ -90766,6 +90766,36 @@ var Cart = function (_React$Component) {
         return this.setState({ processing_payment: false });
       }
 
+      var payload = {
+        store_id: this.props.store[0].id,
+        email: this.state.shipping.email,
+        contents: this.refs.Items.state.contents,
+        address: this.state.shipping,
+        billing_address: this.state.same_billing ? this.state.shipping : this.state.billing,
+        delivery_promised: this.refs.Items.countBusinessDays(this.refs.Items.state.shipping_quote.days + this.refs.Items.estimateManufactureTime(this.refs.Items.state.contents))
+      };
+
+      var placeOrder = function placeOrder(payload) {
+        BowAndDrape.api("POST", "/order", payload, function (err, resp) {
+          if (err) {
+            _this3.setState({ processing_payment: false });
+            return Errors.emitError(null, err.error);
+          }
+          BowAndDrape.cart_menu.update([]);
+          _this3.setState({ done: true });
+          // we need to update the user, as account credits may have changed
+          // FIXME we're getting an error: Not Found here? I guess I'll deal
+          // with this later....
+          BowAndDrape.api("POST", "/login", {}, function (err, resp) {
+            BowAndDrape.dispatcher.handleAuth(resp);
+          });
+        });
+      };
+
+      // if the user owes nothing, don't bother hitting the payment gateway
+      if (ItemUtils.getPrice(payload.contents) == 0) {
+        return placeOrder(payload);
+      }
       // credit card info goes to the payment gateway ONLY, not to our servers
       // the payment handling gateway then gives us a nonce to reference that
       // client's payment info, and this is what we pass back to the server to
@@ -90776,22 +90806,8 @@ var Cart = function (_React$Component) {
           Errors.emitError("card", err);
           return;
         }
-        var payload = {
-          store_id: _this3.props.store[0].id,
-          email: _this3.state.shipping.email,
-          contents: _this3.refs.Items.state.contents,
-          payment_nonce: payment_nonce,
-          address: _this3.state.shipping,
-          billing_address: _this3.state.same_billing ? _this3.state.shipping : _this3.state.billing,
-          delivery_promised: _this3.refs.Items.countBusinessDays(_this3.refs.Items.state.shipping_quote.days + _this3.refs.Items.estimateManufactureTime(_this3.state.items))
-        };
-        BowAndDrape.api("POST", "/order", payload, function (err, resp) {
-          if (err) {
-            return Errors.emitError("card", err.error);
-          }
-          BowAndDrape.cart_menu.update([]);
-          _this3.setState({ done: true });
-        });
+        payload.payment_nonce = payment_nonce;
+        placeOrder(payload);
       });
     } // handlePay()
 
@@ -90800,21 +90816,35 @@ var Cart = function (_React$Component) {
     value: function render() {
       if (this.state.done) return React.createElement(ThanksPurchaseComplete, null);
 
+      // see if we need to show payment components
+      var payment_info = null;
+      var total_price = undefined;
+      if (this.refs.Items) {
+        total_price = ItemUtils.getPrice(this.refs.Items.state.contents);
+      }
+      if (total_price > 0) {
+        payment_info = React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'div',
+            { style: { margin: "auto", width: "480px" } },
+            'same billing address ',
+            React.createElement('input', { onChange: this.handleSameBillingToggle.bind(this), type: 'checkbox', checked: this.state.same_billing })
+          ),
+          this.state.same_billing ? null : React.createElement(InputAddress, _extends({ section_title: 'Billing Address', errors: React.createElement(Errors, { label: 'billing' }), handleFieldChange: this.handleFieldChange.bind(this, "billing"), handleSetSectionState: this.handleSetSectionState.bind(this, "billing") }, this.state.billing)),
+          this.renderInputCredit()
+        );
+      } // total_price > 0
+
       return React.createElement(
         'div',
         null,
-        React.createElement(Errors, null),
-        React.createElement(Items, { ref: 'Items', contents: this.state.items, is_cart: 'true' }),
+        React.createElement(Items, { ref: 'Items', contents: this.props.items, is_cart: 'true' }),
         React.createElement(UserLogin, { style: { margin: "10px auto", width: "480px", display: "block" }, cta: 'Login or proceed as Guest' }),
         React.createElement(InputAddress, _extends({ section_title: 'Shipping Address', errors: React.createElement(Errors, { label: 'shipping' }), handleFieldChange: this.handleFieldChange.bind(this, "shipping"), handleSetSectionState: this.handleSetSectionState.bind(this, "shipping") }, this.state.shipping)),
-        React.createElement(
-          'div',
-          { style: { margin: "auto", width: "480px" } },
-          'same billing address ',
-          React.createElement('input', { onChange: this.handleSameBillingToggle.bind(this), type: 'checkbox', checked: this.state.same_billing })
-        ),
-        this.state.same_billing ? null : React.createElement(InputAddress, _extends({ section_title: 'Billing Address', errors: React.createElement(Errors, { label: 'billing' }), handleFieldChange: this.handleFieldChange.bind(this, "billing"), handleSetSectionState: this.handleSetSectionState.bind(this, "billing") }, this.state.billing)),
-        this.renderInputCredit(),
+        payment_info,
+        React.createElement(Errors, { style: { width: "460px" } }),
         React.createElement(
           'button',
           { onClick: this.handlePay.bind(this) },
@@ -90849,7 +90879,7 @@ var Cart = function (_React$Component) {
 
 module.exports = Cart;
 
-},{"../models/PayBraintree.js":2,"./Errors.jsx":688,"./InputAddress.jsx":692,"./Items.jsx":695,"./PayBraintreeClient.js":702,"./ThanksPurchaseComplete.jsx":715,"./UserLogin.jsx":717,"react":609}],681:[function(require,module,exports){
+},{"../models/PayBraintree.js":2,"./Errors.jsx":688,"./InputAddress.jsx":692,"./ItemUtils.js":694,"./Items.jsx":695,"./PayBraintreeClient.js":702,"./ThanksPurchaseComplete.jsx":715,"./UserLogin.jsx":717,"react":609}],681:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -92050,6 +92080,7 @@ var Errors = function (_React$Component) {
       // no listeners server side, obviously
       if (!BowAndDrape) return;
       var appendMessage = function appendMessage(message) {
+        console.log("handling error message: " + message);
         _this2.setState(function (prevState) {
           var errors = prevState.errors.slice(0);
           if (errors.indexOf(message) < 0) errors.push(message);
@@ -92082,7 +92113,7 @@ var Errors = function (_React$Component) {
       });
       return React.createElement(
         "errors",
-        null,
+        { style: this.props.style },
         errors
       );
     }
@@ -92809,7 +92840,7 @@ var recurseAssembly = function recurseAssembly(component, foreach) {
 // get price of an item list, optionally only counting ones that pass filter
 var getPrice = function getPrice(items, filter) {
   var total_price = 0;
-  contents.forEach(function (item, index) {
+  items.forEach(function (item, index) {
     if (typeof filter == "function" && !filter(item)) return;
     var quant = item.quantity || 1;
     total_price += parseFloat(item.props.price) * quant;
@@ -92817,6 +92848,7 @@ var getPrice = function getPrice(items, filter) {
   return total_price;
 };
 
+// items gets passed in by reference and updated
 var applyPromoCode = function applyPromoCode(items, promo, callback) {
   // only one promo code at a time, remove any previous ones
   items.forEach(function (item, index) {
@@ -92836,10 +92868,33 @@ var applyPromoCode = function applyPromoCode(items, promo, callback) {
   callback(null, items);
 };
 
+// items gets passed in by reference and updated
+var applyCredits = function applyCredits(credits, items) {
+  // remove any previous credits line
+  items.forEach(function (item, index) {
+    // TODO generalize special line items like these
+    if (new RegExp("^Account balance", "i").test(item.props.name)) return items.splice(index, 1);
+  });
+  // credits should never be negative anyways
+  if (!credits || credits < 0) return;
+  var total_price = getPrice(items);
+  // don't apply credit to a nothing
+  if (!total_price) return;
+  var credit_price = Math.min(total_price, credits);
+  items.push({
+    props: {
+      name: "Account balance",
+      price: -1 * credit_price,
+      description: credits - credit_price + " remaining in balance"
+    }
+  });
+};
+
 module.exports = {
   recurseAssembly: recurseAssembly,
   getPrice: getPrice,
-  applyPromoCode: applyPromoCode
+  applyPromoCode: applyPromoCode,
+  applyCredits: applyCredits
 };
 
 },{}],695:[function(require,module,exports){
@@ -92882,14 +92937,15 @@ var Items = function (_React$Component) {
         amount: 7,
         currency_local: "USD"
       },
-      promo_code: ""
+      promo_code: "",
+      account_credit: 0
     };
     return _this;
   }
 
   _createClass(Items, [{
     key: 'updateShipping',
-    value: function updateShipping() {
+    value: function updateShipping(callback) {
       if (!this.props.is_cart) return;
       this.setState(function (prevState) {
         var contents = JSON.parse(JSON.stringify(prevState.contents));
@@ -92903,7 +92959,11 @@ var Items = function (_React$Component) {
         if (!contents.length) {
           return { contents: contents };
         }
-        var total_price = ItemUtils.getPrice(contents);
+        // don't include account credits in this price
+        var total_price = ItemUtils.getPrice(contents, function (item) {
+          if (new RegExp("^Account balance", "i").test(item.props.name)) return false;
+          return true;
+        });
         var shipping_cost = shipping_quote.amount;
         // free domestic shipping for 75+ orders
         if (total_price >= 75 && shipping_quote.currency_local.toLowerCase() == "usd") shipping_cost = 0;
@@ -92914,7 +92974,7 @@ var Items = function (_React$Component) {
           }
         });
         return { contents: contents };
-      }); // this.setState()
+      }, callback); // this.setState()
     }
   }, {
     key: 'componentDidMount',
@@ -92927,11 +92987,31 @@ var Items = function (_React$Component) {
       }
     }
   }, {
+    key: 'updateCredit',
+    value: function updateCredit(credit) {
+      var _this2 = this;
+
+      this.setState({ account_credit: credit }, function () {
+        _this2.updateContents(_this2.state.contents);
+      });
+    }
+  }, {
     key: 'updateContents',
     value: function updateContents(contents) {
+      var _this3 = this;
+
       contents = contents || [];
-      this.setState({ contents: contents });
-      this.updateShipping();
+      this.setState({ contents: contents }, function () {
+        // update shipping line
+        _this3.updateShipping(function () {
+          // update account credit line
+          _this3.setState(function (prevState) {
+            var contents = JSON.parse(JSON.stringify(prevState.contents));
+            ItemUtils.applyCredits(prevState.account_credit, contents);
+            return { contents: contents };
+          });
+        });
+      });
     }
 
     // estimate manufacturing time
@@ -92982,28 +93062,25 @@ var Items = function (_React$Component) {
   }, {
     key: 'handleApplyDiscountCode',
     value: function handleApplyDiscountCode() {
-      var _this2 = this;
+      var _this4 = this;
 
       BowAndDrape.api("GET", "/promocode", { code: this.state.promo_code }, function (err, result) {
         if (err) return Errors.emitError("promo", err.toString());
         if (!result.length) return Errors.emitError("promo", "no such promo code");
         var promo = result[0];
-        console.log(err, promo);
         // FIXME this is a race as contents could be modified between
         // clone and set, but I can't figure out how to wrap this properly
-        var contents = JSON.parse(JSON.stringify(_this2.state.contents));
+        var contents = JSON.parse(JSON.stringify(_this4.state.contents));
         ItemUtils.applyPromoCode(contents, promo, function (err, items) {
           if (err) return Errors.emitError("promo", err.toString());
-          _this2.setState(function (prevState) {
-            return { contents: items };
-          });
+          _this4.updateContents(items);
         });
       });
     }
   }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
+      var _this5 = this;
 
       var items = [];
       var has_promo = false;
@@ -93039,12 +93116,12 @@ var Items = function (_React$Component) {
           React.createElement(Errors, { label: 'promo' }),
           'Promo Code:',
           React.createElement('input', { type: 'text', style: { height: "20px" }, value: this.state.promo_code, onChange: function onChange(event) {
-              _this3.setState({ promo_code: event.target.value });
+              _this5.setState({ promo_code: event.target.value });
             } }),
           React.createElement(
             'button',
             { onClick: function onClick() {
-                _this3.handleApplyDiscountCode();
+                _this5.handleApplyDiscountCode();
               } },
             'Apply'
           )
@@ -96676,18 +96753,16 @@ var Dispatcher = function (_EventEmitter) {
   _createClass(Dispatcher, [{
     key: 'handleAuth',
     value: function handleAuth(auth_object) {
-      if (auth_object.error) {
+      if (!auth_object || !auth_object.token) {
         document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
         delete BowAndDrape.token;
-        Errors.emitError("login", auth_object.error.toString());
-        return this.emit('user', { error: auth_object.error });
-      }
-      if (!auth_object.token) {
-        document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        if (auth_object && auth_object.error) {
+          Errors.emitError("login", auth_object.error.toString());
+          return this.emit('user', { error: auth_object.error });
+        }
         return this.emit('user', {});
       }
       var decoded = jwt_decode(auth_object.token);
-      this.emit('user', decoded);
       // save cookie
       var d = new Date();
       d.setTime(decoded.exp * 1000);
@@ -96695,6 +96770,7 @@ var Dispatcher = function (_EventEmitter) {
       document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
       // also save it in memory for API auth
       BowAndDrape.token = auth_object.token;
+      this.emit('user', decoded);
       this.emit("authenticated");
     }
   }]);
@@ -96738,8 +96814,15 @@ var api = function api(method, endpoint, body, callback) {
     if (this.readyState != 4) {
       return;
     }
-    if (this.status != 200) return callback(JSON.parse(this.responseText));
-    callback(null, JSON.parse(this.responseText));
+    var response = void 0;
+    try {
+      response = JSON.parse(this.responseText);
+    } catch (err) {
+      callback("invalid server response =(");
+    }
+    if (this.status != 200) return callback(response);
+    if (response.error) return callback(response);
+    callback(null, response);
   };
   var payload = new FormData();
   if (body) {

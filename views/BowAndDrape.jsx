@@ -38,18 +38,16 @@ class Dispatcher extends EventEmitter {
     super(props);
   }
   handleAuth(auth_object) {
-    if (auth_object.error) {
+    if (!auth_object || !auth_object.token) {
       document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
       delete BowAndDrape.token;
-      Errors.emitError("login", auth_object.error.toString());
-      return this.emit('user', {error: auth_object.error});
-    }
-    if (!auth_object.token) {
-      document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      if (auth_object && auth_object.error) {
+        Errors.emitError("login", auth_object.error.toString());
+        return this.emit('user', {error: auth_object.error});
+      }
       return this.emit('user', {});
     }
     let decoded = jwt_decode(auth_object.token);
-    this.emit('user', decoded);
     // save cookie
     var d = new Date();
     d.setTime(decoded.exp*1000);
@@ -57,6 +55,7 @@ class Dispatcher extends EventEmitter {
     document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
     // also save it in memory for API auth
     BowAndDrape.token = auth_object.token;
+    this.emit('user', decoded);
     this.emit("authenticated");
   }
 }
@@ -97,9 +96,17 @@ let api = function(method, endpoint, body, callback) {
     console.log("attempting api call while not logged in");
   xhr.onreadystatechange = function() {
     if (this.readyState!=4) { return; }
+    let response;
+    try {
+      response = JSON.parse(this.responseText);
+    } catch(err) {
+      callback("invalid server response =(");
+    }
     if (this.status!=200)
-      return callback(JSON.parse(this.responseText));
-    callback(null, JSON.parse(this.responseText));
+      return callback(response);
+    if (response.error)
+      return callback(response);
+    callback(null, response);
   }
   let payload = new FormData();
   if (body) {

@@ -22,6 +22,7 @@ class Items extends React.Component {
         currency_local: "USD",
       },
       promo_code: "",
+      account_credit: 0,
     }
   }
 
@@ -31,7 +32,8 @@ class Items extends React.Component {
     });
   }
 
-  updateShipping() {
+  updateShipping(callback) {
+
     if (!this.props.is_cart) return;
     this.setState((prevState) => {
       let contents = JSON.parse(JSON.stringify(prevState.contents));
@@ -46,7 +48,12 @@ class Items extends React.Component {
       if (!contents.length) {
         return ({contents: contents});
       }
-      let total_price = ItemUtils.getPrice(contents);
+      // don't include account credits in this price
+      let total_price = ItemUtils.getPrice(contents, (item)=>{
+        if (new RegExp("^Account balance", "i").test(item.props.name))
+          return false;
+        return true;
+      });
       let shipping_cost = shipping_quote.amount;
       // free domestic shipping for 75+ orders
       if (total_price>=75 && shipping_quote.currency_local.toLowerCase()=="usd")
@@ -58,7 +65,7 @@ class Items extends React.Component {
         }
       });
       return ({contents: contents});
-    }); // this.setState()
+    }, callback); // this.setState()
   }
 
   componentDidMount() {
@@ -72,10 +79,26 @@ class Items extends React.Component {
     }
   }
 
+  updateCredit(credit) {
+    this.setState({account_credit:credit}, () => {
+      this.updateContents(this.state.contents);
+    });
+  };
+
   updateContents(contents) {
     contents = contents || [];
-    //this.setState({contents});
     this.updateShipping();
+    this.setState({contents}, () => {
+      // update shipping line
+      this.updateShipping(() => {
+        // update account credit line
+        this.setState((prevState) => {
+          let contents = JSON.parse(JSON.stringify(prevState.contents));
+          ItemUtils.applyCredits(prevState.account_credit, contents);
+          return ({contents});
+        });
+      });
+    });
   }
 
   // estimate manufacturing time
@@ -131,9 +154,7 @@ class Items extends React.Component {
       let contents = JSON.parse(JSON.stringify(this.state.contents));
       ItemUtils.applyPromoCode(contents, promo, (err, items) => {
         if (err) return Errors.emitError("promo", err.toString());
-        this.setState((prevState) => {
-          return ({contents: items});
-        });
+        this.updateContents(items);
       });
     });
   }

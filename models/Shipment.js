@@ -33,6 +33,16 @@ class Shipment extends JSONAPI {
     };
   }
 
+  // extends JSONAPI
+  hasApiPermission(req, res) {
+    // allow user to ask for own shipments
+    if (req.method=='GET' && req.user && req.user.email==req.query.email)
+      return true;
+
+    return super.hasApiPermission(req, res);
+  }
+
+  // extends JSONAPI
   onApiSave(req, res, object, callback) {
     // if this was a request for shipping rates, return that instead
     if (req.path=="/shipment/quote") {
