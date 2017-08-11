@@ -81,6 +81,20 @@ class Order {
           total_payments += total_price;
         }
 
+        // apply user credits if we can
+        for (let i=0; i<contents.length; i++) {
+          if (!contents[i].props) continue;
+          if (!/Account balance/.test(contents[i].props.name)) continue;
+          if ((contents[i].props.price*-1) > req.user.credits)
+            return res.json({error: "User login error, try logging out and then back in"});
+          // deduct user credits
+          // TODO transaction me
+          User.get(req.user.email, (err, user) => {
+            user.credits += contents[i].props.price;
+            user.upsert();
+          });
+        }
+
         // if it ain't free, charge for it
         if (total_price > total_payments) {
           // process payment

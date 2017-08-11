@@ -28,6 +28,7 @@ let getPrice = (items, filter) => {
   return total_price;
 }
 
+// items gets passed in by reference and updated
 let applyPromoCode = (items, promo, callback) => {
   // only one promo code at a time, remove any previous ones
   items.forEach((item, index) => {
@@ -46,8 +47,32 @@ let applyPromoCode = (items, promo, callback) => {
   callback(null, items);
 }
 
+// items gets passed in by reference and updated
+let applyCredits = (credits, items) => {
+  // remove any previous credits line
+  items.forEach((item, index) => {
+    // TODO generalize special line items like these
+    if (new RegExp("^Account balance", "i").test(item.props.name))
+      return items.splice(index, 1);
+  });
+  // credits should never be negative anyways
+  if (!credits || credits < 0) return;
+  let total_price = getPrice(items);
+  // don't apply credit to a nothing
+  if (!total_price) return;
+  let credit_price = Math.min(total_price, credits);
+  items.push({
+    props: {
+      name: "Account balance",
+      price: -1*credit_price,
+      description: `${credits-credit_price} remaining in balance`,
+    },
+  });
+}
+
 module.exports = {
   recurseAssembly,
   getPrice,
   applyPromoCode,
+  applyCredits,
 };
