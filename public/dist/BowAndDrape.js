@@ -96653,7 +96653,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
-var UserProfile = require('./UserProfile.jsx');
+var UserLogin = require('./UserLogin.jsx');
 var jwt_decode = require('jwt-decode');
 
 /***
@@ -96685,7 +96685,7 @@ var UserPasswordReset = function (_React$Component) {
       var password = document.getElementById("password").value;
       var auth = this.getUser();
 
-      UserProfile.hashPassword(auth.user.email, password, function (err, passhash) {
+      UserLogin.hashPassword(auth.user.email, password, function (err, passhash) {
         var payload = { passhash: passhash };
         BowAndDrape.api("POST", "/user/reset_password", payload, function (err, response) {
           // TODO handle errors?
@@ -96744,7 +96744,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserProfile.jsx":721,"jwt-decode":384,"react":609}],721:[function(require,module,exports){
+},{"./UserLogin.jsx":718,"jwt-decode":384,"react":609}],721:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
