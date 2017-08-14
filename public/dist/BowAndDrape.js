@@ -96391,6 +96391,7 @@ var UserLogin = function (_React$Component) {
           passhash: passhash
         };
         BowAndDrape.api("POST", "/user/login", payload, function (err, response) {
+          if (err) Errors.emitError("login", err);
           BowAndDrape.dispatcher.handleAuth(response);
         });
       });
@@ -96402,7 +96403,8 @@ var UserLogin = function (_React$Component) {
       if (!email) return Errors.emitError("login", "Must enter email");
       var payload = { email: email };
       BowAndDrape.api("POST", "/user/verify", payload, function (err, response) {
-        return Errors.emitError("login", response.error);
+        // okay, so this endpoint is weird and uses an error to talk back =(
+        return Errors.emitError("login", err);
       });
     }
   }, {
@@ -96841,7 +96843,7 @@ var api = function api(method, endpoint, body, callback) {
       callback("invalid server response =(");
     }
     if (this.status != 200) return callback(response);
-    if (response.error) return callback(response);
+    if (response && response.error) return callback(response.error);
     callback(null, response);
   };
   var payload = new FormData();

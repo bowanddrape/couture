@@ -104,8 +104,8 @@ let api = function(method, endpoint, body, callback) {
     }
     if (this.status!=200)
       return callback(response);
-    if (response.error)
-      return callback(response);
+    if (response && response.error)
+      return callback(response.error);
     callback(null, response);
   }
   let payload = new FormData();
