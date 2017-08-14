@@ -22,36 +22,55 @@ class LayoutBasic extends React.Component {
   render() {
     let content = null;
 
-    if (typeof(document)=='undefined' || typeof(BowAndDrape.views[this.props.content_name])=='undefined') {
+    if (typeof(document)=='undefined') {
       content = (<div dangerouslySetInnerHTML={{__html:unescape(this.props.content_string)}} />);
     } else {
-      content = React.createElement(
-        BowAndDrape.views[this.props.content_name],
-        JSON.parse(this.props.content_props)
-      );
+      content = [];
+      let props_contents = this.props.content;
+      let static_server_render = false;
+      if (typeof(props_contents)=='string')
+        props_contents = JSON.parse(props_contents);
+      for (let i=0; i<props_contents.length; i++) {
+        // if we didn't get a client-side component, use the server-side render
+        if (!BowAndDrape.views[props_contents[i].name]) {
+          content = (<div dangerouslySetInnerHTML={{__html:unescape(this.props.content_string)}} />);
+          break;
+        }
+        let props = props_contents[i].props;
+        props.key = content.length;
+        content.push(React.createElement(
+          BowAndDrape.views[props_contents[i].name],
+          props
+        ));
+      };
     }
 
     return (
-      <div>
-        <meta httpEquiv="content-type" content="text/html; charset=utf-8" />
+      <div className="layout">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
         {content}
+
         <script src="/BowAndDrape.js"></script>
+        <script src="/masonry.pkgd.min.js"></script>
 
         <script dangerouslySetInnerHTML={{__html:`
+
           var BowAndDrape = require("BowAndDrape");
           var React = BowAndDrape.React;
           var ReactDOM = BowAndDrape.ReactDOM;
-          var layout = React.createElement(BowAndDrape.views.LayoutBasic, {
-            content_string: \`${escape(this.props.content_string)}\`,
-            content_name: \`${this.props.content_name}\`,
-            content_props: \`${this.props.content_props}\`}
-          );
-          ReactDOM.render(
-            layout,
-            document.body
-          );
+          var content = \`${JSON.stringify(this.props.content)}\`;
+          if (content != "undefined") {
+            content = content.replace(/\\n/g, "");
+            var layout = React.createElement(BowAndDrape.views.LayoutBasic, {
+              content_string: \`${escape(this.props.content_string)}\`,
+              content,
+            });
+            ReactDOM.render(
+              layout,
+              document.querySelector(".layout")
+            );
+          }
         `}} >
         </script>
 

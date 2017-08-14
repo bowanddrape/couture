@@ -129,6 +129,7 @@ module.exports = {
   // FIXME script this?
   views: {
     LayoutMain: require('./LayoutMain.jsx'),
+    LayoutBasic: require('./LayoutBasic.jsx'),
     UserPasswordReset: require('./UserPasswordReset.jsx'),
     FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),

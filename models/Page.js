@@ -7,6 +7,7 @@ const async = require('async');
 const JSONAPI = require('./JSONAPI');
 
 const LayoutMain = require('../views/LayoutMain.jsx');
+const LayoutBasic = require('../views/LayoutBasic.jsx');
 
 const NotFound = require('../views/NotFound.jsx');
 
@@ -145,7 +146,7 @@ class Page extends JSONAPI {
         return async.parallel(render_elements, function(err, data) {
           if(err) return res.status(500).end(err.toString());
           let head = Page.getHTMLHead(req, res, {});
-          let body = Page.renderString(data, LayoutMain);
+          let body = Page.renderString(data, req.query.embed?LayoutBasic:LayoutMain);
           return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
         });
       } // for pages
