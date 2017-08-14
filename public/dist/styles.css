@@ -586,6 +586,26 @@ component_edit input[type="text"][name="sku"] {
 component_edit input[type="text"][name="props_name"] {
   width: 150px;
 }
+signup {
+  text-align: center;
+  display: block;
+}
+signup div {
+  display: block;
+  width: 300px;
+  margin: 2px auto;
+  position: relative;
+}
+signup div label {
+  position: absolute;
+  width: 300px;
+  left: -302px;
+  text-align: right;
+}
+signup div input[type="text"] {
+  width: 100%;
+  box-sizing: content-box;
+}
 .icon {
   background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
 }
