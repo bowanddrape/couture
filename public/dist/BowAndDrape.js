@@ -91744,7 +91744,11 @@ var Customizer = function () {
 
       var components = [];
       // set product
-      if (product) set_tasks.push(this.product.set.bind(this.product, this.gl, { props: product.props, geometry: "doublesided" }));
+      if (product) {
+        var geometry = null;
+        if (product.props.cameras && product.props.cameras.length > 1) geometry = "doublesided";
+        set_tasks.push(this.product.set.bind(this.product, this.gl, { props: product.props, geometry: geometry }));
+      }
       // recurse assemblies
       if (construction && construction.assembly) {
         construction.assembly.forEach(function (component) {
@@ -95951,7 +95955,7 @@ var Signup = function (_React$Component) {
           React.createElement(
             "button",
             { onClick: this.handleSubmit.bind(this), style: { margin: "auto" } },
-            "Submit"
+            "SUBMIT"
           )
         )
       );

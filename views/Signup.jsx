@@ -73,7 +73,7 @@ class Signup extends React.Component {
         <signup>
           {unique_keys}
           {misc_keys}
-          <button onClick={this.handleSubmit.bind(this)} style={{margin:"auto"}}>Submit</button>
+          <button onClick={this.handleSubmit.bind(this)} style={{margin:"auto"}}>SUBMIT</button>
         </signup>
       </div>
     );
