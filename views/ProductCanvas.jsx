@@ -46,7 +46,7 @@ class ProductCanvas extends React.Component {
     let selected = this.state.assembly[this.state.selected_component];
     if (!selected) return ret;
     selected.assembly.forEach((component) => {
-      let toks = component.props.name.split('_');
+      let toks = component.sku.split('_');
       let character = toks[toks.length-1].toLowerCase();
       character = skutext_to_character[character] || character;
       ret += character;

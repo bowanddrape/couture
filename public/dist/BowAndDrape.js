@@ -94175,7 +94175,7 @@ var ProductCanvas = function (_React$Component) {
       var selected = this.state.assembly[this.state.selected_component];
       if (!selected) return ret;
       selected.assembly.forEach(function (component) {
-        var toks = component.props.name.split('_');
+        var toks = component.sku.split('_');
         var character = toks[toks.length - 1].toLowerCase();
         character = skutext_to_character[character] || character;
         ret += character;
@@ -94216,6 +94216,7 @@ var ProductCanvas = function (_React$Component) {
         selected.assembly = text.split("").map(function (letter) {
           letter = letter.toLowerCase();
           letter = character_to_skutext[letter] || letter;
+          console.log(letter, componentMap[letter]);
           // deep copy and set the quantity of this component to be used to 1
           var component = JSON.parse(JSON.stringify(componentMap[letter]));
           component.quantity = 1;
@@ -94659,13 +94660,13 @@ var ProductComponentPicker = function (_React$Component) {
               var component_letters = {};
               for (var j = 0; j < product.compatible_components[i].options.length; j++) {
                 var letter = product.compatible_components[i].options[j];
-                var toks = letter.props.name.split('_');
+                var toks = letter.sku.split('_');
                 var character = toks[toks.length - 1].toLowerCase();
                 component_letters[character] = letter;
               }
               components.push(React.createElement(
                 'div',
-                { key: components.length, name: product.compatible_components[i].props.name, style: { height: "auto" }, className: 'component_container' },
+                { key: components.length, name: product.compatible_components[i].sku, style: { height: "auto" }, className: 'component_container' },
                 React.createElement('input', { type: 'text', style: { width: "90%" },
                   onChange: function onChange(event) {
                     _this2.handleSetComponentText(event.target.value, component_letters);

@@ -43,8 +43,12 @@ class Customizer {
 
     let components = [];
     // set product
-    if (product)
-      set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props, geometry:"doublesided"}));
+    if (product) {
+      let geometry = null;
+      if (product.props.cameras && product.props.cameras.length>1)
+        geometry = "doublesided";
+      set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props, geometry: geometry}));
+    }
     // recurse assemblies
     if (construction && construction.assembly) {
       construction.assembly.forEach((component) => {
