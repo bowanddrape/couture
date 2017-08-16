@@ -20,7 +20,8 @@ class Shipment extends React.Component {
       packed: this.props.packed,
       approved: this.props.approved,
       on_hold: this.props.on_hold,
-      in_production: this.props.in_production,
+      picked: this.props.picked,
+      inspected: this.props.inspected,
       received: this.props.received,
       tracking_code: this.props.tracking_code,
       shipping_label: this.props.shipping_label,
@@ -164,17 +165,19 @@ class Shipment extends React.Component {
     if (!this.state.tracking_code)
       actions.push(<button key={actions.length} onClick={this.handleQueryRates}>Ship</button>);
 
-    if (this.state.tracking_code && this.state.tracking_code!="quoting..." && !this.state.approved && !this.state.on_hold)
+    if (!this.state.approved && !this.state.packed && !this.state.on_hold)
       actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "approved")}>Ready to Make</button>);
-    if (!this.state.approved && !this.state.on_hold)
+    if (!this.state.approved && !this.state.packed && !this.state.on_hold)
       actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "on_hold")}>Hold</button>);
     if (this.state.on_hold)
       actions.push(<button key={actions.length} onClick={this.handleRemoveHold.bind(this)}>Remove Hold</button>);
 
-    if (this.state.approved && !this.state.in_production && !this.state.packed && !this.state.received)
-      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "in_production")}>Send to Production</button>);
-    if (this.state.in_production && !this.state.packed && !this.state.received)
-      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "packed")}>Mark as Packed</button>);
+    if (this.state.approved && !this.state.picked && !this.state.packed && !this.state.received)
+      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "picked")}>Picked</button>);
+    if (this.state.approved && this.state.picked && !this.state.inspected && !this.state.received)
+      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "inspected")}>QA passed</button>);
+    if (this.state.inspected && !this.state.packed && !this.state.received)
+      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "packed")}>Packed</button>);
     // TODO for kiosk mode
     if (false) {
       actions.push(<button key={actions.length} onClick={this.setSink.bind(this, "customer_pickup")}>Marked as Pickedup</button>);

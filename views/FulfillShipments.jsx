@@ -51,24 +51,42 @@ class FulfillShipments extends React.Component {
             <Scrollable
               component={Shipment}
               component_props={{picklist:true}}
-              endpoint={`/shipment?store_id=${this.props.store.id}&approved=not_null&in_production=null`}
+              endpoint={`/shipment?store_id=${this.props.store.id}&approved=not_null&picked=null&packed=null&received=null`}
               page = {{sort:"requested", direction:"ASC", limit:100}}
             />
           </shipments>
           <shipments>
-            <h2>In Production</h2>
+            <h2>Picked</h2>
             <Scrollable
               component={Shipment}
               component_props={{picklist:true}}
-              endpoint={`/shipment?store_id=${this.props.store.id}&in_production=not_null&packed=null`}
+              endpoint={`/shipment?store_id=${this.props.store.id}&picked=not_null&inspected=null`}
               page = {{sort:"requested", direction:"ASC"}}
+            />
+          </shipments>
+          <shipments>
+            <h2>Inspected</h2>
+            <Scrollable
+              component={Shipment}
+              component_props={{picklist:true}}
+              endpoint={`/shipment?store_id=${this.props.store.id}&inspected=not_null&packed=null`}
+              page = {{sort:"requested", direction:"ASC"}}
+            />
+          </shipments>
+          <shipments>
+            <h2>Packed</h2>
+            <Scrollable
+              component={Shipment}
+              component_props={{picklist:true}}
+              endpoint={`/shipment?store_id=${this.props.store.id}&packed=not_null&ship_description=null`}
+              page = {{sort:"requested", direction:"DESC"}}
             />
           </shipments>
           <shipments>
             <h2>Shipped</h2>
             <Scrollable
               component={Shipment}
-              endpoint={`/shipment?store_id=${this.props.store.id}&packed=not_null&received=null`}
+              endpoint={`/shipment?store_id=${this.props.store.id}&ship_description=not_null&received=null`}
               page = {{sort:"requested", direction:"ASC"}}
             />
           </shipments>

@@ -1,5 +1,6 @@
 
 const shippo = require('shippo')(process.env.SHIPPO_TOKEN);
+const Component = require('./Component.js');
 
 /***
 Integration with shipment providers
@@ -35,21 +36,31 @@ class ShipProvider {
       metadata: "Order #"+shipment.id
     }
 
+    let weight = 0;
+    shipment.contents.forEach((item) => {
+      let component = new Component(item);
+      component.recurseAssembly((component) => {
+        component.props = component.props || {};
+        component.props.weight = component.props.weight || 10;
+        weight = component.props.weight;
+      });
+    });
+
     // parcel object dict
     var parcel = {
       length: "5",
       width: "5",
       height: "5",
       distance_unit: "in",
-      weight: "2",
+      weight: (weight*0.00220462).toString(),
       mass_unit: "lb",
     }
 
     // example CustomsItems object. This is required for int'l shipment only.
     var customsItem = {
-      description: "T-Shirt",
-      quantity: 2,
-      net_weight: "0.3",
+      description: "apparel",
+      quantity: 1,
+      net_weight: (weight*0.00220462).toString(),
       mass_unit: "lb",
       value_amount: "20",
       value_currency: "USD",
