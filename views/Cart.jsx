@@ -23,7 +23,6 @@ page and the shipping/payment on it.
 class Cart extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       card: {
         number: "",
@@ -80,13 +79,97 @@ class Cart extends React.Component {
     callback(null, options);
   } // preprocessProps()
 
+  // estimate manufacturing time
+  estimateManufactureTime(items) {
+    let days_needed = 1;
+    Items.recurseAssembly(items, (component) => {
+      // hardcoded defaults, if not set.
+      let default_manufacture_time = {
+        parallel: 3,
+        serial: 0,
+      }
+      // embroidery and airbrush will take longer, too lazy to update the db
+      if (/letter_embroidery/.test(component.sku) || /letter_airbrush/.test(component.sku))
+        default_manufacture_time.parallel = 7;
+      // extract the manufacture_time for this component
+      let manufacture_time = component.props.manufacture_time || {};
+      manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
+      manufacture_time.serial = manufacture_time.serial || default_manufacture_time.serial;
+      // update our accumulator
+      days_needed = Math.max(days_needed, manufacture_time.parallel);
+      days_needed += manufacture_time.serial;
+    });
+    return days_needed;
+  }
+
+
+  // estimate date from now, takes days, returns time in seconds
+  countBusinessDays(days) {
+    let floorDate = function(time_stamp) {
+      time_stamp -= time_stamp % (24 * 60 * 60 * 1000); // subtract amount of time since midnight
+      time_stamp += new Date().getTimezoneOffset() * 60 * 1000; // add on the timezone offset
+      return time_stamp;
+    }
+    // start counting from midnight tonight
+    let ms_per_day = (24 * 60 * 60 * 1000);
+    let time = floorDate(new Date().getTime()) + ms_per_day;
+    for (let i=0; i<days; ) {
+      time += ms_per_day;
+      if (new Date(time).getDay()%6!=0)
+        i += 1;
+    }
+    return time/1000;
+  }
+
+  //  fill in shipping cost
+  initShipping(items) {
+    let shipping_quote = this.state.shipping_quote;
+    // for now, fixed shipping
+    shipping_quote = {
+      days: 5,
+      amount: 7,
+      currency_local: "USD",
+    }
+    // remove any previous shipping line
+    items.forEach((item, index) => {
+      if (item.props.name == "Shipping & Handling")
+        return items.splice(index, 1);
+    });
+    if (items.length) {
+      let total_price = 0;
+      items.forEach((item, index) => {
+        total_price += parseFloat(item.props.price);
+      });
+      let shipping_cost = shipping_quote.amount;
+      // free domestic shipping for 75+ orders
+      if (total_price>=75 && shipping_quote.currency_local.toLowerCase()=="usd")
+        shipping_cost = 0;
+      items.push({
+        props: {
+          name: "Shipping & Handling",
+          price: shipping_cost
+        }
+      });
+    }
+  }
 
   componentDidMount() {
-    // populate cart contents
-    if (BowAndDrape.cart_menu) {
-      this.updateContents(BowAndDrape.cart_menu.state.contents);
+    // For conditions like a Virtual Sample Sale
+    // Ignore anything a user might have in an existing cart
+    // Only VSS carts have the ignoreWebCart prop
+    if ("undefined" === typeof this.props.ignoreWebCart) {
+        //  Utilize the web cart
+        if (BowAndDrape.cart_menu) {
+          this.updateContents(BowAndDrape.cart_menu.state.contents);
+        }
+        BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
-    BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
+    // TODO: Do we need this for sample sales??
+    this.updateContents(this.props.items);
+
+    // if the user is signed in, get latest shipping/billing info
+    //BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
+
     BowAndDrape.dispatcher.on("user", (user) => {
       if (!user.email) return;
       // if the user is signed in, get latest shipping/billing info
@@ -257,7 +340,7 @@ class Cart extends React.Component {
 
     return (
       <div>
-        <Items ref="Items" contents={this.props.items} is_cart="true" />
+        <Items ref="Items" contents={this.props.items} is_cart="true"  ignoreWebCart = {this.props.ignoreWebCart}/>
 
         <UserLogin style={{margin:"10px auto",width:"480px",display:"block"}} cta="Login or proceed as Guest" />
 

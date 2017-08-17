@@ -46,52 +46,104 @@ class SQLTable {
 
   // run a query, optionally returning an array of the provided model
   // TODO lockdown everything that isn't a select from being run here
-  static sqlQuery(model, query, values, callback) {
-    pg_read_pool.connect(function(err, client, done) {
-      if(err) return callback(err);
+  static sqlQuery(model, query, values, externCallback, client = undefined, done = undefined) {
 
+    // TODO: func to get client maybe? callback does thing
+
+    let getClient = function(client, done, callback) {
+      if (client){
+        return callback(client, done)
+      }
+      // make a relevant client
+      pg_read_pool.connect(function(err, client, done) {
+        if(err) return callback(err);
+        return callback(client, done)
+      }); // db connection
+    }  // getClient declaration
+
+    getClient(client, done, (client, done) => {
       client.query(query, values, function(err, result) {
         done(); // release connection back to pool
         if(err) {
           // TODO escalate?
           console.error(JSON.stringify(err));
-          return callback(err);
+          return externCallback(err);
         }
 
         if (model) {
           if (!result.rows.length)
-            return callback(null, []);
+            return externCallback(null, []);
           let ret = result.rows.map(function(row) {return new model(row)});
-          return callback(null, ret);
+          return externCallback(null, ret);
         }
-        return callback(null, result);
-      }); // query
-    }); // db connection
+        return externCallback(null, result);
+      }); // client.query
+    });  // getClient
   } // sqlQuery()
 
-  // run a write statement, this will go to master, where
-  // as the sqlQuery function will go to a read replica
-  static sqlExec(query, values, callback) {
-    pg_write_pool.connect(function(err, client, done) {
-      if(err) return callback(err);
+  static sqlTransaction(callback){
+      // a generic method for using sql transactions
+      //  Connect to the write pool
+      pg_write_pool.connect((err, client, done) => {
+          // Create a function for handling errors
+          const shouldAbort = (err) => {
+              if (err) {
+                  console.error('Error in transaction', err.stack)
+                  client.query('ROLLBACK', (err) => {
+                      if (err) {
+                          console.error('Error attepting ROLLBACK', err.stack)
+                      }
+                      done()
+                  })
+              }
+              return !!err
+          }  //  shouldAbort
 
-      client.query(query, values, function(err, result) {
-        done(); // release connection back to pool
-        if(err) {
-          // TODO escalate?
-          console.error(JSON.stringify(err));
-          if (callback) callback(err);
-          return;
-        }
-        if (callback)
-          return callback(null, result);
-      }); // query
-    }); // db connection
-  } // sqlExec
+          //  Begin our transaction
+          client.query('BEGIN', (err) => {
+            if (shouldAbort(err)) return  //  error checking
+            callback(null, client, done);  //  provide client
+          });
+          //  close transaction with a commit
+          client.query('COMMIT', (err) =>{
+            if (shouldAbort(err)) return  //  error checking
+          });
+          done();
+      });
+  }
+
+  static sqlExec(query, values, externCallback, client = undefined, done = undefined) {
+
+          let getClient = function(client, done, callback) {
+            if (client){
+              return callback(client, done)
+            }
+            // make a relevant client
+            pg_write_pool.connect(function(err, client, done) {
+              if(err) return callback(err);
+              return callback(client, done)
+            }); // db connection
+          }  // getClient declaration
+
+          getClient(client, done, (client, done) => {
+            client.query(query, values, (err, result) => {
+              done();
+              if (err) {
+                // TODO escalate?
+                console.error(JSON.stringify(err));
+                if (externCallback)
+                  externCallback(err);
+                return;
+              }
+              if (externCallback)
+                return externCallback(null, result);
+              });  //client.query
+            }); // getClient
+          } // sqlExec
 
   // helper function to query an object from the database
   // TODO maybe update this so that we can have a primary key that is multiple columns? (like for cart)
-  static get(primary_key_value, callback) {
+  static get(primary_key_value, callback, client = undefined, done = undefined) {
     if (!this.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.getSQLSettings();
     let query = `SELECT * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
@@ -101,7 +153,7 @@ class SQLTable {
       if (err) return callback(err);
       if (!results.length) return callback(null, null);
       callback(null, results[0]);
-    });
+    }, client, done);
   }
 
   // query db for all objects matching the constraints query object
@@ -179,11 +231,11 @@ class SQLTable {
   } // getAll()
 
   // update or insert if row not already existing
-  upsert(callback) {
+  upsert(callback, client = undefined, done = undefined) {
     if (!this.constructor.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.constructor.getSQLSettings();
     let self = this;
-    let buildQueryAndExec = (callback) => {
+    let buildQueryAndExec = (callback, client, done) => {
       // build arrays of columns and values
       let fields = [];
       let substitutions = []
@@ -206,12 +258,12 @@ class SQLTable {
         }
       });
       let query = `INSERT INTO ${sql.tablename} (${fields.join(',')}) VALUES (${substitutions.join(',')}) ON CONFLICT (${sql.pkey}) DO UPDATE SET (${fields.join(',')}) = (${substitutions.join(',')}) RETURNING ${sql.pkey}`;
-      return SQLTable.sqlExec(query, values, callback);
+      return SQLTable.sqlExec(query, values, callback, client, done);
     };
 
     // if we don't need to deal with properties, just upsert
     if (typeof(this.props)=='undefined') {
-      return buildQueryAndExec(callback);
+      return buildQueryAndExec(callback,client, done);
     }
 
     // otherwise we need to check if other properties existed and merge them
@@ -227,7 +279,7 @@ class SQLTable {
         this.props = Object.assign(prev[0].props, this.props);
       }
       buildQueryAndExec(callback);
-    })
+  }, client, done);
   } // upsert()
 
   // helper function to delete an object from the database

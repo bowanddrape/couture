@@ -26,7 +26,14 @@ class Items extends React.Component {
     }
   }
 
+  static recurseAssembly(components, foreach) {
+    components.forEach((component) => {
+      Item.recurseAssembly(component, foreach);
+    });
+  }
+
   updateShipping(callback) {
+
     if (!this.props.is_cart) return;
     this.setState((prevState) => {
       let contents = JSON.parse(JSON.stringify(prevState.contents));
@@ -62,11 +69,13 @@ class Items extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.is_cart) {
-      if (BowAndDrape.cart_menu) {
-        this.updateContents(BowAndDrape.cart_menu.state.contents);
+    if ("undefined" === typeof this.props.ignoreWebCart) {
+      if (this.props.is_cart) {
+        if (BowAndDrape.cart_menu) {
+          this.updateContents(BowAndDrape.cart_menu.state.contents);
+        }
+        BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
       }
-      BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
   }
 
@@ -78,6 +87,7 @@ class Items extends React.Component {
 
   updateContents(contents) {
     contents = contents || [];
+    this.updateShipping();
     this.setState({contents}, () => {
       // update shipping line
       this.updateShipping(() => {
@@ -90,6 +100,7 @@ class Items extends React.Component {
       });
     });
   }
+
 
   // estimate manufacturing time
   estimateManufactureTime() {
@@ -130,7 +141,7 @@ class Items extends React.Component {
       if (new Date(time).getDay()%6!=0)
         i += 1;
     }
-    return time/1000;
+    return time / 1000;
   }
 
   handleApplyDiscountCode() {
@@ -138,6 +149,7 @@ class Items extends React.Component {
       if (err) return Errors.emitError("promo", err.toString());
       if (!result.length) return Errors.emitError("promo", "no such promo code");
       let promo = result[0];
+      console.log(err, promo);
       // FIXME this is a race as contents could be modified between
       // clone and set, but I can't figure out how to wrap this properly
       let contents = JSON.parse(JSON.stringify(this.state.contents));
@@ -149,18 +161,28 @@ class Items extends React.Component {
   }
 
   render() {
+
     let items = [];
     let has_promo = false;
+
     for (let i=0; i<this.state.contents.length; i++) {
       let remove = null;
-      if (this.state.contents[i].sku)
-        remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
-      if (this.state.contents[i].props && new RegExp("^promo:", "i").test(this.state.contents[i].props.name)) {
-        has_promo = true;
-        remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+      try {
+        if (this.state.contents[i].sku)
+          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+        if (this.state.contents[i].props && new RegExp("^promo:", "i").test(this.state.contents[i].props.name)) {
+          has_promo = true;
+          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+        }
+      }  // try
+
+      catch(err) {
+        console.log("CATCH: " + err);
       }
       items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={remove}/>);
     }
+
+
 
     if (typeof(window)!="undefined" && !items.length)
       return null;
@@ -181,6 +203,6 @@ class Items extends React.Component {
         }
       </cart>
     );
-  }
-}
+  }  //  render
+}  //  class Items
 module.exports = Items;

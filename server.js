@@ -40,7 +40,10 @@ if (["stag", "prod"].indexOf(process.env.ENV)!=-1) {
 
 var aws = require('aws-sdk');
 const multerS3 = require('multer-s3');
-var s3 = new aws.S3({ accessKeyId: process.env.AWS_ACCESS_KEY, secretAccessKey: process.env.AWS_SECRET_KEY, region: process.env.AWS_REGION })
+var s3 = new aws.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
+    region: process.env.AWS_REGION })
 let upload = multer({
   storage: multerS3({
     s3: s3,
@@ -73,6 +76,7 @@ const Facility = require('./models/Facility.js');
 const Component = require('./models/Component.js');
 const PromoCode = require('./models/PromoCode.js');
 const Page = require('./models/Page.js');
+const Vss = require('./models/Vss.js');
 
 const LayoutMain = require('./views/LayoutMain');
 const BowAndDrape = require('./views/BowAndDrape.jsx');
@@ -159,7 +163,8 @@ app.use((req, res, next) => {new SpreadsheetEmails().handleHTTP(req, res, next);
 // handle pages
 app.use(Page.handleRenderPage);
 
-
+// handle virtual sample sale components
+app.use(Vss.handleHTTP);
 // render homepage
 app.use(function(req, res, next) {
   if (req.url!="/") {
@@ -178,5 +183,3 @@ server.on('request', app);
 server.listen(80, function () {
   console.log("restarted webserver");
 });
-
-
