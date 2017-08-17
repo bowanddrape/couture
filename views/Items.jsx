@@ -101,6 +101,7 @@ class Items extends React.Component {
     });
   }
 
+
   // estimate manufacturing time
   estimateManufactureTime() {
     let days_needed = 1;

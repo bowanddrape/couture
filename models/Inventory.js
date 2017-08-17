@@ -23,10 +23,16 @@ class Inventory extends SQLTable {
 
   static getInventory(facility_id, callback) {
       let sql = Inventory.getSQLSettings()
-      Inventory.sqlTransaction((err, client) => {
+      Inventory.sqlTransaction((err, client, done) => {
         let query = `SELECT * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
         client.query(query, [facility_id], (err, result) => {
-          return callback(null, result["rows"][0]["inventory"])
+          //  TODO:  Why does it return zero rows sometimes?
+          if (err)
+            return callback(err)
+          let contents = {};
+          if (typeof(result) != "undefined" && result["rows"].length > 0)
+            contents = result["rows"][0]["inventory"] || {};
+          return callback(null, contents, client, done)
         });
      });  //sqlTransaction
    }  //getInventory()

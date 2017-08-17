@@ -154,7 +154,6 @@ class Cart extends React.Component {
   }
 
   componentDidMount() {
-
     // For conditions like a Virtual Sample Sale
     // Ignore anything a user might have in an existing cart
     // Only VSS carts have the ignoreWebCart prop
@@ -169,7 +168,7 @@ class Cart extends React.Component {
     this.updateContents(this.props.items);
 
     // if the user is signed in, get latest shipping/billing info
-    BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
+    //BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
 
     BowAndDrape.dispatcher.on("user", (user) => {
       if (!user.email) return;
@@ -341,7 +340,7 @@ class Cart extends React.Component {
 
     return (
       <div>
-        <Items ref="Items" contents={this.props.items} is_cart="true" />
+        <Items ref="Items" contents={this.props.items} is_cart="true"  ignoreWebCart = {this.props.ignoreWebCart}/>
 
         <UserLogin style={{margin:"10px auto",width:"480px",display:"block"}} cta="Login or proceed as Guest" />
 

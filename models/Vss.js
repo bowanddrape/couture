@@ -6,6 +6,7 @@ const Shipment = require('./Shipment.js');
 const Component = require('./Component.js');
 const SQLTable = require('./SQLTable.js');
 const Inventory = require('./Inventory.js');
+const IDS = require('./FacilityIDS.js');
 
 /*
 ██╗   ██╗███████╗███████╗
@@ -22,21 +23,14 @@ Date: Summer 2017
 The Virtual Sample Sale (VSS) class is responsible for managing the creation and
 display of products sold as part of Instagram sample sales.
 
-TODO: Explain stuff better
+TODO: Explain stuff more betterer
 */
 
 class Vss{
 
-    constructor(){
-        // Hold relevant db id's
-        this.id = {
-            store : 'd955f9f3-e9ae-475a-a944-237862b589b3', // VSS store
-            from : '5c637540-d460-4938-ac38-b6d283ea9a6d', // Man adjust facility
-            to : '83bcecf8-6881-4202-bb1c-051f77f27d90' // VSS facility
-        }
-    }  // constructor
-
     static handleGET(req, res){
+
+        // Manages all GET requests to /vss
         // Check for required query string
         if (Object.keys(req.query).length < 1)
             return Page.renderNotFound(req, res)
@@ -48,11 +42,11 @@ class Vss{
               return Page.renderNotFound(req, res)
             }
             // Check if we have inventory before rendering cartProps
-            let vssFacility = '83bcecf8-6881-4202-bb1c-051f77f27d90';
-            let sku = req.query["sku"];
-
-            Inventory.getInventory(vssFacility, (err, results) => {
+            Inventory.getInventory(IDS.vssFacility, (err, results) => {
                 //  Do stuff in here that depends on positive inventory
+                // TODO: Have 0 inventory instances redirect to a custom page
+                let sku = req.query["sku"];
+
                 if (err) {
                     console.log("ERROR checking inventory");
                     return Page.renderNotFound(req, res)
@@ -63,9 +57,8 @@ class Vss{
                 }
                 //  Prep cart
                 let cartProps = {
-                  store: [{id: 'd955f9f3-e9ae-475a-a944-237862b589b3'}],
+                  store: [{id: IDS.vssStore}],
                   items: [{sku: sku, props: comp.props}],
-                  //items: [{props: comp.props}],
                   ignoreWebCart: true,
                   is_cart: true
                 }
@@ -80,9 +73,9 @@ class Vss{
     static handlePOST(req, res){
 
         //facility id's
-        var from_id = '5c637540-d460-4938-ac38-b6d283ea9a6d'; // Manual adjust
-        var to_id = '83bcecf8-6881-4202-bb1c-051f77f27d90'; // VSS
-        var store_id = 'd955f9f3-e9ae-475a-a944-237862b589b3'; // VSS store
+        var from_id = IDS.manual_adjust;
+        var to_id = IDS.vssFacility;
+        var store_id = IDS.vssStore;
 
         if (typeof(req.body) == 'string') {
             try {
@@ -121,6 +114,9 @@ class Vss{
       // Skip if we're going to '/vss' ( ex: www.bowanddrape.com/someOtherPage )
       if(req.path_tokens[0].toLowerCase() !== 'vss')
         return next();
+      // user must be admin
+      if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
+        return Page.renderNotFound(req, res);
       // goto www.bowanddrape.com/vss/admin
       if(req.path_tokens.length > 1 && req.path_tokens[1].toLowerCase() === 'admin')
         return Page.render(req, res, VssAdmin, {});
