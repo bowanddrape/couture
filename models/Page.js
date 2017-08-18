@@ -172,9 +172,14 @@ class Page extends JSONAPI {
   }
 
   // TODO render function for 5XX errors
+  static renderError(req, res) {
+    res.status(500);
+    Page.render(req, res, NotFound, {error:"Server Error"});
+  }
 
   // helper function to render 404
   static renderNotFound(req, res) {
+    res.status(404);
     Page.render(req, res, NotFound, {error:"Not Found"});
   }
 

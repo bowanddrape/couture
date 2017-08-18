@@ -74,7 +74,7 @@ class LayoutMain extends React.Component {
     });
 
     // bind resize
-    window.addEventListener("resize", BowAndDrape.dispatcher.emit("resize"));
+    window.addEventListener("resize", () => {BowAndDrape.dispatcher.emit("resize");});
     window.addEventListener("touchend", this.handleResize.bind(this));
     this.handleResize();
 
