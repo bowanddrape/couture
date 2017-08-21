@@ -172,7 +172,13 @@ class Store extends SQLTable {
       }); // ProductList.preprocessProps()
     }); // Store.get()
   }
-
 }
+
+// keep around some common constant special ids so we don't have to do a db
+// lookup each time
+// TODO cache things and look things up from cache instead
+Store.special_ids = {
+  vss : 'd955f9f3-e9ae-475a-a944-237862b589b3',
+};
 
 module.exports = Store;

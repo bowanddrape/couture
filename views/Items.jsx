@@ -61,15 +61,6 @@ class Items extends React.Component {
     }, callback); // this.setState()
   }
 
-  componentDidMount() {
-    if (this.props.is_cart) {
-      if (BowAndDrape.cart_menu) {
-        this.updateContents(BowAndDrape.cart_menu.state.contents);
-      }
-      BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
-    }
-  }
-
   updateCredit(credit) {
     this.setState({account_credit:credit}, () => {
       this.updateContents(this.state.contents);
@@ -134,6 +125,7 @@ class Items extends React.Component {
   }
 
   handleApplyDiscountCode() {
+    if (!BowAndDrape) return;
     BowAndDrape.api("GET", "/promocode", {code:this.state.promo_code}, (err, result) => {
       if (err) return Errors.emitError("promo", err.toString());
       if (!result.length) return Errors.emitError("promo", "no such promo code");
@@ -153,11 +145,13 @@ class Items extends React.Component {
     let has_promo = false;
     for (let i=0; i<this.state.contents.length; i++) {
       let remove = null;
-      if (this.state.contents[i].sku)
-        remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
-      if (this.state.contents[i].props && new RegExp("^promo:", "i").test(this.state.contents[i].props.name)) {
-        has_promo = true;
-        remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+      if (typeof(BowAndDrape)!="undefined" && BowAndDrape.cart_menu) {
+        if (this.state.contents[i].sku)
+          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+        if (this.state.contents[i].props && new RegExp("^promo:", "i").test(this.state.contents[i].props.name)) {
+          has_promo = true;
+          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+        }
       }
       items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={remove}/>);
     }

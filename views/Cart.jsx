@@ -82,11 +82,13 @@ class Cart extends React.Component {
 
 
   componentDidMount() {
-    // populate cart contents
-    if (BowAndDrape.cart_menu) {
-      this.updateContents(BowAndDrape.cart_menu.state.contents);
+    if (!this.props.ignoreWebCart) {
+      // populate cart contents
+      if (BowAndDrape.cart_menu) {
+        this.updateContents(BowAndDrape.cart_menu.state.contents);
+      }
+      BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
-    BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     BowAndDrape.dispatcher.on("user", (user) => {
       if (!user.email) return;
       // if the user is signed in, get latest shipping/billing info
@@ -203,7 +205,7 @@ class Cart extends React.Component {
       BowAndDrape.api("POST", "/order", payload, (err, resp) => {
         if (err) {
           this.setState({processing_payment:false});
-          return Errors.emitError(null, err.error);
+          return Errors.emitError(null, err);
         }
         BowAndDrape.cart_menu.update([]);
         this.setState({done:true});

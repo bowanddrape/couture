@@ -142,6 +142,7 @@ module.exports = {
     Gallery: require('./Gallery.jsx'),
     Signup: require('./Signup.jsx'),
     TextContent: require('./TextContent.jsx'),
+    VSSAdmin: require('./VSSAdmin.jsx'),
   },
   dispatcher,
   api,
