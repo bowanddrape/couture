@@ -163,7 +163,8 @@ class ProductCanvas extends React.Component {
   }
 
   handleChangeCamera(index) {
-    this.customizer.updatePMatrix(this.cameras[index]);
+    this.camera_index = index;
+    this.customizer.updatePMatrix(this.cameras[this.camera_index]);
     this.handleSelectComponent(-1);
   }
 
@@ -283,6 +284,9 @@ class ProductCanvas extends React.Component {
         }
       });
     }
+    if (!this.camera_index || this.camera_index+1>this.cameras.length)
+      this.camera_index = 0;
+    this.customizer.updatePMatrix(this.cameras[this.camera_index]);
   }
 
   render() {
@@ -315,9 +319,10 @@ class ProductCanvas extends React.Component {
     let camera_switcher = [];
     if (this.cameras) {
       this.cameras.forEach((camera) => {
+        let camera_label = camera.name.toUpperCase() || `Camera ${camera_switcher.length}`;
         camera_switcher.push(
           <button key={camera_switcher.length} onClick={this.handleChangeCamera.bind(this, camera_switcher.length)}>
-            Camera {camera_switcher.length}
+            {camera_label}
           </button>
         )
       });
@@ -330,7 +335,7 @@ class ProductCanvas extends React.Component {
         {component_hitboxes}
         <hud_controls style={{position:"absolute",right:"0",top:"0"}}>
           {camera_switcher}
-          <button onClick={this.autoLayout.bind(this, true)}>Auto</button>
+          <button onClick={this.autoLayout.bind(this, true)}>AUTO</button>
         </hud_controls>
         <ProductComponentPicker product={this.props.product} productCanvas={this}/>
       </div>

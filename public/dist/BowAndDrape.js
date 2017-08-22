@@ -95571,7 +95571,13 @@ var Customizer = function () {
     key: 'worldToScreen',
     value: function worldToScreen(world) {
       world[3] = world[3] || 1;
-      var normDeviceCoords = this.pMatrix.x(new Vector([world[0], world[1], world[2], world[3]]));
+      // FIXME this stuff is weird and needs to be fixed
+      var camera_world = new Vector([world[0], world[1], world[2], world[3]]);
+      var camera_offset = new Vector([this.camera.position[0], this.camera.position[1], this.camera.position[2], 0]);
+      camera_world = camera_world.add(camera_offset);
+
+      var normDeviceCoords = this.pMatrix.x(camera_world);
+      normDeviceCoords = normDeviceCoords.x(-1 / this.camera.position[2]);
       var screen = [0, 0, 0, 1];
       screen[0] = normDeviceCoords.elements[0] * this.options.canvas.offsetWidth / 2 + this.options.canvas.offsetWidth / 2;
       screen[1] = this.options.canvas.offsetHeight / 2 - normDeviceCoords.elements[1] * this.options.canvas.offsetHeight / 2;
@@ -98020,7 +98026,8 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleChangeCamera',
     value: function handleChangeCamera(index) {
-      this.customizer.updatePMatrix(this.cameras[index]);
+      this.camera_index = index;
+      this.customizer.updatePMatrix(this.cameras[this.camera_index]);
       this.handleSelectComponent(-1);
     }
   }, {
@@ -98146,6 +98153,8 @@ var ProductCanvas = function (_React$Component) {
           }
         });
       }
+      if (!this.camera_index || this.camera_index + 1 > this.cameras.length) this.camera_index = 0;
+      this.customizer.updatePMatrix(this.cameras[this.camera_index]);
     }
   }, {
     key: 'render',
@@ -98179,11 +98188,11 @@ var ProductCanvas = function (_React$Component) {
       var camera_switcher = [];
       if (this.cameras) {
         this.cameras.forEach(function (camera) {
+          var camera_label = camera.name.toUpperCase() || 'Camera ' + camera_switcher.length;
           camera_switcher.push(React.createElement(
             'button',
             { key: camera_switcher.length, onClick: _this7.handleChangeCamera.bind(_this7, camera_switcher.length) },
-            'Camera ',
-            camera_switcher.length
+            camera_label
           ));
         });
       }
@@ -98200,7 +98209,7 @@ var ProductCanvas = function (_React$Component) {
           React.createElement(
             'button',
             { onClick: this.autoLayout.bind(this, true) },
-            'Auto'
+            'AUTO'
           )
         ),
         React.createElement(ProductComponentPicker, { product: this.props.product, productCanvas: this })
@@ -100327,6 +100336,11 @@ var UserMenu = function (_React$Component) {
           'a',
           { href: '/fulfillment', key: key++, disabled: true },
           'Order Fulfillment'
+        ));
+        menu_items.push(React.createElement(
+          'a',
+          { href: '/vss/admin', key: key++, disabled: true },
+          'VSS Admin'
         ));
       }
       if (this.props.user && this.props.user.roles && this.props.user.roles.indexOf("bowanddrape") >= 0) {

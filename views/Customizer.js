@@ -168,7 +168,13 @@ class Customizer {
 
   worldToScreen(world) {
     world[3] = world[3] || 1;
-    let normDeviceCoords = this.pMatrix.x(new Vector([world[0], world[1], world[2], world[3]]));
+    // FIXME this stuff is weird and needs to be fixed
+    let camera_world = new Vector([world[0], world[1], world[2], world[3]]);
+    let camera_offset = new Vector([this.camera.position[0], this.camera.position[1], this.camera.position[2], 0]);
+    camera_world = camera_world.add(camera_offset);
+
+    let normDeviceCoords = this.pMatrix.x(camera_world);
+    normDeviceCoords = normDeviceCoords.x(-1/this.camera.position[2]);
     let screen = [0, 0, 0, 1];
     screen[0] = normDeviceCoords.elements[0] * this.options.canvas.offsetWidth/2
       + this.options.canvas.offsetWidth/2;
