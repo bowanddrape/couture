@@ -2,7 +2,6 @@ const React = require('react');
 
 /***
 Draws the Virtual Sample Sale Admin page.
-
 ***/
 
 class VSSAdmin extends React.Component {
@@ -40,7 +39,7 @@ class VSSAdmin extends React.Component {
           return this.handleSetSectionState("card", {errors: [err.error]});
         }
         let querySKU = resp.shipment.contents[0].sku;
-        let redirectURL = "//localhost/vss?sku=" + querySKU;
+        let redirectURL = "/vss?sku=" + querySKU;
         //redirect to cart url
         location.href = redirectURL;
       });

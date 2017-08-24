@@ -100547,7 +100547,6 @@ var React = require('react');
 
 /***
 Draws the Virtual Sample Sale Admin page.
-
 ***/
 
 var VSSAdmin = function (_React$Component) {
@@ -100597,7 +100596,7 @@ var VSSAdmin = function (_React$Component) {
           return _this2.handleSetSectionState("card", { errors: [err.error] });
         }
         var querySKU = resp.shipment.contents[0].sku;
-        var redirectURL = "//localhost/vss?sku=" + querySKU;
+        var redirectURL = "/vss?sku=" + querySKU;
         //redirect to cart url
         location.href = redirectURL;
       });
