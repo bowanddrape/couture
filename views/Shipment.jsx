@@ -91,7 +91,7 @@ class Shipment extends React.Component {
   handleQueryRates() {
     let shipment = {id: this.props.id};
     BowAndDrape.api("POST", "/shipment/quote", shipment, (err, ret) =>{
-      if (err) return alert(err.error);
+      if (err) return alert(err);
       let rates = [];
       ret.forEach((rate) => {
         rates.push({
@@ -112,7 +112,7 @@ class Shipment extends React.Component {
   handleBuyLabel(rate_id) {
     let shipment = {id: this.props.id,rate_id: rate_id};
     BowAndDrape.api("POST", "/shipment/buylabel", shipment, (err, shipment) =>{
-      if (err) return alert(err.error);
+      if (err) return alert(err);
       this.setState({
         rates: undefined,
         tracking_code: shipment.tracking_code,

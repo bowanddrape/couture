@@ -99243,7 +99243,7 @@ var Shipment = function (_React$Component) {
 
       var shipment = { id: this.props.id };
       BowAndDrape.api("POST", "/shipment/quote", shipment, function (err, ret) {
-        if (err) return alert(err.error);
+        if (err) return alert(err);
         var rates = [];
         ret.forEach(function (rate) {
           rates.push({
@@ -99267,7 +99267,7 @@ var Shipment = function (_React$Component) {
 
       var shipment = { id: this.props.id, rate_id: rate_id };
       BowAndDrape.api("POST", "/shipment/buylabel", shipment, function (err, shipment) {
-        if (err) return alert(err.error);
+        if (err) return alert(err);
         _this7.setState({
           rates: undefined,
           tracking_code: shipment.tracking_code,

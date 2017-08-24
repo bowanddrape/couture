@@ -46,13 +46,14 @@ class ShipProvider {
       });
     });
 
+console.log((weight*0.00220462).toFixed(2).toString());
     // parcel object dict
     var parcel = {
       length: "5",
       width: "5",
       height: "5",
       distance_unit: "in",
-      weight: (weight*0.00220462).toString(),
+      weight: (weight*0.00220462).toFixed(3).toString(),
       mass_unit: "lb",
     }
 
@@ -60,7 +61,7 @@ class ShipProvider {
     var customsItem = {
       description: "apparel",
       quantity: 1,
-      net_weight: (weight*0.00220462).toString(),
+      net_weight: (weight*0.00220462).toFixed(3).toString(),
       mass_unit: "lb",
       value_amount: "20",
       value_currency: "USD",
