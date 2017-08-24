@@ -14,5 +14,10 @@ class PromoCode extends JSONAPI {
       fields: ["props"],
     };
   }
+
+  hasApiPermission(req, res) {
+    if (req.method=="GET") return true;
+    return super.hasApiPermission(req, res);
+  }
 }
 module.exports = PromoCode;

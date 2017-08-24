@@ -102,8 +102,10 @@ let api = function(method, endpoint, body, callback) {
     } catch(err) {
       callback("invalid server response =(");
     }
-    if (this.status!=200)
+    if (this.status!=200) {
+      if (response.error) return callback(response.error);
       return callback(response);
+    }
     if (response && response.error)
       return callback(response.error);
     callback(null, response);
