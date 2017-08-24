@@ -99543,7 +99543,7 @@ var Shipment = function (_React$Component) {
             ),
             React.createElement(
               'div',
-              null,
+              { style: { pointerEvents: "none" } },
               React.createElement(
                 'label',
                 null,

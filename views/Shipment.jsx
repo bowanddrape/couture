@@ -202,7 +202,7 @@ class Shipment extends React.Component {
             {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
             {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}
             <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
-            <div><label>Comments: </label></div>
+            <div style={{pointerEvents:"none"}}><label>Comments: </label></div>
             <Comments comments={this.state.comments} handlePostComment={this.handlePostComment.bind(this)} />
           </shipping_details>
           <div className="action_bar">
