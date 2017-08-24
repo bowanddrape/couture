@@ -94778,17 +94778,12 @@ var Component = function () {
   function Component() {
     _classCallCheck(this, Component);
 
-    this.bounds = {
-      min: [-4, -4, -5],
-      max: [4, 4, -1]
-    };
     this.scale = [1, 1, 1];
+    // TODO combine position + rotation into a single transform, they're split
+    // because I always go "lemme just use a fucking quaternion" and it's
+    // always a bad idea
     this.position = [0, 0, 0];
-    this.velocity = [0, 0, 0];
-    this.rotation = {
-      angle: 0,
-      axis: [0, 1, 0]
-    };
+    this.rotation = Matrix.I(4);
     this.props = {};
     this.assembly = [];
   }
@@ -94879,8 +94874,7 @@ var Component = function () {
         this.position[1] = parseFloat(state.props.position[1]) || 0;
       }
       if (state.props.rotation) {
-        this.rotation.angle = state.props.rotation.angle;
-        this.rotation.axis = state.props.rotation.axis.slice(0, 3);
+        this.rotation = new Matrix(state.props.rotation.elements);
       }
       // fill out if we got an internal assembly
       state.assembly = state.assembly || [];
@@ -94981,7 +94975,7 @@ var Component = function () {
       var modelview = void 0;
       modelview = mvMatrix.x(Matrix.Translation(new Vector([this.position[0], this.position[1], this.position[2]])).ensure4x4());
 
-      var rotation_matrix = Matrix.Rotation(this.rotation.angle, new Vector(this.rotation.axis)).ensure4x4();
+      var rotation_matrix = new Matrix(this.rotation.elements);
       var rotation_matrix_inv = rotation_matrix.inv();
       modelview = modelview.x(rotation_matrix);
       modelview = modelview.x(Matrix.Diagonal([this.scale[0], this.scale[1], this.scale[2], 1]));
@@ -95021,45 +95015,17 @@ var Component = function () {
       return [width, height, 0];
     }
   }, {
-    key: 'randomizePosition',
-    value: function randomizePosition() {
-      this.position = [Math.random() * (this.bounds.max[0] - this.bounds.min[0]) + this.bounds.min[0], this.bounds.max[1], Math.random() * (this.bounds.max[2] - this.bounds.min[2]) + this.bounds.min[2]];
-      this.velocity = [0, 0, 0];
-    }
-  }, {
-    key: 'isOutOfBounds',
-    value: function isOutOfBounds() {
-      return this.position[0] < this.bounds.min[0] || this.position[0] > this.bounds.max[0] || this.position[1] < this.bounds.min[1] || this.position[1] > this.bounds.max[1] || this.position[2] < this.bounds.min[2] || this.position[2] > this.bounds.max[2];
-    }
-  }, {
-    key: 'updatePosition',
-    value: function updatePosition(time) {
-      // rotate
-      this.rotation.angle += 30 * time / 100000.0;
+    key: 'getWorldBoundingBox',
+    value: function getWorldBoundingBox() {
+      var dims = this.getWorldDims();
+      var position = new Vector([this.position[0], this.position[1], this.position[2], 1]);
 
-      // gravity
-      if (this.velocity[1] > -.001) {
-        this.velocity[1] -= 0.000001;
-      }
+      var top_left = new Vector([-dims[0] / 2, -dims[1] / 2, 0, 1]);
+      var bottom_right = new Vector([dims[0] / 2, dims[1] / 2, 0, 1]);
 
-      // random drift
-      for (var i = 0; i < 3; i++) {
-        if (Math.abs(this.velocity[i]) < 0.001) {
-          this.velocity[i] += Math.random() * 0.00002 - 0.00001;
-        } else {
-          this.velocity[i] *= 0.9;
-        }
-      }
-
-      // update position
-      for (var i = 0; i < 3; i++) {
-        this.position[i] += this.velocity[i] * time;
-      }
-
-      // respawn if out of bounds
-      if (this.isOutOfBounds()) {
-        this.randomizePosition();
-      }
+      top_left = position.add(this.rotation.x(top_left));
+      bottom_right = position.add(this.rotation.x(bottom_right));
+      return { top_left: top_left, bottom_right: bottom_right };
     }
   }]);
 
@@ -95572,9 +95538,8 @@ var Customizer = function () {
     value: function worldToScreen(world) {
       world[3] = world[3] || 1;
       // FIXME this stuff is weird and needs to be fixed
-      var camera_world = new Vector([world[0], world[1], world[2], world[3]]);
       var camera_offset = new Vector([this.camera.position[0], this.camera.position[1], this.camera.position[2], 0]);
-      camera_world = camera_world.add(camera_offset);
+      var camera_world = world.add(camera_offset);
 
       var normDeviceCoords = this.pMatrix.x(camera_world);
       normDeviceCoords = normDeviceCoords.x(-1 / this.camera.position[2]);
@@ -95587,12 +95552,9 @@ var Customizer = function () {
   }, {
     key: 'getScreenBoundingBox',
     value: function getScreenBoundingBox(component) {
-      var rotation_matrix = Matrix.Rotation(component.rotation.angle, new Vector(component.rotation.axis));
-      var world_dims = component.getWorldDims();
-      var bottom_right = new Vector(component.position).add(rotation_matrix.x(new Vector(world_dims).x(0.5))).elements;
-      bottom_right = this.worldToScreen(bottom_right);
-      var top_left = new Vector(component.position).subtract(rotation_matrix.x(new Vector(world_dims).x(0.5))).elements;
-      top_left = this.worldToScreen(top_left);
+      var world_bb = component.getWorldBoundingBox();
+      var bottom_right = this.worldToScreen(world_bb.bottom_right);
+      var top_left = this.worldToScreen(world_bb.top_left);
 
       return {
         top_left: top_left,
@@ -97917,13 +97879,14 @@ var ProductCanvas = function (_React$Component) {
         if (!selected) {
           // if nothing is selected make a new selected component
           // facing the camera for now TODO get normal of intersected tri
+          var rotation = Matrix.I(4);
+          if (_this2.customizer.camera.rotation.angle) {
+            rotation = Matrix.Rotation(-_this2.customizer.camera.rotation.angle, new Vector(_this2.customizer.camera.rotation.axis)).ensure4x4();
+          }
           selected = {
             props: {
               position: [0, 0, 0],
-              rotation: {
-                angle: -_this2.customizer.camera.rotation.angle,
-                axis: _this2.customizer.camera.rotation.axis
-              }
+              rotation: rotation
             },
             assembly: []
           };
@@ -97965,10 +97928,10 @@ var ProductCanvas = function (_React$Component) {
         // if nothing is selected make a new selected component
         // facing the camera for now TODO get normal of intersected tri
         var position = [0, 0, 0];
-        var rotation = {
-          angle: -_this3.customizer.camera.rotation.angle,
-          axis: _this3.customizer.camera.rotation.axis
-        };
+        var rotation = Matrix.I(4);
+        if (_this3.customizer.camera.rotation.angle) {
+          rotation = Matrix.Rotation(-_this3.customizer.camera.rotation.angle, new Vector(_this3.customizer.camera.rotation.axis)).ensure4x4();
+        }
         assembly.push({
           props: {
             position: position,
@@ -97982,12 +97945,14 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handlePopComponent',
     value: function handlePopComponent() {
+      var cascade = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
       this.setState(function (prevState, props) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[prevState.selected_component];
         if (selected) {
           selected.assembly.pop();
-          if (!selected.assembly.length) {
+          if (cascade || !selected.assembly.length) {
             assembly.splice(prevState.selected_component, 1);
             return { assembly: assembly, selected_component: -1 };
           }
@@ -98019,6 +97984,23 @@ var ProductCanvas = function (_React$Component) {
       });
     }
   }, {
+    key: 'handleComponentRotate',
+    value: function handleComponentRotate(angle, event) {
+      var _this5 = this;
+
+      // update the component rotation
+      this.setState(function (prevState, props) {
+        var assembly = JSON.parse(JSON.stringify(prevState.assembly));
+        var selected = assembly[prevState.selected_component];
+        if (selected) {
+          var component_rotation = new Matrix(selected.props.rotation.elements);
+          var camera_rotation = Matrix.Rotation(_this5.customizer.camera.rotation.angle, new Vector(_this5.customizer.camera.rotation.axis));
+          selected.props.rotation = Matrix.Rotation(angle, camera_rotation.x(new Vector(_this5.customizer.camera.position))).ensure4x4().x(component_rotation);
+        }
+        return { assembly: assembly };
+      });
+    }
+  }, {
     key: 'handleSelectComponent',
     value: function handleSelectComponent(index) {
       this.setState({ selected_component: index });
@@ -98033,16 +98015,15 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'autoLayout',
     value: function autoLayout() {
-      var _this5 = this;
+      var _this6 = this;
 
       var reflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       var getComponentsOfInterest = function getComponentsOfInterest(assembly) {
         return assembly.filter(function (component) {
-          // TODO switch component rotation away from quaternions and to a
-          // rotation matrix?
-          var camera_position_world = Matrix.Rotation(_this5.customizer.camera.rotation.angle, new Vector(_this5.customizer.camera.rotation.axis)).x(new Vector(_this5.customizer.camera.position));
-          var relative_camera_direction = Matrix.Rotation(component.props.rotation.angle, new Vector(component.props.rotation.axis)).x(camera_position_world).elements;
+          var camera_position_world = Matrix.Rotation(_this6.customizer.camera.rotation.angle, new Vector(_this6.customizer.camera.rotation.axis)).ensure4x4().x(new Vector([_this6.customizer.camera.position[0], _this6.customizer.camera.position[1], _this6.customizer.camera.position[2], 1]));
+          var component_rotation = new Matrix(component.props.rotation.elements);
+          var relative_camera_direction = component_rotation.x(camera_position_world).elements;
           return relative_camera_direction[2] <= 0;
           // TODO don't affect components that have been positioned manually
           // unless the reflow flag is flipped?
@@ -98053,12 +98034,12 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected_component = prevState.selected_component;
         // TODO rectangular design areas for now
-        var design_area = _this5.props.product.props.design_area && _this5.props.product.props.design_area.width ? _this5.props.product.props.design_area : {
-          top: _this5.props.product.props.imageheight / 2 - 0.05,
-          left: -_this5.props.product.props.imagewidth / 2,
-          width: _this5.props.product.props.imagewidth * 5 / 9,
-          height: _this5.props.product.props.imageheight * 3 / 4,
-          gravity: [0, _this5.props.product.props.imageheight / 4]
+        var design_area = _this6.props.product.props.design_area && _this6.props.product.props.design_area.width ? _this6.props.product.props.design_area : {
+          top: _this6.props.product.props.imageheight / 2 - 0.05,
+          left: -_this6.props.product.props.imagewidth / 2,
+          width: _this6.props.product.props.imagewidth * 5 / 9,
+          height: _this6.props.product.props.imageheight * 3 / 4,
+          gravity: [0, _this6.props.product.props.imageheight / 4]
         };
         // only work on visible components
         var components = getComponentsOfInterest(assembly);
@@ -98123,15 +98104,15 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      var _this6 = this;
+      var _this7 = this;
 
       this.customizer.resizeViewport();
       // handle actions on hitboxes
       this.canvas.parentNode.childNodes.forEach(function (node) {
         if (node.tagName.toLowerCase() != "component_hitbox") return;
         // this overrides the synthetic react events so we don't scroll
-        node.ontouchmove = _this6.handleComponentMove.bind(_this6, node.getAttribute("data"));
-        node.onmousemove = _this6.handleComponentMove.bind(_this6, node.getAttribute("data"));
+        node.ontouchmove = _this7.handleComponentMove.bind(_this7, node.getAttribute("data"));
+        node.onmousemove = _this7.handleComponentMove.bind(_this7, node.getAttribute("data"));
       });
       this.handleUpdateProduct();
     }
@@ -98159,7 +98140,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this7 = this;
+      var _this8 = this;
 
       var component_hitboxes = [];
 
@@ -98167,8 +98148,8 @@ var ProductCanvas = function (_React$Component) {
         for (var index = 0; index < this.customizer.components.length; index++) {
           var component = this.customizer.components[index];
           var dims_screen = this.customizer.getScreenBoundingBox(component);
-          // cull backfacing hitboxes
-          if (dims_screen.bottom_right[0] < dims_screen.top_left[0]) continue;
+          // FIXME we want to cull backfacing hitboxes but not like this
+          //if (dims_screen.bottom_right[0]<dims_screen.top_left[0]) continue;
           component_hitboxes.push(React.createElement('component_hitbox', {
             key: component_hitboxes.length,
             style: {
@@ -98191,10 +98172,31 @@ var ProductCanvas = function (_React$Component) {
           var camera_label = camera.name.toUpperCase() || 'Camera ' + camera_switcher.length;
           camera_switcher.push(React.createElement(
             'button',
-            { key: camera_switcher.length, onClick: _this7.handleChangeCamera.bind(_this7, camera_switcher.length) },
+            { key: camera_switcher.length, onClick: _this8.handleChangeCamera.bind(_this8, camera_switcher.length) },
             camera_label
           ));
         });
+      }
+      if (this.state.assembly[this.state.selected_component]) {
+        camera_switcher.push(React.createElement(
+          'div',
+          { key: camera_switcher.length, style: { display: "flex" } },
+          React.createElement(
+            'button',
+            { onClick: this.handleComponentRotate.bind(this, -Math.PI / 20) },
+            '\u2B05'
+          ),
+          React.createElement(
+            'button',
+            { onClick: this.handlePopComponent.bind(this, true) },
+            '\u2716'
+          ),
+          React.createElement(
+            'button',
+            { onClick: this.handleComponentRotate.bind(this, Math.PI / 20) },
+            '\u27A1'
+          )
+        ));
       }
 
       return React.createElement(
@@ -98204,7 +98206,7 @@ var ProductCanvas = function (_React$Component) {
         component_hitboxes,
         React.createElement(
           'hud_controls',
-          { style: { position: "absolute", right: "0", top: "0" } },
+          { style: { position: "absolute", right: "20px", top: "0" } },
           camera_switcher,
           React.createElement(
             'button',

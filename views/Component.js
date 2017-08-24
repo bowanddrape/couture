@@ -9,17 +9,12 @@ Describe a component for the Customizer to draw
 ***/
 class Component {
   constructor() {
-    this.bounds = {
-      min: [-4, -4, -5],
-      max: [4, 4, -1]
-    };
     this.scale = [1, 1, 1];
+    // TODO combine position + rotation into a single transform, they're split
+    // because I always go "lemme just use a fucking quaternion" and it's
+    // always a bad idea
     this.position = [0, 0, 0];
-    this.velocity = [0, 0, 0];
-    this.rotation = {
-      angle: 0,
-      axis: [0, 1, 0],
-    }
+    this.rotation = Matrix.I(4);
     this.props = {};
     this.assembly = [];
   }
@@ -101,8 +96,7 @@ class Component {
       this.position[1] = parseFloat(state.props.position[1]) || 0;
     }
     if (state.props.rotation) {
-      this.rotation.angle = state.props.rotation.angle;
-      this.rotation.axis = state.props.rotation.axis.slice(0, 3);
+      this.rotation = new Matrix(state.props.rotation.elements);
     }
     // fill out if we got an internal assembly
     state.assembly = state.assembly || [];
@@ -234,7 +228,7 @@ class Component {
     let modelview;
     modelview = mvMatrix.x(Matrix.Translation(new Vector([this.position[0], this.position[1], this.position[2]])).ensure4x4());
 
-    let rotation_matrix = Matrix.Rotation(this.rotation.angle, new Vector(this.rotation.axis)).ensure4x4();
+    let rotation_matrix = new Matrix(this.rotation.elements);
     let rotation_matrix_inv = rotation_matrix.inv();
     modelview = modelview.x(rotation_matrix);
     modelview = modelview.x(Matrix.Diagonal([this.scale[0], this.scale[1], this.scale[2], 1]));
@@ -278,46 +272,21 @@ class Component {
     return [width, height, 0];
   }
 
-  randomizePosition() {
-    this.position = [
-      Math.random()*(this.bounds.max[0]-this.bounds.min[0]) + this.bounds.min[0],
-      this.bounds.max[1],
-      Math.random()*(this.bounds.max[2]-this.bounds.min[2]) + this.bounds.min[2]
-    ];
-    this.velocity = [0, 0, 0];
-  }
+  getWorldBoundingBox() {
+    let dims = this.getWorldDims();
+    let position = new Vector([
+      this.position[0],
+      this.position[1],
+      this.position[2],
+      1,
+    ]);
 
-  isOutOfBounds() {
-    return this.position[0]<this.bounds.min[0] || this.position[0]>this.bounds.max[0]||this.position[1]<this.bounds.min[1] || this.position[1]>this.bounds.max[1]||this.position[2]<this.bounds.min[2] || this.position[2]>this.bounds.max[2];
-  }
+    let top_left = new Vector([-dims[0]/2, -dims[1]/2, 0, 1]);
+    let bottom_right = new Vector([dims[0]/2, dims[1]/2, 0, 1]);
 
-  updatePosition(time) {
-    // rotate
-    this.rotation.angle += (30 * time) / 100000.0;
-
-    // gravity
-    if (this.velocity[1]>-.001) {
-      this.velocity[1] -= 0.000001;
-    }
-
-    // random drift
-    for (var i=0; i<3; i++) {
-      if (Math.abs(this.velocity[i])<0.001) {
-        this.velocity[i] += Math.random()*0.00002 - 0.00001;
-      } else {
-        this.velocity[i] *= 0.9;
-      }
-    }
-
-    // update position
-    for (var i=0; i<3; i++) {
-      this.position[i] += this.velocity[i] * time;
-    }
-
-    // respawn if out of bounds
-    if (this.isOutOfBounds()) {
-      this.randomizePosition();
-    }
+    top_left = position.add(this.rotation.x(top_left));
+    bottom_right = position.add(this.rotation.x(bottom_right));
+    return {top_left, bottom_right};
   }
 }
 
