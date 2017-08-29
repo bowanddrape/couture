@@ -145,6 +145,7 @@ module.exports = {
     Signup: require('./Signup.jsx'),
     TextContent: require('./TextContent.jsx'),
     VSSAdmin: require('./VSSAdmin.jsx'),
+    Shipment: require('./Shipment.jsx'),
   },
   dispatcher,
   api,

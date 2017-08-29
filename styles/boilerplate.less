@@ -2,24 +2,92 @@
 @import "./colors.less";
 @import "./fonts.less";
 
+a {
+  text-decoration: none;
+  color: @color_secondary;
+}
+a:not(.button):hover {
+  text-decoration: underline;
+}
+a.button {
+  padding: 12px 0 0 0;
+}
 button, .button {
   .headerfont;
   display: block;
-  background-color: @color_primary;
-  color: @color_secondary;
-  font-weight: bold;
-  font-size: 20px;
-  border: solid 5px @color_secondary;
-  padding: 5px;
+  position: relative;
+  background-color: @color_secondary;
+  color: @color_primary;
+  font-size: 17px;
+  border: none;
   text-align: center;
   text-decoration: none;
-  margin: 10px;
+    box-sizing: border-box;
+    align-items: flex-start;
+    -webkit-appearance: button;
+    text-rendering: auto;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+  padding: 0;
+  margin: 12px 0;
   width: 100%;
-  max-width: 300px;
-  max-height: 50px;
-  &:hover {
-    background-color: @color_secondary;
-    color: @color_primary;
+  max-width: 200px;
+  height: 45px;
+  cursor: pointer;
+  text-transform: uppercase;
+  &.centered {
+    margin: 12px auto;
+  }
+  &:after {
+    content: '';
+    width: 100%;
+    max-width: 200px;
+    height: 45px;
+    position: absolute;
+    z-index: -2;
+    top: 0px;
+    left: 0px;
+    background-color: #7f5cff;
+    transition: top .2s ease, left .2s linear;
+  }
+  &:before {
+    content: '';
+    width: 100%;
+    max-width: 200px;
+    height: 45px;
+    position: absolute;
+    z-index: -2;
+    top: 0px;
+    left: 0px;
+    background-color: #5ca9ff;
+    transition: top .2s ease, left .2s linear;
+  }
+  &:hover:after {
+    top: -2px;
+    left: -2px;
+  }
+  &:hover:before {
+    top: 2px;
+    left: 2px;
+  }
+  &.primary:after {
+    top: 4px;
+    left: 4px;
+  }
+  &.primary:before {
+    top: -4px;
+    left: 10px;
+  }
+  &.primary:hover:after {
+    top: -4px;
+    left: -5px;
+  }
+  &.primary:hover:before {
+    top: 4px;
+    left: 5px;
   }
 }
 actions {

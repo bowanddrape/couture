@@ -268,7 +268,7 @@ class Cart extends React.Component {
 
         <Errors style={{width:"460px"}}/>
         {/* TODO display loading state when this.state.processing_payment */}
-        <button onClick={this.handlePay.bind(this)}>Get it!</button>
+        <button className="primary centered" onClick={this.handlePay.bind(this)}>Get it!</button>
 
 {/* Needed by stripe, not needed by braintree
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>

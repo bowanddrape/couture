@@ -1,7 +1,76 @@
 
 const React = require('react');
 const ItemUtils = require('./ItemUtils.js');
+const Price = require('./Price.jsx');
 
+/* I moved the styles to inline for email compatibility, but currently the item
+design is still relying on unsupported styles and thus doesn't work */
+const color_secondary = "#000";
+const item_preview_width = "150px";
+const item_width = "700px";
+const item_padding = "13px";
+const item_margin = "5px";
+const style = {
+  item: {
+    display: "flex",
+    position: "relative",
+    maxWidth: item_width,
+    margin: "auto",
+    padding: item_padding+" 0",
+    borderBottom: "solid 1px "+color_secondary,
+  },
+  img_preview_container: {
+    display: "block",
+    width: item_preview_width,
+  },
+  img_preview: {
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+    width: item_preview_width,
+  },
+  deets: {
+    display: "block",
+    fontSize: "18px",
+    position: "absolute",
+    top: "0",
+    bottom: "0",
+    right: "0",
+    left: parseInt(item_preview_width)+parseInt(item_margin)+"px",
+    margin: item_margin+" 0",
+    fontFamily: "sans-serif",
+    fontSize: "18px",
+  },
+  price: {
+    position: "absolute",
+    bottom: "0px",
+    fontFamily: "arvo",
+    fontSize: "14px",
+  },
+  price_total: {
+    position: "absolute",
+    bottom: "0px",
+    right: "0px",
+    fontFamily: "arvo",
+    fontSize: "14px",
+  },
+};
+const style_summary = {
+  item: Object.assign({}, style.item, {
+    borderBottom: "none",
+  }),
+  img_preview_container: {
+    position: "absolute",
+    left: "0px",
+    top: "0px",
+    bottom: "-2px",
+    width: item_preview_width,
+    backgroundColor: "#fff",
+  },
+  deets: Object.assign({}, style.deets, {
+    fontFamily: "arvo",
+    fontSize: "14px",
+  }),
+}
 /***
 Draw an Item. Used in views/Items.jsx
 props: will mirror a Component model
@@ -11,12 +80,27 @@ class Item extends React.Component {
   render() {
     if (!this.props.props) {
       return (
-        <item>{JSON.stringify(this.props)}</item>
+        <div className="item">{JSON.stringify(this.props)}</div>
       );
     }
+
+    let className = "item";
+    if (new RegExp("^promo:", "i").test(this.props.props.name) && this.props.onRemove)
+      className += " promo";
+    let inline_style = this.props.style?this.props.style:style;
+
+    let quantity = this.props.quantity || 1;
+
+    let product_options = [];
+    for (let i=1; typeof(this.props.props.options)!="undefined" && i<this.props.props.options.length; i++) {
+      product_options.push(
+        <div key={product_options.length}>{this.props.props.options[i]}</div>
+      )
+    }
+
     let assembly = [];
     let assembly_contents = {};
-    if (this.props.picklist && this.props.assembly) {
+    if (this.props.fulfillment && this.props.assembly) {
       for (let i=0; i<this.props.assembly.length; i++) {
         ItemUtils.recurseAssembly(this.props.assembly[i], (component) => {
           // haute imported entries will have "text" set
@@ -57,33 +141,37 @@ class Item extends React.Component {
           <span key={assembly.length}><span style={{display:"inline-block",width:"20px",height:"20px",backgroundPosition:"center",backgroundRepeat:"no-repeat",backgroundImage,backgroundSize}}/>{assembly_contents[sku].quantity>1?"x"+assembly_contents[sku].quantity:null}</span>
         );
       });
+      if (assembly.length)
+        assembly = (<assembly>{assembly}</assembly>);
     }
 
     return (
-      <item className={this.props.props.image?"has_image":""}>
-        <a href={this.props.props.url}>
-          <img className="preview" src={this.props.props.image} onError={(event)=>{event.target.style.display='none'}}/>
-          <img className="preview" src={this.props.props.image?this.props.props.image+"&camera=1":undefined} onError={(event)=>{event.target.style.display='none'}}/>
+      <div style={inline_style.item} className={className}>
+        <a href={this.props.props.url} style={inline_style.img_preview_container}>
+          <img style={style.img_preview} className="preview" src={this.props.props.image?this.props.props.image:""} onError={(event)=>{event.target.style.display='none'}}/>
+          <img style={style.img_preview} className="preview" src={this.props.props.image?this.props.props.image+"&camera=1":""} onError={(event)=>{event.target.style.display='none'}}/>
           {/*for legacy haute orders, draw the back*/}
           {
             /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ?
-              <img className="preview" src={this.props.props.image?this.props.props.image.replace("_front","_back").replace("_f.jpg","_b.jpg"):undefined} onError={(event)=>{event.target.style.display='none'}}/>
+              <img style={style.img_preview} className="preview" src={this.props.props.image?this.props.props.image.replace("_front","_back").replace("_f.jpg","_b.jpg"):undefined} onError={(event)=>{event.target.style.display='none'}}/>
               : null
           }
         </a>
-        <deets>
-          {/*<div className="sku">{this.props.sku}</div>*/}
+        <div className="deets" style={inline_style.deets}>
           <a href={this.props.props.url}>
             <div className="name">{this.props.props.name}</div>
           </a>
-          <div className={`price ${this.props.props.price<0?"negative":(this.props.props.price==0?"free":"")}`} >{this.props.props.price?parseFloat(this.props.props.price).toFixed(2)+"$":"Free!"}</div>
+          {product_options}
           {this.props.onRemove?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
 
-          <assembly>
-            {assembly}
-          </assembly>
-        </deets>
-      </item>
+          {assembly}
+          {this.props.sku ?
+            <Price style={inline_style.price} price={this.props.props.price} quantity={quantity} />
+            : null
+          }
+          <Price style={inline_style.price_total} price={this.props.props.price*quantity} />
+        </div>
+      </div>
     )
   }
 
@@ -102,4 +190,6 @@ class Item extends React.Component {
   }
 }
 
+Item.style = style;
+Item.style_summary = Object.assign({}, style, style_summary);
 module.exports = Item;

@@ -140,8 +140,7 @@ class ProductList extends React.Component {
     return (
       <customize>
         {this.props.edit ?
-          <ComponentEdit {...product_raw} inherits={product} /> :
-          <button onClick={this.handleAddToCart.bind(this, product)} style={{position:"fixed",top:"0px",right:"0px",zIndex:"3",maxWidth:"none",margin:"0px"}}>Add To Cart</button>
+          <ComponentEdit {...product_raw} inherits={product} /> : null
         }
         <div className="canvas_container">
           <product_options>
@@ -149,6 +148,9 @@ class ProductList extends React.Component {
           </product_options>
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
         </div>
+        {this.props.edit ?
+          null : <div style={{textAlign:"center"}}><button className="primary centered" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</button></div>
+        }
       </customize>
     );
   }
@@ -217,6 +219,8 @@ class ProductList extends React.Component {
       assembly: this.refs.ProductCanvas.state.assembly,
       props: product.props,
     };
+    // fill in human-readable options
+    item.props.options = this.state.selected_product;
 
     // set item url
     item.props.url = location.href;
@@ -226,7 +230,7 @@ class ProductList extends React.Component {
     if (toks.length>1) {
       query_params = querystring.parse(toks.slice(1).join('?'));
     }
-    item.props.image = `/store/${this.props.store.id}/preview?w=256&h=256&c=${encodeURIComponent(query_params.c)}`;
+    item.props.image = `/store/${this.props.store.id}/preview?c=${encodeURIComponent(query_params.c)}`;
 
     BowAndDrape.cart_menu.add(item);
     location.href = "/cart";
@@ -273,8 +277,6 @@ class ProductList extends React.Component {
 
     // recurse to fill out option menus
     let traverse_options = (option_product, depth=1) => {
-      // TODO FIXME when not in edit mode, we need to set state.selected_product to the default selected options here
-
       // if we're not editing, select whatever product we end up on
       if (!this.props.edit)
         product = option_product;
@@ -296,8 +298,14 @@ class ProductList extends React.Component {
       }
       // if no option is otherwise selected, default to the first option
       let selected_option = this.state.selected_product[depth];
-      if (!selected_option && available_options.length)
+      if (!selected_option && available_options.length) {
         selected_option = available_options[0];
+        this.setState((prevState) => {
+          let selected_product = prevState.selected_product.slice(0);
+          selected_product[depth] = available_options[0];
+          return {selected_product};
+        });
+      }
       // populate options
       for (let i=0; i<available_options.length; i++) {
         options.push(<option key={options.length} value={available_options[i]}>{available_options[i]}</option>);

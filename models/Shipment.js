@@ -6,6 +6,8 @@ const JSONAPI = require('./JSONAPI');
 const Item = require('./Item');
 const Address = require('./Address');
 const ShipProvider = require('./ShipProvider.js');
+const Page = require('./Page');
+const ShipmentView = require('../views/Shipment.jsx');
 var aws = require('aws-sdk');
 var s3 = new aws.S3({ accessKeyId: process.env.AWS_ACCESS_KEY, secretAccessKey: process.env.AWS_SECRET_KEY, region: process.env.AWS_REGION })
 
@@ -40,6 +42,16 @@ class Shipment extends JSONAPI {
       return true;
 
     return super.hasApiPermission(req, res);
+  }
+
+  // extends JSONAPI
+  handleHTTPPage(req, res, next) {
+    if (req.path_tokens.length < 2)
+      return Page.renderNotFound(req, res);
+    return Shipment.get(req.path_tokens[1], (err, shipment) => {
+      if (err || !shipment) return Page.renderNotFound(req, res);
+      Page.render(req, res, ShipmentView, shipment);
+    });
   }
 
   // extends JSONAPI

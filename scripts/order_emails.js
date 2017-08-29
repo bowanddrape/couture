@@ -8,9 +8,10 @@ const Shipment = require('../models/Shipment');
 if (process.env.ENV!="prod")
   process.exit(0);
 
-
+// FIXME paginate this
 Shipment.getAll({tracking_code:"not_null",address:"not_null"}, (err, shipments) => {
   if (err) return console.log(err);
+  if (!shipments) return;
   shipments.forEach((shipment) => {
 
     // send shipping confirmation email if not shipped yet
@@ -30,5 +31,7 @@ Shipment.getAll({tracking_code:"not_null",address:"not_null"}, (err, shipments) 
     }
 
   }); // shipments.forEach()
+  // FIXME looks like babel has problems closing
+  setTimeout(()=>{process.exit()}, 10000);
 });
 

@@ -26,20 +26,20 @@ class UserMenu extends React.Component {
     menu_items.push(<UserProfile key={key++} {...this.props}/>);
     menu_items.push(<FacebookLogin key={key++} {...this.props}/>);
     menu_items.push(<CartMenu key={key++} />);
-    menu_items.push(<a key={key++} href="/customize-your-own" disabled>Customize</a>);
+    menu_items.push(<a className="button primary" key={key++} href="/customize-your-own">Customize</a>);
     // links to admin pages
     if (this.props.user&&this.props.user.roles&&this.props.user.roles.length) {
-      menu_items.push(<a href="/store" key={key++} disabled>Admin Store</a>);
-      menu_items.push(<a href="/fulfillment" key={key++} disabled>Order Fulfillment</a>);
-      menu_items.push(<a href="/vss/admin" key={key++} disabled>VSS Admin</a>);
+      menu_items.push(<a className="button primary" href="/store" key={key++}>Admin Store</a>);
+      menu_items.push(<a className="button primary" href="/fulfillment" key={key++}>Order Fulfillment</a>);
+      menu_items.push(<a className="button primary" href="/vss/admin" key={key++}>VSS Admin</a>);
 
     }
     if (this.props.user&&this.props.user.roles&&this.props.user.roles.indexOf("bowanddrape")>=0) {
-      menu_items.push(<a href="/page" key={key++} disabled>Admin Pages</a>);
+      menu_items.push(<a className="button primary" href="/page" key={key++}>Admin Pages</a>);
 
     }
     if (this.props.user&&this.props.user.email)
-      menu_items.push(<button key={key++} onClick={this.logout.bind(this)}>Logout</button>);
+      menu_items.push(<a className="button" key={key++} onClick={this.logout.bind(this)}>Logout</a>);
 
     return (
       <menu>

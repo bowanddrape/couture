@@ -115,6 +115,10 @@ class User extends SQLTable {
     if (/Bearer /i.test(req.header('Authorization'))) {
       token = req.header('Authorization').substr(7);
     }
+    // check querystring
+    if (req.query && req.query.token) {
+      token = req.query.token;
+    }
 
     // ignore if no creds supplied
     if (!token) return next();

@@ -260,7 +260,9 @@ var SQLTable = function () {
     // TODO lockdown everything that isn't a select from being run here
     value: function sqlQuery(model, query, values, callback) {
       pg_read_pool.connect(function (err, client, done) {
-        if (err) return callback(err);
+        if (err) {
+          return callback(err);
+        };
 
         client.query(query, values, function (err, result) {
           done(); // release connection back to pool
@@ -380,7 +382,7 @@ var SQLTable = function () {
         if (column == "search") {
           values.push('.*' + constraints[column] + '.*');
           // if we have props, search that too
-          var sql_constraint = sql.fields.indexOf("props") >= 0 ? '(props->>\'name\' ~* $' + values.length + ' OR ' + sql.pkey + ' ~* $' + values.length + ')' : sql.pkey + ' ~* $' + values.length;
+          var sql_constraint = sql.fields.indexOf("props") >= 0 ? '(props->>\'name\' ~* $' + values.length + ' OR props->>\'legacy_id\' ~* $' + values.length + ' OR ' + sql.pkey + '::text ~* $' + values.length + ')' : sql.pkey + '::text ~* $' + values.length;
 
           where = where ? where + (' AND ' + sql_constraint) : 'WHERE ' + sql_constraint;
           continue;
@@ -94542,7 +94544,7 @@ var Cart = function (_React$Component) {
         React.createElement(Errors, { style: { width: "460px" } }),
         React.createElement(
           'button',
-          { onClick: this.handlePay.bind(this) },
+          { className: 'primary centered', onClick: this.handlePay.bind(this) },
           'Get it!'
         )
       );
@@ -94574,7 +94576,7 @@ var Cart = function (_React$Component) {
 
 module.exports = Cart;
 
-},{"../models/PayBraintree.js":2,"./Errors.jsx":737,"./InputAddress.jsx":741,"./ItemUtils.js":743,"./Items.jsx":744,"./PayBraintreeClient.js":752,"./ThanksPurchaseComplete.jsx":765,"./UserLogin.jsx":767,"react":652}],730:[function(require,module,exports){
+},{"../models/PayBraintree.js":2,"./Errors.jsx":737,"./InputAddress.jsx":741,"./ItemUtils.js":743,"./Items.jsx":744,"./PayBraintreeClient.js":752,"./ThanksPurchaseComplete.jsx":766,"./UserLogin.jsx":768,"react":652}],730:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -94756,7 +94758,7 @@ var Comments = function (_React$Component) {
 
 module.exports = Comments;
 
-},{"./Timestamp.jsx":766,"react":652}],732:[function(require,module,exports){
+},{"./Timestamp.jsx":767,"react":652}],732:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -94873,7 +94875,7 @@ var Component = function () {
         this.position[0] = parseFloat(state.props.position[0]) || 0;
         this.position[1] = parseFloat(state.props.position[1]) || 0;
       }
-      if (state.props.rotation) {
+      if (state.props.rotation && state.props.rotation.elements) {
         this.rotation = new Matrix(state.props.rotation.elements);
       }
       // fill out if we got an internal assembly
@@ -94953,7 +94955,6 @@ var Component = function () {
     value: function render(gl, mvMatrix, shaderProgram) {
 
       if (!this.geometry_vbo || !this.texture_vbo || !this.ibo) {
-        console.log("Component::render() called without geometry");
         return;
       }
 
@@ -95909,7 +95910,7 @@ var FacebookLogin = function (_React$Component) {
 
 module.exports = FacebookLogin;
 
-},{"./UserProfile.jsx":770,"https":404,"react":652}],739:[function(require,module,exports){
+},{"./UserProfile.jsx":771,"https":404,"react":652}],739:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -95935,10 +95936,12 @@ var FulfillShipments = function (_React$Component) {
   function FulfillShipments(props) {
     _classCallCheck(this, FulfillShipments);
 
-    // make a global map of known facilities?
     var _this = _possibleConstructorReturn(this, (FulfillShipments.__proto__ || Object.getPrototypeOf(FulfillShipments)).call(this, props));
 
-    if (typeof BowAndDrape != "undefined") {
+    _this.state = {
+      search_query: ""
+      // make a global map of known facilities?
+    };if (typeof BowAndDrape != "undefined") {
       if (!BowAndDrape.facilities) {
         BowAndDrape.facilities = {};
       }
@@ -95956,6 +95959,8 @@ var FulfillShipments = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       return React.createElement(
         'div',
         null,
@@ -95979,6 +95984,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
+              component_props: { fulfillment: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&approved=null&on_hold=null&packed=null&received=null',
               page: { sort: "requested", direction: "ASC" }
             })
@@ -95993,8 +95999,9 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
+              component_props: { fulfillment: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&approved=null&on_hold=not_null',
-              page: { sort: "requested", direction: "ASC" }
+              page: { sort: "requested", direction: "DESC" }
             })
           ),
           React.createElement(
@@ -96007,7 +96014,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { picklist: true },
+              component_props: { fulfillment: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&approved=not_null&picked=null&packed=null&received=null',
               page: { sort: "requested", direction: "ASC", limit: 100 }
             })
@@ -96022,7 +96029,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { picklist: true },
+              component_props: { fulfillment: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&picked=not_null&inspected=null',
               page: { sort: "requested", direction: "ASC" }
             })
@@ -96037,7 +96044,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { picklist: true },
+              component_props: { fulfillment: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&inspected=not_null&packed=null',
               page: { sort: "requested", direction: "ASC" }
             })
@@ -96052,7 +96059,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { picklist: true },
+              component_props: { fulfillment: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&packed=not_null&ship_description=null',
               page: { sort: "requested", direction: "DESC" }
             })
@@ -96067,6 +96074,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
+              component_props: { fulfillment: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&ship_description=not_null&received=null',
               page: { sort: "requested", direction: "ASC" }
             })
@@ -96081,8 +96089,27 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
+              component_props: { fulfillment: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&received=not_null',
               page: { sort: "received", direction: "DESC" }
+            })
+          ),
+          React.createElement(
+            'shipments',
+            null,
+            React.createElement(
+              'h2',
+              null,
+              'Search'
+            ),
+            React.createElement('input', { type: 'text', placeholder: 'search by id', value: this.state.search_query, onChange: function onChange(event) {
+                _this2.setState({ search_query: event.target.value });
+              } }),
+            React.createElement(Scrollable, {
+              component: Shipment,
+              component_props: { fulfillment: true },
+              endpoint: '/shipment?search=' + this.state.search_query,
+              page: { sort: "requested", direction: "DESC" }
             })
           )
         )
@@ -96095,7 +96122,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./Scrollable.jsx":758,"./Shipment.jsx":759,"./Tabs.jsx":763,"react":652}],740:[function(require,module,exports){
+},{"./Scrollable.jsx":759,"./Shipment.jsx":760,"./Tabs.jsx":764,"react":652}],740:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -96376,14 +96403,83 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var React = require('react');
 var ItemUtils = require('./ItemUtils.js');
+var Price = require('./Price.jsx');
 
-/***
-Draw an Item. Used in views/Items.jsx
-props: will mirror a Component model
-***/
-
+/* I moved the styles to inline for email compatibility, but currently the item
+design is still relying on unsupported styles and thus doesn't work */
+var color_secondary = "#000";
+var item_preview_width = "150px";
+var item_width = "700px";
+var item_padding = "13px";
+var item_margin = "5px";
+var style = {
+  item: {
+    display: "flex",
+    position: "relative",
+    maxWidth: item_width,
+    margin: "auto",
+    padding: item_padding + " 0",
+    borderBottom: "solid 1px " + color_secondary
+  },
+  img_preview_container: {
+    display: "block",
+    width: item_preview_width
+  },
+  img_preview: {
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+    width: item_preview_width
+  },
+  deets: _defineProperty({
+    display: "block",
+    fontSize: "18px",
+    position: "absolute",
+    top: "0",
+    bottom: "0",
+    right: "0",
+    left: parseInt(item_preview_width) + parseInt(item_margin) + "px",
+    margin: item_margin + " 0",
+    fontFamily: "sans-serif"
+  }, 'fontSize', "18px"),
+  price: {
+    position: "absolute",
+    bottom: "0px",
+    fontFamily: "arvo",
+    fontSize: "14px"
+  },
+  price_total: {
+    position: "absolute",
+    bottom: "0px",
+    right: "0px",
+    fontFamily: "arvo",
+    fontSize: "14px"
+  }
+};
+var style_summary = {
+  item: Object.assign({}, style.item, {
+    borderBottom: "none"
+  }),
+  img_preview_container: {
+    position: "absolute",
+    left: "0px",
+    top: "0px",
+    bottom: "-2px",
+    width: item_preview_width,
+    backgroundColor: "#fff"
+  },
+  deets: Object.assign({}, style.deets, {
+    fontFamily: "arvo",
+    fontSize: "14px"
+  })
+  /***
+  Draw an Item. Used in views/Items.jsx
+  props: will mirror a Component model
+  ***/
+};
 var Item = function (_React$Component) {
   _inherits(Item, _React$Component);
 
@@ -96398,16 +96494,32 @@ var Item = function (_React$Component) {
     value: function render() {
       if (!this.props.props) {
         return React.createElement(
-          'item',
-          null,
+          'div',
+          { className: 'item' },
           JSON.stringify(this.props)
         );
       }
+
+      var className = "item";
+      if (new RegExp("^promo:", "i").test(this.props.props.name) && this.props.onRemove) className += " promo";
+      var inline_style = this.props.style ? this.props.style : style;
+
+      var quantity = this.props.quantity || 1;
+
+      var product_options = [];
+      for (var i = 1; typeof this.props.props.options != "undefined" && i < this.props.props.options.length; i++) {
+        product_options.push(React.createElement(
+          'div',
+          { key: product_options.length },
+          this.props.props.options[i]
+        ));
+      }
+
       var assembly = [];
       var assembly_contents = {};
-      if (this.props.picklist && this.props.assembly) {
-        for (var i = 0; i < this.props.assembly.length; i++) {
-          ItemUtils.recurseAssembly(this.props.assembly[i], function (component) {
+      if (this.props.fulfillment && this.props.assembly) {
+        for (var _i = 0; _i < this.props.assembly.length; _i++) {
+          ItemUtils.recurseAssembly(this.props.assembly[_i], function (component) {
             // haute imported entries will have "text" set
             if (component.props && component.props.image && component.text) {
               var letters = {};
@@ -96445,27 +96557,32 @@ var Item = function (_React$Component) {
             assembly_contents[sku].quantity > 1 ? "x" + assembly_contents[sku].quantity : null
           ));
         });
+        if (assembly.length) assembly = React.createElement(
+          'assembly',
+          null,
+          assembly
+        );
       }
 
       return React.createElement(
-        'item',
-        { className: this.props.props.image ? "has_image" : "" },
+        'div',
+        { style: inline_style.item, className: className },
         React.createElement(
           'a',
-          { href: this.props.props.url },
-          React.createElement('img', { className: 'preview', src: this.props.props.image, onError: function onError(event) {
+          { href: this.props.props.url, style: inline_style.img_preview_container },
+          React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image : "", onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
-          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image + "&camera=1" : undefined, onError: function onError(event) {
+          React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image + "&camera=1" : "", onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
-          /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
+          /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
               event.target.style.display = 'none';
             } }) : null
         ),
         React.createElement(
-          'deets',
-          null,
+          'div',
+          { className: 'deets', style: inline_style.deets },
           React.createElement(
             'a',
             { href: this.props.props.url },
@@ -96475,21 +96592,15 @@ var Item = function (_React$Component) {
               this.props.props.name
             )
           ),
-          React.createElement(
-            'div',
-            { className: 'price ' + (this.props.props.price < 0 ? "negative" : this.props.props.price == 0 ? "free" : "") },
-            this.props.props.price ? parseFloat(this.props.props.price).toFixed(2) + "$" : "Free!"
-          ),
+          product_options,
           this.props.onRemove ? React.createElement(
             'button',
             { className: 'remove', onClick: this.handleRemovePromptConfirm.bind(this), onBlur: this.handleRemoveBlur },
             'Remove'
           ) : null,
-          React.createElement(
-            'assembly',
-            null,
-            assembly
-          )
+          assembly,
+          this.props.sku ? React.createElement(Price, { style: inline_style.price, price: this.props.props.price, quantity: quantity }) : null,
+          React.createElement(Price, { style: inline_style.price_total, price: this.props.props.price * quantity })
         )
       );
     }
@@ -96515,9 +96626,11 @@ var Item = function (_React$Component) {
   return Item;
 }(React.Component);
 
+Item.style = style;
+Item.style_summary = Object.assign({}, style, style_summary);
 module.exports = Item;
 
-},{"./ItemUtils.js":743,"react":652}],743:[function(require,module,exports){
+},{"./ItemUtils.js":743,"./Price.jsx":754,"react":652}],743:[function(require,module,exports){
 "use strict";
 
 var recurseAssembly = function recurseAssembly(component, foreach) {
@@ -96616,6 +96729,7 @@ var Item = require('./Item.jsx');
 var Timestamp = require('./Timestamp.jsx');
 var ItemUtils = require('./ItemUtils.js');
 var Errors = require('./Errors.jsx');
+var Price = require('./Price.jsx');
 
 /***
 Draw a list of Item.
@@ -96755,7 +96869,7 @@ var Items = function (_React$Component) {
       var _this4 = this;
 
       if (!BowAndDrape) return;
-      BowAndDrape.api("GET", "/promocode", { code: this.state.promo_code }, function (err, result) {
+      BowAndDrape.api("GET", "/promocode", { code: this.state.promo_code.toLowerCase() }, function (err, result) {
         if (err) return Errors.emitError("promo", err.toString());
         if (!result.length) return Errors.emitError("promo", "no such promo code");
         var promo = result[0];
@@ -96773,28 +96887,41 @@ var Items = function (_React$Component) {
     value: function render() {
       var _this5 = this;
 
-      var items = [];
+      var line_items = [];
+      var summary_items = [];
       var has_promo = false;
+      var subtotal = 0;
+      var total = 0;
       for (var i = 0; i < this.state.contents.length; i++) {
         var remove = null;
-        if (typeof BowAndDrape != "undefined" && BowAndDrape.cart_menu) {
-          if (this.state.contents[i].sku) remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+        var quantity = this.state.contents[i].quantity || 1;
+        total += quantity * this.state.contents[i].props.price;
+        if (this.state.contents[i].sku) subtotal += quantity * this.state.contents[i].props.price;
+        // attach quantity edit buttons
+        if (this.props.is_cart && typeof BowAndDrape != "undefined" && BowAndDrape.cart_menu) {
+          // remove button
+          if (this.state.contents[i].sku) remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, i);
           if (this.state.contents[i].props && new RegExp("^promo:", "i").test(this.state.contents[i].props.name)) {
             has_promo = true;
-            remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+            remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, i);
           }
         }
-        items.push(React.createElement(Item, _extends({ key: items.length }, this.state.contents[i], { onRemove: remove })));
+        // if has a base sku or is a legacy imported item
+        if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
+          line_items.push(React.createElement(Item, _extends({ style: Item.style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment })));
+        } else {
+          summary_items.push(React.createElement(Item, _extends({ style: Item.style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove })));
+        }
       }
 
-      if (typeof window != "undefined" && !items.length) return null;
+      if (typeof window != "undefined" && !line_items.length) return null;
 
       return React.createElement(
         'cart',
         null,
         this.props.is_cart ? React.createElement(
-          'item',
-          null,
+          'div',
+          { className: 'item', style: Item.style.item },
           React.createElement(
             'span',
             { style: { marginRight: "5px" } },
@@ -96802,21 +96929,56 @@ var Items = function (_React$Component) {
           ),
           React.createElement(Timestamp, { time: this.countBusinessDays(this.estimateManufactureTime()) })
         ) : null,
-        items,
-        has_promo ? null : React.createElement(
-          'item',
-          null,
-          React.createElement(Errors, { label: 'promo' }),
-          'Promo Code:',
-          React.createElement('input', { type: 'text', style: { height: "20px" }, value: this.state.promo_code, onChange: function onChange(event) {
-              _this5.setState({ promo_code: event.target.value });
-            } }),
+        line_items,
+        React.createElement(
+          'div',
+          { className: 'summary_items' },
           React.createElement(
-            'button',
-            { onClick: function onClick() {
-                _this5.handleApplyDiscountCode();
-              } },
-            'Apply'
+            'div',
+            { className: 'item', style: Item.style_summary.item },
+            React.createElement('div', { style: Item.style_summary.img_preview_container }),
+            React.createElement(
+              'div',
+              { className: 'deets', style: Item.style_summary.deets },
+              'Item Subtotal',
+              React.createElement(Price, { style: Item.style_summary.price_total, price: subtotal })
+            )
+          ),
+          has_promo || !this.props.is_cart ? null : React.createElement(
+            'div',
+            { className: 'item promo', style: Item.style_summary.item },
+            React.createElement(
+              'div',
+              { style: Item.style_summary.img_preview_container },
+              React.createElement(Errors, { label: 'promo' })
+            ),
+            React.createElement(
+              'div',
+              { className: 'deets', style: Item.style_summary.deets },
+              'Promo Code',
+              React.createElement('input', { type: 'text', style: { height: "20px", width: "116px" }, value: this.state.promo_code, onChange: function onChange(event) {
+                  _this5.setState({ promo_code: event.target.value });
+                } }),
+              React.createElement(
+                'button',
+                { style: { position: "absolute", bottom: "-6px" }, onClick: function onClick() {
+                    _this5.handleApplyDiscountCode();
+                  } },
+                'Apply'
+              )
+            )
+          ),
+          summary_items,
+          React.createElement(
+            'div',
+            { className: 'item', style: Item.style_summary.item },
+            React.createElement('div', { style: Item.style_summary.img_preview_container }),
+            React.createElement(
+              'div',
+              { className: 'deets', style: Item.style_summary.deets },
+              'Package Total',
+              React.createElement(Price, { style: Item.style_summary.price_total, price: total })
+            )
           )
         )
       );
@@ -96828,7 +96990,7 @@ var Items = function (_React$Component) {
 
 module.exports = Items;
 
-},{"./Errors.jsx":737,"./Item.jsx":742,"./ItemUtils.js":743,"./Timestamp.jsx":766,"react":652}],745:[function(require,module,exports){
+},{"./Errors.jsx":737,"./Item.jsx":742,"./ItemUtils.js":743,"./Price.jsx":754,"./Timestamp.jsx":767,"react":652}],745:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -97088,7 +97250,7 @@ var LayoutMain = function (_React$Component) {
 
 module.exports = LayoutMain;
 
-},{"./UserMenu.jsx":768,"react":652,"react-dom/server":505,"react-swipeable":506}],747:[function(require,module,exports){
+},{"./UserMenu.jsx":769,"react":652,"react-dom/server":505,"react-swipeable":506}],747:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -97687,7 +97849,7 @@ var PageList = function (_React$Component) {
 
 module.exports = PageList;
 
-},{"./Errors.jsx":737,"./PageEdit.jsx":747,"./Scrollable.jsx":758,"react":652}],752:[function(require,module,exports){
+},{"./Errors.jsx":737,"./PageEdit.jsx":747,"./Scrollable.jsx":759,"react":652}],752:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -97786,7 +97948,56 @@ var Placeholder = function (_React$Component) {
 
 module.exports = Placeholder;
 
-},{"./Stroke.jsx":761,"react":652}],754:[function(require,module,exports){
+},{"./Stroke.jsx":762,"react":652}],754:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+
+/***
+Helper component for displaying prices
+***/
+
+var Price = function (_React$Component) {
+  _inherits(Price, _React$Component);
+
+  function Price() {
+    _classCallCheck(this, Price);
+
+    return _possibleConstructorReturn(this, (Price.__proto__ || Object.getPrototypeOf(Price)).apply(this, arguments));
+  }
+
+  _createClass(Price, [{
+    key: "render",
+    value: function render() {
+      var price = parseFloat(this.props.price);
+      var style = { color: "#000" };
+      if (price < 0) style.color = "#d6492a";
+      if (price == 0) style.opacity = "0.5";
+      style = Object.assign({}, this.props.style, style);
+
+      return React.createElement(
+        "div",
+        { style: style },
+        price ? "$" + price.toFixed(2) : "Free!",
+        this.props.quantity ? " x " + this.props.quantity : null
+      );
+    }
+  }]);
+
+  return Price;
+}(React.Component);
+
+module.exports = Price;
+
+},{"react":652}],755:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -98201,7 +98412,7 @@ var ProductCanvas = function (_React$Component) {
 
       return React.createElement(
         'div',
-        { style: { position: "relative", margin: "auto" } },
+        { style: { position: "relative", width: "100%" } },
         React.createElement('canvas', { style: { display: "block", height: "300px", width: "100%", minWidth: "400px" } }),
         component_hitboxes,
         React.createElement(
@@ -98224,7 +98435,7 @@ var ProductCanvas = function (_React$Component) {
 
 module.exports = ProductCanvas;
 
-},{"./ProductComponentPicker.jsx":755,"react":652,"react-swipeable":506,"sylvester-es6":713}],755:[function(require,module,exports){
+},{"./ProductComponentPicker.jsx":756,"react":652,"react-swipeable":506,"sylvester-es6":713}],756:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -98254,7 +98465,6 @@ var ProductComponentPicker = function (_React$Component) {
   _createClass(ProductComponentPicker, [{
     key: 'handleTabClick',
     value: function handleTabClick() {
-      document.querySelector(".component_spacer").style.height = document.querySelector(".components").offsetHeight + "px";
       var text_input = document.querySelector(".components").querySelector('input[type="text"]');
       if (text_input) text_input.focus();
       // scroll so canvas is just below "add to cart" button
@@ -98265,7 +98475,6 @@ var ProductComponentPicker = function (_React$Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       // init size of default selected tab
-      document.querySelector(".component_spacer").style.height = document.querySelector(".components").offsetHeight + "px";
     }
   }, {
     key: 'render',
@@ -98274,7 +98483,6 @@ var ProductComponentPicker = function (_React$Component) {
       return React.createElement(
         'div',
         null,
-        React.createElement('div', { className: 'component_spacer' }),
         React.createElement(
           Tabs,
           { className: 'components', onChange: this.handleTabClick.bind(this) },
@@ -98369,7 +98577,7 @@ var ProductComponentPicker = function (_React$Component) {
               ));
               components.push(React.createElement(
                 'div',
-                { key: components.length, name: product.compatible_components[i].props.name + "_cont", className: 'component_container' },
+                { key: components.length, name: product.compatible_components[i].props.name + "_cont", className: 'component_container', style: { overflow: "hidden" } },
                 tab_components
               ));
               return 'continue';
@@ -98392,7 +98600,7 @@ var ProductComponentPicker = function (_React$Component) {
               components.push(React.createElement(
                 'div',
                 { key: components.length, name: product.compatible_components[i].sku, style: { height: "auto" }, className: 'component_container' },
-                React.createElement('input', { type: 'text', style: { width: "90%" },
+                React.createElement('input', { type: 'text', style: { width: "90%" }, placeholder: 'Your Text Here',
                   onChange: function onChange(event) {
                     _this2.handleSetComponentText(event.target.value, component_letters);
                   },
@@ -98446,7 +98654,7 @@ var ProductComponentPicker = function (_React$Component) {
 
 module.exports = ProductComponentPicker;
 
-},{"./Tabs.jsx":763,"react":652}],756:[function(require,module,exports){
+},{"./Tabs.jsx":764,"react":652}],757:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -98572,11 +98780,7 @@ var ProductList = function (_React$Component) {
       return React.createElement(
         'customize',
         null,
-        this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : React.createElement(
-          'button',
-          { onClick: this.handleAddToCart.bind(this, product), style: { position: "fixed", top: "0px", right: "0px", zIndex: "3", maxWidth: "none", margin: "0px" } },
-          'Add To Cart'
-        ),
+        this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : null,
         React.createElement(
           'div',
           { className: 'canvas_container' },
@@ -98586,6 +98790,15 @@ var ProductList = function (_React$Component) {
             product_options
           ),
           React.createElement(ProductCanvas, { ref: 'ProductCanvas', product: product, handleUpdateProduct: this.handleUpdateProduct.bind(this), assembly: this.initial_assembly })
+        ),
+        this.props.edit ? null : React.createElement(
+          'div',
+          { style: { textAlign: "center" } },
+          React.createElement(
+            'button',
+            { className: 'primary centered', onClick: this.handleAddToCart.bind(this, product) },
+            'Add To Cart'
+          )
         )
       );
     }
@@ -98661,6 +98874,8 @@ var ProductList = function (_React$Component) {
         assembly: this.refs.ProductCanvas.state.assembly,
         props: product.props
       };
+      // fill in human-readable options
+      item.props.options = this.state.selected_product;
 
       // set item url
       item.props.url = location.href;
@@ -98670,7 +98885,7 @@ var ProductList = function (_React$Component) {
       if (toks.length > 1) {
         query_params = querystring.parse(toks.slice(1).join('?'));
       }
-      item.props.image = '/store/' + this.props.store.id + '/preview?w=256&h=256&c=' + encodeURIComponent(query_params.c);
+      item.props.image = '/store/' + this.props.store.id + '/preview?c=' + encodeURIComponent(query_params.c);
 
       BowAndDrape.cart_menu.add(item);
       location.href = "/cart";
@@ -98748,8 +98963,6 @@ var ProductList = function (_React$Component) {
       var traverse_options = function traverse_options(option_product) {
         var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
-        // TODO FIXME when not in edit mode, we need to set state.selected_product to the default selected options here
-
         // if we're not editing, select whatever product we end up on
         if (!_this3.props.edit) product = option_product;
         // if at a leaf, we're done
@@ -98768,7 +98981,14 @@ var ProductList = function (_React$Component) {
         }
         // if no option is otherwise selected, default to the first option
         var selected_option = _this3.state.selected_product[depth];
-        if (!selected_option && available_options.length) selected_option = available_options[0];
+        if (!selected_option && available_options.length) {
+          selected_option = available_options[0];
+          _this3.setState(function (prevState) {
+            var selected_product = prevState.selected_product.slice(0);
+            selected_product[depth] = available_options[0];
+            return { selected_product: selected_product };
+          });
+        }
         // populate options
         for (var _i2 = 0; _i2 < available_options.length; _i2++) {
           options.push(React.createElement(
@@ -98877,7 +99097,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./ComponentEdit.jsx":733,"./ComponentSerializer.js":734,"./ProductCanvas.jsx":754,"./ProductListEdit.jsx":757,"./Switch.jsx":762,"async":45,"querystring":500,"react":652}],757:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./ComponentEdit.jsx":733,"./ComponentSerializer.js":734,"./ProductCanvas.jsx":755,"./ProductListEdit.jsx":758,"./Switch.jsx":763,"async":45,"querystring":500,"react":652}],758:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -99007,7 +99227,7 @@ var ProductListEdit = function (_React$Component) {
 
 module.exports = ProductListEdit;
 
-},{"async":45,"react":652,"react-autocomplete":503}],758:[function(require,module,exports){
+},{"async":45,"react":652,"react-autocomplete":503}],759:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -99115,10 +99335,8 @@ var Scrollable = function (_React$Component) {
 
 module.exports = Scrollable;
 
-},{"react":652}],759:[function(require,module,exports){
+},{"react":652}],760:[function(require,module,exports){
 'use strict';
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -99132,9 +99350,11 @@ var React = require('react');
 var jwt_decode = require('jwt-decode');
 
 var Item = require('./Item.jsx');
+var Items = require('./Items.jsx');
 var Timestamp = require('./Timestamp.jsx');
 var Address = require('./Address.jsx');
 var Comments = require('./Comments.jsx');
+var Price = require('./Price.jsx');
 
 /***
 Draw a shipment. Used in lists of orders/shipments
@@ -99281,18 +99501,11 @@ var Shipment = function (_React$Component) {
       var _this8 = this;
 
       var line_items = [];
-      if (this.props.contents) {
-        var item_array = typeof this.props.contents.items != 'undefined' ? this.props.contents.items : this.props.contents;
-        var picklist = !this.state.packed && !this.state.received;
-        for (var i = 0; i < item_array.length; i++) {
-          line_items.push(React.createElement(Item, _extends({ key: line_items.length, picklist: picklist }, item_array[i])));
-        }
-      } // populate line_items
       if (this.state.rates) {
         this.state.rates.slice(0).reverse().forEach(function (rate) {
           line_items.unshift(React.createElement(
-            'item',
-            { key: line_items.length, style: { minHeight: "65px" } },
+            'div',
+            { key: line_items.length, style: Item.style.item },
             React.createElement(
               'button',
               { onClick: _this8.handleBuyLabel.bind(_this8, rate.rate_id), style: { maxWidth: "190px" } },
@@ -99316,12 +99529,7 @@ var Shipment = function (_React$Component) {
                 { style: { marginLeft: "10px" } },
                 rate.duration
               ),
-              React.createElement(
-                'div',
-                { className: 'price' },
-                rate.price,
-                '$'
-              )
+              React.createElement(Price, { price: rate.price, style: Item.style.price_total })
             ),
             React.createElement('div', { style: { clear: "both" } })
           ));
@@ -99435,133 +99643,143 @@ var Shipment = function (_React$Component) {
         'Cancel'
       ));
 
+      var fulfillment_tools = null;
+      if (this.props.fulfillment) {
+        fulfillment_tools = React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'div',
+            { className: 'time_bar' },
+            React.createElement(
+              'div',
+              null,
+              'requested: ',
+              React.createElement(Timestamp, { time: this.props.requested })
+            ),
+            React.createElement(
+              'div',
+              null,
+              'approved: ',
+              React.createElement(Timestamp, { time: this.props.approved })
+            ),
+            React.createElement(
+              'div',
+              null,
+              'packed: ',
+              React.createElement(Timestamp, { time: this.state.packed })
+            ),
+            React.createElement(
+              'div',
+              null,
+              'received: ',
+              React.createElement(Timestamp, { time: this.state.received })
+            )
+          ),
+          React.createElement(
+            'div',
+            { className: 'header_menu' },
+            React.createElement(
+              'shipping_details',
+              null,
+              React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
+                  'Order_id: '
+                ),
+                this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
+              ),
+              React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
+                  'Deliver_by: '
+                ),
+                React.createElement(Timestamp, { time: this.props.delivery_promised })
+              ),
+              to,
+              React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
+                  'User: '
+                ),
+                this.props.email
+              ),
+              this.props.address ? React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
+                  'Address: '
+                ),
+                React.createElement(Address, this.props.address)
+              ) : null,
+              this.state.shipping_label ? React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
+                  'Shipping: '
+                ),
+                React.createElement(
+                  'a',
+                  { href: this.state.shipping_label, target: '_blank' },
+                  'Label'
+                )
+              ) : null,
+              React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
+                  'Tracking: '
+                ),
+                React.createElement(
+                  'a',
+                  { href: 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' + this.state.tracking_code, target: '_blank' },
+                  this.state.tracking_code
+                )
+              ),
+              React.createElement(
+                'div',
+                { style: { pointerEvents: "none" } },
+                React.createElement(
+                  'label',
+                  null,
+                  'Comments: '
+                )
+              ),
+              React.createElement(Comments, { comments: this.state.comments, handlePostComment: this.handlePostComment.bind(this) })
+            ),
+            React.createElement(
+              'div',
+              { className: 'action_bar' },
+              actions
+            )
+          )
+        );
+      }
+
       return React.createElement(
         'shipment',
         null,
-        React.createElement(
-          'div',
-          { className: 'time_bar' },
-          React.createElement(
-            'div',
-            null,
-            'requested: ',
-            React.createElement(Timestamp, { time: this.props.requested })
-          ),
-          React.createElement(
-            'div',
-            null,
-            'approved: ',
-            React.createElement(Timestamp, { time: this.props.approved })
-          ),
-          React.createElement(
-            'div',
-            null,
-            'packed: ',
-            React.createElement(Timestamp, { time: this.state.packed })
-          ),
-          React.createElement(
-            'div',
-            null,
-            'received: ',
-            React.createElement(Timestamp, { time: this.state.received })
-          )
-        ),
-        React.createElement(
-          'div',
-          { className: 'header_menu' },
-          React.createElement(
-            'shipping_details',
-            null,
-            React.createElement(
-              'div',
-              null,
-              React.createElement(
-                'label',
-                null,
-                'Order_id: '
-              ),
-              this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
-            ),
-            React.createElement(
-              'div',
-              null,
-              React.createElement(
-                'label',
-                null,
-                'Deliver_by: '
-              ),
-              React.createElement(Timestamp, { time: this.props.delivery_promised })
-            ),
-            to,
-            React.createElement(
-              'div',
-              null,
-              React.createElement(
-                'label',
-                null,
-                'User: '
-              ),
-              this.props.email
-            ),
-            this.props.address ? React.createElement(
-              'div',
-              null,
-              React.createElement(
-                'label',
-                null,
-                'Address: '
-              ),
-              React.createElement(Address, this.props.address)
-            ) : null,
-            this.state.shipping_label ? React.createElement(
-              'div',
-              null,
-              React.createElement(
-                'label',
-                null,
-                'Shipping: '
-              ),
-              React.createElement(
-                'a',
-                { href: this.state.shipping_label, target: '_blank' },
-                'Label'
-              )
-            ) : null,
-            React.createElement(
-              'div',
-              null,
-              React.createElement(
-                'label',
-                null,
-                'Tracking: '
-              ),
-              React.createElement(
-                'a',
-                { href: 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' + this.state.tracking_code, target: '_blank' },
-                this.state.tracking_code
-              )
-            ),
-            React.createElement(
-              'div',
-              { style: { pointerEvents: "none" } },
-              React.createElement(
-                'label',
-                null,
-                'Comments: '
-              )
-            ),
-            React.createElement(Comments, { comments: this.state.comments, handlePostComment: this.handlePostComment.bind(this) })
-          ),
-          React.createElement(
-            'div',
-            { className: 'action_bar' },
-            actions
-          )
-        ),
+        fulfillment_tools,
         React.createElement(
           'contents',
           null,
-          line_items
+          line_items,
+          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment })
         )
       );
     }
@@ -99572,7 +99790,7 @@ var Shipment = function (_React$Component) {
 
 module.exports = Shipment;
 
-},{"./Address.jsx":728,"./Comments.jsx":731,"./Item.jsx":742,"./Timestamp.jsx":766,"jwt-decode":414,"react":652}],760:[function(require,module,exports){
+},{"./Address.jsx":728,"./Comments.jsx":731,"./Item.jsx":742,"./Items.jsx":744,"./Price.jsx":754,"./Timestamp.jsx":767,"jwt-decode":414,"react":652}],761:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -99643,12 +99861,7 @@ var Signup = function (_React$Component) {
         unique_keys.push(React.createElement(
           "div",
           { key: unique_keys.length },
-          React.createElement(
-            "label",
-            null,
-            key
-          ),
-          React.createElement("input", { type: "text", onChange: function onChange(event) {
+          React.createElement("input", { type: "text", placeholder: key, onChange: function onChange(event) {
               _this2.handleChange(true, key, event.target.value);
             }, value: _this2.state.id[key] })
         ));
@@ -99660,12 +99873,7 @@ var Signup = function (_React$Component) {
           misc_keys.push(React.createElement(
             "div",
             { key: misc_keys.length },
-            React.createElement(
-              "label",
-              null,
-              key
-            ),
-            React.createElement("input", { type: "text", onChange: function onChange(event) {
+            React.createElement("input", { type: "text", placeholder: key, onChange: function onChange(event) {
                 _this2.handleChange(false, key, event.target.value);
               }, value: _this2.state.props[key] })
           ));
@@ -99682,8 +99890,8 @@ var Signup = function (_React$Component) {
           misc_keys,
           React.createElement(
             "button",
-            { onClick: this.handleSubmit.bind(this), style: { margin: "auto" } },
-            "SUBMIT"
+            { className: "primary centered", onClick: this.handleSubmit.bind(this) },
+            "ENTER NOW"
           )
         )
       );
@@ -99695,7 +99903,7 @@ var Signup = function (_React$Component) {
 
 module.exports = Signup;
 
-},{"react":652}],761:[function(require,module,exports){
+},{"react":652}],762:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -99813,7 +100021,7 @@ var Stroke = function (_React$Component) {
 
 module.exports = Stroke;
 
-},{"react":652}],762:[function(require,module,exports){
+},{"react":652}],763:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -99906,7 +100114,7 @@ var Switch = function (_React$Component) {
 
 module.exports = Switch;
 
-},{"./Stroke.jsx":761,"react":652}],763:[function(require,module,exports){
+},{"./Stroke.jsx":762,"react":652}],764:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100010,7 +100218,7 @@ var initDefaultFallback = function initDefaultFallback() {
 
 module.exports = Tabs;
 
-},{"./Switch.jsx":762,"fs":293,"react":652}],764:[function(require,module,exports){
+},{"./Switch.jsx":763,"fs":293,"react":652}],765:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100050,7 +100258,7 @@ var TextContent = function (_React$Component) {
 
 module.exports = TextContent;
 
-},{"react":652}],765:[function(require,module,exports){
+},{"react":652}],766:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100096,7 +100304,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"react":652}],766:[function(require,module,exports){
+},{"react":652}],767:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100141,7 +100349,7 @@ var Timestamp = function (_React$Component) {
 
 module.exports = Timestamp;
 
-},{"react":652}],767:[function(require,module,exports){
+},{"react":652}],768:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100274,7 +100482,7 @@ var UserLogin = function (_React$Component) {
 
 module.exports = UserLogin;
 
-},{"./Errors.jsx":737,"bcryptjs":47,"react":652}],768:[function(require,module,exports){
+},{"./Errors.jsx":737,"bcryptjs":47,"react":652}],769:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -100324,37 +100532,37 @@ var UserMenu = function (_React$Component) {
       menu_items.push(React.createElement(CartMenu, { key: key++ }));
       menu_items.push(React.createElement(
         'a',
-        { key: key++, href: '/customize-your-own', disabled: true },
+        { className: 'button primary', key: key++, href: '/customize-your-own' },
         'Customize'
       ));
       // links to admin pages
       if (this.props.user && this.props.user.roles && this.props.user.roles.length) {
         menu_items.push(React.createElement(
           'a',
-          { href: '/store', key: key++, disabled: true },
+          { className: 'button primary', href: '/store', key: key++ },
           'Admin Store'
         ));
         menu_items.push(React.createElement(
           'a',
-          { href: '/fulfillment', key: key++, disabled: true },
+          { className: 'button primary', href: '/fulfillment', key: key++ },
           'Order Fulfillment'
         ));
         menu_items.push(React.createElement(
           'a',
-          { href: '/vss/admin', key: key++, disabled: true },
+          { className: 'button primary', href: '/vss/admin', key: key++ },
           'VSS Admin'
         ));
       }
       if (this.props.user && this.props.user.roles && this.props.user.roles.indexOf("bowanddrape") >= 0) {
         menu_items.push(React.createElement(
           'a',
-          { href: '/page', key: key++, disabled: true },
+          { className: 'button primary', href: '/page', key: key++ },
           'Admin Pages'
         ));
       }
       if (this.props.user && this.props.user.email) menu_items.push(React.createElement(
-        'button',
-        { key: key++, onClick: this.logout.bind(this) },
+        'a',
+        { className: 'button', key: key++, onClick: this.logout.bind(this) },
         'Logout'
       ));
 
@@ -100378,7 +100586,7 @@ var UserMenu = function (_React$Component) {
 
 module.exports = UserMenu;
 
-},{"./CartMenu.jsx":730,"./FacebookLogin.jsx":738,"./UserProfile.jsx":770,"react":652}],769:[function(require,module,exports){
+},{"./CartMenu.jsx":730,"./FacebookLogin.jsx":738,"./UserProfile.jsx":771,"react":652}],770:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100481,7 +100689,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserLogin.jsx":767,"jwt-decode":414,"react":652}],770:[function(require,module,exports){
+},{"./UserLogin.jsx":768,"jwt-decode":414,"react":652}],771:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100532,7 +100740,7 @@ var UserProfile = function (_React$Component) {
 
 module.exports = UserProfile;
 
-},{"./UserLogin.jsx":767,"react":652}],771:[function(require,module,exports){
+},{"./UserLogin.jsx":768,"react":652}],772:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100889,11 +101097,12 @@ module.exports = {
     Gallery: require('./Gallery.jsx'),
     Signup: require('./Signup.jsx'),
     TextContent: require('./TextContent.jsx'),
-    VSSAdmin: require('./VSSAdmin.jsx')
+    VSSAdmin: require('./VSSAdmin.jsx'),
+    Shipment: require('./Shipment.jsx')
   },
   dispatcher: dispatcher,
   api: api,
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":729,"./ComponentsEdit.jsx":735,"./Customizer.js":736,"./Errors.jsx":737,"./FulfillShipments.jsx":739,"./Gallery.jsx":740,"./Items.jsx":744,"./LayoutBasic.jsx":745,"./LayoutMain.jsx":746,"./PageEdit.jsx":747,"./PageList.jsx":751,"./Placeholder.jsx":753,"./ProductList.jsx":756,"./Signup.jsx":760,"./TextContent.jsx":764,"./UserPasswordReset.jsx":769,"./VSSAdmin.jsx":771,"events":356,"jwt-decode":414,"querystring":500,"react":652,"react-dom":504}]},{},[]);
+},{"./Cart.jsx":729,"./ComponentsEdit.jsx":735,"./Customizer.js":736,"./Errors.jsx":737,"./FulfillShipments.jsx":739,"./Gallery.jsx":740,"./Items.jsx":744,"./LayoutBasic.jsx":745,"./LayoutMain.jsx":746,"./PageEdit.jsx":747,"./PageList.jsx":751,"./Placeholder.jsx":753,"./ProductList.jsx":757,"./Shipment.jsx":760,"./Signup.jsx":761,"./TextContent.jsx":765,"./UserPasswordReset.jsx":770,"./VSSAdmin.jsx":772,"events":356,"jwt-decode":414,"querystring":500,"react":652,"react-dom":504}]},{},[]);

@@ -46,7 +46,6 @@ class ShipProvider {
       });
     });
 
-console.log((weight*0.00220462).toFixed(2).toString());
     // parcel object dict
     var parcel = {
       length: "5",

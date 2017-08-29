@@ -174,6 +174,8 @@ Store.initMandatory(["haute"], (err, store_ids) => {
               shipment.upsert((err)=> {
                 if (err) console.log(err);
               });
+              // FIXME looks like both babel and mysql have problems closing
+              setTimeout(()=>{process.exit()}, 10000);
             }
           }); // shipment.lookupTracking()
         }); // get previous record if it was already imported

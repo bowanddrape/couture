@@ -95,7 +95,7 @@ class Component {
       this.position[0] = parseFloat(state.props.position[0]) || 0;
       this.position[1] = parseFloat(state.props.position[1]) || 0;
     }
-    if (state.props.rotation) {
+    if (state.props.rotation && state.props.rotation.elements) {
       this.rotation = new Matrix(state.props.rotation.elements);
     }
     // fill out if we got an internal assembly
@@ -206,7 +206,6 @@ class Component {
   render(gl, mvMatrix, shaderProgram) {
 
     if(!this.geometry_vbo || !this.texture_vbo || !this.ibo) {
-      console.log("Component::render() called without geometry");
       return;
     }
 

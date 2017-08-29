@@ -11,7 +11,6 @@ class ProductComponentPicker extends React.Component {
   }
 
   handleTabClick() {
-    document.querySelector(".component_spacer").style.height = document.querySelector(".components").offsetHeight + "px";
     let text_input = document.querySelector(".components").querySelector(`input[type="text"]`);
     if (text_input)
       text_input.focus();
@@ -22,14 +21,12 @@ class ProductComponentPicker extends React.Component {
 
   componentDidMount() {
     // init size of default selected tab
-    document.querySelector(".component_spacer").style.height = document.querySelector(".components").offsetHeight + "px";
   }
 
   render() {
     let components = this.populateComponents(this.props.product);
     return (
       <div>
-        <div className="component_spacer" />
         <Tabs className="components" onChange={this.handleTabClick.bind(this)}>
           {components}
         </Tabs>
@@ -104,7 +101,7 @@ class ProductComponentPicker extends React.Component {
             </div>
           );
           components.push(
-            <div key={components.length} name={product.compatible_components[i].props.name+"_cont"} className="component_container">{tab_components}</div>
+            <div key={components.length} name={product.compatible_components[i].props.name+"_cont"} className="component_container" style={{overflow:"hidden"}}>{tab_components}</div>
           );
           continue;
         } // is_letters
@@ -121,7 +118,7 @@ class ProductComponentPicker extends React.Component {
           }
           components.push(
             <div key={components.length} name={product.compatible_components[i].sku} style={{height:"auto"}} className="component_container">
-              <input type="text" style={{width:"90%"}}
+              <input type="text" style={{width:"90%"}} placeholder="Your Text Here"
                 onChange={(event) => {
                   this.handleSetComponentText(event.target.value, component_letters);
                 }}

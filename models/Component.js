@@ -133,9 +133,6 @@ class Component extends JSONAPI {
 
   // extends JSONAPI
   handleHTTPPage(req, res, next) {
-    // user must be an admin
-    if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
-      return Page.renderNotFound(req, res);
     Page.render(req, res, ComponentsEdit, {});
   }
 

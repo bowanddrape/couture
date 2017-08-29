@@ -159,8 +159,8 @@ class SQLTable {
         values.push(`.*${constraints[column]}.*`);
         // if we have props, search that too
         let sql_constraint = (sql.fields.indexOf("props") >= 0) ?
-          `(props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})` :
-          `${sql.pkey} ~* $${values.length}`;
+          `(props->>'name' ~* $${values.length} OR props->>'legacy_id' ~* $${values.length} OR ${sql.pkey}::text ~* $${values.length})` :
+          `${sql.pkey}::text ~* $${values.length}`;
 
         where = where ?
           where + ` AND ${sql_constraint}`:

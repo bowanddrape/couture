@@ -4,6 +4,7 @@ const LayoutEmail = require('../views/LayoutEmail.jsx');
 const OrderShippedEmail = require('../views/OrderShippedEmail.jsx');
 const OrderSurveyEmail = require('../views/OrderSurveyEmail.jsx');
 const Page = require('./Page');
+const User = require('./User');
 
 /***
 Interface to send mail
@@ -44,18 +45,28 @@ class Mail {
   }
 
   static sendShippedEmail(shipment, callback) {
-    // TODO this is the legacy haute props
-    let props = {
-      username: shipment.address.name,
-      order_id: shipment.props.legacy_id,
-      order_link: "http://www.bowanddrape.com/account/order?id="+shipment.props.legacy_id,
-      tracking_link: "https://tools.usps.com/go/TrackConfirmAction.action?tLabels="+shipment.tracking_code
-    }
-    let body = Page.renderString([{component:OrderShippedEmail, props}], LayoutEmail);
-    Mail.send(null, `Bow & Drape order ${props.order_id}`, body, (err) => {
-      if (err) console.log(err);
-      callback();
-    });
+    User.get(shipment.email, (err, user) => {
+      if (err) return callback(err);
+      User.generateJwtToken(user, (err, token) => {
+        if (err) return callback(err);
+
+        // TODO this is the legacy haute props
+        let props = {
+          username: shipment.address.name,
+          order_id: shipment.props.legacy_id,
+          token: token,
+          order_link: "https://couture.bowanddrape.com/shipment/"+shipment.id,
+          order_href: "http://www.bowanddrape.com/account/order?id="+shipment.props.legacy_id,
+          tracking_link: "https://tools.usps.com/go/TrackConfirmAction.action?tLabels="+shipment.tracking_code,
+          contents: shipment.contents,
+        }
+        let body = Page.renderString([{component:OrderShippedEmail, props}], LayoutEmail);
+        Mail.send(null, `Bow & Drape order ${props.order_id}`, body, (err) => {
+          if (err) return callback(err);
+          callback();
+        });
+      }); // generate JWT token
+    }); // get user
   }
 
   static sendSurveyEmail(shipment, callback) {

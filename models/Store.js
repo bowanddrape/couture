@@ -139,32 +139,33 @@ class Store extends SQLTable {
         product_list.componentWillMount();
         if (!product_list.initial_product) return Page.renderNotFound(req, res);
 
-        let width = req.query['w'] || 200;
-        let height = req.query['h'] || 200;
-        let camera_index = req.query['camera'] || 0;
-        let customizer = new Customizer({width:width, height:height});
+        let width = parseInt(req.query['w']) || 200;
+        let height = parseInt(req.query['h']) || 200;
+        let camera_index = parseInt(req.query['camera']) || 0;
+        let resolution = 2;
+        let customizer = new Customizer({width:width*resolution, height:height*resolution});
         customizer.init();
-        if (camera_index) {
-          if (!product_list.initial_product.props.cameras || !product_list.initial_product.props.cameras[camera_index])
+        if (product_list.initial_product.props.cameras) {
+          if (!product_list.initial_product.props.cameras[camera_index])
             return Page.renderNotFound(req, res);
           customizer.updatePMatrix(product_list.initial_product.props.cameras[camera_index]);
         }
 
         customizer.set(product_list.initial_product, {assembly:product_list.initial_assembly}, () => {
 
-          let pixel_buffer = new Uint8Array(width * height * 4);
+          let pixel_buffer = new Uint8Array(width * height * resolution * resolution * 4);
           let gl = customizer.gl;
           gl.clearColor(1, 1, 1, 0);
           customizer.render();
-          gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixel_buffer);
+          gl.readPixels(0, 0, width*resolution, height*resolution, gl.RGBA, gl.UNSIGNED_BYTE, pixel_buffer);
           // these 2 lines shouldn't be needed but it's having some type problems
-          let pixels = zeros([height, width, 4]);
+          let pixels = zeros([height*resolution, width*resolution, 4]);
           pixels.data = pixel_buffer;
 
           res.setHeader("Cache-Control", "public, max-age=0");
           res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
           res.setHeader("Last-Modified", new Date(0).toUTCString());
-          savePixels(pixels, "png").pipe(sharp().rotate(270)).pipe(res).on("finish", () => {
+          savePixels(pixels, "png").pipe(sharp().rotate(270).resize(width, height)).pipe(res).on("finish", () => {
             // tell headless-gl to garbage collect
             gl.getExtension('STACKGL_destroy_context').destroy();
           });

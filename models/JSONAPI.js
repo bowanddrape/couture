@@ -13,12 +13,12 @@ class JSONAPI extends SQLTable {
     if (req.path_tokens[0]!=this.constructor.name.toLowerCase())
       return next();
 
+    if (!this.hasApiPermission(req, res))
+      return res.status(404).json({error:"Not Found"}).end();
+
     // if not a json request, see if we handle that
     if (req.accepts('*/*') || !req.accepts('application/json'))
       return this.handleHTTPPage(req, res, next);
-
-    if (!this.hasApiPermission(req, res))
-      return res.status(404).json({error:"Not Found"}).end();
 
     if (req.method=='GET') {
       if (!req.query.page) {

@@ -5,6 +5,7 @@ const Item = require('./Item.jsx');
 const Timestamp = require('./Timestamp.jsx');
 const ItemUtils = require('./ItemUtils.js');
 const Errors = require('./Errors.jsx');
+const Price = require('./Price.jsx');
 
 /***
 Draw a list of Item.
@@ -126,7 +127,7 @@ class Items extends React.Component {
 
   handleApplyDiscountCode() {
     if (!BowAndDrape) return;
-    BowAndDrape.api("GET", "/promocode", {code:this.state.promo_code}, (err, result) => {
+    BowAndDrape.api("GET", "/promocode", {code:this.state.promo_code.toLowerCase()}, (err, result) => {
       if (err) return Errors.emitError("promo", err.toString());
       if (!result.length) return Errors.emitError("promo", "no such promo code");
       let promo = result[0];
@@ -141,38 +142,76 @@ class Items extends React.Component {
   }
 
   render() {
-    let items = [];
+    let line_items = [];
+    let summary_items = [];
     let has_promo = false;
+    let subtotal = 0;
+    let total = 0;
     for (let i=0; i<this.state.contents.length; i++) {
       let remove = null;
-      if (typeof(BowAndDrape)!="undefined" && BowAndDrape.cart_menu) {
+      let quantity = this.state.contents[i].quantity || 1;
+      total += quantity * this.state.contents[i].props.price;
+      if (this.state.contents[i].sku)
+        subtotal += quantity * this.state.contents[i].props.price;
+      // attach quantity edit buttons
+      if (this.props.is_cart && typeof(BowAndDrape)!="undefined" && BowAndDrape.cart_menu) {
+        // remove button
         if (this.state.contents[i].sku)
-          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, i);
         if (this.state.contents[i].props && new RegExp("^promo:", "i").test(this.state.contents[i].props.name)) {
           has_promo = true;
-          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, items.length);
+          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, i);
         }
       }
-      items.push(<Item key={items.length} {...this.state.contents[i]} onRemove={remove}/>);
+      // if has a base sku or is a legacy imported item
+      if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
+        line_items.push(<Item style={Item.style} key={line_items.length} {...this.state.contents[i]} onRemove={remove} fulfillment={this.props.fulfillment}/>);
+      } else {
+        summary_items.push(<Item style={Item.style_summary} key={summary_items.length} {...this.state.contents[i]} onRemove={remove}/>);
+      }
     }
 
-    if (typeof(window)!="undefined" && !items.length)
+    if (typeof(window)!="undefined" && !line_items.length)
       return null;
 
     return (
       <cart>
         {this.props.is_cart ?
-          <item><span style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></item>
+          <div className="item" style={Item.style.item}><span style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></div>
           : null
         }
-        {items}
-        {has_promo ? null :
-          <item>
-            <Errors label="promo" />
-            Promo Code:<input type="text" style={{height:"20px"}} value={this.state.promo_code} onChange={(event)=>{this.setState({promo_code:event.target.value})}}/>
-            <button onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
-          </item>
-        }
+        {line_items}
+        <div className="summary_items">
+          {/* item subtotal */}
+          <div className="item" style={Item.style_summary.item}>
+            <div style={Item.style_summary.img_preview_container} />
+            <div className="deets" style={Item.style_summary.deets}>
+              Item Subtotal
+              <Price style={Item.style_summary.price_total} price={subtotal}/>
+            </div>
+          </div>
+
+          {has_promo || !this.props.is_cart ? null :
+            <div className="item promo" style={Item.style_summary.item}>
+              <div style={Item.style_summary.img_preview_container}><Errors label="promo" /></div>
+              <div className="deets" style={Item.style_summary.deets}>
+                Promo Code
+                <input type="text" style={{height:"20px",width:"116px"}} value={this.state.promo_code} onChange={(event)=>{this.setState({promo_code:event.target.value})}}/>
+                <button style={{position:"absolute",bottom:"-6px"}} onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
+              </div>
+            </div>
+          }
+          {summary_items}
+
+          {/* item price total */}
+          <div className="item" style={Item.style_summary.item}>
+            <div style={Item.style_summary.img_preview_container} />
+            <div className="deets" style={Item.style_summary.deets}>
+              Package Total
+              <Price style={Item.style_summary.price_total} price={total}/>
+            </div>
+          </div>
+        </div>
       </cart>
     );
   }

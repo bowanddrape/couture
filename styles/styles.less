@@ -19,13 +19,13 @@ body {
 }
 
 @user_img_width: 50px;
-@menu_handle_width: 30px;
+@menu_handle_width: 36px;
 menu {
   position: fixed;
   top: 0;
   border-left: solid 1px @color_secondary;
   height: 100%;
-  background-color: @color_tertiary;
+  background-color: @color_menu;
   margin: 0;
   padding: 20px;
   width: 100%;
@@ -39,8 +39,6 @@ menu user {
   margin-left: @user_img_width + 5px;
   margin-bottom: 15px;
   img {
-    .icon;
-    .sprite(@pizza, inline);
     border-radius: 5px;
     border: solid 2px @color_primary;
     position: absolute;
@@ -51,8 +49,8 @@ menu user {
 }
 menu handle {
   .icon;
-  .sprite(@hamburger_menu);
-  background-color: @color_tertiary;
+  .sprite(@pizza);
+  background-color: @color_menu;
   display: block;
   position: absolute;
   top: 20px;

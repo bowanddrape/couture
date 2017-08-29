@@ -50,8 +50,7 @@ class Signup extends React.Component {
       if (!key) return;
       unique_keys.push(
         <div key={unique_keys.length}>
-          <label>{key}</label>
-          <input type="text" onChange={(event)=>{this.handleChange(true, key, event.target.value)}} value={this.state.id[key]}/>
+          <input type="text" placeholder={key} onChange={(event)=>{this.handleChange(true, key, event.target.value)}} value={this.state.id[key]}/>
         </div>
       );
     });
@@ -61,8 +60,7 @@ class Signup extends React.Component {
         if (!key) return;
         misc_keys.push(
           <div key={misc_keys.length}>
-            <label>{key}</label>
-            <input type="text" onChange={(event)=>{this.handleChange(false, key, event.target.value)}} value={this.state.props[key]}/>
+            <input type="text" placeholder={key} onChange={(event)=>{this.handleChange(false, key, event.target.value)}} value={this.state.props[key]}/>
           </div>
         );
       });
@@ -73,7 +71,7 @@ class Signup extends React.Component {
         <signup>
           {unique_keys}
           {misc_keys}
-          <button onClick={this.handleSubmit.bind(this)} style={{margin:"auto"}}>SUBMIT</button>
+          <button className="primary centered" onClick={this.handleSubmit.bind(this)}>ENTER NOW</button>
         </signup>
       </div>
     );

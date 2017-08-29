@@ -3,9 +3,11 @@ const React = require('react');
 const jwt_decode = require('jwt-decode');
 
 const Item = require('./Item.jsx');
+const Items = require('./Items.jsx');
 const Timestamp = require('./Timestamp.jsx');
 const Address = require('./Address.jsx');
 const Comments = require('./Comments.jsx');
+const Price = require('./Price.jsx');
 
 
 /***
@@ -123,26 +125,19 @@ class Shipment extends React.Component {
 
   render() {
     let line_items = [];
-    if (this.props.contents) {
-      let item_array = typeof(this.props.contents.items)!='undefined'?this.props.contents.items:this.props.contents;
-      let picklist = !this.state.packed && !this.state.received;
-      for (let i=0; i<item_array.length; i++) {
-        line_items.push(<Item key={line_items.length} picklist={picklist} {...item_array[i]} />);
-      }
-    } // populate line_items
     if (this.state.rates) {
       this.state.rates.slice(0).reverse().forEach((rate) => {
         line_items.unshift(
-          <item key={line_items.length} style={{minHeight:"65px"}}>
+          <div key={line_items.length} style={Item.style.item}>
             <button onClick={this.handleBuyLabel.bind(this, rate.rate_id)} style={{maxWidth:"190px"}}>Buy Label</button>
             <deets>
               <div className="name">{rate.provider}</div>
               <div style={{marginLeft:"10px"}}>{rate.service}</div>
               <div style={{marginLeft:"10px"}}>{rate.duration}</div>
-              <div className="price">{rate.price}$</div>
+              <Price price={rate.price} style={Item.style.price_total}/>
             </deets>
             <div style={{clear:"both"}}/>
-          </item>
+          </div>
         );
       });
     } // this.state.rates
@@ -185,31 +180,43 @@ class Shipment extends React.Component {
 
     actions.push(<button key={actions.length} onClick={this.setSink.bind(this, "canceled")}>Cancel</button>);
 
-    return (
-      <shipment>
-        <div className="time_bar">
-          <div>requested: <Timestamp time={this.props.requested} /></div>
-          <div>approved: <Timestamp time={this.props.approved} /></div>
-          <div>packed: <Timestamp time={this.state.packed} /></div>
-          <div>received: <Timestamp time={this.state.received} /></div>
-        </div>
-        <div className="header_menu">
-          <shipping_details>
-            <div><label>Order_id: </label>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</div>
-            <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
-            {to}
-            <div><label>User: </label>{this.props.email}</div>
-            {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
-            {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}
-            <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
-            <div style={{pointerEvents:"none"}}><label>Comments: </label></div>
-            <Comments comments={this.state.comments} handlePostComment={this.handlePostComment.bind(this)} />
-          </shipping_details>
-          <div className="action_bar">
-            {actions}
+    let fulfillment_tools = null;
+    if (this.props.fulfillment) {
+      fulfillment_tools = (
+        <div>
+          <div className="time_bar">
+            <div>requested: <Timestamp time={this.props.requested} /></div>
+            <div>approved: <Timestamp time={this.props.approved} /></div>
+            <div>packed: <Timestamp time={this.state.packed} /></div>
+            <div>received: <Timestamp time={this.state.received} /></div>
+          </div>
+          <div className="header_menu">
+            <shipping_details>
+              <div><label>Order_id: </label>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</div>
+              <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
+              {to}
+              <div><label>User: </label>{this.props.email}</div>
+              {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
+              {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}
+              <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
+              <div style={{pointerEvents:"none"}}><label>Comments: </label></div>
+              <Comments comments={this.state.comments} handlePostComment={this.handlePostComment.bind(this)} />
+            </shipping_details>
+            <div className="action_bar">
+              {actions}
+            </div>
           </div>
         </div>
-        <contents>{line_items}</contents>
+      )
+    }
+
+    return (
+      <shipment>
+        {fulfillment_tools}
+        <contents>
+          {line_items}
+          <Items contents={this.props.contents} fulfillment={this.props.fulfillment}/>
+        </contents>
       </shipment>
     )
   }

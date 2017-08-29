@@ -364,7 +364,7 @@ class ProductCanvas extends React.Component {
     }
 
     return (
-      <div style={{position:"relative",margin:"auto"}}>
+      <div style={{position:"relative",width:"100%"}}>
         <canvas style={{display:"block",height:"300px",width:"100%",minWidth:"400px"}}>
         </canvas>
         {component_hitboxes}

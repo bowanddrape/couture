@@ -16,6 +16,10 @@ class Signup extends JSONAPI {
     };
   }
 
+  // extends JSONAPI
+  hasApiPermission(req, res) {
+    return true;
+  }
 }
 
 module.exports = Signup;

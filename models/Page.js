@@ -3,6 +3,7 @@
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const async = require('async');
+const sharp = require('sharp');
 
 const JSONAPI = require('./JSONAPI');
 
@@ -10,6 +11,7 @@ const LayoutMain = require('../views/LayoutMain.jsx');
 const LayoutBasic = require('../views/LayoutBasic.jsx');
 
 const NotFound = require('../views/NotFound.jsx');
+const HTMLConvert = require('html-convert')({width: 600, height: 800});
 
 // these are the models the page query will have access to
 const whitelisted_models = [
@@ -205,6 +207,27 @@ class Page extends JSONAPI {
     // if json was requested, just return the props object
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.json(props).end();
+    // allow query to override layout
+    if (req.query.layout)
+      layout = req.query.layout;
+
+    switch (layout) {
+      case "basic":
+        layout = LayoutBasic;
+        break;
+      case "image":
+        try {
+          // I thought req.protocol would work, but we need to specify https
+          HTMLConvert(`${process.env.ENV=='dev'?'http':'https'}://${req.headers.host}${req.path}?layout=basic&token=${req.query.token}`).pipe(sharp().trim()).pipe(res);
+        } catch(err) {
+          return Page.renderError(req, res);
+        }
+        return;
+      case "main":
+      default:
+        layout = LayoutMain;
+        break;
+    }
     let head = Page.getHTMLHead(req, res, props);
     let body = Page.renderString([{component, props}], layout);
     return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);

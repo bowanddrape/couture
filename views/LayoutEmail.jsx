@@ -22,7 +22,6 @@ class LayoutEmail extends React.Component {
       <head>
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title></title>
       </head>
       <body style={styles.body}>
         <center style={styles.wrapper}>
