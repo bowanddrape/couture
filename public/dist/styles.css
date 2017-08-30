@@ -323,7 +323,7 @@ customize .component_container div {
   cursor: pointer;
 }
 customize .component_container div.backspace {
-  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-image: url('/sprite.PNG?0b47213105198b73635d8e876e595b91d6d0b741');
   background-position: 0px -155px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -335,7 +335,7 @@ customize .component_container div.backspace {
   border: none;
 }
 customize .component_container div.enter {
-  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-image: url('/sprite.PNG?0b47213105198b73635d8e876e595b91d6d0b741');
   background-position: 0px -203px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -369,7 +369,7 @@ customize .component_virtual_keyboard_container div {
   cursor: pointer;
 }
 customize .component_virtual_keyboard_container div.backspace {
-  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-image: url('/sprite.PNG?0b47213105198b73635d8e876e595b91d6d0b741');
   background-position: 0px -155px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -381,7 +381,7 @@ customize .component_virtual_keyboard_container div.backspace {
   border: none;
 }
 customize .component_virtual_keyboard_container div.enter {
-  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-image: url('/sprite.PNG?0b47213105198b73635d8e876e595b91d6d0b741');
   background-position: 0px -203px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -404,7 +404,7 @@ customize .component_virtual_keyboard_container row div {
   flex: 0 1 auto;
 }
 customize .component_virtual_keyboard_container div.spacebar {
-  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-image: url('/sprite.PNG?0b47213105198b73635d8e876e595b91d6d0b741');
   background-position: 0px -251px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -607,7 +607,7 @@ signup div input[type="text"] {
   box-sizing: content-box;
 }
 .icon {
-  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-image: url('/sprite.PNG?0b47213105198b73635d8e876e595b91d6d0b741');
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
@@ -633,7 +633,7 @@ menu user {
   margin-bottom: 15px;
 }
 menu user img {
-  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-image: url('/sprite.PNG?0b47213105198b73635d8e876e595b91d6d0b741');
   background-position: 0px -299px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -648,7 +648,7 @@ menu user img {
   margin-left: -55px;
 }
 menu handle {
-  background-image: url('/sprite.png?dab1e53017dec9005b2d94033a86440dc5e7b8de');
+  background-image: url('/sprite.PNG?0b47213105198b73635d8e876e595b91d6d0b741');
   background-position: 0px 0px;
   background-repeat: no-repeat;
   overflow: hidden;
