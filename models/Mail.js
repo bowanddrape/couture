@@ -1,18 +1,5 @@
 
-const sendmail = require('sendmail')({
-  logger: {
-    debug: ()=>{},
-    info: ()=>{},
-    warn: ()=>{},
-    error: console.error
-  },
-  silent: true,
-  dkim: false/*{ // TODO we need this 
-    privateKey: fs.readFileSync('./dkim-private.pem', 'utf8'),
-    keySelector: 'mydomainkey'
-  },
-*/
-});
+const ses = require('node-ses');
 const LayoutEmail = require('../views/LayoutEmail.jsx');
 const OrderShippedEmail = require('../views/OrderShippedEmail.jsx');
 const OrderSurveyEmail = require('../views/OrderSurveyEmail.jsx');
@@ -25,19 +12,34 @@ Helps build and send out email
 class Mail {
 
   static send(to, subject, html, callback) {
+    // Object to hold neccessary email properties
+    let bccArray = [
+      'peter+testing@bowanddrape.com',
+      'shelly+testing@bowanddrape.com',
+      'renee+testing@bowanddrape.com'
+    ]
     let options = {
       from: 'no-reply@bowanddrape.com',
       to: to,
-      bcc: 'peter+testing@bowanddrape.com, shelly+testing@bowanddrape.com',
+      bcc: bccArray,
       subject: subject,
-      html: html,
+      message: html,
     };
 
-    sendmail(options, function(err, reply) {
-      if (err) {
-        console.log("sendmail error " + err.toString());
+    // Create email client
+    let client = ses.createClient({
+      key: process.env.AWS_ACCESS_KEY,
+      secret: process.env.AWS_SECRET_KEY,
+    });
+
+    // Send out the email!
+    client.sendEmail(options, (err, data, res) =>{
+      if (err){
+        console.log("ses error");
+        console.log(err && err.stack);
       }
-      if (callback) callback(err, reply);
+      if(callback)
+        callback(err, res);
     });
   }
 
