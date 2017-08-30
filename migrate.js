@@ -22,7 +22,7 @@ pg_pool.connect(function(err, client, done) {
   // TODO wrap all this in a transaction!
   client.query(`
     CREATE TABLE IF NOT EXISTS migrations (
-      filename VARCHAR(32) PRIMARY KEY
+      filename VARCHAR(64) PRIMARY KEY
     );
   `, function(err, result) {
 
@@ -48,8 +48,8 @@ pg_pool.connect(function(err, client, done) {
             if(err) {
               done(); return console.error('error running query', err);
             }
-            client.query('INSERT INTO migrations (filename) VALUES ($$'+migrations[i]+'$$)');
           });
+          client.query('INSERT INTO migrations (filename) VALUES ($$'+migrations[i]+'$$)');
         }
       }
 

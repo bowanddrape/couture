@@ -137,11 +137,19 @@ class Store extends SQLTable {
         product_list.c = req.query['c'];
         product_list = new ProductList(product_list);
         product_list.componentWillMount();
+        if (!product_list.initial_product) return Page.renderNotFound(req, res);
 
         let width = req.query['w'] || 200;
         let height = req.query['h'] || 200;
+        let camera_index = req.query['camera'] || 0;
         let customizer = new Customizer({width:width, height:height});
         customizer.init();
+        if (camera_index) {
+          if (!product_list.initial_product.props.cameras || !product_list.initial_product.props.cameras[camera_index])
+            return Page.renderNotFound(req, res);
+          customizer.updatePMatrix(product_list.initial_product.props.cameras[camera_index]);
+        }
+
         customizer.set(product_list.initial_product, {assembly:product_list.initial_assembly}, () => {
 
           let pixel_buffer = new Uint8Array(width * height * 4);
@@ -164,7 +172,13 @@ class Store extends SQLTable {
       }); // ProductList.preprocessProps()
     }); // Store.get()
   }
-
 }
+
+// keep around some common constant special ids so we don't have to do a db
+// lookup each time
+// TODO cache things and look things up from cache instead
+Store.special_ids = {
+  vss : 'd955f9f3-e9ae-475a-a944-237862b589b3',
+};
 
 module.exports = Store;

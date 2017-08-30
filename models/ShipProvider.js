@@ -1,5 +1,6 @@
 
 const shippo = require('shippo')(process.env.SHIPPO_TOKEN);
+const Component = require('./Component.js');
 
 /***
 Integration with shipment providers
@@ -10,13 +11,13 @@ class ShipProvider {
 
   static quote(shipment, callback) {
     var addressFrom  = {
-      name: "Andrea",
+      name: "Shelly",
       company: "Bow & Drape",
-      street1: "54 Front St",
-      street2: "",
-      city: "Fall River",
-      state: "MA",
-      zip: "02721",
+      street1: "67 West St",
+      street2: "209",
+      city: "Brooklyn",
+      state: "NY",
+      zip: "11222",
       country: "US", //iso2 country code
       phone: "+1 917-515-4332",
       email: "peter@bowanddrape.com",
@@ -25,6 +26,7 @@ class ShipProvider {
     // example address_to object dict
     var addressTo = {
       name: shipment.address.name,
+      email: shipment.address.email,
       street1: shipment.address.street,
       street2: shipment.address.apt,
       city: shipment.address.locality,
@@ -34,21 +36,32 @@ class ShipProvider {
       metadata: "Order #"+shipment.id
     }
 
+    let weight = 0;
+    shipment.contents.forEach((item) => {
+      let component = new Component(item);
+      component.recurseAssembly((component) => {
+        component.props = component.props || {};
+        component.props.weight = component.props.weight || 10;
+        weight = component.props.weight;
+      });
+    });
+
+console.log((weight*0.00220462).toFixed(2).toString());
     // parcel object dict
     var parcel = {
       length: "5",
       width: "5",
       height: "5",
       distance_unit: "in",
-      weight: "2",
+      weight: (weight*0.00220462).toFixed(3).toString(),
       mass_unit: "lb",
     }
 
     // example CustomsItems object. This is required for int'l shipment only.
     var customsItem = {
-      description: "T-Shirt",
-      quantity: 2,
-      net_weight: "0.3",
+      description: "apparel",
+      quantity: 1,
+      net_weight: (weight*0.00220462).toFixed(3).toString(),
       mass_unit: "lb",
       value_amount: "20",
       value_currency: "USD",
@@ -102,8 +115,6 @@ class ShipProvider {
       if(transaction.status != "SUCCESS")
         return callback("There was an error creating transaction: "+JSON.stringify(transaction.messages));
       // print label_url and tracking_number
-console.log("Label URL: %s", transaction.label_url);
-console.log("Tracking Number: %s", transaction.tracking_number);
       shipment.tracking_code = transaction.tracking_number;
       shipment.shipping_label = transaction.label_url;
       shipment.upsert((err) => {

@@ -1,5 +1,8 @@
 
 const React = require('react');
+const PageEditGallery = require("./PageEditGallery.jsx");
+const PageEditSignup = require("./PageEditSignup.jsx");
+const PageEditTextContent = require("./PageEditTextContent.jsx");
 
 /***
 Admin widget for managing CMS pages
@@ -12,9 +15,6 @@ class PageEdit extends React.Component {
       path: this.props.path,
       elements: this.props.elements,
     };
-    this.state.elements.forEach((element) => {
-      element.props = JSON.stringify(element.props);
-    });
   }
 
   handleNewElement() {
@@ -23,9 +23,9 @@ class PageEdit extends React.Component {
     this.setState({elements});
   }
 
-  handleUpdateElement(index, event) {
+  handleUpdateProps(index, name, value) {
     let elements = this.state.elements;
-    elements[index][event.target.getAttribute("name")] = event.target.value;
+    elements[index][name] = value;
     this.setState({elements});
   }
 
@@ -35,9 +35,10 @@ class PageEdit extends React.Component {
     // TODO some validation, maybe don't allow saving over other slugs
     let page = this.state;
     page.elements.forEach((element) => {
-      element.props = JSON.parse(element.props);
+      if (typeof(element.props)=="string")
+        element.props = JSON.parse(element.props);
     });
-    BowAndDrape.api("POST", "/page", this.state, (err, result) => {
+    BowAndDrape.api("POST", "/page", page, (err, result) => {
       if (err)
         return BowAndDrape.dispatcher.emit("error", err.error);
       location.reload();
@@ -63,12 +64,34 @@ class PageEdit extends React.Component {
 
     let elements = [];
     for (let i=0; i<this.state.elements.length; i++) {
+      let edit_props = null;
+      switch (this.state.elements[i].type) {
+        case "Gallery":
+          edit_props = (
+            <PageEditGallery onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
+          );
+          break;
+        case "Signup":
+          edit_props = (
+            <PageEditSignup onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
+          );
+          break;
+        case "TextContent":
+          edit_props = (
+            <PageEditTextContent onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
+          );
+          break;
+        default:
+          edit_props = (
+            <input type="text" name="props" style={{width:"100%"}} value={JSON.stringify(this.state.elements[i].props)} onChange={(event)=>{this.handleUpdateProps(i, "props", event.target.value)}}/>
+          );
+      }
       elements.push(
         <element key={elements.length}>
-          <select value={this.state.elements[i].type} onChange={this.handleUpdateElement.bind(this, i)} name="type">
+          <select value={this.state.elements[i].type} onChange={(event)=>{this.handleUpdateProps(i, "type", event.target.value)}} name="type">
             {whitelisted_components}
           </select>
-          <input type="text" name="props" value={this.state.elements[i].props} onChange={this.handleUpdateElement.bind(this, i)}/>
+          {edit_props}
         </element>
       );
     }

@@ -43,8 +43,12 @@ class Customizer {
 
     let components = [];
     // set product
-    if (product)
-      set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props, geometry:"doublesided"}));
+    if (product) {
+      let geometry = null;
+      if (product.props.cameras && product.props.cameras.length>1)
+        geometry = "doublesided";
+      set_tasks.push(this.product.set.bind(this.product, this.gl, {props: product.props, geometry: geometry}));
+    }
     // recurse assemblies
     if (construction && construction.assembly) {
       construction.assembly.forEach((component) => {
@@ -55,7 +59,6 @@ class Customizer {
     while (this.components.length < components.length) {
       this.components.push(new Component());
     }
-    // TODO unbind textures here so we don't leak
     this.components.length = components.length;
     for (let i=0; i<components.length; i++) {
       set_tasks.push(this.components[i].set.bind(this.components[i], this.gl, components[i]));
@@ -69,6 +72,12 @@ class Customizer {
   // call this on window resize, when we need to re-setup pretty much everything
   resizeViewport() {
     // set canvas space to be 1-to-1 with browser space
+    if (this.options.canvas) {
+      this.options.canvas.width = this.options.resolution * this.options.canvas.offsetWidth;
+      this.options.canvas.height = this.options.resolution * this.options.canvas.offsetHeight;
+      this.options.width = this.options.canvas.width;
+      this.options.height = this.options.canvas.height;
+    }
     this.gl.viewport(0, 0, this.options.width, this.options.height);
     // f_pixels is useful for a lot of transforms, remember it
     this.focal_length_pixels = this.options.height/2/Math.tan(this.options.vfov*Math.PI/360);
@@ -159,7 +168,12 @@ class Customizer {
 
   worldToScreen(world) {
     world[3] = world[3] || 1;
-    let normDeviceCoords = this.pMatrix.x(new Vector([world[0], world[1], world[2], world[3]]));
+    // FIXME this stuff is weird and needs to be fixed
+    let camera_offset = new Vector([this.camera.position[0], this.camera.position[1], this.camera.position[2], 0]);
+    let camera_world = world.add(camera_offset);
+
+    let normDeviceCoords = this.pMatrix.x(camera_world);
+    normDeviceCoords = normDeviceCoords.x(-1/this.camera.position[2]);
     let screen = [0, 0, 0, 1];
     screen[0] = normDeviceCoords.elements[0] * this.options.canvas.offsetWidth/2
       + this.options.canvas.offsetWidth/2;
@@ -169,12 +183,9 @@ class Customizer {
   }
 
   getScreenBoundingBox(component) {
-    let rotation_matrix = Matrix.Rotation(component.rotation.angle, new Vector(component.rotation.axis));
-    let world_dims = component.getWorldDims();
-    let bottom_right = new Vector(component.position).add(rotation_matrix.x(new Vector(world_dims).x(0.5))).elements;
-    bottom_right = this.worldToScreen(bottom_right);
-    let top_left = new Vector(component.position).subtract(rotation_matrix.x(new Vector(world_dims).x(0.5))).elements;
-    top_left = this.worldToScreen(top_left);
+    let world_bb = component.getWorldBoundingBox();
+    let bottom_right = this.worldToScreen(world_bb.bottom_right);
+    let top_left = this.worldToScreen(world_bb.top_left);
 
     return {
       top_left,
@@ -184,22 +195,15 @@ class Customizer {
 
   initWebGL() {
     let gl = null;
-    try {
-      if (this.options.canvas) {
-        gl = this.options.canvas.getContext("webgl");
-        this.options.canvas.width = this.options.resolution * this.options.canvas.offsetWidth;
-        this.options.canvas.height = this.options.resolution * this.options.canvas.offsetHeight;
-        this.options.width = this.options.canvas.width;
-        this.options.height = this.options.canvas.height;
-      } else {
-        // if we didn't get passed a canvas, we're doing a server side render
-        gl = require('gl')(this.options.width, this.options.height);
-      }
+    if (this.options.canvas) {
+      gl = this.options.canvas.getContext("webgl");
+    } else {
+      // if we didn't get passed a canvas, we're doing a server side render
+      gl = require('gl')(this.options.width, this.options.height);
     }
-    catch(e) {}
 
     if (!gl) {
-      console.log("Unable to initialize WebGL. Your browser may not support it.");
+      alert("Unable to initialize WebGL. Your browser may not support it, please upgrade your browser to a more modern version");
     }
     return gl;
   }

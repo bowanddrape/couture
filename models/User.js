@@ -24,10 +24,8 @@ Handle all things related to user auth and settings
 class User extends SQLTable {
   constructor(user) {
     super();
+    Object.assign(this, user);
     this.email = user.email.toLowerCase(); // remember lowercase while selecting
-    this.passhash = user.passhash;
-    this.verified = user.verified;
-    this.props = user.props;
   }
 
   // needed by SQLTable
@@ -35,7 +33,7 @@ class User extends SQLTable {
     return {
       tablename: "users",
       pkey: "email",
-      fields: ["passhash", "verified", "props"]
+      fields: ["passhash", "verified", "props", "credits"]
     };
   }
 
@@ -55,19 +53,30 @@ class User extends SQLTable {
 
     if (req.path_tokens[1]=='verify') {
       if (req.method=="POST") {
+
         return User.get(req.body.email, function(err, user) {
           if (err || !user)
-            return res.json({error: {email: "Please register first!"}});
+            return res.json({error:"Please register first!"});
           user.verifying = true;
           User.generateJwtToken(user, (err, token) => {
-            let body = Page.renderString(UserVerifyEmail, {user: user, link:`https://${req.headers.host}/user/verify/${token}`, host:req.headers.host}, LayoutEmail);
+            if (err) return res.json({error: err.toString()});
+            let body = Page.renderString([{
+              component: UserVerifyEmail,
+              props: {
+                user: user,
+                link: `https://${req.headers.host}/user/verify/${token}`,
+                host: JSON.parse(JSON.stringify(req.headers.host)),
+              }
+            }], LayoutEmail);
             Mail.send(user.email, "Verify your Bow & Drape Account", body, (err) => {
-              if (err) return res.json({error: err.toString()});
-
-              res.json({error: 'email sent, please wait a few mins for it to reach your inbox'});
+              // FIXME for some reason this line is giving errors, ignoring for now
+              try {
+                return res.json({error: 'email sent, please check your inbox'});
+              } catch(err) {}
             });
           });
         });
+
       } // POST, send email
       if (req.method=="GET") {
         return jsonwebtoken.verify(req.path_tokens[2], jwt_secret, (err, user) => {
@@ -118,6 +127,19 @@ class User extends SQLTable {
           req.user = null;
           return next();
         }
+        // do a db fetch if we are about to try something
+        if (req.method=='POST') {
+          return User.get(user.email, (err, user) => {
+            if (err) {
+              req.user = null;
+              return next();
+            }
+            req.user = user;
+            req.user.populateRoles();
+            next();
+          });
+        }
+        // otherwise just trust the token
         req.user = new User(user);
         req.user.populateRoles();
         next();
@@ -176,11 +198,14 @@ class User extends SQLTable {
           return User.handleRegister(req, res);
 
         if (!user.passhash)
-          return res.json({error:{password:"Verify your email to set password"}}).end();
+          return res.json({error:"Select 'Forgot Password' to set a password"}).end();
         if (user.passhash!=req.body.passhash)
-          return res.json({error:{password:"Incorrect password"}}).end();
+          return res.json({error:"Incorrect password"}).end();
         User.sendJwtToken(res, user);
       });
+    } else if (req.user) {
+      // if the user is already logged in, just issue a new token
+      return User.sendJwtToken(res, req.user);
     }
 
     return res.json({error:"no login credentials"}).end();

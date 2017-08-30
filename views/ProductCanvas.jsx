@@ -8,15 +8,7 @@ const ProductComponentPicker = require('./ProductComponentPicker.jsx');
 
 // lookup table to find skus corresponding to certain characters
 let character_to_skutext = {
-  " ":"space",
-  "#":"hashtag",
-  "?":"question",
-  "!":"exclamation",
-  "&":"and",
-  "\"":"quote",
-  "\'":"quote",
-  ",":"comma",
-  ".":"period",
+  "_":"underscore",
 };
 let skutext_to_character = {};
 Object.keys(character_to_skutext).forEach((key) => {
@@ -48,17 +40,13 @@ class ProductCanvas extends React.Component {
     this.forceUpdate();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    this.customizer.resizeViewport();
-  }
-
   // get a text version of a component
   getComponentText() {
     let ret = "";
     let selected = this.state.assembly[this.state.selected_component];
     if (!selected) return ret;
     selected.assembly.forEach((component) => {
-      let toks = component.props.name.split('_');
+      let toks = component.sku.split('_');
       let character = toks[toks.length-1].toLowerCase();
       character = skutext_to_character[character] || character;
       ret += character;
@@ -74,13 +62,17 @@ class ProductCanvas extends React.Component {
       if (!selected) {
         // if nothing is selected make a new selected component
         // facing the camera for now TODO get normal of intersected tri
+        let rotation = Matrix.I(4);
+        if (this.customizer.camera.rotation.angle) {
+          rotation = Matrix.Rotation(
+            -this.customizer.camera.rotation.angle,
+            new Vector(this.customizer.camera.rotation.axis)
+          ).ensure4x4();
+        }
         selected = {
           props: {
             position: [0,0,0],
-            rotation: {
-              angle: -this.customizer.camera.rotation.angle,
-              axis: this.customizer.camera.rotation.axis,
-            },
+            rotation,
           },
           assembly: [],
         };
@@ -94,7 +86,10 @@ class ProductCanvas extends React.Component {
       selected.assembly = text.split("").map((letter) => {
         letter = letter.toLowerCase();
         letter = character_to_skutext[letter] || letter;
-        return componentMap[letter];
+        // deep copy and set the quantity of this component to be used to 1
+        let component = JSON.parse(JSON.stringify(componentMap[letter]));
+        component.quantity = 1;
+        return component;
       }).filter((component) => {
         return component;
       });
@@ -103,6 +98,9 @@ class ProductCanvas extends React.Component {
   }
 
   handleAddComponent(component) {
+    // deep copy and set the quantity of this component to be used to 1
+    component = JSON.parse(JSON.stringify(component));
+    component.quantity = 1;
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected = assembly[prevState.selected_component];
@@ -113,9 +111,12 @@ class ProductCanvas extends React.Component {
       // if nothing is selected make a new selected component
       // facing the camera for now TODO get normal of intersected tri
       let position = [0,0,0];
-      let rotation = {
-        angle: -this.customizer.camera.rotation.angle,
-        axis: this.customizer.camera.rotation.axis,
+      let rotation = Matrix.I(4);
+      if (this.customizer.camera.rotation.angle) {
+        rotation = Matrix.Rotation(
+          -this.customizer.camera.rotation.angle,
+          new Vector(this.customizer.camera.rotation.axis)
+        ).ensure4x4();
       }
       assembly.push({
         props: {
@@ -127,13 +128,13 @@ class ProductCanvas extends React.Component {
       return {assembly, selected_component: assembly.length-1};
     });
   }
-  handlePopComponent() {
+  handlePopComponent(cascade=false) {
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected = assembly[prevState.selected_component];
       if (selected) {
         selected.assembly.pop();
-        if (!selected.assembly.length) {
+        if (cascade || !selected.assembly.length) {
           assembly.splice(prevState.selected_component, 1);
           return {assembly, selected_component: -1};
         }
@@ -164,22 +165,36 @@ class ProductCanvas extends React.Component {
     });
   }
 
+  handleComponentRotate(angle, event) {
+    // update the component rotation
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      let selected = assembly[prevState.selected_component];
+      if (selected) {
+        let component_rotation = new Matrix(selected.props.rotation.elements);
+        let camera_rotation = Matrix.Rotation(this.customizer.camera.rotation.angle, new Vector(this.customizer.camera.rotation.axis));
+        selected.props.rotation = Matrix.Rotation(angle, camera_rotation.x(new Vector(this.customizer.camera.position))).ensure4x4().x(component_rotation);
+      }
+      return {assembly};
+    });
+  }
+
   handleSelectComponent(index) {
     this.setState({selected_component: index});
   }
 
   handleChangeCamera(index) {
-    this.customizer.updatePMatrix(this.cameras[index]);
+    this.camera_index = index;
+    this.customizer.updatePMatrix(this.cameras[this.camera_index]);
     this.handleSelectComponent(-1);
   }
 
   autoLayout(reflow=false) {
     let getComponentsOfInterest = (assembly) => {
       return assembly.filter((component) => {
-        // TODO switch component rotation away from quaternions and to a
-        // rotation matrix?
-        let camera_position_world = Matrix.Rotation(this.customizer.camera.rotation.angle, new Vector(this.customizer.camera.rotation.axis)).x(new Vector(this.customizer.camera.position))
-        let relative_camera_direction = Matrix.Rotation(component.props.rotation.angle, new Vector(component.props.rotation.axis)).x(camera_position_world).elements;
+        let camera_position_world = Matrix.Rotation(this.customizer.camera.rotation.angle, new Vector(this.customizer.camera.rotation.axis)).ensure4x4().x(new Vector([this.customizer.camera.position[0],this.customizer.camera.position[1],this.customizer.camera.position[2],1]));
+        let component_rotation = new Matrix(component.props.rotation.elements);
+        let relative_camera_direction = component_rotation.x(camera_position_world).elements;
         return relative_camera_direction[2] <= 0;
         // TODO don't affect components that have been positioned manually
         // unless the reflow flag is flipped?
@@ -191,10 +206,10 @@ class ProductCanvas extends React.Component {
       let selected_component = prevState.selected_component;
       // TODO rectangular design areas for now
       let design_area = this.props.product.props.design_area&&this.props.product.props.design_area.width ? this.props.product.props.design_area : {
-        top: this.props.product.props.imageheight/2,
+        top: this.props.product.props.imageheight/2 - 0.05,
         left: -this.props.product.props.imagewidth/2,
-        width: this.props.product.props.imagewidth,
-        height: this.props.product.props.imageheight,
+        width: this.props.product.props.imagewidth*5/9,
+        height: this.props.product.props.imageheight*3/4,
         gravity: [0,this.props.product.props.imageheight/4],
       };
       // only work on visible components
@@ -262,6 +277,7 @@ class ProductCanvas extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    this.customizer.resizeViewport();
     // handle actions on hitboxes
     this.canvas.parentNode.childNodes.forEach((node) => {
       if (node.tagName.toLowerCase()!="component_hitbox") return;
@@ -276,8 +292,8 @@ class ProductCanvas extends React.Component {
     // send state to gl
     this.customizer.set(nextProps.product, nextState);
     // update our cameras
-    this.cameras = nextProps.product.cameras;
-    if (!this.cameras || typeof(this.cameras)!='array') {
+    this.cameras = nextProps.product.props.cameras;
+    if (!this.cameras || (typeof(this.cameras)!='array'&&typeof(this.cameras)!='object')) {
       // the default camera, one meter away
       this.cameras = [];
       this.cameras.push({
@@ -287,21 +303,10 @@ class ProductCanvas extends React.Component {
           axis: [0, 1, 0],
         }
       });
-      this.cameras.push({
-        position: [0, 0, -1],
-        rotation: {
-          angle: Math.PI/4,
-          axis: [0, 1, 0],
-        }
-      });
-      this.cameras.push({
-        position: [0, 0, -1],
-        rotation: {
-          angle: Math.PI,
-          axis: [0, 1, 0],
-        }
-      });
     }
+    if (!this.camera_index || this.camera_index+1>this.cameras.length)
+      this.camera_index = 0;
+    this.customizer.updatePMatrix(this.cameras[this.camera_index]);
   }
 
   render() {
@@ -311,8 +316,8 @@ class ProductCanvas extends React.Component {
       for (let index=0; index<this.customizer.components.length; index++) {
         let component = this.customizer.components[index];
         let dims_screen = this.customizer.getScreenBoundingBox(component);
-        // cull backfacing hitboxes
-        if (dims_screen.bottom_right[0]<dims_screen.top_left[0]) continue;
+        // FIXME we want to cull backfacing hitboxes but not like this
+        //if (dims_screen.bottom_right[0]<dims_screen.top_left[0]) continue;
         component_hitboxes.push(
           <component_hitbox
             key={component_hitboxes.length}
@@ -334,22 +339,38 @@ class ProductCanvas extends React.Component {
     let camera_switcher = [];
     if (this.cameras) {
       this.cameras.forEach((camera) => {
+        let camera_label = camera.name.toUpperCase() || `Camera ${camera_switcher.length}`;
         camera_switcher.push(
           <button key={camera_switcher.length} onClick={this.handleChangeCamera.bind(this, camera_switcher.length)}>
-            Camera {camera_switcher.length}
+            {camera_label}
           </button>
         )
       });
     }
+    if (this.state.assembly[this.state.selected_component]) {
+      camera_switcher.push(
+        <div key={camera_switcher.length} style={{display:"flex"}}>
+          <button onClick={this.handleComponentRotate.bind(this, -Math.PI/20)}>
+            ⬅
+          </button>
+          <button onClick={this.handlePopComponent.bind(this, true)}>
+            ✖
+          </button>
+          <button onClick={this.handleComponentRotate.bind(this, Math.PI/20)}>
+            ➡
+          </button>
+        </div>
+      )
+    }
 
     return (
-      <div style={{position:"relative"}}>
-        <canvas style={{position:"relative",height:"300px",width:"100%",minWidth:"400px"}}>
+      <div style={{position:"relative",margin:"auto"}}>
+        <canvas style={{display:"block",height:"300px",width:"100%",minWidth:"400px"}}>
         </canvas>
         {component_hitboxes}
-        <hud_controls style={{position:"absolute",right:"0",top:"0"}}>
+        <hud_controls style={{position:"absolute",right:"20px",top:"0"}}>
           {camera_switcher}
-          <button onClick={this.autoLayout.bind(this, true)}>Auto</button>
+          <button onClick={this.autoLayout.bind(this, true)}>AUTO</button>
         </hud_controls>
         <ProductComponentPicker product={this.props.product} productCanvas={this}/>
       </div>

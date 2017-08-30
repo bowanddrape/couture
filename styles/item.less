@@ -5,7 +5,7 @@
 @item_width: 700px;
 
 item {
-  display: block;
+  display: flex;
   position: relative;
   max-width: @item_width;
   margin: auto;
@@ -15,8 +15,6 @@ item {
     border-bottom: solid 1px @color_secondary;
   }
   img.preview {
-    display: none;
-    position: absolute;
     max-width: @item_preview_width;
     max-height: @item_preview_height;
   }
@@ -28,18 +26,20 @@ item {
   }
   deets {
     display: block;
-    margin-left: @item_preview_width + 10px;
-    margin-right: 10px;
-    * {
-      color: @color_secondary;
-      float: left;
-      display: inline-block;
-    }
+    color: @color_secondary;
     .name, .price {
       font-weight: bold;
     }
     .price {
-      float: right;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      &.free {
+        opacity: 0.5;
+      }
+      &.negative {
+        color: @color_support_6;
+      }
     }
     .remove {
       clear: both;
@@ -60,7 +60,6 @@ item {
   }
   assembly {
     clear: both;
-    margin-left: @item_preview_width;
   }
 }
 

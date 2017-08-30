@@ -2,7 +2,7 @@
   "author": "graphicsforge",
   "scripts": {
     "build_js": "mkdir -p public/dist && ./node_modules/browserify/bin/cmd.js --exclude ./model/* -t [ babelify --presets [ react es2015 ] ] -r ./views/BowAndDrape.jsx:BowAndDrape -o public/dist/BowAndDrape.js",
-    "build_sprites": "./node_modules/.bin/sprity create public/dist/ public/*.png -c / -p less -s sprite.less --cachebuster",
+    "build_sprites": "./node_modules/.bin/sprity create public/dist/ public/*.png -c / -p less -s sprite.less --cachebuster --engine sprity-gm",
     "build_styles": "/usr/bin/lessc ./styles/styles.less public/dist/styles.css",
     "build": "npm run build_js && npm run build_sprites && npm run build_styles",
     "start": "npm run build && sudo node server.js"
@@ -19,12 +19,14 @@
     "browserify": "^13.0.1",
     "compression": "^1.6.2",
     "cookie-parser": "^1.4.3",
+    "deep-equal": "^1.0.1",
     "dotenv": "^4.0.0",
     "express": "~4.13.4",
     "get-pixels": "^3.3.0",
     "gl": "^4.0.3",
     "googleapis": "^19.0.0",
     "html-pdf": "^2.1.0",
+    "influx": "^5.0.0-alpha.4",
     "jsonwebtoken": "^7.1.9",
     "jwt-decode": "^2.1.0",
     "less-vars-to-js": "^1.1.2",
@@ -34,12 +36,16 @@
     "newrelic": "^1.33.0",
     "node-babel": "^0.1.2",
     "node-jsx-babel": "^0.14.2",
+    "node-taxcloud": "^1.1.4",
+    "node-uuid": "^1.4.8",
     "pg": "^6.1.0",
     "pg-native": "^1.10.0",
+    "querystring": "^0.2.0",
     "ray-triangle-intersection": "^1.0.3",
     "react": "~15.3.2",
     "react-autocomplete": "^1.4.0",
     "react-swipeable": "^3.9.2",
+    "response-time": "^2.3.2",
     "save-pixels": "^2.3.4",
     "sendgrid": "^4.7.1",
     "node-ses": "^2.0.0",
@@ -58,6 +64,7 @@
     "react-dom": "~15.3.2",
     "sprity-cli": "^1.0.1",
     "sprity-less": "^1.0.3",
+    "sprity-gm": "^1.0.3",
     "webpack": "^1.13.2"
   }
 }

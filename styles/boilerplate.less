@@ -1,5 +1,6 @@
 
 @import "./colors.less";
+@import "./fonts.less";
 
 button, .button {
   .headerfont;
@@ -30,6 +31,7 @@ errors {
   background-color: @color_error;
   border-radius: 5px;
   padding: 5px;
+  margin: 3px auto;
   border-radius: 5px;
   display: block;
 }
@@ -109,5 +111,20 @@ a.card {
     label {
       opacity: 1;
     }
+  }
+  &.not_link {
+    cursor: default;
+  }
+}
+.gallery {
+  a.card:not(.not_link):hover {
+    border: 3px solid @color_secondary;
+  }
+  .caption {
+    .headerfont;
+    z-index: 1;
+    background-color: @color_primary;
+    width: 100%;
+    text-align: center;
   }
 }

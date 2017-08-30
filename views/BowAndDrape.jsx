@@ -4,10 +4,10 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const EventEmitter = require('events');
 const jwt_decode = require('jwt-decode');
+const queryString = require('querystring');
 
-const LayoutBasic = require('./LayoutBasic.jsx');
-const LayoutMain = require('./LayoutMain.jsx');
 const Customizer = require('./Customizer.js');
+const Errors = require('./Errors.jsx');
 
 /***
 Okay, this is a namespace to wrap all the things needed globally on the client-
@@ -38,16 +38,16 @@ class Dispatcher extends EventEmitter {
     super(props);
   }
   handleAuth(auth_object) {
-    if (auth_object.error) {
+    if (!auth_object || !auth_object.token) {
       document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-      return this.emit('user', {error: auth_object.error});
-    }
-    if (!auth_object.token) {
-      document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      delete BowAndDrape.token;
+      if (auth_object && auth_object.error) {
+        Errors.emitError("login", auth_object.error.toString());
+        return this.emit('user', {error: auth_object.error});
+      }
       return this.emit('user', {});
     }
     let decoded = jwt_decode(auth_object.token);
-    this.emit('user', decoded);
     // save cookie
     var d = new Date();
     d.setTime(decoded.exp*1000);
@@ -55,6 +55,7 @@ class Dispatcher extends EventEmitter {
     document.cookie = "token=" + auth_object.token + ";" + expires + ";path=/";
     // also save it in memory for API auth
     BowAndDrape.token = auth_object.token;
+    this.emit('user', decoded);
     this.emit("authenticated");
   }
 }
@@ -66,12 +67,24 @@ dispatcher.on("loaded", () => {
   if (token) {
     dispatcher.handleAuth({token:token});
   }
+  // google analytics
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-52623236-1', 'auto');
+  ga('send', 'pageview');
 });
 
 // helper function mostly for making XHR calls. Our API expects multipart form
 // data and a json request header. Some calls need an auth token to take effect
 let api = function(method, endpoint, body, callback) {
-  var self = this;
+  // if we didn't, build GET querystring
+  if (method=="GET" && !/\?/.test(endpoint))
+    endpoint += "?"+queryString.stringify(body);
+  // clear error messages on POST
+  if (method == "POST")
+    Errors.clear();
   let xhr = new XMLHttpRequest();
   xhr.open(method, endpoint, true);
   xhr.setRequestHeader("Accept","application/json");
@@ -83,9 +96,19 @@ let api = function(method, endpoint, body, callback) {
     console.log("attempting api call while not logged in");
   xhr.onreadystatechange = function() {
     if (this.readyState!=4) { return; }
-    if (this.status!=200)
-      return callback(JSON.parse(this.responseText));
-    callback(null, JSON.parse(this.responseText));
+    let response;
+    try {
+      response = JSON.parse(this.responseText);
+    } catch(err) {
+      callback("invalid server response =(");
+    }
+    if (this.status!=200) {
+      if (response.error) return callback(response.error);
+      return callback(response);
+    }
+    if (response && response.error)
+      return callback(response.error);
+    callback(null, response);
   }
   let payload = new FormData();
   if (body) {
@@ -107,16 +130,21 @@ module.exports = {
   // any interactable view MUST be listed here
   // FIXME script this?
   views: {
-    LayoutMain: LayoutMain,
-    LayoutBasic: LayoutBasic,
+    LayoutMain: require('./LayoutMain.jsx'),
+    LayoutBasic: require('./LayoutBasic.jsx'),
     UserPasswordReset: require('./UserPasswordReset.jsx'),
     FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),
     Cart: require('./Cart.jsx'),
     Placeholder: require('./Placeholder.jsx'),
     PageList: require('./PageList.jsx'),
+    PageEdit: require('./PageEdit.jsx'),
     Items: require('./Items.jsx'),
     ComponentsEdit: require('./ComponentsEdit.jsx'),
+    Gallery: require('./Gallery.jsx'),
+    Signup: require('./Signup.jsx'),
+    TextContent: require('./TextContent.jsx'),
+    VSSAdmin: require('./VSSAdmin.jsx'),
   },
   dispatcher,
   api,

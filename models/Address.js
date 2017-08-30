@@ -13,6 +13,7 @@ class Address {
     }
     this.name = address.name;
     this.email = address.email;
+    this.phone = address.phone;
     if (this.name)
       this.name = this.name.replace(/"/g, "'");
     this.street = address.street;

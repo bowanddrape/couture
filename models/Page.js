@@ -7,6 +7,7 @@ const async = require('async');
 const JSONAPI = require('./JSONAPI');
 
 const LayoutMain = require('../views/LayoutMain.jsx');
+const LayoutBasic = require('../views/LayoutBasic.jsx');
 
 const NotFound = require('../views/NotFound.jsx');
 
@@ -21,6 +22,9 @@ const whitelisted_components = [
   "ItemProductionChecklist",
   "ItemProductionChecklistLegacy",
   "Cart",
+  "Gallery",
+  "Signup",
+  "TextContent",
 ]
 
 /***
@@ -49,6 +53,21 @@ class Page extends JSONAPI {
     if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
       return Page.renderNotFound(req, res);
 
+    // if path is specified
+    if (req.path_tokens.length > 1) {
+      let path = `/${req.path_tokens.slice(1).join('/')}`;
+      return Page.get(path, (err, page) => {
+        if (err) return res.status(500).json(err);
+        if (!page) return Page.renderNotFound(req, res);
+        Page.render(req, res, require(`../views/PageEdit.jsx`), {
+          whitelisted_models,
+          whitelisted_components,
+          path: page.path,
+          elements: page.elements,
+        });
+      });
+    }
+
     Page.render(req, res, require(`../views/PageList.jsx`), {whitelisted_models, whitelisted_components});
   }
 
@@ -57,91 +76,111 @@ class Page extends JSONAPI {
     let pages = Page.getAll(null, function(err, pages) {
       for (let i=0; i<pages.length; i++) {
         let matches = req.path.match(pages[i].path);
-        if (matches) {
-          // TODO go through all elements and do this
-          let element = pages[i].elements[0];
-          if (!element) continue;
+        if (!matches) continue;
+        let render_elements = [];
+        pages[i].elements.forEach((element) => {
+          if (!element) return;
+          render_elements.push(function(callback) {
 
-          // there are 2 ways of specifying prop data, immediate or from db
-          let immediate = {};
-          // can also be supplied from querystring?
-          for (let key in req.query) {
-            try {
-              // parse it if it's json
-              immediate[key] = JSON.parse(req.query[key]);
-            } catch(err) {
-              // otherwise strip quotes as they mess with JSON format
-              immediate[key] = req.query[key].replace(/"/g, '');
+            // there are 2 ways of specifying prop data, immediate or from db
+            let immediate = {};
+            // can also be supplied from querystring?
+            for (let key in req.query) {
+              try {
+                // parse it if it's json
+                immediate[key] = JSON.parse(req.query[key]);
+              } catch(err) {
+                // otherwise strip quotes as they mess with JSON format
+                immediate[key] = req.query[key].replace(/"/g, '');
+              }
             }
-          }
-          let queries = [];
-          for (let prop in element.props) {
-            // if the prop was not in model-query form, just copy it
-            if (!element.props[prop].model || !element.props[prop].query) {
-              immediate[prop] = element.props[prop];
-              continue;
-            }
-            // otherwise try the db fetch
-            if (whitelisted_models.indexOf(element.props[prop].model)==-1)
-              return res.status(500).end("Page Error: model not whitelisted");
-            let model = require(`./${element.props[prop].model}.js`);
-            let query = element.props[prop].query;
-            queries.push(function(callback) {
-              model.getAll(query, function(err, data) {
-                callback(err, {prop:prop, data:data});
-              });
-            });
-          }
-
-          return async.parallel(queries, function(err, data) {
-            if (err) return res.status(500).end("Data Error: could not fetch from database");
-
-            // convert db data array to prop object for the react component
-            let props = {};
-            data.map(function(query_result) {
-              props[query_result.prop] = query_result.data;
-            });
-            // copy over immediate props
-            Object.assign(props, immediate);
-
-            // render react component
-            if (whitelisted_components.indexOf(element.type)==-1)
-              return res.status(500).json({error:"page component not whitelisted"});
-            let component = require(`../views/${element.type}.jsx`);
-            // have a place for optional async preprocessing?
-            if (component.preprocessProps) {
-              return component.preprocessProps(props, function(err, result) {
-                if (err) {
-                  console.log(err); //TODO elevate this
-                  return res.status(500).json({error:err.toString()});
-                }
-                Page.render(req, res, component, result);
+            let queries = [];
+            for (let prop in element.props) {
+              // if the prop was not in model-query form, just copy it
+              if (!element.props[prop].model || !element.props[prop].query) {
+                immediate[prop] = element.props[prop];
+                continue;
+              }
+              // otherwise try the db fetch
+              if (whitelisted_models.indexOf(element.props[prop].model)==-1)
+                return callback("Page Error: model not whitelisted");
+              let model = require(`./${element.props[prop].model}.js`);
+              let query = element.props[prop].query;
+              queries.push(function(callback) {
+                model.getAll(query, function(err, data) {
+                  callback(err, {prop:prop, data:data});
+                });
               });
             }
-            Page.render(req, res, component, props);
-          });
-        }
-      }
+
+            return async.parallel(queries, function(err, data) {
+              if (err) return callback("Data Error: could not fetch from database");
+
+              // convert db data array to prop object for the react component
+              let props = {};
+              data.map(function(query_result) {
+                props[query_result.prop] = query_result.data;
+              });
+              // copy over immediate props
+              Object.assign(props, immediate);
+
+              // render react component
+              if (whitelisted_components.indexOf(element.type)==-1)
+                return callbackn({error:"page component not whitelisted"});
+              let component = require(`../views/${element.type}.jsx`);
+              // have a place for optional async preprocessing?
+              if (component.preprocessProps) {
+                return component.preprocessProps(props, function(err, result) {
+                  if (err) {
+                    console.log(err); //TODO elevate this
+                    return callback(err);
+                  }
+                  return callback(null, {component, props:result});
+                });
+              }
+              return callback(null, {component, props});
+            });
+          }); // setup render_elements
+
+        }); //go through all elements on page
+        return async.parallel(render_elements, function(err, data) {
+          if(err) return res.status(500).end(err.toString());
+          let head = Page.getHTMLHead(req, res, {});
+          let body = Page.renderString(data, req.query.embed?LayoutBasic:LayoutMain);
+          return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
+        });
+      } // for pages
       next();
-    });
+    }); // page.getAll()
   }
 
-  static renderString(component, props, layout) {
+  static renderString(component_list, layout) {
     // render the page server-side
-    let content = React.createElement(component, props);
-    let page = React.createElement(layout, {content_string:ReactDOMServer.renderToString(content), content_name:content.type.name.toString(), content_props: JSON.stringify(props)});
+    let content_string = "";
+    let content = [];
+    component_list.forEach((comp_props) => {
+      let react_element = React.createElement(comp_props.component, comp_props.props);
+      content_string += ReactDOMServer.renderToString(react_element);
+      content.push({
+        name: react_element.type.name.toString(),
+        props: comp_props.props,
+      });
+    });
+    let page = React.createElement(layout, {content_string, content});
 
     return ReactDOMServer.renderToString(page);
   }
 
   // TODO render function for 5XX errors
+  static renderError(req, res) {
+    res.status(500);
+    Page.render(req, res, NotFound, {error:"Server Error"});
+  }
 
   // helper function to render 404
   static renderNotFound(req, res) {
-    if (!req.accepts('*/*') && req.accepts('application/json'))
-      return res.status(404).json({error:"Not Found"}).end();
-    let page = React.createElement(NotFound, {});
-    return res.status(404).end(ReactDOMServer.renderToString(page));
+    res.status(404);
+    Page.render(req, res, NotFound, {error:"Not Found"});
   }
 
   // helper functions to get <head> stuff, usually used to popoulate meta tags
@@ -167,8 +206,8 @@ class Page extends JSONAPI {
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.json(props).end();
     let head = Page.getHTMLHead(req, res, props);
-    let body = Page.renderString(component, props, layout);
-    return res.end(`<head>${head}</head><body>${body}</body>`);
+    let body = Page.renderString([{component, props}], layout);
+    return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
   }
 
 }

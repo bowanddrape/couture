@@ -29,10 +29,20 @@ class Shipment extends JSONAPI {
     return {
       tablename: "shipments",
       pkey: "id",
-      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "in_production", "packed", "received", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address"]
+      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address"]
     };
   }
 
+  // extends JSONAPI
+  hasApiPermission(req, res) {
+    // allow user to ask for own shipments
+    if (req.method=='GET' && req.user && req.user.email==req.query.email)
+      return true;
+
+    return super.hasApiPermission(req, res);
+  }
+
+  // extends JSONAPI
   onApiSave(req, res, object, callback) {
     // if this was a request for shipping rates, return that instead
     if (req.path=="/shipment/quote") {
@@ -70,13 +80,13 @@ class Shipment extends JSONAPI {
           method: 'GET',
           hostname: 'production.shippingapis.com',
           path: encodeURI(`/ShippingAPI.dll?API=TrackV2&XML=<?xml version="1.0" encoding="UTF-8" ?><TrackRequest USERID="717BOWDR0178"><TrackID ID="${this.tracking_code}"></TrackID></TrackRequest>`)
-        }, function (result) {
+        }, (result) => {
           result.setEncoding('utf8');
           let tracking_data = '';
-          result.on('data', function(data) {
+          result.on('data', (data) => {
             tracking_data += data;
           });
-          result.on('end', function() {
+          result.on('end', () => {
             xmlParseString(tracking_data, (err, tracking) => {
               if (err) return callback(err);
               let description = "";
@@ -86,6 +96,8 @@ class Shipment extends JSONAPI {
               } catch (err) {
                 return callback({error: "unhandled response from USPS tracking",response: tracking});
               }
+              if (!/could not locate the tracking information/.test(description))
+                this.ship_description = description;
               if (/ delivered /.test(description) && !/ not be delivered/.test(description)) {
                 let matches = description.match(/ ([0-9]+):([0-9]+) (.m) on ([^\s]+ [^\s]+ [^\s]+)/);
                 if (!matches) {

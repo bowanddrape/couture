@@ -26,6 +26,27 @@ const token = process.env.SLACK_TOKEN;
 // connect to slack RTM for messages
 slackbot.listen({token});
 
+// setup connection to influxdb for timeseries logging
+const Influx = require('influx');
+const influx = new Influx.InfluxDB({
+  host: process.env.INFLUX_HOST,
+  database: 'couture_'+process.env.ENV,
+  schema: [
+    {
+      measurement: 'webserver_response_time',
+      fields: {
+        path: Influx.FieldType.STRING,
+        value: Influx.FieldType.INTEGER,
+      },
+      tags: [
+        'host',
+        'status',
+        'user_email',
+      ]
+    }
+  ]
+})
+
 /***
 Log a message. Currently goes to Slack
 ***/
@@ -62,6 +83,65 @@ class Log {
       text: msg,
     }));
   }
+
+  static webserverResponse(req, res, time) {
+    influx.writePoints([
+      {
+        measurement: 'webserver_response_time',
+        tags: {
+          host: os.hostname(),
+          status: res.statusCode,
+          user_email: req.user?req.user.email:null,
+        },
+        fields: {
+          path: req.path,
+          value: time,
+        },
+      }
+    ]).catch((reason) => {
+      console.log("Log.webserverResponse error "+reason);
+    });
+  }
+
+  static handleHTTP(req, res, next) {
+    if (req.path_tokens[0]!='log')
+      return next();
+    if (!req.query.measurement)
+      return res.status(404).json({error:"no measurement specified"});
+    if (!req.query.time_start)
+      return res.status(404).json({error:"no time_start specified"});
+    if (!req.query.time_interval)
+      return res.status(404).json({error:"no time_interval specified"});
+
+    let where = [];
+    for (let key in req.query) {
+      if (["measurement", "time_interval"].indexOf(key)>=0)
+        continue;
+      if (key=="time_start") {
+        where.push(`time>=${req.query[key]}`);
+        continue;
+      }
+      if (key=="time_stop") {
+        where.push(`time<=${req.query[key]}`);
+        continue;
+      }
+      where.push(`${key}=${req.query[key]}`);
+    }
+
+    let query = `
+      select mean(value), count(value) from ${req.query.measurement}
+      where ${where.join(" and ")}
+      group by time(${req.query.time_interval})
+    `;
+
+    influx.query(query).then((rows) => {
+      res.json(rows);
+    }).catch((reason) => {
+      console.log(reason);
+      return res.status(500).end(reason);
+    });
+  }
+
 }
 
 Log.username = username;

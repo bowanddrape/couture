@@ -1,0 +1,6 @@
+
+ALTER TABLE migrations ALTER COLUMN filename TYPE VARCHAR(64);
+CREATE TABLE IF NOT EXISTS promos (
+  code VARCHAR(128) PRIMARY KEY,
+  props JSONB DEFAULT '{}'
+);

@@ -3,18 +3,38 @@
 
 page_edit {
   display: block;
-  border: solid 3px @color_tertiary;
+  border: solid 3px @color_admin_0;
   padding: 5px;
   margin-top: 5px;
   element {
     display: block;
-    background-color: @color_support_5;
+    background-color: @color_admin_0;
     padding: 3px;
-    &:nth-child(2n) {
-      background-color: @color_tertiary;
+    border-bottom: solid 3px @color_admin_1;
+    &:last-of-type {
+      border-bottom: none;
+    }
+    card {
+      .preview {
+        width: 150px;
+        height: 150px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      fields {
+        width: 300px;
+        margin-left: 75px;
+        div {
+          position: relative;
+        }
+        label {
+          position: absolute;
+          right: 305px;
+        }
+      }
     }
     input[type="text"] {
-      width: 100%
     }
   }
 }

@@ -1,6 +1,6 @@
 
 const React = require('react');
-const UserProfile = require('./UserProfile.jsx');
+const UserLogin = require('./UserLogin.jsx');
 const jwt_decode = require('jwt-decode');
 
 /***
@@ -23,7 +23,7 @@ class UserPasswordReset extends React.Component {
     let password = document.getElementById("password").value;
     let auth = this.getUser();
 
-    UserProfile.hashPassword(auth.user.email, password, (err, passhash) => {
+    UserLogin.hashPassword(auth.user.email, password, (err, passhash) => {
       let payload={passhash: passhash};
       BowAndDrape.api("POST", "/user/reset_password", payload, (err, response) => {
         // TODO handle errors?

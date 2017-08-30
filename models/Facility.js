@@ -24,7 +24,15 @@ class Facility extends SQLTable {
       fields: ["props", "address"]
     };
   }
-
 }
+
+// keep around some common constant special ids so we don't have to do a db
+// lookup each time
+// TODO cache things and look things up from cache instead
+Facility.special_ids = {
+  customer_ship: '6ee01152-cc5e-49e7-97b7-d676ca7ff108',
+  manual_adjust : '5c637540-d460-4938-ac38-b6d283ea9a6d',
+  vss : '83bcecf8-6881-4202-bb1c-051f77f27d90',
+};
 
 module.exports = Facility;

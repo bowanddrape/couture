@@ -11,16 +11,12 @@ class UserVerifyEmail extends React.Component {
 
   render() {
     return (
-      <table align="center"><tbody>
-        {/* TODO use LayoutEmail to draw this email!! */}
+      <table><tbody>
         <tr><td style={styles.fullwidth}>
-            <img src="https://{this.props.host}/sprite.png" width="600" alt="some image" />
+          <a href={this.props.link}>
+            Click here to reset your password / verify your account
+          </a>
         </td></tr>
-        <tr><td style={styles.fullwidth}>
-            <a href={this.props.link}>
-              Click here to reset your password / verify your account
-            </a>
-          </td></tr>
       </tbody></table>
     );
   }

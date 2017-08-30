@@ -115,12 +115,12 @@ class ProductComponentPicker extends React.Component {
           let component_letters = {};
           for (let j=0; j<product.compatible_components[i].options.length; j++) {
             let letter = product.compatible_components[i].options[j];
-            let toks = letter.props.name.split('_');
+            let toks = letter.sku.split('_');
             let character = toks[toks.length-1].toLowerCase();
             component_letters[character] = letter;
           }
           components.push(
-            <div key={components.length} name={product.compatible_components[i].props.name} style={{height:"auto"}} className="component_container">
+            <div key={components.length} name={product.compatible_components[i].sku} style={{height:"auto"}} className="component_container">
               <input type="text" style={{width:"90%"}}
                 onChange={(event) => {
                   this.handleSetComponentText(event.target.value, component_letters);

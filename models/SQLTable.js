@@ -89,6 +89,39 @@ class SQLTable {
     }); // db connection
   } // sqlExec
 
+  // run an array of functions that need to be wrapped in a transaction
+  static sqlExecTransaction(sql_tasks, error_task) {
+    // we need to go to the write pool
+    pg_write_pool.connect(function(err, client, done) {
+      if (err) return error_task(err);
+
+      // prepend transaction open
+      sql_tasks.unshift((callback) => {
+        client.query('BEGIN', (err) => {
+          callback(err, client);
+        });
+      });
+      // append transaction commit
+      sql_tasks.push((callback) => {
+        client.query('COMMIT', (err) => {
+          callback(err);
+        });
+      });
+      async.waterfall(sql_tasks, (err) => {
+        if (err) {
+          // if we errored, call rollback and run error_task
+          return client.query('ROLLBACK', () => {
+            done();
+            if (error_task)
+              error_task(err);
+          });
+        }
+        // success. close out this connection
+        done();
+      });
+    });
+  }
+
   // helper function to query an object from the database
   // TODO maybe update this so that we can have a primary key that is multiple columns? (like for cart)
   static get(primary_key_value, callback) {
@@ -123,12 +156,15 @@ class SQLTable {
       if (column == "page") continue;
       // special handling for search object
       if (column == "search") {
-        if (sql.fields.indexOf("props")>=0) {
-          values.push(`.*${constraints[column]}.*`);
-          where = where ?
-            where + ` AND (props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})`:
-            `WHERE (props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})`;
-        }
+        values.push(`.*${constraints[column]}.*`);
+        // if we have props, search that too
+        let sql_constraint = (sql.fields.indexOf("props") >= 0) ?
+          `(props->>'name' ~* $${values.length} OR ${sql.pkey} ~* $${values.length})` :
+          `${sql.pkey} ~* $${values.length}`;
+
+        where = where ?
+          where + ` AND ${sql_constraint}`:
+          `WHERE ${sql_constraint}`;
         continue;
       }
       // parse the rest of constraints into a query
@@ -175,43 +211,46 @@ class SQLTable {
     });
   } // getAll()
 
+  // helper function for upsert
+  buildUpsertQuery() {
+    let sql = this.constructor.getSQLSettings();
+    // build arrays of columns and values
+    let fields = [];
+    let substitutions = []
+    let values = [];
+    sql.fields.splice(0, 0, sql.pkey);
+    sql.fields.map((field) => {
+      // skip undefined
+      if (typeof(this[field])=='undefined') return;
+      // skip null
+      if (this[field]===null) return;
+      fields.push(field);
+      substitutions.push('$'+fields.length);
+      if (typeof(this[field])=='object') {
+        values.push(JSON.stringify(this[field]));
+      } else if (this[field]=='' || this[field]=='null') {
+        // set empty strings or the word 'null' to null
+        values.push(null);
+      } else {
+        values.push(this[field]);
+      }
+    });
+    let query = `INSERT INTO ${sql.tablename} (${fields.join(',')}) VALUES (${substitutions.join(',')}) ON CONFLICT (${sql.pkey}) DO UPDATE SET (${fields.join(',')}) = (${substitutions.join(',')}) RETURNING ${sql.pkey}`;
+    return {query, values};
+  }
   // update or insert if row not already existing
   upsert(callback) {
     if (!this.constructor.getSQLSettings) return callback("getSQLSettings not defined");
     let sql = this.constructor.getSQLSettings();
-    let self = this;
-    let buildQueryAndExec = (callback) => {
-      // build arrays of columns and values
-      let fields = [];
-      let substitutions = []
-      let values = [];
-      sql.fields.splice(0, 0, sql.pkey);
-      sql.fields.map((field) => {
-        // skip undefined
-        if (typeof(self[field])=='undefined') return;
-        // skip null
-        if (self[field]===null) return;
-        fields.push(field);
-        substitutions.push('$'+fields.length);
-        if (typeof(self[field])=='object') {
-          values.push(JSON.stringify(self[field]));
-        } else if (self[field]=='' || self[field]=='null') {
-          // set empty strings or the word 'null' to null
-          values.push(null);
-        } else {
-          values.push(self[field]);
-        }
-      });
-      let query = `INSERT INTO ${sql.tablename} (${fields.join(',')}) VALUES (${substitutions.join(',')}) ON CONFLICT (${sql.pkey}) DO UPDATE SET (${fields.join(',')}) = (${substitutions.join(',')}) RETURNING ${sql.pkey}`;
-      return SQLTable.sqlExec(query, values, callback);
-    };
 
     // if we don't need to deal with properties, just upsert
     if (typeof(this.props)=='undefined') {
-      return buildQueryAndExec(callback);
+      let upsert = this.buildUpsertQuery();
+      return SQLTable.sqlExec(upsert.query, upsert.values, callback);
     }
 
     // otherwise we need to check if other properties existed and merge them
+    // FIXME use a "props || jsonb'{"key":"value"}' instead, to make this atomic
     let query = `SELECT * FROM ${sql.tablename} WHERE ${sql.pkey}=$1 LIMIT 1`;
     SQLTable.sqlQuery(this.constructor, query, [this[sql.pkey]], (err, prev) => {
       if (err) {
@@ -223,7 +262,8 @@ class SQLTable {
         prev[0].props = prev[0].props ? prev[0].props : {};
         this.props = Object.assign(prev[0].props, this.props);
       }
-      buildQueryAndExec(callback);
+      let upsert = this.buildUpsertQuery();
+      return SQLTable.sqlExec(upsert.query, upsert.values, callback);
     })
   } // upsert()
 

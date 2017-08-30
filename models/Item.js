@@ -62,6 +62,7 @@ class Item extends Array {
     skus.forEach((sku) =>{
       sku_query.push(function(callback) {
         Component.get(sku, function(err, component) {
+          if (err || !component) return callback(err, component);
           component.populateFromDB(() => {
             components[sku] = component;
             callback(err);
