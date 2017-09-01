@@ -55,6 +55,10 @@ class Cart extends React.Component {
       },
       processing_payment: false,
       done: false,
+      savedItems: {
+        itemsList: false,
+        saved: false,
+      },
     };
 
     if (!this.props.store[0].id) {
@@ -109,6 +113,11 @@ class Cart extends React.Component {
   updateContents(items) {
     Errors.clear();
     items = items || [];
+
+    // For use in displaying items on the thank you page
+    if (!this.state.savedItems.saved)
+      this.setState({savedItems: {itemsList: items, saved: true}});
+
     this.refs.Items.updateContents(items);
     if (!items.length)
       Errors.emitError(null, "Cart is empty");
@@ -236,8 +245,10 @@ class Cart extends React.Component {
   } // handlePay()
 
   render() {
-    if (this.state.done)
-      return <ThanksPurchaseComplete />;
+    if (this.state.done){
+      //return <ThanksPurchaseComplete items = {this.state.savedItems} is_cart = {false} />;
+      return <ThanksPurchaseComplete items = {this.state.savedItems.itemsList} is_cart = {false} />;
+    }
 
     // see if we need to show payment components
     let payment_info = null;
