@@ -53,12 +53,11 @@ class Tabs extends React.Component {
 
     return (
       <tabs className={this.props.className}>
-        <Switch style={{}} value={this.state.selected_tab} onChange={this.handleTabChange.bind(this)}>
+        {this.props.switch_below ? <tab_contents>{children[this.state.selected_tab]}</tab_contents> : null}
+        <Switch always_expanded={true} value={this.state.selected_tab} onChange={this.handleTabChange.bind(this)}>
           {tabs}
         </Switch>
-        <tab_contents>
-          {children[this.state.selected_tab]}
-        </tab_contents>
+        {!this.props.switch_below ? <tab_contents>{children[this.state.selected_tab]}</tab_contents> : null}
       </tabs>
     );
   }

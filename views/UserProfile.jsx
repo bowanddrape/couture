@@ -24,7 +24,7 @@ class UserProfile extends React.Component {
 
     return (
       React.createElement("user", {},
-        <img className="pizza" src={this.props.user.props.image}></img>,
+        <img src={this.props.user.props.image} onError={(event)=>{event.target.setAttribute('src', '/smily_tongue.svg')}}/>,
         <name>{this.props.user.props.name}</name>,
         "! Welcome Home!",
       )

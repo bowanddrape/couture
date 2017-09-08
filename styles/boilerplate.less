@@ -10,88 +10,113 @@ a:not(.button):hover {
   text-decoration: underline;
 }
 a.button {
-  padding: 12px 0 0 0;
+  padding: 16px 0 0 0;
 }
 button, .button {
-  .headerfont;
+  font-family: Arvo;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+
+  height: 56px;
+  border: 5px solid @color_secondary;
   display: block;
   position: relative;
-  background-color: @color_secondary;
-  color: @color_primary;
-  font-size: 17px;
-  border: none;
-  text-align: center;
+  background-color: @color_primary;
+  color: @color_secondary;
   text-decoration: none;
+  padding: 0;
+  margin: 6px auto;
+  width: 100%;
+  max-width: 180px;
+  cursor: pointer;
+  text-transform: uppercase;
     box-sizing: border-box;
     align-items: flex-start;
     -webkit-appearance: button;
     text-rendering: auto;
-    letter-spacing: normal;
     word-spacing: normal;
-    text-transform: none;
     text-indent: 0px;
     text-shadow: none;
-  padding: 0;
-  margin: 12px 0;
-  width: 100%;
-  max-width: 200px;
-  height: 45px;
-  cursor: pointer;
-  text-transform: uppercase;
-  &.centered {
+  &.primary {
     margin: 12px auto;
   }
   &:after {
     content: '';
     width: 100%;
-    max-width: 200px;
-    height: 45px;
+    height: 56px;
+    max-width: 190px;
     position: absolute;
     z-index: -2;
-    top: 0px;
+    top: -5px;
     left: 0px;
-    background-color: #7f5cff;
+    background-color: @color_support_1;
     transition: top .2s ease, left .2s linear;
   }
   &:before {
     content: '';
     width: 100%;
-    max-width: 200px;
-    height: 45px;
+    height: 56px;
+    max-width: 190px;
     position: absolute;
     z-index: -2;
-    top: 0px;
+    top: -5px;
     left: 0px;
-    background-color: #5ca9ff;
+    background-color: @color_support_2;
     transition: top .2s ease, left .2s linear;
   }
   &:hover:after {
-    top: -2px;
-    left: -2px;
+    top: -7px;
+    left: -7px;
   }
   &:hover:before {
-    top: 2px;
-    left: 2px;
+    top: -3px;
+    left: 7px;
   }
   &.primary:after {
-    top: 4px;
-    left: 4px;
-  }
-  &.primary:before {
-    top: -4px;
+    top: 0px;
     left: 10px;
   }
+  &.primary:before {
+    top: -10px;
+    left: 15px;
+  }
   &.primary:hover:after {
-    top: -4px;
-    left: -5px;
+    top: -10px;
+    left: -10px;
   }
   &.primary:hover:before {
-    top: 4px;
-    left: 5px;
+    top: 0px;
+    left: 10px;
   }
 }
 actions {
   display: flex;
+}
+
+.rainbow_border {
+  z-index: 0;
+  &:before {
+    content: " ";
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    background-image: @gradient-rainbow;
+    z-index: -2;
+  }
+  &:after {
+    content: " ";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    top: 2px;
+    bottom: 2px;
+    background-color: @color_primary;
+    z-index: -1;
+  }
 }
 
 errors {
@@ -108,12 +133,13 @@ input.error {
   color: @color_error;
 }
 input[type="text"], input[type="password"] {
-  background-color: @color_support_0;
-  border: solid 1px rgba(0,0,0,.1);
+  background-color: @color_primary;
+  border: none;
+  border-bottom: solid 5px @color_secondary;
   width: 230px;
-  &:focus {
-    border: solid 1px @color_tertiary;
-  }
+  margin: 10px auto;
+  padding: 5px 0;
+  outline: none;
 }
 
 .deck {

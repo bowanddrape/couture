@@ -57,7 +57,11 @@ class FacebookLogin extends React.Component {
   sendServerLogin(access_token) {
     console.log('FB login initiated!  Fetching your information.... ');
     FB.api('/me?fields=id,name,email,picture', function(response) {
-      UserProfile.sendLoginRequest({fb_access_token: access_token});
+      BowAndDrape.api("POST", "/user/login", {fb_access_token: access_token}, (err, response) => {
+        if (err)
+          Errors.emitError("login", err);
+        BowAndDrape.dispatcher.handleAuth(response);
+      });
     });
   }
 

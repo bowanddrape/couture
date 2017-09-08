@@ -1,0 +1,37 @@
+
+@import "./colors.less";
+
+switch {
+  z-index: 1;
+  display: flex;
+  flex-flow: row wrap;
+  padding: 8px;
+  switch_option {
+    z-index: 2;
+    position: relative;
+    margin: 0 10px;
+    background-color: @color_primary;
+    border: solid 2px @color_primary;
+    color: @color_secondary;
+    max-width: 165px;
+    box-sizing: border-box;
+    transition: max-width 1s, margin 1s;
+  }
+  &.expanded {
+    background-color: @color_primary;
+    border: solid 2px @color_secondary;
+    switch_option.selected {
+      border: solid 2px @color_secondary;
+    }
+  }
+  &:not(.expanded) switch_option:not(.selected) {
+    max-width: 0px;
+    margin: 0px;
+    border: none;
+    overflow: hidden;
+  }
+}
+product_options switch {
+  justify-content: flex-begin;
+  margin-bottom: 10px;
+}

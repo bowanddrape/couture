@@ -56,40 +56,32 @@ class InputAddress extends React.Component {
 
         {this.props.section_title=="Shipping Address" ?
           <row><div>
-            <label>Email</label>
-            <input type="text" onChange={this.handleFieldChange} value={this.props.email} name="email"/>
+            <input type="text" onChange={this.handleFieldChange} value={this.props.email} name="email" placeholder="Email"/>
           </div></row> : null
         }
         <row><div>
-          <label>Name</label>
-          <input type="text" onChange={this.handleFieldChange} value={this.props.name} name="name"/>
+          <input type="text" onChange={this.handleFieldChange} value={this.props.name} name="name" placeholder="Name"/>
         </div></row>
         <row>
           <div>
-            <label>Street Address</label>
-            <input type="text" onChange={this.handleFieldChange} id={"address_autocomplete"+this.props.section_title.substring(0,4)} value={this.props.street} name="street"/>
+            <input type="text" onChange={this.handleFieldChange} id={"address_autocomplete"+this.props.section_title.substring(0,4)} value={this.props.street} name="street" placeholder="Street Address"/>
           </div>
           <div>
-            <label>Apt.</label>
-            <input type="text" onChange={this.handleFieldChange} value={this.props.apt} name="apt"/>
+            <input type="text" onChange={this.handleFieldChange} value={this.props.apt} name="apt" placeholder="Apt#"/>
           </div>
         </row><row>
           <div>
-            <label>City</label>
-            <input type="text" onChange={this.handleFieldChange} value={this.props.locality} name="locality"/>
+            <input type="text" onChange={this.handleFieldChange} value={this.props.locality} name="locality" placeholder="City"/>
           </div>
           <div>
-            <label>State</label>
-            <input type="text" onChange={this.handleFieldChange} value={this.props.region} name="region"/>
+            <input type="text" onChange={this.handleFieldChange} value={this.props.region} name="region" placeholder="State"/>
           </div>
           <div>
-            <label>Zip</label>
-            <input type="text" onChange={this.handleFieldChange} value={this.props.postal} name="postal"/>
+            <input type="text" onChange={this.handleFieldChange} value={this.props.postal} name="postal" placeholder="Zip"/>
           </div>
         </row><row>
           <div>
-            <label>Country</label>
-            <input type="text" onChange={this.handleFieldChange} value={this.props.country} name="country"/>
+            <input type="text" onChange={this.handleFieldChange} value={this.props.country} name="country" placeholder="Country"/>
           </div>
         </row>
 

@@ -1,19 +1,18 @@
 
+@import "./boilerplate.less";
+
 @customize_emoji_key_height: 40px;
 @customize_emoji_key_width: 40px;
 @customize_emoji_key_margin: 4px;
 customize {
   product_options {
+    position: absolute;
+    left: 0;
     display: flex;
     flex-direction: column;
-    min-width: 300px;
     select {
       font-size: 35px;
     }
-  }
-  switch {
-    background-color: @color_support_0;
-    margin-bottom: 20px;
   }
   .canvas_container {
     display: flex;
@@ -32,9 +31,6 @@ customize {
   }
   tabs.components {
     display: block;
-    switch {
-      margin-bottom: 0px;
-    }
   }
 
   .component_container {
@@ -99,6 +95,28 @@ customize {
       width: @customize_emoji_key_width/2;
       margin: 0 @customize_emoji_key_margin;
       border: none;
+    }
+  }
+  .component_container.letters {
+    max-width: 400px;
+    margin: 0 auto 20px auto;
+    padding: 15px;
+    position: relative;
+    .rainbow_border;
+  }
+
+  hud_controls {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0px;
+    right: 14px;
+    padding: 0 10px;
+    button:before {
+      display: none;
+    }
+    button:after {
+      display: none;
     }
   }
 }

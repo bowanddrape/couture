@@ -284,6 +284,7 @@ class ProductCanvas extends React.Component {
       // this overrides the synthetic react events so we don't scroll
       node.ontouchmove = this.handleComponentMove.bind(this, node.getAttribute("data"));
       node.onmousemove = this.handleComponentMove.bind(this, node.getAttribute("data"));
+      node.onclick = this.handleSelectComponent.bind(this, node.getAttribute("data"));
     });
     this.handleUpdateProduct();
   }
@@ -336,31 +337,24 @@ class ProductCanvas extends React.Component {
       };
     }
 
-    let camera_switcher = [];
-    if (this.cameras) {
+    let hud_controls = [];
+    if (this.state.assembly[this.state.selected_component]) {
+      hud_controls.push(<button key={hud_controls.length} onClick={this.handlePopComponent.bind(this, true)}>✖</button>);
+      hud_controls.push(<div key={hud_controls.length} style={{display:"flex"}}><button onClick={this.handleComponentRotate.bind(this, -Math.PI/20)}>↶</button>
+        <button onClick={this.handleComponentRotate.bind(this, Math.PI/20)}>↷</button></div>
+      );
+      hud_controls.push(<button key={hud_controls.length} onClick={this.handleSelectComponent.bind(this, -1)}>✔</button>);
+    }
+    else if (this.cameras) {
       this.cameras.forEach((camera) => {
-        let camera_label = camera.name.toUpperCase() || `Camera ${camera_switcher.length}`;
-        camera_switcher.push(
-          <button key={camera_switcher.length} onClick={this.handleChangeCamera.bind(this, camera_switcher.length)}>
+        let camera_label = camera.name.toUpperCase() || `Camera ${hud_controls.length}`;
+        hud_controls.push(
+          <button key={hud_controls.length} onClick={this.handleChangeCamera.bind(this, hud_controls.length)}>
             {camera_label}
           </button>
-        )
+        );
       });
-    }
-    if (this.state.assembly[this.state.selected_component]) {
-      camera_switcher.push(
-        <div key={camera_switcher.length} style={{display:"flex"}}>
-          <button onClick={this.handleComponentRotate.bind(this, -Math.PI/20)}>
-            ⬅
-          </button>
-          <button onClick={this.handlePopComponent.bind(this, true)}>
-            ✖
-          </button>
-          <button onClick={this.handleComponentRotate.bind(this, Math.PI/20)}>
-            ➡
-          </button>
-        </div>
-      )
+      hud_controls.push(<button onClick={this.autoLayout.bind(this, true)}>AUTO</button>);
     }
 
     return (
@@ -368,10 +362,7 @@ class ProductCanvas extends React.Component {
         <canvas style={{display:"block",height:"300px",width:"100%",minWidth:"400px"}}>
         </canvas>
         {component_hitboxes}
-        <hud_controls style={{position:"absolute",right:"20px",top:"0"}}>
-          {camera_switcher}
-          <button onClick={this.autoLayout.bind(this, true)}>AUTO</button>
-        </hud_controls>
+        <hud_controls className={this.state.assembly[this.state.selected_component]?"rainbow_border":""}>{hud_controls}</hud_controls>
         <ProductComponentPicker product={this.props.product} productCanvas={this}/>
       </div>
     );

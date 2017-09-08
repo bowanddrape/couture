@@ -25,6 +25,7 @@ class Cart extends React.Component {
     super(props);
 
     this.state = {
+      user: {},
       card: {
         number: "",
         cvc: "",
@@ -84,12 +85,10 @@ class Cart extends React.Component {
   componentDidMount() {
     if (!this.props.ignoreWebCart) {
       // populate cart contents
-      if (BowAndDrape.cart_menu) {
-        this.updateContents(BowAndDrape.cart_menu.state.contents);
-      }
       BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
     BowAndDrape.dispatcher.on("user", (user) => {
+      this.setState({user});
       if (!user.email) return;
       // if the user is signed in, get latest shipping/billing info
       let query = {email:user.email, page:JSON.stringify({sort:"requested", direction:"DESC", limit:1})};
@@ -108,6 +107,7 @@ class Cart extends React.Component {
   }
 
   updateContents(items) {
+    Errors.clear();
     items = items || [];
     this.refs.Items.updateContents(items);
     if (!items.length)
@@ -152,21 +152,19 @@ class Cart extends React.Component {
         <Errors label="card" />
         <row>
           <div>
-            <label>Card Number</label>
-            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.number} name="number"/>
+            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.number} name="number" placeholder="Card Number"/>
           </div>
           <div>
-            <label>cvc</label>
-            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.cvc} name="cvc"/>
+            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.cvc} name="cvc" placeholder="cvc"/>
           </div>
-        </row><row>
+        </row><row style={{justifyContent:"start"}}>
+          <div style={{marginTop:"13px"}}>Expiration</div>
           <div>
-            <label>Exp Month</label>
-            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_month} name="exp_month"/>
+            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_month} name="exp_month" placeholder="Month"/>
           </div>
+          <div style={{marginTop:"13px"}}>/</div>
           <div>
-            <label>Exp Year</label>
-            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_year} name="exp_year"/>
+            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_year} name="exp_year" placeholder="Year"/>
           </div>
         </row>
       </input_credit>
@@ -261,14 +259,19 @@ class Cart extends React.Component {
       <div>
         <Items ref="Items" contents={this.props.items} is_cart="true" />
 
-        <UserLogin style={{margin:"10px auto",width:"480px",display:"block"}} cta="Login or proceed as Guest" />
+        { this.state.user.email ? null :
+          <div className="checkout_section">
+            <section>Login</section>
+            <UserLogin style={{width:"230px",display:"block"}} cta="...or proceed as Guest" />
+          </div>
+        }
 
         <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
         {payment_info}
 
         <Errors style={{width:"460px"}}/>
         {/* TODO display loading state when this.state.processing_payment */}
-        <button className="primary centered" onClick={this.handlePay.bind(this)}>Get it!</button>
+        <button className="primary" onClick={this.handlePay.bind(this)}>Get it!</button>
 
 {/* Needed by stripe, not needed by braintree
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>

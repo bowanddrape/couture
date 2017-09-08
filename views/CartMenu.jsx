@@ -20,8 +20,6 @@ class CartMenu extends React.Component {
   }
 
   init() {
-    // init only once globally
-    if (BowAndDrape.cart_menu) return;
     BowAndDrape.cart_menu = this;
 
     // get our cart contents from cookie
@@ -37,8 +35,13 @@ class CartMenu extends React.Component {
 
   update(contents) {
     window.localStorage.setItem("cart", JSON.stringify(contents));
-    this.setState({contents: contents});
-    BowAndDrape.dispatcher.emit("update_cart", contents);
+    this.setState((prevstate, prevprops) => {
+      return ({contents});
+    });
+  }
+
+  componentDidUpdate() {
+    BowAndDrape.dispatcher.emit("update_cart", this.state.contents);
   }
 
   add(item) {
@@ -63,12 +66,15 @@ class CartMenu extends React.Component {
         num_cart_items += 1;
     });
 
-    if (!num_cart_items)
-      return null;
+    if (!num_cart_items) {
+      return (
+        <a className="cartmenu" href="/customize-your-own">
+        </a>
+      );
+    }
 
     return (
-      <a href="/cart">
-        Cart
+      <a className="cartmenu" href="/cart">
         <cart_bug>{num_cart_items}</cart_bug>
       </a>
     );

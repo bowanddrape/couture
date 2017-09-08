@@ -14,6 +14,9 @@ children:
 class Switch extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      expanded: false,
+    }
   }
 
   render() {
@@ -23,38 +26,21 @@ class Switch extends React.Component {
       let child = children[index];
       if (child.type!="option") continue;
       options.push(
-        <switch_option ref={index} key={index} {...child.props} style={{
-          zIndex: "2",
-          position: "relative",
-          margin: "0 10px",
-          color:this.props.value==child.props.value?"#000":"#f7afc9"
-        }} onClick={
+        <switch_option className={child.props.value==this.props.value?"selected":""} ref={index} key={index} {...child.props} onClick={
           ()=>{this.props.onChange(child.props.value)}
         }>
           <div style={{textAlign:"center",width:"160px"}}>
             {child.props.children}
           </div>
-          {
-            (child.props.value==this.props.value) ?
-              <Stroke data="/select_stroke.svg" style={{
-                zIndex: "-1",
-                width: "200px",
-                height: "100px",
-                position: "absolute",
-                top: "-28px",
-                left: "-20px",
-                pointerEvents: "none",
-              }} draw_on_load={true} duration={1}/>
-              : null
-          }
         </switch_option>
       );
     }
     return (
-      <switch style={{
-        display: "flex",
-        flexFlow: "row wrap",
-      }}>
+      <switch
+        className={this.state.expanded||this.props.always_expanded?"expanded":""}
+        onClick={()=>{this.setState({expanded:!this.state.expanded})}}
+        style={this.props.style}
+      >
         {options}
       </switch>
     )

@@ -14,9 +14,6 @@ class ProductComponentPicker extends React.Component {
     let text_input = document.querySelector(".components").querySelector(`input[type="text"]`);
     if (text_input)
       text_input.focus();
-    // scroll so canvas is just below "add to cart" button
-    document.querySelector("canvas").scrollIntoView();
-    document.scrollY -= 20;
   }
 
   componentDidMount() {
@@ -27,7 +24,7 @@ class ProductComponentPicker extends React.Component {
     let components = this.populateComponents(this.props.product);
     return (
       <div>
-        <Tabs className="components" onChange={this.handleTabClick.bind(this)}>
+        <Tabs className="components" switch_below={true} onChange={this.handleTabClick.bind(this)}>
           {components}
         </Tabs>
       </div>
@@ -117,10 +114,16 @@ class ProductComponentPicker extends React.Component {
             component_letters[character] = letter;
           }
           components.push(
-            <div key={components.length} name={product.compatible_components[i].sku} style={{height:"auto"}} className="component_container">
-              <input type="text" style={{width:"90%"}} placeholder="Your Text Here"
+            <div key={components.length} name={product.compatible_components[i].sku} style={{height:"auto",overflow:"hidden"}} className="component_container letters">
+              <input type="text" style={{width:"90%",margin:"auto"}} placeholder="Say Something Punny"
                 onChange={(event) => {
                   this.handleSetComponentText(event.target.value, component_letters);
+                }}
+                onFocus={(event) => {
+                  // TODO figure out some better scrolly what-nots?
+                  setTimer(() => {
+                    event.target.scrollIntoView(false);
+                  }, 1);
                 }}
                 onKeyUp={(event) => {
                   if (event.which!=13) return;

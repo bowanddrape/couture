@@ -195,9 +195,8 @@ class Items extends React.Component {
             <div className="item promo" style={Item.style_summary.item}>
               <div style={Item.style_summary.img_preview_container}><Errors label="promo" /></div>
               <div className="deets" style={Item.style_summary.deets}>
-                Promo Code
-                <input type="text" style={{height:"20px",width:"116px"}} value={this.state.promo_code} onChange={(event)=>{this.setState({promo_code:event.target.value})}}/>
-                <button style={{position:"absolute",bottom:"-6px"}} onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
+                <input placeholder="Promo code" type="text" style={{marginTop:"20px",width:"90px"}} value={this.state.promo_code} onChange={(event)=>{this.setState({promo_code:event.target.value})}}/>
+                <button style={{position:"absolute",top:"-12px", left:"95px", width:"90px"}} onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
               </div>
             </div>
           }

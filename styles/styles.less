@@ -10,6 +10,7 @@
 @import "./page_edit.less";
 @import "./component_edit.less";
 @import "./signup.less";
+@import "./switch.less";
 @import "../public/dist/sprite.less";
 
 
@@ -20,65 +21,71 @@ body {
 
 @user_img_width: 50px;
 @menu_handle_width: 36px;
-menu {
-  position: fixed;
-  top: 0;
-  border-left: solid 1px @color_secondary;
-  height: 100%;
-  background-color: @color_menu;
-  margin: 0;
-  padding: 20px;
-  width: 100%;
-  a {
-    font-size: 28px;
+.header {
+  handle {
+    background-image: url(/pizza.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 3px;
+    left: 11px;
+    display: block;
+    width: @menu_handle_width;
+    height: @menu_handle_width + 4px;
   }
+  img.logo {
+    display: block;
+    margin: auto;
+    width: 200px;
+  }
+  .cartmenu {
+    background-image: url(/cart.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    overflow: visible;
+    top: 3px;
+    right: 11px;
+    width: @menu_handle_width;
+    height: @menu_handle_width + 4px;
+    cart_bug {
+      position: relative;
+      padding: 0px 7px;
+      border-radius: 500px;
+      background-color: @color_support_2;
+      font-size: 11px;
+      right: -24px;
+    }
+  }
+}
+
+menu {
+  top: 0;
+  margin: 10px 0;
+  padding: 0px;
+  width: 100%;
+  overflow: hidden;
+  max-height: 0px;
+  text-align: center;
+  transition: max-height 1s ease, border-bottom 1s ease;
+  border-bottom: solid 3px rgba(0,0,0,0);
+}
+menu.expanded {
+  max-height: 500px;
+  border-bottom: solid 3px rgba(0,0,0,1);
 }
 menu user {
   display: block;
-  color: @color_primary;
   margin-left: @user_img_width + 5px;
   margin-bottom: 15px;
   img {
     border-radius: 5px;
     border: solid 2px @color_primary;
-    position: absolute;
     width: @user_img_width;
-    height: @user_img_width;
     margin-left: -@user_img_width - 5px;
   }
-}
-menu handle {
-  .icon;
-  .sprite(@pizza);
-  background-color: @color_menu;
-  display: block;
-  position: absolute;
-  top: 20px;
-  left: -@menu_handle_width;
-  width: @menu_handle_width;
-  height: @menu_handle_width + 4px;
-  border: solid 1px @color_secondary;
-  border-right: none;
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-}
-menu a {
-  .headerfont;
-  display: block;
-  padding: 5px;
-  margin-bottom: 10px;
-  white-space: nowrap;
-  overflow-right: hidden;
-  text-decoration: none;
-  position: relative;
-  cart_bug {
-    position: relative;
-    top: -9px;
-    padding: 0px 10px;
-    border-radius: 500px;
-    background-color: @color_primary;
-    font-size: 16px;
-    right: -9px;
+  name {
+    margin-top: @user_img_width/2;
   }
 }
 
