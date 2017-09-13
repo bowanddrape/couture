@@ -24,6 +24,9 @@ switch {
     background-color: @color_primary;
     switch_option:not(.selected) {
       opacity: 0.25;
+      &:hover {
+        opacity: 1;
+      }
     }
   }
   &:not(.expanded) switch_option:not(.selected) {

@@ -43,6 +43,9 @@ customize {
   }
 
   .component_container {
+    &:not(.letters) {
+      .rainbow_border;
+    }
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -51,7 +54,6 @@ customize {
     max-width: 100%;
     overflow-x: scroll;
 
-    background-color: rgba(200,200,200,0.9);
     div {
       height: @customize_emoji_key_height;
       width: @customize_emoji_key_width;

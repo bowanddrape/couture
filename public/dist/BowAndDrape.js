@@ -98631,7 +98631,7 @@ var ProductComponentPicker = function (_React$Component) {
             }
             components.push(React.createElement(
               'div',
-              { key: components.length, name: product.compatible_components[i].sku, style: { height: "auto", overflow: "hidden" }, className: 'component_container letters' },
+              { key: components.length, name: product.compatible_components[i].props.name || product.compatible_components[i].sku, style: { height: "auto", overflow: "hidden" }, className: 'component_container letters' },
               React.createElement('input', { type: 'text', style: { width: "90%", margin: "auto" }, placeholder: 'Say Something Punny',
                 onChange: function onChange(event) {
                   _this2.handleSetComponentText(event.target.value, _component_letters);
@@ -98668,7 +98668,6 @@ var ProductComponentPicker = function (_React$Component) {
           for (var _j2 = 0; _j2 < product.compatible_components[i].options.length; _j2++) {
             _loop2(_j2);
           }
-          tab_components.push(React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this2.handlePopComponent.bind(_this2) }));
           components.push(React.createElement(
             'div',
             { key: components.length, name: product.compatible_components[i].props.name, className: 'component_container' },
@@ -100119,6 +100118,7 @@ var Switch = function (_React$Component) {
       var _loop = function _loop(index) {
         var child = children[index];
         if (child.type != "option") return 'continue';
+        var child_content = child.props.children;
         options.push(React.createElement(
           'switch_option',
           _extends({ className: child.props.value == _this2.props.value ? "selected" : "", ref: index, key: index }, child.props, { onClick: function onClick() {
@@ -100126,8 +100126,8 @@ var Switch = function (_React$Component) {
             } }),
           React.createElement(
             'div',
-            { style: { textAlign: "center", width: "160px" } },
-            child.props.children
+            { style: { textAlign: "center" } },
+            React.createElement('img', { src: child.props.children.toString().replace(/ /g, "_").toLowerCase() + ".svg", alt: child.props.children })
           )
         ));
       };

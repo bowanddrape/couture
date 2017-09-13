@@ -25,12 +25,13 @@ class Switch extends React.Component {
     for (let index=0; index<children.length; index++) {
       let child = children[index];
       if (child.type!="option") continue;
+      let child_content = child.props.children;
       options.push(
         <switch_option className={child.props.value==this.props.value?"selected":""} ref={index} key={index} {...child.props} onClick={
           ()=>{this.props.onChange(child.props.value)}
         }>
-          <div style={{textAlign:"center",width:"160px"}}>
-            {child.props.children}
+          <div style={{textAlign:"center"}}>
+            <img src={child.props.children.toString().replace(/ /g,"_").toLowerCase()+".svg"} alt={child.props.children} />
           </div>
         </switch_option>
       );

@@ -368,7 +368,30 @@ customize .component_container {
   height: 223px;
   max-width: 100%;
   overflow-x: scroll;
-  background-color: rgba(200, 200, 200, 0.9);
+}
+customize .component_container:not(.letters) {
+  z-index: 0;
+  position: relative;
+}
+customize .component_container:not(.letters):before {
+  content: " ";
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  z-index: -2;
+}
+customize .component_container:not(.letters):after {
+  content: " ";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  z-index: -1;
 }
 customize .component_container div {
   height: 40px;
@@ -413,8 +436,31 @@ customize .component_virtual_keyboard_container {
   height: 223px;
   max-width: 100%;
   overflow-x: scroll;
-  background-color: rgba(200, 200, 200, 0.9);
   align-content: center;
+}
+customize .component_virtual_keyboard_container:not(.letters) {
+  z-index: 0;
+  position: relative;
+}
+customize .component_virtual_keyboard_container:not(.letters):before {
+  content: " ";
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  z-index: -2;
+}
+customize .component_virtual_keyboard_container:not(.letters):after {
+  content: " ";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  z-index: -1;
 }
 customize .component_virtual_keyboard_container div {
   height: 40px;
@@ -810,6 +856,9 @@ switch.expanded:after {
 }
 switch.expanded switch_option:not(.selected) {
   opacity: 0.25;
+}
+switch.expanded switch_option:not(.selected):hover {
+  opacity: 1;
 }
 switch:not(.expanded) switch_option:not(.selected) {
   max-width: 0px;

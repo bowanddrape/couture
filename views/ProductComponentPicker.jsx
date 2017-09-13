@@ -114,7 +114,7 @@ class ProductComponentPicker extends React.Component {
             component_letters[character] = letter;
           }
           components.push(
-            <div key={components.length} name={product.compatible_components[i].sku} style={{height:"auto",overflow:"hidden"}} className="component_container letters">
+            <div key={components.length} name={product.compatible_components[i].props.name||product.compatible_components[i].sku} style={{height:"auto",overflow:"hidden"}} className="component_container letters">
               <input type="text" style={{width:"90%",margin:"auto"}} placeholder="Say Something Punny"
                 onChange={(event) => {
                   this.handleSetComponentText(event.target.value, component_letters);
@@ -148,9 +148,6 @@ class ProductComponentPicker extends React.Component {
             <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={() => {this.handleSelectComponent(-1); this.handleAddComponent(product.compatible_components[i].options[j]);}}/>
           );
         }
-        tab_components.push(
-          <div key="backspace" className="backspace" onClick={this.handlePopComponent.bind(this)}/>
-        );
         components.push(
           <div key={components.length} name={product.compatible_components[i].props.name} className="component_container">
             {tab_components}
