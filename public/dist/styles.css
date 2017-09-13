@@ -114,6 +114,7 @@ actions {
 }
 .rainbow_border {
   z-index: 0;
+  position: relative;
 }
 .rainbow_border:before {
   content: " ";
@@ -344,13 +345,20 @@ customize .canvas_container {
 }
 customize .canvas_container canvas {
   flex-grow: 1;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
+  height: 300px;
+  width: 100%;
+  display: block;
+  min-width: 400px;
   max-height: 100%;
 }
 customize tabs.components {
   display: block;
+}
+customize .components switch:before {
+  display: none;
+}
+customize .components switch:after {
+  display: none;
 }
 customize .component_container {
   display: flex;
@@ -476,8 +484,8 @@ customize .component_container.letters {
   max-width: 400px;
   margin: 0 auto 20px auto;
   padding: 15px;
-  position: relative;
   z-index: 0;
+  position: relative;
 }
 customize .component_container.letters:before {
   content: " ";
@@ -505,13 +513,64 @@ customize hud_controls {
   position: absolute;
   top: 0px;
   right: 14px;
+  min-width: 83px;
   padding: 0 10px;
+}
+customize hud_controls.rainbow_border {
+  position: absolute;
 }
 customize hud_controls button:before {
   display: none;
 }
 customize hud_controls button:after {
   display: none;
+}
+@media (min-width: 1000px) {
+  customize product_options {
+    left: auto;
+    right: 0;
+  }
+  customize product_options switch {
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+  customize hud_controls {
+    top: 150px;
+  }
+  customize .component_picker {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+  }
+  customize .component_picker .components {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  customize .component_picker .components switch {
+    flex-direction: column;
+  }
+  customize .component_picker .components .component_container.letters {
+    position: fixed;
+    left: 50%;
+    bottom: 100px;
+    width: 300px;
+    margin-left: -150px;
+  }
+  customize .component_picker .components .component_container:not(.letters) {
+    height: auto;
+    width: 119px;
+    flex-direction: row;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+  customize .add_to_cart {
+    position: fixed;
+    width: 100%;
+    bottom: 10px;
+  }
+  customize .canvas_container canvas {
+    height: 400px;
+  }
 }
 .checkout_section {
   max-width: 460px;
@@ -720,14 +779,37 @@ switch switch_option {
   color: #000;
   max-width: 165px;
   box-sizing: border-box;
+  cursor: pointer;
   transition: max-width 1s, margin 1s;
 }
 switch.expanded {
+  z-index: 0;
+  position: relative;
+  z-index: 1;
   background-color: #fff;
-  border: solid 2px #000;
 }
-switch.expanded switch_option.selected {
-  border: solid 2px #000;
+switch.expanded:before {
+  content: " ";
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  z-index: -2;
+}
+switch.expanded:after {
+  content: " ";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  z-index: -1;
+}
+switch.expanded switch_option:not(.selected) {
+  opacity: 0.25;
 }
 switch:not(.expanded) switch_option:not(.selected) {
   max-width: 0px;
@@ -735,7 +817,7 @@ switch:not(.expanded) switch_option:not(.selected) {
   border: none;
   overflow: hidden;
 }
-product_options switch {
+product_options switch.expanded {
   justify-content: flex-begin;
   margin-bottom: 10px;
 }

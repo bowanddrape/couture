@@ -23,14 +23,23 @@ customize {
 
     canvas {
       flex-grow: 1;
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
+      height: 300px;
+      width: 100%;
+      display: block;
+      min-width: 400px;
       max-height: 100%;
     }
   }
   tabs.components {
     display: block;
+  }
+  .components switch {
+    &:before {
+      display: none;
+    }
+    &:after {
+      display: none;
+    }
   }
 
   .component_container {
@@ -111,7 +120,11 @@ customize {
     position: absolute;
     top: 0px;
     right: 14px;
+    min-width: 83px;
     padding: 0 10px;
+    &.rainbow_border {
+      position: absolute;
+    }
     button:before {
       display: none;
     }
@@ -120,3 +133,53 @@ customize {
     }
   }
 }
+
+@media (min-width: @desktop_min_width) { customize {
+  product_options {
+    left: auto;
+    right: 0;
+    switch {
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+  }
+  hud_controls {
+    top: 150px;
+  }
+  .component_picker {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    .components {
+      display: flex;
+      flex-direction: row-reverse;
+      switch {
+        flex-direction: column;
+      }
+      .component_container.letters {
+        position: fixed;
+        left: 50%;
+        bottom: 100px;
+        width: 300px;
+        margin-left: -150px;
+      }
+      .component_container:not(.letters) {
+        height: auto;
+        width: 119px;
+        flex-direction: row;
+        overflow-x: hidden;
+        overflow-y: scroll;
+      }
+    }
+  }
+  .add_to_cart {
+    position: fixed;
+    width: 100%;
+    bottom: 10px;
+  }
+  .canvas_container {
+    canvas {
+      height: 400px;
+    }
+  }
+}}

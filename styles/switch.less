@@ -1,5 +1,5 @@
 
-@import "./colors.less";
+@import "./boilerplate.less";
 
 switch {
   z-index: 1;
@@ -15,13 +15,15 @@ switch {
     color: @color_secondary;
     max-width: 165px;
     box-sizing: border-box;
+    cursor: pointer;
     transition: max-width 1s, margin 1s;
   }
   &.expanded {
+    .rainbow_border;
+    z-index: 1;
     background-color: @color_primary;
-    border: solid 2px @color_secondary;
-    switch_option.selected {
-      border: solid 2px @color_secondary;
+    switch_option:not(.selected) {
+      opacity: 0.25;
     }
   }
   &:not(.expanded) switch_option:not(.selected) {
@@ -31,7 +33,7 @@ switch {
     overflow: hidden;
   }
 }
-product_options switch {
+product_options switch.expanded {
   justify-content: flex-begin;
   margin-bottom: 10px;
 }

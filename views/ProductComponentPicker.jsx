@@ -23,7 +23,7 @@ class ProductComponentPicker extends React.Component {
   render() {
     let components = this.populateComponents(this.props.product);
     return (
-      <div>
+      <div className="component_picker">
         <Tabs className="components" switch_below={true} onChange={this.handleTabClick.bind(this)}>
           {components}
         </Tabs>
@@ -121,7 +121,7 @@ class ProductComponentPicker extends React.Component {
                 }}
                 onFocus={(event) => {
                   // TODO figure out some better scrolly what-nots?
-                  setTimer(() => {
+                  setTimeout(() => {
                     event.target.scrollIntoView(false);
                   }, 1);
                 }}
@@ -145,7 +145,7 @@ class ProductComponentPicker extends React.Component {
           if (product.compatible_components[i].options[j].props.imagewidth>product.compatible_components[i].options[j].props.imageheight)
             backgroundSize = `100% ${product.compatible_components[i].options[j].props.imageheight/product.compatible_components[i].options[j].props.imagewidth*100}%`;
           tab_components.push(
-            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={this.handleAddComponent.bind(this, product.compatible_components[i].options[j])}/>
+            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={() => {this.handleSelectComponent(-1); this.handleAddComponent(product.compatible_components[i].options[j]);}}/>
           );
         }
         tab_components.push(

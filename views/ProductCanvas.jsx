@@ -359,7 +359,7 @@ class ProductCanvas extends React.Component {
 
     return (
       <div style={{position:"relative",width:"100%"}}>
-        <canvas style={{display:"block",height:"300px",width:"100%",minWidth:"400px"}}>
+        <canvas>
         </canvas>
         {component_hitboxes}
         <hud_controls className={this.state.assembly[this.state.selected_component]?"rainbow_border":""}>{hud_controls}</hud_controls>

@@ -98457,7 +98457,7 @@ var ProductCanvas = function (_React$Component) {
       return React.createElement(
         'div',
         { style: { position: "relative", width: "100%" } },
-        React.createElement('canvas', { style: { display: "block", height: "300px", width: "100%", minWidth: "400px" } }),
+        React.createElement('canvas', null),
         component_hitboxes,
         React.createElement(
           'hud_controls',
@@ -98518,7 +98518,7 @@ var ProductComponentPicker = function (_React$Component) {
       var components = this.populateComponents(this.props.product);
       return React.createElement(
         'div',
-        null,
+        { className: 'component_picker' },
         React.createElement(
           Tabs,
           { className: 'components', switch_below: true, onChange: this.handleTabClick.bind(this) },
@@ -98554,129 +98554,135 @@ var ProductComponentPicker = function (_React$Component) {
       // populate components
       var components = [];
       var misc_components = [];
-      for (var i = 0; product.compatible_components && i < product.compatible_components.length; i++) {
+
+      var _loop = function _loop(i) {
         if (product.compatible_components[i].options) {
           // handle if virtual keyboard
           if (false && product.compatible_components[i].props.is_letters) {
-            var _ret = function () {
-              // array => map
-              var component_letters = {};
-              var tab_components = [];
-              for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-                var letter = product.compatible_components[i].options[j];
-                var toks = letter.props.name.split('_');
-                var character = toks[toks.length - 1].toLowerCase();
-                if (character.match(/^[a-z]$/)) component_letters[character] = letter;else {
-                  component_letters[character] = letter;
-                  tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + letter.props.image + ')', backgroundSize: letter.props.imagewidth / letter.props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, letter) }));
-                }
+            // array => map
+            var component_letters = {};
+            var _tab_components = [];
+            for (var j = 0; j < product.compatible_components[i].options.length; j++) {
+              var letter = product.compatible_components[i].options[j];
+              var toks = letter.props.name.split('_');
+              var character = toks[toks.length - 1].toLowerCase();
+              if (character.match(/^[a-z]$/)) component_letters[character] = letter;else {
+                component_letters[character] = letter;
+                _tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + letter.props.image + ')', backgroundSize: letter.props.imagewidth / letter.props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, letter) }));
               }
-              components.push(React.createElement(
-                'div',
-                { key: components.length, name: product.compatible_components[i].props.name, className: 'component_virtual_keyboard_container' },
-                React.createElement(
-                  'row',
-                  null,
-                  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
-                  })
-                ),
-                React.createElement(
-                  'row',
-                  null,
-                  React.createElement('div', { key: 'spacer0', className: 'halfgap' }),
-                  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
-                  }),
-                  React.createElement('div', { key: 'spacer1', className: 'halfgap' })
-                ),
-                React.createElement(
-                  'row',
-                  null,
-                  React.createElement('div', { key: 'spacer2', className: 'halfgap' }),
-                  React.createElement('div', { key: 'spacer2a', className: 'halfgap' }),
-                  ['z', 'x', 'c', 'v', 'b', 'n', 'm'].map(function (character) {
-                    return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
-                  }),
-                  React.createElement('div', { key: 'spacer3', className: 'halfgap' }),
-                  React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this2.handlePopComponent.bind(_this2) })
-                ),
-                React.createElement(
-                  'row',
-                  null,
-                  React.createElement('div', { key: 'spacer3a', className: 'halfgap' }),
-                  React.createElement('div', { key: 'spacer3b', className: 'halfgap' }),
-                  React.createElement('div', { key: 'spacebar', className: 'spacebar', onClick: _this2.handleAddComponent.bind(_this2, component_letters["space"]) }),
-                  React.createElement('div', { key: 'spacer3c', className: 'halfgap' }),
-                  React.createElement('div', { key: 'enter', className: 'enter', onClick: _this2.handleSelectComponent.bind(_this2, -1) })
-                )
-              ));
-              components.push(React.createElement(
-                'div',
-                { key: components.length, name: product.compatible_components[i].props.name + "_cont", className: 'component_container', style: { overflow: "hidden" } },
-                tab_components
-              ));
-              return 'continue';
-            }();
-
-            if (_ret === 'continue') continue;
+            }
+            components.push(React.createElement(
+              'div',
+              { key: components.length, name: product.compatible_components[i].props.name, className: 'component_virtual_keyboard_container' },
+              React.createElement(
+                'row',
+                null,
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'].map(function (character) {
+                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                })
+              ),
+              React.createElement(
+                'row',
+                null,
+                React.createElement('div', { key: 'spacer0', className: 'halfgap' }),
+                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'].map(function (character) {
+                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                }),
+                React.createElement('div', { key: 'spacer1', className: 'halfgap' })
+              ),
+              React.createElement(
+                'row',
+                null,
+                React.createElement('div', { key: 'spacer2', className: 'halfgap' }),
+                React.createElement('div', { key: 'spacer2a', className: 'halfgap' }),
+                ['z', 'x', 'c', 'v', 'b', 'n', 'm'].map(function (character) {
+                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                }),
+                React.createElement('div', { key: 'spacer3', className: 'halfgap' }),
+                React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this2.handlePopComponent.bind(_this2) })
+              ),
+              React.createElement(
+                'row',
+                null,
+                React.createElement('div', { key: 'spacer3a', className: 'halfgap' }),
+                React.createElement('div', { key: 'spacer3b', className: 'halfgap' }),
+                React.createElement('div', { key: 'spacebar', className: 'spacebar', onClick: _this2.handleAddComponent.bind(_this2, component_letters["space"]) }),
+                React.createElement('div', { key: 'spacer3c', className: 'halfgap' }),
+                React.createElement('div', { key: 'enter', className: 'enter', onClick: _this2.handleSelectComponent.bind(_this2, -1) })
+              )
+            ));
+            components.push(React.createElement(
+              'div',
+              { key: components.length, name: product.compatible_components[i].props.name + "_cont", className: 'component_container', style: { overflow: "hidden" } },
+              _tab_components
+            ));
+            return 'continue';
           } // is_letters
 
           // handle if native keyboard
           if (product.compatible_components[i].props.is_letters) {
-            var _ret2 = function () {
-              // array => map
-              var component_letters = {};
-              for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-                var letter = product.compatible_components[i].options[j];
-                var toks = letter.sku.split('_');
-                var character = toks[toks.length - 1].toLowerCase();
-                component_letters[character] = letter;
-              }
-              components.push(React.createElement(
-                'div',
-                { key: components.length, name: product.compatible_components[i].sku, style: { height: "auto", overflow: "hidden" }, className: 'component_container letters' },
-                React.createElement('input', { type: 'text', style: { width: "90%", margin: "auto" }, placeholder: 'Say Something Punny',
-                  onChange: function onChange(event) {
-                    _this2.handleSetComponentText(event.target.value, component_letters);
-                  },
-                  onFocus: function onFocus(event) {
-                    // TODO figure out some better scrolly what-nots?
-                    setTimer(function () {
-                      event.target.scrollIntoView(false);
-                    }, 1);
-                  },
-                  onKeyUp: function onKeyUp(event) {
-                    if (event.which != 13) return;
-                    _this2.handleSetComponentText(event.target.value, component_letters);
-                    _this2.props.productCanvas.handleSelectComponent(-1);
-                  },
-                  value: _this2.props.productCanvas.getComponentText()
-                })
-              ));
-              return 'continue';
-            }();
-
-            if (_ret2 === 'continue') continue;
+            // array => map
+            var _component_letters = {};
+            for (var _j = 0; _j < product.compatible_components[i].options.length; _j++) {
+              var _letter = product.compatible_components[i].options[_j];
+              var _toks = _letter.sku.split('_');
+              var _character = _toks[_toks.length - 1].toLowerCase();
+              _component_letters[_character] = _letter;
+            }
+            components.push(React.createElement(
+              'div',
+              { key: components.length, name: product.compatible_components[i].sku, style: { height: "auto", overflow: "hidden" }, className: 'component_container letters' },
+              React.createElement('input', { type: 'text', style: { width: "90%", margin: "auto" }, placeholder: 'Say Something Punny',
+                onChange: function onChange(event) {
+                  _this2.handleSetComponentText(event.target.value, _component_letters);
+                },
+                onFocus: function onFocus(event) {
+                  // TODO figure out some better scrolly what-nots?
+                  setTimeout(function () {
+                    event.target.scrollIntoView(false);
+                  }, 1);
+                },
+                onKeyUp: function onKeyUp(event) {
+                  if (event.which != 13) return;
+                  _this2.handleSetComponentText(event.target.value, _component_letters);
+                  _this2.props.productCanvas.handleSelectComponent(-1);
+                },
+                value: _this2.props.productCanvas.getComponentText()
+              })
+            ));
+            return 'continue';
           } // is_native_keyboard
 
           // otherwise just list them
           var tab_components = [];
-          for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-            var backgroundImage = 'url(' + product.compatible_components[i].options[j].props.image + ')';
-            var backgroundSize = product.compatible_components[i].options[j].props.imagewidth / product.compatible_components[i].options[j].props.imageheight * 100 + '% 100%';
-            if (product.compatible_components[i].options[j].props.imagewidth > product.compatible_components[i].options[j].props.imageheight) backgroundSize = '100% ' + product.compatible_components[i].options[j].props.imageheight / product.compatible_components[i].options[j].props.imagewidth * 100 + '%';
-            tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: backgroundImage, backgroundSize: backgroundSize }, onClick: this.handleAddComponent.bind(this, product.compatible_components[i].options[j]) }));
+
+          var _loop2 = function _loop2(_j2) {
+            var backgroundImage = 'url(' + product.compatible_components[i].options[_j2].props.image + ')';
+            var backgroundSize = product.compatible_components[i].options[_j2].props.imagewidth / product.compatible_components[i].options[_j2].props.imageheight * 100 + '% 100%';
+            if (product.compatible_components[i].options[_j2].props.imagewidth > product.compatible_components[i].options[_j2].props.imageheight) backgroundSize = '100% ' + product.compatible_components[i].options[_j2].props.imageheight / product.compatible_components[i].options[_j2].props.imagewidth * 100 + '%';
+            tab_components.push(React.createElement('div', { key: i + '_' + _j2, style: { backgroundImage: backgroundImage, backgroundSize: backgroundSize }, onClick: function onClick() {
+                _this2.handleSelectComponent(-1);_this2.handleAddComponent(product.compatible_components[i].options[_j2]);
+              } }));
+          };
+
+          for (var _j2 = 0; _j2 < product.compatible_components[i].options.length; _j2++) {
+            _loop2(_j2);
           }
-          tab_components.push(React.createElement('div', { key: 'backspace', className: 'backspace', onClick: this.handlePopComponent.bind(this) }));
+          tab_components.push(React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this2.handlePopComponent.bind(_this2) }));
           components.push(React.createElement(
             'div',
             { key: components.length, name: product.compatible_components[i].props.name, className: 'component_container' },
             tab_components
           ));
-          continue;
+          return 'continue';
         }
         misc_components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + product.compatible_components[i].props.image + ')' } }));
+      };
+
+      for (var i = 0; product.compatible_components && i < product.compatible_components.length; i++) {
+        var _ret = _loop(i);
+
+        if (_ret === 'continue') continue;
       }
 
       if (misc_components.length) {
@@ -98835,7 +98841,7 @@ var ProductList = function (_React$Component) {
         ),
         this.props.edit ? null : React.createElement(
           'div',
-          { style: { textAlign: "center" } },
+          { className: 'add_to_cart', style: { textAlign: "center" } },
           React.createElement(
             'button',
             { className: 'primary', onClick: this.handleAddToCart.bind(this, product) },

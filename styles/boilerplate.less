@@ -2,6 +2,8 @@
 @import "./colors.less";
 @import "./fonts.less";
 
+@desktop_min_width: 1000px;
+
 a {
   text-decoration: none;
   color: @color_secondary;
@@ -97,6 +99,7 @@ actions {
 
 .rainbow_border {
   z-index: 0;
+  position: relative;
   &:before {
     content: " ";
     position: absolute;
