@@ -11,6 +11,10 @@
   color: #000;
   font-weight: bold;
 }
+body {
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+}
 a {
   text-decoration: none;
   color: #000;
@@ -28,6 +32,7 @@ button,
   font-weight: bold;
   letter-spacing: 2px;
   text-align: center;
+  white-space: nowrap;
   height: 56px;
   border: 5px solid #000;
   display: block;
@@ -108,6 +113,16 @@ button.primary:hover:before,
 .button.primary:hover:before {
   top: 0px;
   left: 10px;
+}
+.cta {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding-bottom: 6px;
+  text-decoration: none;
+  border: none;
+  border-bottom: solid 1px #000;
 }
 actions {
   display: flex;
@@ -234,6 +249,15 @@ a.card.not_link {
   background-color: #fff;
   width: 100%;
   text-align: center;
+}
+h1,
+h2 {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
+  font-weight: bold;
+}
+address *:not(:first-child) {
+  margin-left: 7px;
 }
 shipments {
   display: block;
@@ -581,7 +605,7 @@ customize hud_controls button:after {
     margin-bottom: 10px;
   }
   customize hud_controls {
-    top: 150px;
+    top: 165px;
   }
   customize .component_picker {
     position: absolute;
@@ -828,6 +852,10 @@ switch switch_option {
   cursor: pointer;
   transition: max-width 1s, margin 1s;
 }
+switch switch_option.selected,
+switch.expanded switch_option {
+  min-width: 36px;
+}
 switch.expanded {
   z-index: 0;
   position: relative;
@@ -870,13 +898,6 @@ product_options switch.expanded {
   justify-content: flex-begin;
   margin-bottom: 10px;
 }
-.icon {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-}
-body {
-  font-family: "Open Sans", Arial, sans-serif;
-  color: #000;
-}
 .header handle {
   background-image: url(/pizza.svg);
   background-size: contain;
@@ -912,7 +933,7 @@ body {
   font-size: 11px;
   right: -24px;
 }
-menu {
+.header menu {
   top: 0;
   margin: 10px 0;
   padding: 0px;
@@ -923,34 +944,84 @@ menu {
   transition: max-height 1s ease, border-bottom 1s ease;
   border-bottom: solid 3px rgba(0, 0, 0, 0);
 }
-menu.expanded {
+.header menu a:hover {
+  text-decoration: none;
+}
+.header menu button,
+.header menu .button {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding-bottom: 6px;
+  text-decoration: none;
+  border: none;
+  border-bottom: solid 1px #000;
+  height: auto;
+  width: auto;
+  border-bottom: none;
+  margin: 12px auto;
+}
+.header menu button:hover,
+.header menu .button:hover {
+  color: #7f5cff;
+}
+.header menu button:before,
+.header menu .button:before {
+  display: none;
+}
+.header menu button:after,
+.header menu .button:after {
+  display: none;
+}
+.header menu.expanded {
   max-height: 500px;
   border-bottom: solid 3px #000000;
 }
-menu user {
+.header menu user {
   display: block;
-  margin-left: 55px;
-  margin-bottom: 15px;
 }
-menu user img {
+.header menu user img {
   border-radius: 5px;
   border: solid 2px #fff;
   width: 50px;
-  margin-left: -55px;
+  position: relative;
+  top: 20px;
 }
-menu user name {
+.header menu user name {
   margin-top: 25px;
 }
-h1,
-h2 {
-  font-family: "Zurich-Condensed-Bold", sans-serif;
-  color: #000;
-  font-weight: bold;
+@media (min-width: 1000px) {
+  .header handle {
+    left: auto;
+    right: 55px;
+  }
+  .header menu {
+    max-height: initial;
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .header menu menu_items {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .header menu menu_items button {
+    margin: 0px 54px;
+  }
+  .header menu login,
+  .header menu user {
+    display: block;
+    opacity: 0;
+    max-height: 0px;
+    transition: max-height 1s ease, border-bottom 1s ease;
+  }
+  .header menu.expanded login,
+  .header menu.expanded user {
+    opacity: 1;
+    max-height: 300px;
+  }
 }
-address *:not(:first-child) {
-  margin-left: 7px;
-}
-placeholder_content img {
-  width: 100%;
-  pointer-events: none;
+.icon {
+  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
 }

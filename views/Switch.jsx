@@ -3,6 +3,8 @@
 const React = require('react');
 const Stroke = require('./Stroke.jsx');
 
+const override_option_order = ["XXS","XS","S","M","L","XL","XXL","XXXL"];
+
 /***
 This attempts to emulate a select drop-down, but displays options side-by-side
 props:
@@ -22,6 +24,14 @@ class Switch extends React.Component {
   render() {
     let options = [];
     let children = React.Children.toArray(this.props.children);
+    // potentially override option order
+    children.sort((a,b) => {
+      let a_order_override = override_option_order.indexOf(a.props.children);
+      let b_order_override = override_option_order.indexOf(b.props.children);
+      if (a_order_override != b_order_override)
+        return a_order_override - b_order_override;
+      return -1;
+    });
     for (let index=0; index<children.length; index++) {
       let child = children[index];
       if (child.type!="option") continue;

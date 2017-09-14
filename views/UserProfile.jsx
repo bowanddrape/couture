@@ -14,6 +14,12 @@ class UserProfile extends React.Component {
     super(props);
   }
 
+  logout() {
+    // FIXME we also need to unauth or logout facebook
+    BowAndDrape.dispatcher.handleAuth({});
+    location.reload();
+  }
+
   render() {
     // if we don't have a user, display login area
     if (!this.props.user || !this.props.user.email) {
@@ -24,9 +30,10 @@ class UserProfile extends React.Component {
 
     return (
       React.createElement("user", {},
-        <img src={this.props.user.props.image} onError={(event)=>{event.target.setAttribute('src', '/smily_tongue.svg')}}/>,
+        <img src={this.props.user.props.image?this.props.user.props.image:"/nope"} onError={(event)=>{event.target.setAttribute('src', '/smily_tongue.svg')}}/>,
         <name>{this.props.user.props.name}</name>,
         "! Welcome Home!",
+        <user><a onClick={this.logout.bind(this)}><button>Logout</button></a></user>,
       )
     );
   }

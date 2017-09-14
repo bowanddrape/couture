@@ -97036,8 +97036,6 @@ module.exports = LayoutBasic;
 },{"react":652}],746:[function(require,module,exports){
 'use strict';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -97048,7 +97046,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 
-var FacebookLogin = require('./FacebookLogin.jsx');
 var UserProfile = require('./UserProfile.jsx');
 var CartMenu = require('./CartMenu.jsx');
 
@@ -97080,15 +97077,40 @@ var LayoutHeader = function (_React$Component) {
 
       var menu_items = [];
 
-      menu_items.push(React.createElement(UserProfile, _extends({ key: menu_items.length }, this.props)));
-      menu_items.push(React.createElement(FacebookLogin, _extends({ key: menu_items.length }, this.props)));
       menu_items.push(React.createElement(
         'a',
         { key: menu_items.length, href: '/customize-your-own' },
         React.createElement(
           'button',
           { className: 'primary' },
-          'Customize'
+          'Customize Your Own'
+        )
+      ));
+      menu_items.push(React.createElement(
+        'a',
+        { key: menu_items.length, href: '/customize-your-own' },
+        React.createElement(
+          'button',
+          { className: 'primary' },
+          'Shop'
+        )
+      ));
+      menu_items.push(React.createElement(
+        'a',
+        { key: menu_items.length, href: '/customize-your-own' },
+        React.createElement(
+          'button',
+          { className: 'primary' },
+          'Inspo'
+        )
+      ));
+      menu_items.push(React.createElement(
+        'a',
+        { key: menu_items.length, href: '/customize-your-own' },
+        React.createElement(
+          'button',
+          { className: 'primary' },
+          'Lookbook'
         )
       ));
       // links to admin pages
@@ -97132,15 +97154,6 @@ var LayoutHeader = function (_React$Component) {
           )
         ));
       }
-      if (this.props.user && this.props.user.email) menu_items.push(React.createElement(
-        'a',
-        { key: menu_items.length, onClick: this.logout.bind(this) },
-        React.createElement(
-          'button',
-          null,
-          'Logout'
-        )
-      ));
 
       if (this.state.desktop_mode) {
         return React.createElement('div', { className: 'header' });
@@ -97152,21 +97165,23 @@ var LayoutHeader = function (_React$Component) {
         React.createElement('handle', { onClick: function onClick() {
             _this2.setState({ expanded: !_this2.state.expanded });
           } }),
-        React.createElement('img', { className: 'logo', src: '/logo_mini.svg' }),
+        React.createElement(
+          'a',
+          { href: '/' },
+          React.createElement('img', { className: 'logo', src: '/logo_mini.svg' })
+        ),
         React.createElement(CartMenu, { key: menu_items.length }),
         React.createElement(
           'menu',
           { className: this.state.expanded ? "expanded" : "" },
-          menu_items
+          React.createElement(UserProfile, this.props),
+          React.createElement(
+            'menu_items',
+            null,
+            menu_items
+          )
         )
       );
-    }
-  }, {
-    key: 'logout',
-    value: function logout() {
-      // FIXME we also need to unauth or logout facebook
-      BowAndDrape.dispatcher.handleAuth({});
-      location.reload();
     }
   }]);
 
@@ -97175,7 +97190,7 @@ var LayoutHeader = function (_React$Component) {
 
 module.exports = LayoutHeader;
 
-},{"./CartMenu.jsx":730,"./FacebookLogin.jsx":738,"./UserProfile.jsx":771,"react":652}],747:[function(require,module,exports){
+},{"./CartMenu.jsx":730,"./UserProfile.jsx":771,"react":652}],747:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -97973,7 +97988,7 @@ var Placeholder = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      return React.createElement("content", { onClick: this.handleClick.bind(this) }, React.createElement(Stroke, { data: "/logo_stroke.svg", style: { display: "block", width: "600px", maxWidth: "100%", pointerEvents: "none" }, draw_on_load: true, ref: "logo" }));
+      return React.createElement("content", { onClick: this.handleClick.bind(this) }, React.createElement(Stroke, { data: "/logo_stroke.svg", style: { display: "block", width: "300px", maxWidth: "100%", pointerEvents: "none" }, draw_on_load: true, ref: "logo" }));
     }
   }]);
 
@@ -98087,11 +98102,16 @@ var ProductCanvas = function (_React$Component) {
   _createClass(ProductCanvas, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      var _this2 = this;
+
       this.canvas = document.querySelector("canvas");
       this.canvas.setAttribute("width", document.body.offsetWidth);
       this.customizer = new BowAndDrape.Customizer({ canvas: this.canvas });
       this.customizer.init();
       this.forceUpdate();
+      BowAndDrape.dispatcher.on("resize", function () {
+        _this2.customizer.resizeViewport();
+      });
     }
 
     // get a text version of a component
@@ -98115,7 +98135,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleSetComponentText',
     value: function handleSetComponentText(text, componentMap) {
-      var _this2 = this;
+      var _this3 = this;
 
       this.setState(function (prevState, props) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
@@ -98125,8 +98145,8 @@ var ProductCanvas = function (_React$Component) {
           // if nothing is selected make a new selected component
           // facing the camera for now TODO get normal of intersected tri
           var rotation = Matrix.I(4);
-          if (_this2.customizer.camera.rotation.angle) {
-            rotation = Matrix.Rotation(-_this2.customizer.camera.rotation.angle, new Vector(_this2.customizer.camera.rotation.axis)).ensure4x4();
+          if (_this3.customizer.camera.rotation.angle) {
+            rotation = Matrix.Rotation(-_this3.customizer.camera.rotation.angle, new Vector(_this3.customizer.camera.rotation.axis)).ensure4x4();
           }
           selected = {
             props: {
@@ -98158,7 +98178,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleAddComponent',
     value: function handleAddComponent(component) {
-      var _this3 = this;
+      var _this4 = this;
 
       // deep copy and set the quantity of this component to be used to 1
       component = JSON.parse(JSON.stringify(component));
@@ -98174,8 +98194,8 @@ var ProductCanvas = function (_React$Component) {
         // facing the camera for now TODO get normal of intersected tri
         var position = [0, 0, 0];
         var rotation = Matrix.I(4);
-        if (_this3.customizer.camera.rotation.angle) {
-          rotation = Matrix.Rotation(-_this3.customizer.camera.rotation.angle, new Vector(_this3.customizer.camera.rotation.axis)).ensure4x4();
+        if (_this4.customizer.camera.rotation.angle) {
+          rotation = Matrix.Rotation(-_this4.customizer.camera.rotation.angle, new Vector(_this4.customizer.camera.rotation.axis)).ensure4x4();
         }
         assembly.push({
           props: {
@@ -98209,7 +98229,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleComponentMove',
     value: function handleComponentMove(index, event) {
-      var _this4 = this;
+      var _this5 = this;
 
       event.preventDefault();
       event.stopPropagation();
@@ -98223,7 +98243,7 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[index];
         if (selected) {
-          selected.props.position = _this4.customizer.browserToWorld(client_pos);
+          selected.props.position = _this5.customizer.browserToWorld(client_pos);
         }
         return { assembly: assembly, selected_component: index };
       });
@@ -98231,7 +98251,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'handleComponentRotate',
     value: function handleComponentRotate(angle, event) {
-      var _this5 = this;
+      var _this6 = this;
 
       // update the component rotation
       this.setState(function (prevState, props) {
@@ -98239,8 +98259,8 @@ var ProductCanvas = function (_React$Component) {
         var selected = assembly[prevState.selected_component];
         if (selected) {
           var component_rotation = new Matrix(selected.props.rotation.elements);
-          var camera_rotation = Matrix.Rotation(_this5.customizer.camera.rotation.angle, new Vector(_this5.customizer.camera.rotation.axis));
-          selected.props.rotation = Matrix.Rotation(angle, camera_rotation.x(new Vector(_this5.customizer.camera.position))).ensure4x4().x(component_rotation);
+          var camera_rotation = Matrix.Rotation(_this6.customizer.camera.rotation.angle, new Vector(_this6.customizer.camera.rotation.axis));
+          selected.props.rotation = Matrix.Rotation(angle, camera_rotation.x(new Vector(_this6.customizer.camera.position))).ensure4x4().x(component_rotation);
         }
         return { assembly: assembly };
       });
@@ -98260,13 +98280,13 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'autoLayout',
     value: function autoLayout() {
-      var _this6 = this;
+      var _this7 = this;
 
       var reflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       var getComponentsOfInterest = function getComponentsOfInterest(assembly) {
         return assembly.filter(function (component) {
-          var camera_position_world = Matrix.Rotation(_this6.customizer.camera.rotation.angle, new Vector(_this6.customizer.camera.rotation.axis)).ensure4x4().x(new Vector([_this6.customizer.camera.position[0], _this6.customizer.camera.position[1], _this6.customizer.camera.position[2], 1]));
+          var camera_position_world = Matrix.Rotation(_this7.customizer.camera.rotation.angle, new Vector(_this7.customizer.camera.rotation.axis)).ensure4x4().x(new Vector([_this7.customizer.camera.position[0], _this7.customizer.camera.position[1], _this7.customizer.camera.position[2], 1]));
           var component_rotation = new Matrix(component.props.rotation.elements);
           var relative_camera_direction = component_rotation.x(camera_position_world).elements;
           return relative_camera_direction[2] <= 0;
@@ -98279,12 +98299,12 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected_component = prevState.selected_component;
         // TODO rectangular design areas for now
-        var design_area = _this6.props.product.props.design_area && _this6.props.product.props.design_area.width ? _this6.props.product.props.design_area : {
-          top: _this6.props.product.props.imageheight / 2 - 0.05,
-          left: -_this6.props.product.props.imagewidth / 2,
-          width: _this6.props.product.props.imagewidth * 5 / 9,
-          height: _this6.props.product.props.imageheight * 3 / 4,
-          gravity: [0, _this6.props.product.props.imageheight / 4]
+        var design_area = _this7.props.product.props.design_area && _this7.props.product.props.design_area.width ? _this7.props.product.props.design_area : {
+          top: _this7.props.product.props.imageheight / 2 - 0.05,
+          left: -_this7.props.product.props.imagewidth / 2,
+          width: _this7.props.product.props.imagewidth * 5 / 9,
+          height: _this7.props.product.props.imageheight * 3 / 4,
+          gravity: [0, _this7.props.product.props.imageheight / 4]
         };
         // only work on visible components
         var components = getComponentsOfInterest(assembly);
@@ -98349,16 +98369,16 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      var _this7 = this;
+      var _this8 = this;
 
       this.customizer.resizeViewport();
       // handle actions on hitboxes
       this.canvas.parentNode.childNodes.forEach(function (node) {
         if (node.tagName.toLowerCase() != "component_hitbox") return;
         // this overrides the synthetic react events so we don't scroll
-        node.ontouchmove = _this7.handleComponentMove.bind(_this7, node.getAttribute("data"));
-        node.onmousemove = _this7.handleComponentMove.bind(_this7, node.getAttribute("data"));
-        node.onclick = _this7.handleSelectComponent.bind(_this7, node.getAttribute("data"));
+        node.ontouchmove = _this8.handleComponentMove.bind(_this8, node.getAttribute("data"));
+        node.onmousemove = _this8.handleComponentMove.bind(_this8, node.getAttribute("data"));
+        node.onclick = _this8.handleSelectComponent.bind(_this8, node.getAttribute("data"));
       });
       this.handleUpdateProduct();
     }
@@ -98386,7 +98406,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this8 = this;
+      var _this9 = this;
 
       var component_hitboxes = [];
 
@@ -98443,7 +98463,7 @@ var ProductCanvas = function (_React$Component) {
           var camera_label = camera.name.toUpperCase() || 'Camera ' + hud_controls.length;
           hud_controls.push(React.createElement(
             'button',
-            { key: hud_controls.length, onClick: _this8.handleChangeCamera.bind(_this8, hud_controls.length) },
+            { key: hud_controls.length, onClick: _this9.handleChangeCamera.bind(_this9, hud_controls.length) },
             camera_label
           ));
         });
@@ -100084,6 +100104,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var Stroke = require('./Stroke.jsx');
 
+var override_option_order = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+
 /***
 This attempts to emulate a select drop-down, but displays options side-by-side
 props:
@@ -100114,6 +100136,13 @@ var Switch = function (_React$Component) {
 
       var options = [];
       var children = React.Children.toArray(this.props.children);
+      // potentially override option order
+      children.sort(function (a, b) {
+        var a_order_override = override_option_order.indexOf(a.props.children);
+        var b_order_override = override_option_order.indexOf(b.props.children);
+        if (a_order_override != b_order_override) return a_order_override - b_order_override;
+        return -1;
+      });
 
       var _loop = function _loop(index) {
         var child = children[index];
@@ -100410,6 +100439,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var bcrypt = require('bcryptjs');
 
+var FacebookLogin = require('./FacebookLogin.jsx');
 var Errors = require('./Errors.jsx');
 
 var UserLogin = function (_React$Component) {
@@ -100509,7 +100539,8 @@ var UserLogin = function (_React$Component) {
           'div',
           { className: 'cta' },
           this.props.cta
-        ) : null
+        ) : null,
+        React.createElement(FacebookLogin, { user: this.state.user })
       );
     }
   }], [{
@@ -100529,7 +100560,7 @@ var UserLogin = function (_React$Component) {
 
 module.exports = UserLogin;
 
-},{"./Errors.jsx":737,"bcryptjs":47,"react":652}],770:[function(require,module,exports){
+},{"./Errors.jsx":737,"./FacebookLogin.jsx":738,"bcryptjs":47,"react":652}],770:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100663,6 +100694,13 @@ var UserProfile = function (_React$Component) {
   }
 
   _createClass(UserProfile, [{
+    key: 'logout',
+    value: function logout() {
+      // FIXME we also need to unauth or logout facebook
+      BowAndDrape.dispatcher.handleAuth({});
+      location.reload();
+    }
+  }, {
     key: 'render',
     value: function render() {
       // if we don't have a user, display login area
@@ -100670,13 +100708,25 @@ var UserProfile = function (_React$Component) {
         return React.createElement(UserLogin, null);
       }
 
-      return React.createElement("user", {}, React.createElement('img', { src: this.props.user.props.image, onError: function onError(event) {
+      return React.createElement("user", {}, React.createElement('img', { src: this.props.user.props.image ? this.props.user.props.image : "/nope", onError: function onError(event) {
           event.target.setAttribute('src', '/smily_tongue.svg');
         } }), React.createElement(
         'name',
         null,
         this.props.user.props.name
-      ), "! Welcome Home!");
+      ), "! Welcome Home!", React.createElement(
+        'user',
+        null,
+        React.createElement(
+          'a',
+          { onClick: this.logout.bind(this) },
+          React.createElement(
+            'button',
+            null,
+            'Logout'
+          )
+        )
+      ));
     }
   }]);
 

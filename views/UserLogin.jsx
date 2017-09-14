@@ -2,6 +2,7 @@
 const React = require('react');
 const bcrypt = require('bcryptjs');
 
+const FacebookLogin = require('./FacebookLogin.jsx');
 const Errors = require('./Errors.jsx');
 
 class UserLogin extends React.Component {
@@ -78,6 +79,7 @@ class UserLogin extends React.Component {
         <button onClick={this.login.bind(this)}>Login / Register</button>
         <button onClick={this.verify.bind(this)}>Verify / Forgot Pass</button>
         {this.props.cta ? <div className="cta">{this.props.cta}</div> : null}
+        <FacebookLogin user={this.state.user}/>
       </login>
     );
   }

@@ -18,6 +18,9 @@ switch {
     cursor: pointer;
     transition: max-width 1s, margin 1s;
   }
+  switch_option.selected, &.expanded switch_option {
+    min-width: 36px;
+  }
   &.expanded {
     .rainbow_border;
     z-index: 1;

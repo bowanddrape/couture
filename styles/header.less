@@ -1,0 +1,119 @@
+
+@import "./boilerplate.less";
+
+@user_img_width: 50px;
+@menu_handle_width: 36px;
+.header {
+  handle {
+    background-image: url(/pizza.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 3px;
+    left: 11px;
+    display: block;
+    width: @menu_handle_width;
+    height: @menu_handle_width + 4px;
+  }
+  img.logo {
+    display: block;
+    margin: auto;
+    width: 200px;
+  }
+  .cartmenu {
+    background-image: url(/cart.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    overflow: visible;
+    top: 3px;
+    right: 11px;
+    width: @menu_handle_width;
+    height: @menu_handle_width + 4px;
+    cart_bug {
+      position: relative;
+      padding: 0px 7px;
+      border-radius: 500px;
+      background-color: @color_support_2;
+      font-size: 11px;
+      right: -24px;
+    }
+  }
+  menu {
+    top: 0;
+    margin: 10px 0;
+    padding: 0px;
+    width: 100%;
+    overflow: hidden;
+    max-height: 0px;
+    text-align: center;
+    transition: max-height 1s ease, border-bottom 1s ease;
+    border-bottom: solid 3px rgba(0,0,0,0);
+    a:hover {
+      text-decoration: none;
+    }
+    button, .button {
+      .cta;
+      height: auto;
+      width: auto;
+      border-bottom: none;
+      margin: 12px auto;
+      &:hover {
+        color: @color_support_1;
+      }
+      &:before { display:none; }
+      &:after { display:none; }
+    }
+  }
+  menu.expanded {
+    max-height: 500px;
+    border-bottom: solid 3px rgba(0,0,0,1);
+  }
+  menu user {
+    display: block;
+    img {
+      border-radius: 5px;
+      border: solid 2px @color_primary;
+      width: @user_img_width;
+      position: relative;
+      top: @user_img_width/2 - 5px;
+    }
+    name {
+      margin-top: @user_img_width/2;
+    }
+  }
+}
+
+
+
+@media (min-width: @desktop_min_width) { .header {
+  handle {
+    left: auto;
+    right: 55px;
+  }
+  menu {
+    max-height: initial;
+    display: flex;
+    flex-direction: column-reverse;
+    menu_items {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      button {
+        margin: 0px 54px;
+      }
+    }
+    login, user {
+      display: block;
+      opacity: 0;
+      max-height: 0px;
+      transition: max-height 1s ease, border-bottom 1s ease;
+    }
+    &.expanded {
+      login, user {
+        opacity: 1;
+        max-height: 300px;
+      }
+    }
+  }
+}}

@@ -17,7 +17,7 @@ class Placeholder extends React.Component {
   render() {
     return (
       React.createElement("content", {onClick: this.handleClick.bind(this)},
-        React.createElement(Stroke, {data:"/logo_stroke.svg", style:{display:"block",width:"600px",maxWidth:"100%",pointerEvents:"none"}, draw_on_load: true, ref: "logo"}),
+        React.createElement(Stroke, {data:"/logo_stroke.svg", style:{display:"block",width:"300px",maxWidth:"100%",pointerEvents:"none"}, draw_on_load: true, ref: "logo"}),
       )
     );
   }

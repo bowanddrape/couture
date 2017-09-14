@@ -38,6 +38,9 @@ class ProductCanvas extends React.Component {
     this.customizer = new BowAndDrape.Customizer({canvas: this.canvas});
     this.customizer.init();
     this.forceUpdate();
+    BowAndDrape.dispatcher.on("resize", () => {
+      this.customizer.resizeViewport();
+    });
   }
 
   // get a text version of a component
