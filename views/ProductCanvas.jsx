@@ -209,7 +209,7 @@ class ProductCanvas extends React.Component {
       let selected_component = prevState.selected_component;
       // TODO rectangular design areas for now
       let design_area = this.props.product.props.design_area&&this.props.product.props.design_area.width ? this.props.product.props.design_area : {
-        top: this.props.product.props.imageheight/2 - 0.05,
+        top: this.props.product.props.imageheight/2 - (this.props.product.props.imageheight * 0.2),
         left: -this.props.product.props.imagewidth/2,
         width: this.props.product.props.imagewidth*5/9,
         height: this.props.product.props.imageheight*3/4,
@@ -225,7 +225,8 @@ class ProductCanvas extends React.Component {
         components.forEach((component, index) => {
           let total_width = 0;
           component.assembly.forEach((assembly_component) => {
-            total_width += parseFloat(assembly_component.props.imagewidth);
+            if (assembly_component.props)
+              total_width += parseFloat(assembly_component.props.imagewidth);
           });
           if (total_width<=design_area.width) return;
           // try to find a breakpoint
@@ -260,7 +261,8 @@ class ProductCanvas extends React.Component {
         line_count += 1;
         component.max_height = 0;
         component.assembly.forEach((assembly_component) => {
-          component.max_height = Math.max(component.max_height, assembly_component.props.imageheight);
+          if (assembly_component.props)
+            component.max_height = Math.max(component.max_height, assembly_component.props.imageheight);
         });
         total_height += component.max_height;
       });

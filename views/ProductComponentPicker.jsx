@@ -120,6 +120,7 @@ class ProductComponentPicker extends React.Component {
                   this.handleSetComponentText(event.target.value, component_letters);
                 }}
                 onFocus={(event) => {
+                  event.persist();
                   // TODO figure out some better scrolly what-nots?
                   setTimeout(() => {
                     event.target.scrollIntoView(false);

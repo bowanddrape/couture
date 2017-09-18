@@ -4,6 +4,8 @@
 }
 .bodyfont {
   font-family: "Open Sans", Arial, sans-serif;
+  line-height: 1.43;
+  letter-spacing: 1.3px;
   color: #000;
 }
 .headerfont {
@@ -13,7 +15,10 @@
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
+  line-height: 1.43;
+  letter-spacing: 1.3px;
   color: #000;
+  font-size: 14px;
 }
 a {
   text-decoration: none;
@@ -119,7 +124,7 @@ button.primary:hover:before,
   font-size: 10px;
   font-weight: bold;
   letter-spacing: 2px;
-  padding-bottom: 6px;
+  padding: 6px 0px;
   text-decoration: none;
   border: none;
   border-bottom: solid 1px #000;
@@ -582,11 +587,11 @@ customize hud_controls {
   flex-direction: column;
   position: absolute;
   top: 0px;
-  right: 14px;
+  right: 0px;
   min-width: 83px;
-  padding: 0 10px;
 }
 customize hud_controls.rainbow_border {
+  padding: 0 10px;
   position: absolute;
 }
 customize hud_controls button:before {
@@ -953,7 +958,7 @@ product_options switch.expanded {
   font-size: 10px;
   font-weight: bold;
   letter-spacing: 2px;
-  padding-bottom: 6px;
+  padding: 6px 0px;
   text-decoration: none;
   border: none;
   border-bottom: solid 1px #000;

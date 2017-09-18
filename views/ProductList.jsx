@@ -261,7 +261,8 @@ class ProductList extends React.Component {
     // initialize selected_product
     let product = this.state.product_map[this.state.selected_product[0]];
     for (let i=1; product && i<this.state.selected_product.length; i++) {
-      product = product.options[this.state.selected_product[i]];
+      if (product.options[this.state.selected_product[i]])
+        product = product.options[this.state.selected_product[i]];
     }
 
     // first have the top level product selector

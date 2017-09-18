@@ -98300,7 +98300,7 @@ var ProductCanvas = function (_React$Component) {
         var selected_component = prevState.selected_component;
         // TODO rectangular design areas for now
         var design_area = _this7.props.product.props.design_area && _this7.props.product.props.design_area.width ? _this7.props.product.props.design_area : {
-          top: _this7.props.product.props.imageheight / 2 - 0.05,
+          top: _this7.props.product.props.imageheight / 2 - _this7.props.product.props.imageheight * 0.2,
           left: -_this7.props.product.props.imagewidth / 2,
           width: _this7.props.product.props.imagewidth * 5 / 9,
           height: _this7.props.product.props.imageheight * 3 / 4,
@@ -98316,7 +98316,7 @@ var ProductCanvas = function (_React$Component) {
           components.forEach(function (component, index) {
             var total_width = 0;
             component.assembly.forEach(function (assembly_component) {
-              total_width += parseFloat(assembly_component.props.imagewidth);
+              if (assembly_component.props) total_width += parseFloat(assembly_component.props.imagewidth);
             });
             if (total_width <= design_area.width) return;
             // try to find a breakpoint
@@ -98348,7 +98348,7 @@ var ProductCanvas = function (_React$Component) {
           line_count += 1;
           component.max_height = 0;
           component.assembly.forEach(function (assembly_component) {
-            component.max_height = Math.max(component.max_height, assembly_component.props.imageheight);
+            if (assembly_component.props) component.max_height = Math.max(component.max_height, assembly_component.props.imageheight);
           });
           total_height += component.max_height;
         });
@@ -98657,6 +98657,7 @@ var ProductComponentPicker = function (_React$Component) {
                   _this2.handleSetComponentText(event.target.value, _component_letters);
                 },
                 onFocus: function onFocus(event) {
+                  event.persist();
                   // TODO figure out some better scrolly what-nots?
                   setTimeout(function () {
                     event.target.scrollIntoView(false);
@@ -99004,7 +99005,7 @@ var ProductList = function (_React$Component) {
       // initialize selected_product
       var product = this.state.product_map[this.state.selected_product[0]];
       for (var i = 1; product && i < this.state.selected_product.length; i++) {
-        product = product.options[this.state.selected_product[i]];
+        if (product.options[this.state.selected_product[i]]) product = product.options[this.state.selected_product[i]];
       }
 
       // first have the top level product selector
@@ -100156,7 +100157,7 @@ var Switch = function (_React$Component) {
           React.createElement(
             'div',
             { style: { textAlign: "center" } },
-            React.createElement('img', { src: child.props.children.toString().replace(/ /g, "_").toLowerCase() + ".svg", alt: child.props.children })
+            React.createElement('img', { src: "/" + child.props.children.toString().replace(/ /g, "_").toLowerCase() + ".svg", alt: child.props.children })
           )
         ));
       };
