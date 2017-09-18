@@ -150,9 +150,9 @@ class ProductComponentPicker extends React.Component {
           );
         }
         components.push(
-          <div key={components.length} name={product.compatible_components[i].props.name} className="component_container">
+          <div key={components.length} name={product.compatible_components[i].props.name} className="rainbow_border"><div className="component_container">
             {tab_components}
-          </div>
+          </div></div>
         );
         continue;
       }

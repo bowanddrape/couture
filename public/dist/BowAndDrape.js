@@ -98691,8 +98691,12 @@ var ProductComponentPicker = function (_React$Component) {
           }
           components.push(React.createElement(
             'div',
-            { key: components.length, name: product.compatible_components[i].props.name, className: 'component_container' },
-            tab_components
+            { key: components.length, name: product.compatible_components[i].props.name, className: 'rainbow_border' },
+            React.createElement(
+              'div',
+              { className: 'component_container' },
+              tab_components
+            )
           ));
           return 'continue';
         }

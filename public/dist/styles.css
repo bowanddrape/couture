@@ -398,30 +398,6 @@ customize .component_container {
   max-width: 100%;
   overflow-x: scroll;
 }
-customize .component_container:not(.letters) {
-  z-index: 0;
-  position: relative;
-}
-customize .component_container:not(.letters):before {
-  content: " ";
-  position: absolute;
-  left: 0px;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-  background-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
-  z-index: -2;
-}
-customize .component_container:not(.letters):after {
-  content: " ";
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  bottom: 2px;
-  background-color: #fff;
-  z-index: -1;
-}
 customize .component_container div {
   height: 40px;
   width: 40px;
@@ -466,30 +442,6 @@ customize .component_virtual_keyboard_container {
   max-width: 100%;
   overflow-x: scroll;
   align-content: center;
-}
-customize .component_virtual_keyboard_container:not(.letters) {
-  z-index: 0;
-  position: relative;
-}
-customize .component_virtual_keyboard_container:not(.letters):before {
-  content: " ";
-  position: absolute;
-  left: 0px;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-  background-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
-  z-index: -2;
-}
-customize .component_virtual_keyboard_container:not(.letters):after {
-  content: " ";
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  bottom: 2px;
-  background-color: #fff;
-  z-index: -1;
 }
 customize .component_virtual_keyboard_container div {
   height: 40px;
@@ -632,7 +584,7 @@ customize hud_controls button:after {
     margin-left: -150px;
   }
   customize .component_picker .components .component_container:not(.letters) {
-    height: auto;
+    height: 400px;
     width: 119px;
     flex-direction: row;
     overflow-x: hidden;
