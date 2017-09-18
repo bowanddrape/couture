@@ -182,6 +182,27 @@ class ProductCanvas extends React.Component {
     });
   }
 
+  handleComponentCenter(index) {
+    // update the component rotation
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      let selected = assembly[prevState.selected_component];
+      if (selected) {
+        let position = [0,0,0];
+        let rotation = Matrix.I(4);
+        if (this.customizer.camera.rotation.angle) {
+          rotation = Matrix.Rotation(
+            -this.customizer.camera.rotation.angle,
+            new Vector(this.customizer.camera.rotation.axis)
+          ).ensure4x4();
+        }
+        selected.props.rotation = rotation;
+        selected.props.position = position;
+      }
+      return {assembly};
+    });
+  }
+
   handleSelectComponent(index) {
     this.setState({selected_component: index});
   }
@@ -348,6 +369,7 @@ class ProductCanvas extends React.Component {
       hud_controls.push(<div key={hud_controls.length} style={{display:"flex"}}><button onClick={this.handleComponentRotate.bind(this, -Math.PI/20)}>↶</button>
         <button onClick={this.handleComponentRotate.bind(this, Math.PI/20)}>↷</button></div>
       );
+      hud_controls.push(<button key={hud_controls.length} onClick={this.handleComponentCenter.bind(this)}>▣</button>);
       hud_controls.push(<button key={hud_controls.length} onClick={this.handleSelectComponent.bind(this, -1)}>✔</button>);
     }
     else if (this.cameras) {
@@ -363,7 +385,7 @@ class ProductCanvas extends React.Component {
     }
 
     return (
-      <div style={{position:"relative",width:"100%"}}>
+      <div style={{position:"relative",width:"100%"}} className={this.state.assembly[this.state.selected_component]?"component_selected":""}>
         <canvas>
         </canvas>
         {component_hitboxes}

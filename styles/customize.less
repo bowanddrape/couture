@@ -29,6 +29,11 @@ customize {
       min-width: 400px;
       max-height: 100%;
     }
+    .component_selected {
+      canvas, component_hitbox {
+        margin-left: -30px; /* FIXME this is dumb, comment this out */
+      }
+    }
   }
   tabs.components {
     display: block;
@@ -58,7 +63,6 @@ customize {
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
-      border: solid 1px #fff;
       border-radius: 10px;
       cursor: pointer;
     }
@@ -123,6 +127,7 @@ customize {
     &.rainbow_border {
       padding: 0 10px;
       position: absolute;
+      z-index: 1;
     }
     button:before {
       display: none;
@@ -142,7 +147,7 @@ customize {
       margin-bottom: 10px;
     }
   }
-  hud_controls {
+  hud_controls:not(.rainbow_border) {
     top: 165px;
   }
   .component_picker {
@@ -179,6 +184,11 @@ customize {
   .canvas_container {
     canvas {
       height: 400px;
+    }
+    .component_selected {
+      canvas, component_hitbox {
+        margin-left: 0px; /* cancel out the dumb in the mobile styles */
+      }
     }
   }
 }}

@@ -380,6 +380,11 @@ customize .canvas_container canvas {
   min-width: 400px;
   max-height: 100%;
 }
+customize .canvas_container .component_selected canvas,
+customize .canvas_container .component_selected component_hitbox {
+  margin-left: -30px;
+  /* FIXME this is dumb, comment this out */
+}
 customize tabs.components {
   display: block;
 }
@@ -405,7 +410,6 @@ customize .component_container div {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  border: solid 1px #fff;
   border-radius: 10px;
   cursor: pointer;
 }
@@ -450,7 +454,6 @@ customize .component_virtual_keyboard_container div {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  border: solid 1px #fff;
   border-radius: 10px;
   cursor: pointer;
 }
@@ -545,6 +548,7 @@ customize hud_controls {
 customize hud_controls.rainbow_border {
   padding: 0 10px;
   position: absolute;
+  z-index: 1;
 }
 customize hud_controls button:before {
   display: none;
@@ -561,7 +565,7 @@ customize hud_controls button:after {
     justify-content: flex-end;
     margin-bottom: 10px;
   }
-  customize hud_controls {
+  customize hud_controls:not(.rainbow_border) {
     top: 165px;
   }
   customize .component_picker {
@@ -597,6 +601,11 @@ customize hud_controls button:after {
   }
   customize .canvas_container canvas {
     height: 400px;
+  }
+  customize .canvas_container .component_selected canvas,
+  customize .canvas_container .component_selected component_hitbox {
+    margin-left: 0px;
+    /* cancel out the dumb in the mobile styles */
   }
 }
 .checkout_section {
@@ -807,7 +816,6 @@ switch switch_option {
   max-width: 165px;
   box-sizing: border-box;
   cursor: pointer;
-  transition: max-width 1s, margin 1s;
 }
 switch switch_option.selected,
 switch.expanded switch_option {
@@ -981,4 +989,27 @@ product_options switch.expanded {
 }
 .icon {
   background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
+}
+.purchase_complete {
+  width: 700px;
+  clear: both;
+  margin: auto;
+}
+.purchase_complete > div {
+  width: 600px;
+  margin: auto;
+}
+.purchase_complete img {
+  width: 400px;
+  display: block;
+  margin: auto;
+}
+.purchase_complete h1 {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
+  font-weight: bold;
+  text-align: center;
+}
+.purchase_complete p {
+  text-align: center;
 }

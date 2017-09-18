@@ -94292,7 +94292,11 @@ var Cart = function (_React$Component) {
         country: ""
       },
       processing_payment: false,
-      done: false
+      done: false,
+      savedItems: {
+        itemsList: false,
+        saved: false
+      }
     };
 
     if (!_this.props.store[0].id) {
@@ -94336,6 +94340,10 @@ var Cart = function (_React$Component) {
     value: function updateContents(items) {
       Errors.clear();
       items = items || [];
+
+      // For use in displaying items on the thank you page
+      if (!this.state.savedItems.saved) this.setState({ savedItems: { itemsList: items, saved: true } });
+
       this.refs.Items.updateContents(items);
       if (!items.length) Errors.emitError(null, "Cart is empty");
     }
@@ -94499,7 +94507,10 @@ var Cart = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      if (this.state.done) return React.createElement(ThanksPurchaseComplete, null);
+      if (this.state.done) {
+        //return <ThanksPurchaseComplete items = {this.state.savedItems} is_cart = {false} />;
+        return React.createElement(ThanksPurchaseComplete, { items: this.state.savedItems.itemsList, is_cart: false });
+      }
 
       // see if we need to show payment components
       var payment_info = null;
@@ -98266,6 +98277,27 @@ var ProductCanvas = function (_React$Component) {
       });
     }
   }, {
+    key: 'handleComponentCenter',
+    value: function handleComponentCenter(index) {
+      var _this7 = this;
+
+      // update the component rotation
+      this.setState(function (prevState, props) {
+        var assembly = JSON.parse(JSON.stringify(prevState.assembly));
+        var selected = assembly[prevState.selected_component];
+        if (selected) {
+          var position = [0, 0, 0];
+          var rotation = Matrix.I(4);
+          if (_this7.customizer.camera.rotation.angle) {
+            rotation = Matrix.Rotation(-_this7.customizer.camera.rotation.angle, new Vector(_this7.customizer.camera.rotation.axis)).ensure4x4();
+          }
+          selected.props.rotation = rotation;
+          selected.props.position = position;
+        }
+        return { assembly: assembly };
+      });
+    }
+  }, {
     key: 'handleSelectComponent',
     value: function handleSelectComponent(index) {
       this.setState({ selected_component: index });
@@ -98280,13 +98312,13 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'autoLayout',
     value: function autoLayout() {
-      var _this7 = this;
+      var _this8 = this;
 
       var reflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       var getComponentsOfInterest = function getComponentsOfInterest(assembly) {
         return assembly.filter(function (component) {
-          var camera_position_world = Matrix.Rotation(_this7.customizer.camera.rotation.angle, new Vector(_this7.customizer.camera.rotation.axis)).ensure4x4().x(new Vector([_this7.customizer.camera.position[0], _this7.customizer.camera.position[1], _this7.customizer.camera.position[2], 1]));
+          var camera_position_world = Matrix.Rotation(_this8.customizer.camera.rotation.angle, new Vector(_this8.customizer.camera.rotation.axis)).ensure4x4().x(new Vector([_this8.customizer.camera.position[0], _this8.customizer.camera.position[1], _this8.customizer.camera.position[2], 1]));
           var component_rotation = new Matrix(component.props.rotation.elements);
           var relative_camera_direction = component_rotation.x(camera_position_world).elements;
           return relative_camera_direction[2] <= 0;
@@ -98299,12 +98331,12 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected_component = prevState.selected_component;
         // TODO rectangular design areas for now
-        var design_area = _this7.props.product.props.design_area && _this7.props.product.props.design_area.width ? _this7.props.product.props.design_area : {
-          top: _this7.props.product.props.imageheight / 2 - _this7.props.product.props.imageheight * 0.2,
-          left: -_this7.props.product.props.imagewidth / 2,
-          width: _this7.props.product.props.imagewidth * 5 / 9,
-          height: _this7.props.product.props.imageheight * 3 / 4,
-          gravity: [0, _this7.props.product.props.imageheight / 4]
+        var design_area = _this8.props.product.props.design_area && _this8.props.product.props.design_area.width ? _this8.props.product.props.design_area : {
+          top: _this8.props.product.props.imageheight / 2 - _this8.props.product.props.imageheight * 0.2,
+          left: -_this8.props.product.props.imagewidth / 2,
+          width: _this8.props.product.props.imagewidth * 5 / 9,
+          height: _this8.props.product.props.imageheight * 3 / 4,
+          gravity: [0, _this8.props.product.props.imageheight / 4]
         };
         // only work on visible components
         var components = getComponentsOfInterest(assembly);
@@ -98369,16 +98401,16 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      var _this8 = this;
+      var _this9 = this;
 
       this.customizer.resizeViewport();
       // handle actions on hitboxes
       this.canvas.parentNode.childNodes.forEach(function (node) {
         if (node.tagName.toLowerCase() != "component_hitbox") return;
         // this overrides the synthetic react events so we don't scroll
-        node.ontouchmove = _this8.handleComponentMove.bind(_this8, node.getAttribute("data"));
-        node.onmousemove = _this8.handleComponentMove.bind(_this8, node.getAttribute("data"));
-        node.onclick = _this8.handleSelectComponent.bind(_this8, node.getAttribute("data"));
+        node.ontouchmove = _this9.handleComponentMove.bind(_this9, node.getAttribute("data"));
+        node.onmousemove = _this9.handleComponentMove.bind(_this9, node.getAttribute("data"));
+        node.onclick = _this9.handleSelectComponent.bind(_this9, node.getAttribute("data"));
       });
       this.handleUpdateProduct();
     }
@@ -98406,7 +98438,7 @@ var ProductCanvas = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this9 = this;
+      var _this10 = this;
 
       var component_hitboxes = [];
 
@@ -98455,6 +98487,11 @@ var ProductCanvas = function (_React$Component) {
         ));
         hud_controls.push(React.createElement(
           'button',
+          { key: hud_controls.length, onClick: this.handleComponentCenter.bind(this) },
+          '\u25A3'
+        ));
+        hud_controls.push(React.createElement(
+          'button',
           { key: hud_controls.length, onClick: this.handleSelectComponent.bind(this, -1) },
           '\u2714'
         ));
@@ -98463,7 +98500,7 @@ var ProductCanvas = function (_React$Component) {
           var camera_label = camera.name.toUpperCase() || 'Camera ' + hud_controls.length;
           hud_controls.push(React.createElement(
             'button',
-            { key: hud_controls.length, onClick: _this9.handleChangeCamera.bind(_this9, hud_controls.length) },
+            { key: hud_controls.length, onClick: _this10.handleChangeCamera.bind(_this10, hud_controls.length) },
             camera_label
           ));
         });
@@ -98476,7 +98513,7 @@ var ProductCanvas = function (_React$Component) {
 
       return React.createElement(
         'div',
-        { style: { position: "relative", width: "100%" } },
+        { style: { position: "relative", width: "100%" }, className: this.state.assembly[this.state.selected_component] ? "component_selected" : "" },
         React.createElement('canvas', null),
         component_hitboxes,
         React.createElement(
@@ -99762,7 +99799,11 @@ var Shipment = function (_React$Component) {
                   null,
                   'Order_id: '
                 ),
-                this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
+                React.createElement(
+                  'a',
+                  { href: '/shipment/' + this.props.id },
+                  this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
+                )
               ),
               React.createElement(
                 'div',
@@ -100340,7 +100381,7 @@ var TextContent = function (_React$Component) {
 module.exports = TextContent;
 
 },{"react":652}],767:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -100351,30 +100392,68 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+var Items = require('./Items.jsx');
 
 /***
 Draw after successful purchase
+
+"Thank You!" title
+Cute gif
+"Your order is complete!"
+Additional copy
+Cart contents
+
+
 ***/
 
 var ThanksPurchaseComplete = function (_React$Component) {
   _inherits(ThanksPurchaseComplete, _React$Component);
 
-  function ThanksPurchaseComplete() {
+  function ThanksPurchaseComplete(props) {
     _classCallCheck(this, ThanksPurchaseComplete);
 
-    return _possibleConstructorReturn(this, (ThanksPurchaseComplete.__proto__ || Object.getPrototypeOf(ThanksPurchaseComplete)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (ThanksPurchaseComplete.__proto__ || Object.getPrototypeOf(ThanksPurchaseComplete)).call(this, props));
+
+    _this.state = {
+      items: _this.props.items || []
+    };
+    return _this;
   }
 
   _createClass(ThanksPurchaseComplete, [{
-    key: "render",
+    key: 'render',
     value: function render() {
+
       return React.createElement(
-        "div",
-        { style: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } },
+        'div',
+        { className: 'purchase_complete' },
         React.createElement(
-          "div",
+          'div',
           null,
-          "Thanks for your purchase!"
+          React.createElement(
+            'h1',
+            null,
+            'Thank you for your purchase!'
+          )
+        ),
+        React.createElement(
+          'div',
+          null,
+          React.createElement('img', { src: '/thanks.gif' })
+        ),
+        React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'p',
+            null,
+            'Helper puppies have been dispatched to create your order!'
+          )
+        ),
+        React.createElement(
+          'div',
+          null,
+          React.createElement(Items, { contents: this.state.items })
         )
       );
     }
@@ -100385,7 +100464,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"react":652}],768:[function(require,module,exports){
+},{"./Items.jsx":744,"react":652}],768:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
