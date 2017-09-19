@@ -16,7 +16,7 @@ class Price extends React.Component {
 
     return (
       <div style={style}>
-        {price?`$${price.toFixed(2)}`:`Free!`}
+        <span style={style.price}>{price?`$${price.toFixed(2)}`:`Free!`}</span>
         {this.props.quantity?` x ${this.props.quantity}`:null}
       </div>
     );

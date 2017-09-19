@@ -594,11 +594,6 @@ customize hud_controls button:after {
     overflow-x: hidden;
     overflow-y: scroll;
   }
-  customize .add_to_cart {
-    position: fixed;
-    width: 100%;
-    bottom: 10px;
-  }
   customize .canvas_container canvas {
     height: 400px;
   }

@@ -24706,7 +24706,7 @@ module.exports={
         "spec": ">=2.1.1 <3.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/renee"
+      "/home/default/bowndrape/couture"
     ]
   ],
   "_from": "braintree@>=2.1.1 <3.0.0",
@@ -24742,7 +24742,7 @@ module.exports={
   "_shasum": "654534a2f4751ecfc611992f16abf364d4471b2a",
   "_shrinkwrap": null,
   "_spec": "braintree@^2.1.1",
-  "_where": "/home/default/bowanddrape/renee",
+  "_where": "/home/default/bowndrape/couture",
   "author": {
     "name": "Braintree",
     "email": "code@braintreepayments.com",
@@ -40241,7 +40241,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/renee/node_modules/browserify-sign"
+      "/home/default/bowndrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -40276,7 +40276,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/renee/node_modules/browserify-sign",
+  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -54381,7 +54381,7 @@ module.exports={
         "spec": ">=1.10.0 <2.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/renee"
+      "/home/default/bowndrape/couture"
     ]
   ],
   "_from": "pg-native@>=1.10.0 <2.0.0",
@@ -54419,7 +54419,7 @@ module.exports={
   "_shasum": "94e61ccbb85a7f3436b2e526315c7581107fe40c",
   "_shrinkwrap": null,
   "_spec": "pg-native@^1.10.0",
-  "_where": "/home/default/bowanddrape/renee",
+  "_where": "/home/default/bowndrape/couture",
   "author": {
     "name": "Brian M. Carlson"
   },
@@ -58615,7 +58615,7 @@ module.exports={
         "spec": ">=6.1.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/renee"
+      "/home/default/bowndrape/couture"
     ]
   ],
   "_from": "pg@>=6.1.0 <7.0.0",
@@ -58649,7 +58649,7 @@ module.exports={
   "_shasum": "c364011060eac7a507a2ae063eb857ece910e27f",
   "_shrinkwrap": null,
   "_spec": "pg@^6.1.0",
-  "_where": "/home/default/bowanddrape/renee",
+  "_where": "/home/default/bowndrape/couture",
   "author": {
     "name": "Brian Carlson",
     "email": "brian.m.carlson@gmail.com"
@@ -96868,6 +96868,19 @@ var Items = function (_React$Component) {
       var has_promo = false;
       var subtotal = 0;
       var total = 0;
+
+      var style = Item.style;
+      var style_summary = Item.style_summary;
+      // hide irrelevant things on packing slip
+      if (this.props.packing_slip) {
+        style.price.price = { display: "none" };
+        style.price.right = "0px";
+        style.price_total = { display: "none" };
+        style.img_preview = { display: "none" };
+        style.deets = Object.assign({}, style.deets, { position: "relative", left: "-64px", width: "100%" });
+        style_summary.item = Object.assign({}, style_summary.item, { display: "none" });
+      }
+
       for (var i = 0; i < this.state.contents.length; i++) {
         var remove = null;
         var quantity = this.state.contents[i].quantity || 1;
@@ -96884,9 +96897,9 @@ var Items = function (_React$Component) {
         }
         // if has a base sku or is a legacy imported item
         if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
-          line_items.push(React.createElement(Item, _extends({ style: Item.style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment })));
+          line_items.push(React.createElement(Item, _extends({ style: style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment })));
         } else {
-          summary_items.push(React.createElement(Item, _extends({ style: Item.style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove })));
+          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove })));
         }
       }
 
@@ -96897,7 +96910,7 @@ var Items = function (_React$Component) {
         null,
         this.props.is_cart ? React.createElement(
           'div',
-          { className: 'item', style: Item.style.item },
+          { className: 'item', style: style.item },
           React.createElement(
             'span',
             { style: { marginRight: "5px" } },
@@ -96911,26 +96924,26 @@ var Items = function (_React$Component) {
           { className: 'summary_items' },
           React.createElement(
             'div',
-            { className: 'item', style: Item.style_summary.item },
-            React.createElement('div', { style: Item.style_summary.img_preview_container }),
+            { className: 'item', style: style_summary.item },
+            React.createElement('div', { style: style_summary.img_preview_container }),
             React.createElement(
               'div',
-              { className: 'deets', style: Item.style_summary.deets },
+              { className: 'deets', style: style_summary.deets },
               'Item Subtotal',
-              React.createElement(Price, { style: Item.style_summary.price_total, price: subtotal })
+              React.createElement(Price, { style: style_summary.price_total, price: subtotal })
             )
           ),
           has_promo || !this.props.is_cart ? null : React.createElement(
             'div',
-            { className: 'item promo', style: Item.style_summary.item },
+            { className: 'item promo', style: style_summary.item },
             React.createElement(
               'div',
-              { style: Item.style_summary.img_preview_container },
+              { style: style_summary.img_preview_container },
               React.createElement(Errors, { label: 'promo' })
             ),
             React.createElement(
               'div',
-              { className: 'deets', style: Item.style_summary.deets },
+              { className: 'deets', style: style_summary.deets },
               React.createElement('input', { placeholder: 'Promo code', type: 'text', style: { marginTop: "20px", width: "90px" }, value: this.state.promo_code, onChange: function onChange(event) {
                   _this5.setState({ promo_code: event.target.value });
                 } }),
@@ -96946,13 +96959,13 @@ var Items = function (_React$Component) {
           summary_items,
           React.createElement(
             'div',
-            { className: 'item', style: Item.style_summary.item },
-            React.createElement('div', { style: Item.style_summary.img_preview_container }),
+            { className: 'item', style: style_summary.item },
+            React.createElement('div', { style: style_summary.img_preview_container }),
             React.createElement(
               'div',
-              { className: 'deets', style: Item.style_summary.deets },
+              { className: 'deets', style: style_summary.deets },
               'Package Total',
-              React.createElement(Price, { style: Item.style_summary.price_total, price: total })
+              React.createElement(Price, { style: style_summary.price_total, price: total })
             )
           )
         )
@@ -98046,7 +98059,11 @@ var Price = function (_React$Component) {
       return React.createElement(
         "div",
         { style: style },
-        price ? "$" + price.toFixed(2) : "Free!",
+        React.createElement(
+          "span",
+          { style: style.price },
+          price ? "$" + price.toFixed(2) : "Free!"
+        ),
         this.props.quantity ? " x " + this.props.quantity : null
       );
     }
@@ -99856,6 +99873,20 @@ var Shipment = function (_React$Component) {
                 React.createElement(
                   'label',
                   null,
+                  'PackingSlip: '
+                ),
+                React.createElement(
+                  'a',
+                  { href: '/shipment/' + this.props.id + '?packing_slip=1&layout=basic', target: '_blank' },
+                  'link'
+                )
+              ),
+              React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
                   'Tracking: '
                 ),
                 React.createElement(
@@ -99892,7 +99923,7 @@ var Shipment = function (_React$Component) {
           'contents',
           null,
           line_items,
-          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment })
+          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment, packing_slip: this.props.packing_slip })
         )
       );
     }

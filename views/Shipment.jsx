@@ -198,6 +198,7 @@ class Shipment extends React.Component {
               <div><label>User: </label>{this.props.email}</div>
               {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
               {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}
+              <div><label>PackingSlip: </label><a href={`/shipment/${this.props.id}?packing_slip=1&layout=basic`} target="_blank">link</a></div>
               <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
               <div style={{pointerEvents:"none"}}><label>Comments: </label></div>
               <Comments comments={this.state.comments} handlePostComment={this.handlePostComment.bind(this)} />
@@ -215,7 +216,7 @@ class Shipment extends React.Component {
         {fulfillment_tools}
         <contents>
           {line_items}
-          <Items contents={this.props.contents} fulfillment={this.props.fulfillment}/>
+          <Items contents={this.props.contents} fulfillment={this.props.fulfillment} packing_slip={this.props.packing_slip}/>
         </contents>
       </shipment>
     )

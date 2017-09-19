@@ -229,7 +229,7 @@ class Page extends JSONAPI {
         break;
     }
     let head = Page.getHTMLHead(req, res, props);
-    let body = Page.renderString([{component, props}], layout);
+    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], layout);
     return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
   }
 

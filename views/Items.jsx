@@ -147,6 +147,19 @@ class Items extends React.Component {
     let has_promo = false;
     let subtotal = 0;
     let total = 0;
+
+    let style = Item.style;
+    let style_summary = Item.style_summary;
+    // hide irrelevant things on packing slip
+    if (this.props.packing_slip) {
+      style.price.price = {display:"none"};
+      style.price.right = "0px";
+      style.price_total = {display:"none"};
+      style.img_preview = {display:"none"};
+      style.deets = Object.assign({}, style.deets, {position:"relative", left:"-64px",width:"100%"});
+      style_summary.item = Object.assign({}, style_summary.item, {display:"none"});
+    }
+
     for (let i=0; i<this.state.contents.length; i++) {
       let remove = null;
       let quantity = this.state.contents[i].quantity || 1;
@@ -165,9 +178,9 @@ class Items extends React.Component {
       }
       // if has a base sku or is a legacy imported item
       if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
-        line_items.push(<Item style={Item.style} key={line_items.length} {...this.state.contents[i]} onRemove={remove} fulfillment={this.props.fulfillment}/>);
+        line_items.push(<Item style={style} key={line_items.length} {...this.state.contents[i]} onRemove={remove} fulfillment={this.props.fulfillment}/>);
       } else {
-        summary_items.push(<Item style={Item.style_summary} key={summary_items.length} {...this.state.contents[i]} onRemove={remove}/>);
+        summary_items.push(<Item style={style_summary} key={summary_items.length} {...this.state.contents[i]} onRemove={remove}/>);
       }
     }
 
@@ -177,24 +190,24 @@ class Items extends React.Component {
     return (
       <cart>
         {this.props.is_cart ?
-          <div className="item" style={Item.style.item}><span style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></div>
+          <div className="item" style={style.item}><span style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></div>
           : null
         }
         {line_items}
         <div className="summary_items">
           {/* item subtotal */}
-          <div className="item" style={Item.style_summary.item}>
-            <div style={Item.style_summary.img_preview_container} />
-            <div className="deets" style={Item.style_summary.deets}>
+          <div className="item" style={style_summary.item}>
+            <div style={style_summary.img_preview_container} />
+            <div className="deets" style={style_summary.deets}>
               Item Subtotal
-              <Price style={Item.style_summary.price_total} price={subtotal}/>
+              <Price style={style_summary.price_total} price={subtotal}/>
             </div>
           </div>
 
           {has_promo || !this.props.is_cart ? null :
-            <div className="item promo" style={Item.style_summary.item}>
-              <div style={Item.style_summary.img_preview_container}><Errors label="promo" /></div>
-              <div className="deets" style={Item.style_summary.deets}>
+            <div className="item promo" style={style_summary.item}>
+              <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
+              <div className="deets" style={style_summary.deets}>
                 <input placeholder="Promo code" type="text" style={{marginTop:"20px",width:"90px"}} value={this.state.promo_code} onChange={(event)=>{this.setState({promo_code:event.target.value})}}/>
                 <button style={{position:"absolute",top:"-12px", left:"95px", width:"90px"}} onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
               </div>
@@ -203,11 +216,11 @@ class Items extends React.Component {
           {summary_items}
 
           {/* item price total */}
-          <div className="item" style={Item.style_summary.item}>
-            <div style={Item.style_summary.img_preview_container} />
-            <div className="deets" style={Item.style_summary.deets}>
+          <div className="item" style={style_summary.item}>
+            <div style={style_summary.img_preview_container} />
+            <div className="deets" style={style_summary.deets}>
               Package Total
-              <Price style={Item.style_summary.price_total} price={total}/>
+              <Price style={style_summary.price_total} price={total}/>
             </div>
           </div>
         </div>
