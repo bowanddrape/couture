@@ -15,7 +15,7 @@ const style = {
     display: "flex",
     position: "relative",
     maxWidth: item_width,
-    margin: "auto",
+    margin: "0px auto 0px auto",
     padding: item_padding+" 0",
     borderBottom: "solid 1px "+color_secondary,
   },
@@ -31,6 +31,7 @@ const style = {
   deets: {
     display: "block",
     fontSize: "18px",
+    lineHeight: "16px",
     position: "absolute",
     top: "0",
     bottom: "0",

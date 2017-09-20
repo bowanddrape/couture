@@ -11,7 +11,7 @@
 .headerfont {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   color: #000;
-  font-weight: bold;
+  font-weight: normal;
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
@@ -249,7 +249,7 @@ a.card.not_link {
 .gallery .caption {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   color: #000;
-  font-weight: bold;
+  font-weight: normal;
   z-index: 1;
   background-color: #fff;
   width: 100%;
@@ -259,10 +259,30 @@ h1,
 h2 {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   color: #000;
-  font-weight: bold;
+  font-weight: normal;
 }
-address *:not(:first-child) {
-  margin-left: 7px;
+h1 {
+  font-size: 24px;
+}
+address {
+  display: block;
+  font-family: Arvo;
+  font-size: 13px;
+  font-style: normal;
+}
+address name,
+address street,
+address apt,
+address country {
+  display: block;
+}
+address locality,
+address region,
+address postal {
+  display: inline;
+}
+.payment_info address {
+  margin-top: 6px;
 }
 shipments {
   display: block;
@@ -303,11 +323,6 @@ shipment shipping_details div label {
   position: absolute;
   right: 405px;
   top: 0px;
-  font-weight: normal;
-}
-shipment address {
-  display: inline;
-  font-size: 10px;
   font-weight: normal;
 }
 shipment assembly {
@@ -1002,7 +1017,7 @@ product_options switch.expanded {
 .purchase_complete h1 {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   color: #000;
-  font-weight: bold;
+  font-weight: normal;
   text-align: center;
 }
 .purchase_complete p {

@@ -205,7 +205,7 @@ class Items extends React.Component {
           </div>
 
           {has_promo || !this.props.is_cart ? null :
-            <div className="item promo" style={style_summary.item}>
+            <div className="item promo" style={Object.assign({},style_summary.item,{padding:"none"})}>
               <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
               <div className="deets" style={style_summary.deets}>
                 <input placeholder="Promo code" type="text" style={{marginTop:"20px",width:"90px"}} value={this.state.promo_code} onChange={(event)=>{this.setState({promo_code:event.target.value})}}/>
@@ -216,9 +216,9 @@ class Items extends React.Component {
           {summary_items}
 
           {/* item price total */}
-          <div className="item" style={style_summary.item}>
+          <div className="item" style={Object.assign({},style_summary.item,{minHeight: "28px"})}>
             <div style={style_summary.img_preview_container} />
-            <div className="deets" style={style_summary.deets}>
+            <div className="deets" style={Object.assign({}, style_summary.deets, {paddingTop: "28px"})}>
               Package Total
               <Price style={style_summary.price_total} price={total}/>
             </div>
