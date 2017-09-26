@@ -94711,8 +94711,11 @@ var Cart = function (_React$Component) {
     key: 'render',
     value: function render() {
       if (this.state.done) {
-        //return <ThanksPurchaseComplete items = {this.state.savedItems} is_cart = {false} />;
-        return React.createElement(ThanksPurchaseComplete, { items: this.state.savedItems.itemsList, is_cart: false });
+        return React.createElement(ThanksPurchaseComplete, {
+          items: this.state.savedItems.itemsList,
+          email: this.state.shipping.email,
+          is_cart: false
+        });
       }
 
       // see if we need to show payment components
@@ -97862,7 +97865,7 @@ var PageEditGallery = function (_React$Component) {
 module.exports = PageEditGallery;
 
 },{"react":655}],754:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -97888,7 +97891,7 @@ var PageEditSignup = function (_React$Component) {
   }
 
   _createClass(PageEditSignup, [{
-    key: "handleUpdate",
+    key: 'handleUpdate',
     value: function handleUpdate(is_unique, index, key) {
       if (!this.props.onChange) return;
       var update = this.props || {};
@@ -97897,7 +97900,29 @@ var PageEditSignup = function (_React$Component) {
       this.props.onChange(update);
     }
   }, {
-    key: "handleNewCard",
+    key: 'handleUpdateSelectors',
+    value: function handleUpdateSelectors() {
+      if (!this.props.onChange) return;
+      var update = this.props || {};
+      update = JSON.parse(JSON.stringify(update));
+      var selectors = {};
+
+      // make selectors a key-value pair, where the value is an array of options
+      this.selectors.querySelectorAll("card").forEach(function (card) {
+        var key = card.querySelector('input[name="key"]').value;
+        if (!key.trim()) return;
+        var options = card.querySelector('input[name="options"]').value;
+        selectors[key] = options.split(',').map(function (option) {
+          return option.trim();
+        }).filter(function (option) {
+          return option;
+        });
+      });
+      update.selectors = selectors;
+      this.props.onChange(update);
+    }
+  }, {
+    key: 'handleNewCard',
     value: function handleNewCard(is_unique) {
       if (!this.props.onChange) return;
       var update = this.props || {};
@@ -97912,7 +97937,7 @@ var PageEditSignup = function (_React$Component) {
       this.props.onChange(update);
     }
   }, {
-    key: "handleRemoveCard",
+    key: 'handleRemoveCard',
     value: function handleRemoveCard(is_unique, index) {
       if (!this.props.onChange) return;
       var update = this.props || {};
@@ -97925,7 +97950,7 @@ var PageEditSignup = function (_React$Component) {
       this.props.onChange(update);
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render() {
       var _this2 = this;
 
@@ -97933,15 +97958,15 @@ var PageEditSignup = function (_React$Component) {
       if (this.props.unique_keys) {
         this.props.unique_keys.forEach(function (key, index) {
           unique_keys.push(React.createElement(
-            "card",
+            'card',
             { key: index, style: { display: "flex" } },
-            React.createElement("input", { type: "text", onChange: function onChange(event) {
+            React.createElement('input', { type: 'text', onChange: function onChange(event) {
                 _this2.handleUpdate(true, index, event.target.value);
               }, value: key }),
             React.createElement(
-              "span",
+              'span',
               { onClick: _this2.handleRemoveCard.bind(_this2, true, index) },
-              "x"
+              'x'
             )
           ));
         });
@@ -97951,43 +97976,76 @@ var PageEditSignup = function (_React$Component) {
       if (this.props.misc_keys) {
         this.props.misc_keys.forEach(function (key, index) {
           misc_keys.push(React.createElement(
-            "card",
+            'card',
             { key: index, style: { display: "flex" } },
-            React.createElement("input", { type: "text", onChange: function onChange(event) {
+            React.createElement('input', { type: 'text', onChange: function onChange(event) {
                 _this2.handleUpdate(false, index, event.target.value);
               }, value: key }),
             React.createElement(
-              "span",
+              'span',
               { onClick: _this2.handleRemoveCard.bind(_this2, false, index) },
-              "x"
+              'x'
             )
           ));
         });
       }
 
+      var selectors = [];
+      if (this.props.selectors) {
+        Object.keys(this.props.selectors).forEach(function (key) {
+          selectors.push(React.createElement(
+            'card',
+            { key: selectors.length, style: { display: "flex" } },
+            React.createElement('input', { type: 'text', onChange: function onChange(event) {
+                _this2.handleUpdateSelectors();
+              }, name: 'key', value: key }),
+            React.createElement('input', { type: 'text', onChange: function onChange(event) {
+                _this2.handleUpdateSelectors();
+              }, name: 'options', value: _this2.props.selectors[key].join(", ") })
+          ));
+        });
+      }
+      selectors.push(React.createElement(
+        'card',
+        { key: selectors.length, style: { display: "flex" } },
+        React.createElement('input', { type: 'text', onChange: function onChange(event) {
+            _this2.handleUpdateSelectors();
+          }, name: 'key', value: '', placeholder: 'new selector' }),
+        React.createElement('input', { type: 'text', onChange: function onChange(event) {
+            _this2.handleUpdateSelectors();
+          }, name: 'options', value: '', placeholder: 'comma-separated options' })
+      ));
+
       return React.createElement(
-        "div",
+        'div',
         null,
         React.createElement(
-          "deck",
+          'deck',
           null,
           unique_keys
         ),
         React.createElement(
-          "card",
+          'card',
           { onClick: this.handleNewCard.bind(this, true) },
-          "New Key Field"
+          'New Key Field'
         ),
-        React.createElement("div", null),
+        React.createElement('div', null),
         React.createElement(
-          "deck",
+          'deck',
           null,
           misc_keys
         ),
         React.createElement(
-          "card",
+          'card',
           { onClick: this.handleNewCard.bind(this, false) },
-          "New Misc Field"
+          'New Misc Field'
+        ),
+        React.createElement(
+          'deck',
+          { ref: function ref(element) {
+              _this2.selectors = element;
+            } },
+          selectors
         )
       );
     }
@@ -100184,7 +100242,7 @@ var Shipment = function (_React$Component) {
 module.exports = Shipment;
 
 },{"./Address.jsx":731,"./Comments.jsx":735,"./Item.jsx":746,"./Items.jsx":748,"./Price.jsx":759,"./Timestamp.jsx":772,"jwt-decode":417,"react":655}],766:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -100195,6 +100253,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+var Switch = require('./Switch.jsx');
 
 /***
 Display a signup
@@ -100213,12 +100272,22 @@ var Signup = function (_React$Component) {
       props: {}
     };
     if (_this.props.unique_keys) {
-      _this.props.unique_keys.map(function (key) {
+      _this.props.unique_keys.forEach(function (key) {
         _this.state.id[key] = "";
       });
     }
+    if (_this.props.hidden_keys) {
+      Object.keys(_this.props.hidden_keys).forEach(function (key) {
+        _this.state.id[key] = _this.props.hidden_keys[key];
+      });
+    }
     if (_this.props.misc_keys) {
-      _this.props.misc_keys.map(function (key) {
+      _this.props.misc_keys.forEach(function (key) {
+        _this.state.props[key] = "";
+      });
+    }
+    if (_this.props.selectors) {
+      Object.keys(_this.props.selectors).forEach(function (key) {
         _this.state.props[key] = "";
       });
     }
@@ -100226,7 +100295,7 @@ var Signup = function (_React$Component) {
   }
 
   _createClass(Signup, [{
-    key: "handleSubmit",
+    key: 'handleSubmit',
     value: function handleSubmit() {
       var payload = JSON.parse(JSON.stringify(this.state));
       payload.id.url = location.href;
@@ -100235,7 +100304,7 @@ var Signup = function (_React$Component) {
       });
     }
   }, {
-    key: "handleChange",
+    key: 'handleChange',
     value: function handleChange(is_unique, key, value) {
       return this.setState(function (prevState, prevProps) {
         var state = JSON.parse(JSON.stringify(prevState));
@@ -100244,29 +100313,71 @@ var Signup = function (_React$Component) {
       });
     }
   }, {
-    key: "render",
+    key: 'handleChangeSelector',
+    value: function handleChangeSelector(key, value) {
+      return this.setState(function (prevState) {
+        var state = JSON.parse(JSON.stringify(prevState));
+        state.props[key] = value;
+        return state;
+      });
+    }
+  }, {
+    key: 'render',
     value: function render() {
       var _this2 = this;
 
+      var selectors = [];
+      if (this.props.selectors) {
+        Object.keys(this.props.selectors).forEach(function (key) {
+          var options = [];
+          _this2.props.selectors[key].forEach(function (option) {
+            options.push(React.createElement(
+              'option',
+              { key: options.length, value: option },
+              option
+            ));
+          });
+          selectors.push(React.createElement(
+            'card',
+            { key: selectors.length, style: { display: "flex", flexDirection: "column" } },
+            React.createElement(
+              'label',
+              { name: 'key' },
+              key
+            ),
+            React.createElement('br', null),
+            React.createElement(
+              Switch,
+              { onChange: function onChange(value) {
+                  _this2.handleChangeSelector(key, value);
+                }, value: _this2.state.props[key], always_expanded: true, style: { justifyContent: "center" } },
+              options
+            )
+          ));
+        });
+      }
+
       var unique_keys = [];
-      this.props.unique_keys.forEach(function (key) {
-        if (!key) return;
-        unique_keys.push(React.createElement(
-          "div",
-          { key: unique_keys.length },
-          React.createElement("input", { type: "text", placeholder: key, onChange: function onChange(event) {
-              _this2.handleChange(true, key, event.target.value);
-            }, value: _this2.state.id[key] })
-        ));
-      });
+      if (this.props.unique_keys) {
+        this.props.unique_keys.forEach(function (key) {
+          if (!key) return;
+          unique_keys.push(React.createElement(
+            'div',
+            { key: unique_keys.length },
+            React.createElement('input', { type: 'text', placeholder: key, onChange: function onChange(event) {
+                _this2.handleChange(true, key, event.target.value);
+              }, value: _this2.state.id[key] })
+          ));
+        });
+      }
       var misc_keys = [];
       if (this.props.misc_keys) {
         this.props.misc_keys.forEach(function (key) {
           if (!key) return;
           misc_keys.push(React.createElement(
-            "div",
+            'div',
             { key: misc_keys.length },
-            React.createElement("input", { type: "text", placeholder: key, onChange: function onChange(event) {
+            React.createElement('input', { type: 'text', placeholder: key, onChange: function onChange(event) {
                 _this2.handleChange(false, key, event.target.value);
               }, value: _this2.state.props[key] })
           ));
@@ -100274,17 +100385,18 @@ var Signup = function (_React$Component) {
       }
 
       return React.createElement(
-        "div",
+        'div',
         null,
         React.createElement(
-          "signup",
+          'signup',
           null,
           unique_keys,
+          selectors,
           misc_keys,
           React.createElement(
-            "button",
-            { className: "primary", onClick: this.handleSubmit.bind(this) },
-            "ENTER NOW"
+            'button',
+            { className: 'primary', onClick: this.handleSubmit.bind(this) },
+            'ENTER NOW'
           )
         )
       );
@@ -100296,7 +100408,7 @@ var Signup = function (_React$Component) {
 
 module.exports = Signup;
 
-},{"react":655}],767:[function(require,module,exports){
+},{"./Switch.jsx":768,"react":655}],767:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -100673,6 +100785,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var Items = require('./Items.jsx');
+var Signup = require('./Signup.jsx');
 
 /***
 Draw after successful purchase
@@ -100719,7 +100832,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
         React.createElement(
           'div',
           null,
-          React.createElement('img', { src: '/thanks.gif' })
+          React.createElement('img', { className: 'hero_gif', src: '/thanks.gif' })
         ),
         React.createElement(
           'div',
@@ -100734,7 +100847,13 @@ var ThanksPurchaseComplete = function (_React$Component) {
           'div',
           null,
           React.createElement(Items, { contents: this.state.items })
-        )
+        ),
+        React.createElement('div', { style: { width: "600px", margin: "20px auto", borderBottom: "solid 1px #000" } }),
+        React.createElement(Signup, {
+          hidden_keys: { email: this.props.email },
+          misc_keys: ["Other comments?"],
+          selectors: { "From 1 being \"that's a hard nope\" to 10 being \"absolutely\", how likely are you to recommend Bow & Drape to your friends?": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] }
+        })
       );
     }
   }]);
@@ -100744,7 +100863,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"./Items.jsx":748,"react":655}],772:[function(require,module,exports){
+},{"./Items.jsx":748,"./Signup.jsx":766,"react":655}],772:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();

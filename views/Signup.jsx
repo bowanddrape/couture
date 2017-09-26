@@ -1,5 +1,6 @@
 
 const React = require('react');
+const Switch = require('./Switch.jsx');
 
 /***
 Display a signup
@@ -14,12 +15,22 @@ class Signup extends React.Component {
       props: {},
     };
     if (this.props.unique_keys) {
-      this.props.unique_keys.map((key) => {
+      this.props.unique_keys.forEach((key) => {
         this.state.id[key] = "";
       });
     }
+    if (this.props.hidden_keys) {
+      Object.keys(this.props.hidden_keys).forEach((key) => {
+        this.state.id[key] = this.props.hidden_keys[key];
+      });
+    }
     if (this.props.misc_keys) {
-      this.props.misc_keys.map((key) => {
+      this.props.misc_keys.forEach((key) => {
+        this.state.props[key] = "";
+      });
+    }
+    if (this.props.selectors) {
+      Object.keys(this.props.selectors).forEach((key) => {
         this.state.props[key] = "";
       });
     }
@@ -44,16 +55,44 @@ class Signup extends React.Component {
     });
   }
 
-  render() {
-    let unique_keys = [];
-    this.props.unique_keys.forEach((key) => {
-      if (!key) return;
-      unique_keys.push(
-        <div key={unique_keys.length}>
-          <input type="text" placeholder={key} onChange={(event)=>{this.handleChange(true, key, event.target.value)}} value={this.state.id[key]}/>
-        </div>
-      );
+  handleChangeSelector(key, value) {
+    return this.setState((prevState) => {
+      let state = JSON.parse(JSON.stringify(prevState));
+      state.props[key] = value;
+      return state;
     });
+  }
+
+  render() {
+    let selectors = [];
+    if (this.props.selectors) {
+      Object.keys(this.props.selectors).forEach((key) => {
+        let options = [];
+        this.props.selectors[key].forEach((option) => {
+          options.push(<option key={options.length} value={option}>{option}</option>);
+        });
+        selectors.push(
+          <card key={selectors.length} style={{display:"flex",flexDirection:"column"}}>
+            <label name="key" >{key}</label><br/>
+            <Switch onChange={(value)=>{this.handleChangeSelector(key, value)}} value={this.state.props[key]} always_expanded={true} style={{justifyContent:"center"}}>
+              {options}
+            </Switch>
+          </card>
+        );
+      });
+    }
+
+    let unique_keys = [];
+    if (this.props.unique_keys) {
+      this.props.unique_keys.forEach((key) => {
+        if (!key) return;
+        unique_keys.push(
+          <div key={unique_keys.length}>
+            <input type="text" placeholder={key} onChange={(event)=>{this.handleChange(true, key, event.target.value)}} value={this.state.id[key]}/>
+          </div>
+        );
+      });
+    }
     let misc_keys = []
     if (this.props.misc_keys) {
       this.props.misc_keys.forEach((key) => {
@@ -70,6 +109,7 @@ class Signup extends React.Component {
       <div>
         <signup>
           {unique_keys}
+          {selectors}
           {misc_keys}
           <button className="primary" onClick={this.handleSubmit.bind(this)}>ENTER NOW</button>
         </signup>

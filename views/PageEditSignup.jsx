@@ -21,6 +21,27 @@ class PageEditSignup extends React.Component {
     this.props.onChange(update);
   }
 
+  handleUpdateSelectors() {
+    if (!this.props.onChange) return;
+    let update = this.props || {};
+    update = JSON.parse(JSON.stringify(update));
+    let selectors = {};
+
+    // make selectors a key-value pair, where the value is an array of options
+    this.selectors.querySelectorAll("card").forEach((card) => {
+      let key = card.querySelector('input[name="key"]').value;
+      if (!key.trim()) return;
+      let options = card.querySelector('input[name="options"]').value;
+      selectors[key] = options.split(',').map((option) => {
+        return option.trim();
+      }).filter((option) => {
+        return option;
+      });
+    });
+    update.selectors = selectors;
+    this.props.onChange(update);
+  }
+
   handleNewCard(is_unique) {
     if (!this.props.onChange) return;
     let update = this.props || {};
@@ -72,17 +93,40 @@ class PageEditSignup extends React.Component {
       });
     }
 
+    let selectors = [];
+    if (this.props.selectors) {
+      Object.keys(this.props.selectors).forEach((key) => {
+        selectors.push(
+          <card key={selectors.length} style={{display:"flex"}}>
+            <input type="text" onChange={(event)=>{this.handleUpdateSelectors()}} name="key" value={key}/>
+            <input type="text" onChange={(event)=>{this.handleUpdateSelectors()}} name="options" value={this.props.selectors[key].join(", ")}/>
+          </card>
+        );
+      });
+    }
+    selectors.push(
+      <card key={selectors.length} style={{display:"flex"}}>
+        <input type="text" onChange={(event)=>{this.handleUpdateSelectors()}} name="key" value="" placeholder="new selector"/>
+        <input type="text" onChange={(event)=>{this.handleUpdateSelectors()}} name="options" value="" placeholder="comma-separated options"/>
+      </card>
+    );
+
     return (
       <div>
         <deck>
           {unique_keys}
         </deck>
         <card onClick={this.handleNewCard.bind(this, true)}>New Key Field</card>
+
         <div></div>
         <deck>
           {misc_keys}
         </deck>
         <card onClick={this.handleNewCard.bind(this, false)}>New Misc Field</card>
+
+        <deck ref={(element)=>{this.selectors = element;}}>
+          {selectors}
+        </deck>
       </div>
     );
   }

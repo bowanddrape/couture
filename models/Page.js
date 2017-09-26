@@ -75,9 +75,10 @@ class Page extends JSONAPI {
 
   // if we have a matching path in our pages table, serve that page
   static handleRenderPage(req, res, next) {
+
     let pages = Page.getAll(null, function(err, pages) {
       for (let i=0; i<pages.length; i++) {
-        let matches = req.path.match(pages[i].path);
+        let matches = req.path.match(new RegExp("^"+pages[i].path+"$"));
         if (!matches) continue;
         let render_elements = [];
         pages[i].elements.forEach((element) => {

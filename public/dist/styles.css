@@ -814,13 +814,13 @@ signup {
   text-align: center;
   display: block;
 }
-signup div {
+signup > div {
   display: block;
   width: 300px;
   margin: 12px auto;
   position: relative;
 }
-signup div label {
+signup > div label {
   font-size: 18px;
   position: absolute;
   width: 300px;
@@ -828,13 +828,13 @@ signup div label {
   top: -3px;
   text-align: right;
 }
-signup div input[type="text"] {
+signup > div input[type="text"] {
   width: 100%;
   box-sizing: content-box;
   font-size: 16px;
   padding: 2px;
 }
-signup div:last-of-type {
+signup > div:last-of-type {
   margin-bottom: 16px;
 }
 switch {
@@ -1036,7 +1036,7 @@ product_options switch.expanded {
   width: 600px;
   margin: auto;
 }
-.purchase_complete img {
+.purchase_complete img.hero_gif {
   width: 400px;
   display: block;
   margin: auto;
