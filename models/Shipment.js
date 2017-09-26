@@ -31,7 +31,7 @@ class Shipment extends JSONAPI {
     return {
       tablename: "shipments",
       pkey: "id",
-      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address"]
+      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address", "billing_address"]
     };
   }
 

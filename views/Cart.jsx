@@ -1,5 +1,6 @@
 
 const React = require('react');
+const equal = require('deep-equal');
 const InputAddress = require('./InputAddress.jsx');
 const Items = require('./Items.jsx');
 const ItemUtils = require('./ItemUtils.js');
@@ -102,7 +103,7 @@ class Cart extends React.Component {
         let shipping = result[0].address;
         let billing = result[0].billing_address;
         let same_billing = false;
-        if (!billing || JSON.stringify(shipping)==JSON.stringify(billing)) {
+        if (!billing || equal(shipping,billing)) {
           same_billing = true;
         }
         this.setState({shipping, billing, same_billing});
@@ -218,9 +219,7 @@ class Cart extends React.Component {
         BowAndDrape.cart_menu.update([]);
         this.setState({done:true});
         // we need to update the user, as account credits may have changed
-        // FIXME we're getting an error: Not Found here? I guess I'll deal
-        // with this later....
-        BowAndDrape.api("POST", "/login", {}, (err, resp) => {
+        BowAndDrape.api("POST", "/user/login", {}, (err, resp) => {
           BowAndDrape.dispatcher.handleAuth(resp);
         });
       });

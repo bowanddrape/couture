@@ -142,6 +142,13 @@ class Shipment extends React.Component {
       });
     } // this.state.rates
 
+    let product_quantity = 0;
+    this.props.contents.forEach((item, index) => {
+      if (!item.sku) return;
+      let quant = item.quantity || 1;
+      product_quantity += quant;
+    });
+
     let from = (<div><label>From: </label>{this.state.from_id}</div>);
     let to = (<div><label>To: </label>{this.state.to_id}</div>);
     if (typeof(BowAndDrape)!="undefined" && BowAndDrape.facilities) {
@@ -196,7 +203,6 @@ class Shipment extends React.Component {
               <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
               {to}
               <div><label>User: </label>{this.props.email}</div>
-              {this.props.address?<div><label>Address: </label><Address {...this.props.address}/></div>:null}
               {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}
               <div><label>PackingSlip: </label><a href={`/shipment/${this.props.id}?packing_slip=1&layout=basic`} target="_blank">link</a></div>
               <div><label>Tracking: </label><a href={`https://tools.usps.com/go/TrackConfirmAction.action?tLabels=${this.state.tracking_code}`} target="_blank">{this.state.tracking_code}</a></div>
@@ -211,13 +217,34 @@ class Shipment extends React.Component {
       )
     }
 
+    let payment_info = null;
+    if (!this.props.fulfillment) {
+      payment_info = (
+        <div>
+          <h1 style={Object.assign({},Item.style.item,{borderBottom:"none",borderTop:"solid 1px #000",margin:"12px auto"})}>PAYMENT INFO</h1>
+          <div className="payment_info" style={Object.assign({},Item.style.item,{borderBottom:"none",fontSize:"18px",justifyContent:"space-between"})}>
+            <div>
+              Billing Information
+              <Address {...this.props.billing_address}/>
+            </div>
+            <div>
+              Shipping Address
+              <Address {...this.props.address}/>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <shipment>
         {fulfillment_tools}
+        <h1 style={Object.assign({},Item.style.item,{borderBottom:"none",margin:"34px auto",justifyContent:"space-between"})}><div>ORDER SUMMARY</div><div>ITEMS ( {product_quantity} )</div></h1>
         <contents>
           {line_items}
           <Items contents={this.props.contents} fulfillment={this.props.fulfillment} packing_slip={this.props.packing_slip}/>
         </contents>
+        {payment_info}
       </shipment>
     )
   }

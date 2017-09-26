@@ -268,9 +268,22 @@ a.card {
 h1, h2 {
   .headerfont;
 }
+h1 {
+  font-size: 24px;
+}
 
 address {
-  *:not(:first-child) {
-    margin-left: 7px;
+  display: block;
+  font-family: Arvo;
+  font-size: 13px;
+  font-style: normal;
+  name, street, apt, country {
+    display: block;
   }
+  locality, region, postal {
+    display: inline;
+  }
+}
+.payment_info address {
+  margin-top: 6px;
 }
