@@ -6,6 +6,7 @@ const ItemUtils = require('./ItemUtils.js');
 const ThanksPurchaseComplete = require('./ThanksPurchaseComplete.jsx');
 const UserLogin = require('./UserLogin.jsx');
 const Errors = require('./Errors.jsx');
+const BADbutton = require('./BADbutton.jsx');
 
 //const payment_method_client = require('./PayStripeClient.js');
 const payment_method_client = require('./PayBraintreeClient.js');
@@ -282,7 +283,7 @@ class Cart extends React.Component {
 
         <Errors style={{width:"460px"}}/>
         {/* TODO display loading state when this.state.processing_payment */}
-        <button className="primary" onClick={this.handlePay.bind(this)}>Get it!</button>
+        <BADbutton className = "primary" id = "cartButton" text = "Get it!" onClick = {this.handlePay.bind(this)} />
 
 {/* Needed by stripe, not needed by braintree
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
