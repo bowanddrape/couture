@@ -8,6 +8,7 @@ const ProductListEdit = require('./ProductListEdit.jsx');
 const ComponentEdit = require('./ComponentEdit.jsx');
 const Switch = require('./Switch.jsx');
 const ComponentSerializer = require('./ComponentSerializer.js');
+const BADButton = require('./BADButton.jsx');
 
 /***
 Draws List of products available in a store.
@@ -149,7 +150,7 @@ class ProductList extends React.Component {
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
         </div>
         {this.props.edit ?
-          null : <div className="add_to_cart" style={{textAlign:"center"}}><button className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</button></div>
+          null : <div className="add_to_cart" style={{textAlign:"center"}}><BADButton className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</BADButton></div>
         }
       </customize>
     );

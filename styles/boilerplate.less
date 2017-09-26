@@ -6,12 +6,7 @@
 
 @keyframes busyState {
   0%    { opacity: 1;}
-  13%   { opacity: 0.148;}
-  25%   { opacity: 0.0438;}
-  50%   { opacity: 0;}
-  75%   { opacity: 0.0438;}
-  88%   { opacity: 0.148;}
-  100%  { opacity: 1;}
+  50%   { opacity: 0.2;}
 }
 
 body {
@@ -71,7 +66,7 @@ button, .button {
     transition: top .2s ease, left .2s linear;
   }
   &:focus {
-    box-shadow:
+    box-shadow: none;
   }
   &:before {
     content: '';
@@ -114,13 +109,14 @@ button, .button {
   }
   /* CSS for button busy states */
   &.primary.busyState {
-    color: #999;
-    transition: color .3s;
+    background-color: @color_support_0;
   }
   &.primary.busyState:before {
+    animation-timing-function: ease;
     animation: busyState 1.5s infinite;
   }
   &.primary.busyState:after {
+    animation-timing-function: ease;
     animation: busyState 1.5s infinite;
   }
 }
