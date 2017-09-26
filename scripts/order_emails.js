@@ -32,6 +32,6 @@ Shipment.getAll({tracking_code:"not_null",address:"not_null"}, (err, shipments) 
 
   }); // shipments.forEach()
   // FIXME looks like babel has problems closing
-  setTimeout(()=>{process.exit()}, 10000);
+  setTimeout(()=>{process.exit()}, 120000);
 });
 

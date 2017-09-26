@@ -174,7 +174,7 @@ Store.initMandatory(["haute"], (err, store_ids) => {
               if (err) console.log(err);
             });
             // FIXME looks like both babel and mysql have problems closing
-            setTimeout(()=>{process.exit()}, 10000);
+            setTimeout(()=>{process.exit()}, 120000);
           }
         }); // get previous record if it was already imported
       }); // orders.map()
