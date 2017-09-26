@@ -94327,7 +94327,8 @@ var Address = function (_React$Component) {
         React.createElement(
           "region",
           null,
-          this.props.region
+          this.props.region,
+          " "
         ),
         React.createElement(
           "postal",
@@ -94497,11 +94498,7 @@ var Cart = function (_React$Component) {
         country: ""
       },
       processing_payment: false,
-      done: false,
-      savedItems: {
-        itemsList: false,
-        saved: false
-      }
+      done: false
     };
 
     if (!_this.props.store[0].id) {
@@ -94546,10 +94543,8 @@ var Cart = function (_React$Component) {
       Errors.clear();
       items = items || [];
 
-      // For use in displaying items on the thank you page
-      if (!this.state.savedItems.saved) this.setState({ savedItems: { itemsList: items, saved: true } });
+      if (this.refs.Items) this.refs.Items.updateContents(items);
 
-      this.refs.Items.updateContents(items);
       if (!items.length) Errors.emitError(null, "Cart is empty");
     }
   }, {
@@ -94679,6 +94674,18 @@ var Cart = function (_React$Component) {
             _this3.setState({ processing_payment: false });
             return Errors.emitError(null, err);
           }
+
+          // save our successfully placed order payload
+          _this3.order_payload = payload;
+
+          // facebook track event
+          try {
+            var total_price = ItemUtils.getPrice(_this3.order_payload.contents);
+            fbq('track', 'Purchase', { value: total_price, currency: 'USD' });
+          } catch (err) {
+            console.log(err);
+          }
+
           BowAndDrape.cart_menu.update([]);
           _this3.setState({ done: true });
           // we need to update the user, as account credits may have changed
@@ -94712,8 +94719,8 @@ var Cart = function (_React$Component) {
     value: function render() {
       if (this.state.done) {
         return React.createElement(ThanksPurchaseComplete, {
-          items: this.state.savedItems.itemsList,
-          email: this.state.shipping.email,
+          items: this.order_payload.contents,
+          email: this.order_payload.email,
           is_cart: false
         });
       }

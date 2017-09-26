@@ -57,10 +57,6 @@ class Cart extends React.Component {
       },
       processing_payment: false,
       done: false,
-      savedItems: {
-        itemsList: false,
-        saved: false,
-      },
     };
 
     if (!this.props.store[0].id) {
@@ -116,11 +112,9 @@ class Cart extends React.Component {
     Errors.clear();
     items = items || [];
 
-    // For use in displaying items on the thank you page
-    if (!this.state.savedItems.saved)
-      this.setState({savedItems: {itemsList: items, saved: true}});
+    if (this.refs.Items)
+      this.refs.Items.updateContents(items);
 
-    this.refs.Items.updateContents(items);
     if (!items.length)
       Errors.emitError(null, "Cart is empty");
   }
@@ -216,6 +210,16 @@ class Cart extends React.Component {
           this.setState({processing_payment:false});
           return Errors.emitError(null, err);
         }
+
+        // save our successfully placed order payload
+        this.order_payload = payload;
+
+        // facebook track event
+        try {
+          let total_price = ItemUtils.getPrice(this.order_payload.contents)
+          fbq('track', 'Purchase', {value: total_price, currency: 'USD'});
+        } catch(err) {console.log(err)}
+
         BowAndDrape.cart_menu.update([]);
         this.setState({done:true});
         // we need to update the user, as account credits may have changed
@@ -247,8 +251,8 @@ class Cart extends React.Component {
   render() {
     if (this.state.done){
       return <ThanksPurchaseComplete
-        items={this.state.savedItems.itemsList}
-        email={this.state.shipping.email}
+        items={this.order_payload.contents}
+        email={this.order_payload.email}
         is_cart={false}
       />;
     }
