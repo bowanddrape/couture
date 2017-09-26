@@ -4,6 +4,11 @@
 
 @desktop_min_width: 1000px;
 
+@keyframes busyState {
+  0%    { opacity: 1;}
+  50%   { opacity: 0.2;}
+}
+
 body {
   .bodyfont;
   font-size: 14px;
@@ -47,9 +52,7 @@ button, .button {
     word-spacing: normal;
     text-indent: 0px;
     text-shadow: none;
-  &.primary {
-    margin: 12px auto;
-  }
+
   &:after {
     content: '';
     width: 100%;
@@ -61,6 +64,9 @@ button, .button {
     left: 0px;
     background-color: @color_support_1;
     transition: top .2s ease, left .2s linear;
+  }
+  &:focus {
+    box-shadow: none;
   }
   &:before {
     content: '';
@@ -82,6 +88,9 @@ button, .button {
     top: -3px;
     left: 7px;
   }
+  &.primary {
+    margin: 12px auto;
+  }
   &.primary:after {
     top: 0px;
     left: 10px;
@@ -97,6 +106,18 @@ button, .button {
   &.primary:hover:before {
     top: 0px;
     left: 10px;
+  }
+  /* CSS for button busy states */
+  &.primary.busyState {
+    background-color: @color_support_0;
+  }
+  &.primary.busyState:before {
+    animation-timing-function: ease;
+    animation: busyState 1.5s infinite;
+  }
+  &.primary.busyState:after {
+    animation-timing-function: ease;
+    animation: busyState 1.5s infinite;
   }
 }
 

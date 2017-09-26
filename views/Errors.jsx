@@ -14,6 +14,7 @@ class Errors extends React.Component {
   }
 
   static emitError(label, message) {
+    BowAndDrape.dispatcher.emit(`clear_busy`);
     // if there is a listener for this specific label of error, fire that
     if(BowAndDrape.dispatcher.listenerCount(`error_${label}`))
       return BowAndDrape.dispatcher.emit(`error_${label}`, message);

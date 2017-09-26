@@ -13,6 +13,14 @@
   color: #000;
   font-weight: bold;
 }
+@keyframes busyState {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
 body {
   font-family: "Open Sans", Arial, sans-serif;
   line-height: 1.43;
@@ -58,10 +66,7 @@ button,
   word-spacing: normal;
   text-indent: 0px;
   text-shadow: none;
-}
-button.primary,
-.button.primary {
-  margin: 12px auto;
+  /* CSS for button busy states */
 }
 button:after,
 .button:after {
@@ -75,6 +80,10 @@ button:after,
   left: 0px;
   background-color: #7f5cff;
   transition: top .2s ease, left .2s linear;
+}
+button:focus,
+.button:focus {
+  box-shadow: none;
 }
 button:before,
 .button:before {
@@ -99,6 +108,10 @@ button:hover:before,
   top: -3px;
   left: 7px;
 }
+button.primary,
+.button.primary {
+  margin: 12px auto;
+}
 button.primary:after,
 .button.primary:after {
   top: 0px;
@@ -118,6 +131,20 @@ button.primary:hover:before,
 .button.primary:hover:before {
   top: 0px;
   left: 10px;
+}
+button.primary.busyState,
+.button.primary.busyState {
+  background-color: #eaeaea;
+}
+button.primary.busyState:before,
+.button.primary.busyState:before {
+  animation-timing-function: ease;
+  animation: busyState 1.5s infinite;
+}
+button.primary.busyState:after,
+.button.primary.busyState:after {
+  animation-timing-function: ease;
+  animation: busyState 1.5s infinite;
 }
 .cta {
   font-family: "Zurich-Condensed-Bold", sans-serif;
