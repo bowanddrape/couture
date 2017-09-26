@@ -120,7 +120,9 @@ class Cart extends React.Component {
     if (!this.state.savedItems.saved)
       this.setState({savedItems: {itemsList: items, saved: true}});
 
-    this.refs.Items.updateContents(items);
+    if (this.refs.Items)
+      this.refs.Items.updateContents(items);
+
     if (!items.length)
       Errors.emitError(null, "Cart is empty");
   }
@@ -216,6 +218,13 @@ class Cart extends React.Component {
           this.setState({processing_payment:false});
           return Errors.emitError(null, err);
         }
+
+        // facebook track event
+        try {
+          let total_price = ItemUtils.getPrice(payload.contents)
+          fbq('track', 'Purchase', {value: total_price, currency: 'USD'});
+        } catch(err) {console.log(err)}
+
         BowAndDrape.cart_menu.update([]);
         this.setState({done:true});
         // we need to update the user, as account credits may have changed

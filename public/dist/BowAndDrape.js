@@ -94549,7 +94549,8 @@ var Cart = function (_React$Component) {
       // For use in displaying items on the thank you page
       if (!this.state.savedItems.saved) this.setState({ savedItems: { itemsList: items, saved: true } });
 
-      this.refs.Items.updateContents(items);
+      if (this.refs.Items) this.refs.Items.updateContents(items);
+
       if (!items.length) Errors.emitError(null, "Cart is empty");
     }
   }, {
@@ -94679,6 +94680,15 @@ var Cart = function (_React$Component) {
             _this3.setState({ processing_payment: false });
             return Errors.emitError(null, err);
           }
+
+          // facebook track event
+          try {
+            var total_price = ItemUtils.getPrice(payload.contents);
+            fbq('track', 'Purchase', { value: total_price, currency: 'USD' });
+          } catch (err) {
+            console.log(err);
+          }
+
           BowAndDrape.cart_menu.update([]);
           _this3.setState({ done: true });
           // we need to update the user, as account credits may have changed
@@ -99167,6 +99177,16 @@ var ProductList = function (_React$Component) {
 
       var product_raw = this.getSelectedProductRaw();
 
+      // facebook view event
+      try {
+        fbq('track', 'ViewContent', {
+          currency: product.props.price,
+          content_ids: product.sku
+        });
+      } catch (err) {
+        console.log(err);
+      }
+
       return React.createElement(
         'customize',
         null,
@@ -99278,6 +99298,17 @@ var ProductList = function (_React$Component) {
       item.props.image = '/store/' + this.props.store.id + '/preview?c=' + encodeURIComponent(query_params.c);
 
       BowAndDrape.cart_menu.add(item);
+
+      // facebook track event
+      try {
+        fbq('track', 'AddToCart', {
+          currency: product.props.price,
+          content_ids: product.sku
+        });
+      } catch (err) {
+        console.log(err);
+      }
+
       location.href = "/cart";
     }
   }, {

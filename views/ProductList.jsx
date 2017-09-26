@@ -138,6 +138,14 @@ class ProductList extends React.Component {
 
     let product_raw = this.getSelectedProductRaw();
 
+    // facebook view event
+    try {
+      fbq('track', 'ViewContent', {
+        currency: product.props.price,
+        content_ids: product.sku,
+      });
+    } catch(err) {console.log(err)}
+
     return (
       <customize>
         {this.props.edit ?
@@ -234,6 +242,15 @@ class ProductList extends React.Component {
     item.props.image = `/store/${this.props.store.id}/preview?c=${encodeURIComponent(query_params.c)}`;
 
     BowAndDrape.cart_menu.add(item);
+
+    // facebook track event
+    try {
+      fbq('track', 'AddToCart', {
+        currency: product.props.price,
+        content_ids: product.sku,
+      });
+    } catch(err) {console.log(err)}
+
     location.href = "/cart";
   }
 
