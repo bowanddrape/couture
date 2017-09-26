@@ -246,8 +246,11 @@ class Cart extends React.Component {
 
   render() {
     if (this.state.done){
-      //return <ThanksPurchaseComplete items = {this.state.savedItems} is_cart = {false} />;
-      return <ThanksPurchaseComplete items = {this.state.savedItems.itemsList} is_cart = {false} />;
+      return <ThanksPurchaseComplete
+        items={this.state.savedItems.itemsList}
+        email={this.state.shipping.email}
+        is_cart={false}
+      />;
     }
 
     // see if we need to show payment components
