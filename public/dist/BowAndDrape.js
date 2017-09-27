@@ -94470,6 +94470,7 @@ var Cart = function (_React$Component) {
 
     _this.state = {
       user: {},
+      items: _this.props.items,
       card: {
         number: "",
         cvc: "",
@@ -94534,7 +94535,7 @@ var Cart = function (_React$Component) {
           }
           _this2.setState({ shipping: shipping, billing: billing, same_billing: same_billing });
         });
-        _this2.refs.Items.updateCredit(user.credits);
+        if (_this2.refs.Items) _this2.refs.Items.updateCredit(user.credits);
       });
     }
   }, {
@@ -94678,10 +94679,22 @@ var Cart = function (_React$Component) {
           // save our successfully placed order payload
           _this3.order_payload = payload;
 
+          // google track event
+          try {
+            var total_price = ItemUtils.getPrice(resp.shipment.contents);
+            gtag('event', 'purchase', {
+              transaction_id: resp.shipment.id,
+              value: total_price,
+              currency: 'usd',
+              items: resp.shipment.contents
+            });
+          } catch (err) {
+            console.log(err);
+          }
           // facebook track event
           try {
-            var total_price = ItemUtils.getPrice(_this3.order_payload.contents);
-            fbq('track', 'Purchase', { value: total_price, currency: 'USD' });
+            var _total_price = ItemUtils.getPrice(_this3.order_payload.contents);
+            fbq('track', 'Purchase', { value: _total_price, currency: 'USD' });
           } catch (err) {
             console.log(err);
           }
@@ -94717,7 +94730,10 @@ var Cart = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      var _this4 = this;
+
       if (this.state.done) {
+        if (document) document.querySelector("body").scrollTop = 0;
         return React.createElement(ThanksPurchaseComplete, {
           items: this.order_payload.contents,
           email: this.order_payload.email,
@@ -94749,7 +94765,14 @@ var Cart = function (_React$Component) {
       return React.createElement(
         'div',
         null,
-        React.createElement(Items, { ref: 'Items', contents: this.props.items, is_cart: 'true' }),
+        React.createElement(Items, {
+          ref: 'Items',
+          contents: this.state.items,
+          onUpdate: function onUpdate(items) {
+            _this4.setState({ items: items.contents });
+          },
+          is_cart: 'true'
+        }),
         this.state.user.email ? null : React.createElement(
           'div',
           { className: 'checkout_section' },
@@ -96864,6 +96887,7 @@ var applyPromoCode = function applyPromoCode(items, promo, callback) {
     return item.sku;
   });
   // TODO see if the promo is applicable
+  // TODO if the promo is a percent, maybe decrease the cost of cart items (for tax)
   // figure out value of our promo
   promo.props.price = -1 * Math.max(Math.round(total_price * promo.props.percent) / 100 || 0, promo.props.absolute || 0);
   if (!new RegExp("^promo:", "i").test(promo.props.name)) {
@@ -96943,15 +96967,22 @@ var Items = function (_React$Component) {
         amount: 7,
         currency_local: "USD"
       },
-      promo_code: "",
+      promo: {
+        code: ""
+      },
       account_credit: 0
     };
     return _this;
   }
 
+  // TODO maybe put this in ItemUtils.js
+
+
   _createClass(Items, [{
     key: 'updateShipping',
     value: function updateShipping(callback) {
+      var _this2 = this;
+
       if (!this.props.is_cart) return;
       this.setState(function (prevState) {
         var contents = JSON.parse(JSON.stringify(prevState.contents));
@@ -96965,14 +96996,15 @@ var Items = function (_React$Component) {
         if (!contents.length) {
           return { contents: contents };
         }
-        // don't include account credits in this price
         var total_price = ItemUtils.getPrice(contents, function (item) {
+          // don't include account credits in this price
           if (new RegExp("^Account balance", "i").test(item.props.name)) return false;
           return true;
         });
         var shipping_cost = shipping_quote.amount;
         // free domestic shipping for 75+ orders
         if (total_price >= 75 && shipping_quote.currency_local.toLowerCase() == "usd") shipping_cost = 0;
+        if (_this2.state.promo.props && _this2.state.promo.props.free_ship) shipping_cost = 0;
         contents.push({
           props: {
             name: "Shipping & Handling",
@@ -96985,26 +97017,29 @@ var Items = function (_React$Component) {
   }, {
     key: 'updateCredit',
     value: function updateCredit(credit) {
-      var _this2 = this;
+      var _this3 = this;
 
       this.setState({ account_credit: credit }, function () {
-        _this2.updateContents(_this2.state.contents);
+        _this3.updateContents(_this3.state.contents);
       });
     }
   }, {
     key: 'updateContents',
     value: function updateContents(contents) {
-      var _this3 = this;
+      var _this4 = this;
 
       contents = contents || [];
       this.setState({ contents: contents }, function () {
         // update shipping line
-        _this3.updateShipping(function () {
+        _this4.updateShipping(function () {
           // update account credit line
-          _this3.setState(function (prevState) {
+          _this4.setState(function (prevState) {
             var contents = JSON.parse(JSON.stringify(prevState.contents));
             ItemUtils.applyCredits(prevState.account_credit, contents);
             return { contents: contents };
+          }, function () {
+            // as a final callback, call onUpdate from parent?
+            if (_this4.props.onUpdate) _this4.props.onUpdate(_this4);
           });
         });
       });
@@ -97057,26 +97092,27 @@ var Items = function (_React$Component) {
   }, {
     key: 'handleApplyDiscountCode',
     value: function handleApplyDiscountCode() {
-      var _this4 = this;
+      var _this5 = this;
 
       if (!BowAndDrape) return;
-      BowAndDrape.api("GET", "/promocode", { code: this.state.promo_code.toLowerCase() }, function (err, result) {
+      BowAndDrape.api("GET", "/promocode", { code: this.state.promo.code.toLowerCase() }, function (err, result) {
         if (err) return Errors.emitError("promo", err.toString());
         if (!result.length) return Errors.emitError("promo", "no such promo code");
         var promo = result[0];
+        _this5.setState({ promo: promo });
         // FIXME this is a race as contents could be modified between
         // clone and set, but I can't figure out how to wrap this properly
-        var contents = JSON.parse(JSON.stringify(_this4.state.contents));
+        var contents = JSON.parse(JSON.stringify(_this5.state.contents));
         ItemUtils.applyPromoCode(contents, promo, function (err, items) {
           if (err) return Errors.emitError("promo", err.toString());
-          _this4.updateContents(items);
+          _this5.updateContents(items);
         });
       });
     }
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this6 = this;
 
       var line_items = [];
       var summary_items = [];
@@ -97159,13 +97195,13 @@ var Items = function (_React$Component) {
             React.createElement(
               'div',
               { className: 'deets', style: style_summary.deets },
-              React.createElement('input', { placeholder: 'Promo code', type: 'text', style: { marginTop: "20px", width: "90px" }, value: this.state.promo_code, onChange: function onChange(event) {
-                  _this5.setState({ promo_code: event.target.value });
+              React.createElement('input', { placeholder: 'Promo code', type: 'text', style: { marginTop: "20px", width: "90px" }, value: this.state.promo.code, onChange: function onChange(event) {
+                  _this6.setState({ promo: { code: event.target.value } });
                 } }),
               React.createElement(
                 'button',
                 { style: { position: "absolute", top: "-12px", left: "95px", width: "90px" }, onClick: function onClick() {
-                    _this5.handleApplyDiscountCode();
+                    _this6.handleApplyDiscountCode();
                   } },
                 'Apply'
               )
@@ -99296,6 +99332,12 @@ var ProductList = function (_React$Component) {
 
       BowAndDrape.cart_menu.add(item);
 
+      // google track event
+      try {
+        gtag('event', 'add_to_cart', { value: product.props.price, currency: 'usd', items: [product] });
+      } catch (err) {
+        console.log(err);
+      }
       // facebook track event
       try {
         fbq('track', 'AddToCart', {
@@ -100949,6 +100991,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var bcrypt = require('bcryptjs');
+var jwt_decode = require('jwt-decode');
 
 var FacebookLogin = require('./FacebookLogin.jsx');
 var Errors = require('./Errors.jsx');
@@ -101000,6 +101043,14 @@ var UserLogin = function (_React$Component) {
         BowAndDrape.api("POST", "/user/login", payload, function (err, response) {
           if (err) Errors.emitError("login", err);
           BowAndDrape.dispatcher.handleAuth(response);
+
+          // google analytics event
+          try {
+            var user = jwt_decode(BowAndDrape.token);
+            gtag('event', 'login', { 'method': user.props.login_mode });
+          } catch (err) {
+            console.log(err);
+          }
         });
       });
     }
@@ -101071,7 +101122,7 @@ var UserLogin = function (_React$Component) {
 
 module.exports = UserLogin;
 
-},{"./Errors.jsx":741,"./FacebookLogin.jsx":742,"bcryptjs":47,"react":655}],774:[function(require,module,exports){
+},{"./Errors.jsx":741,"./FacebookLogin.jsx":742,"bcryptjs":47,"jwt-decode":417,"react":655}],774:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();

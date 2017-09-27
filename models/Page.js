@@ -201,6 +201,17 @@ class Page extends JSONAPI {
       <meta property="og:type" content="website"/>
       ${image_header}
 
+      <!-- Global Site Tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-52623236-1"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments)};
+        gtag('js', new Date());
+        gtag('config', 'UA-52623236-1');
+        gtag('event', 'page_view');
+      </script>
+      <!-- End Google Analytics -->
+
       <!-- Facebook Pixel Code -->
       <script>
         !function(f,b,e,v,n,t,s)

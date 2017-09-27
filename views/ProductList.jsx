@@ -243,6 +243,10 @@ class ProductList extends React.Component {
 
     BowAndDrape.cart_menu.add(item);
 
+    // google track event
+    try {
+      gtag('event', 'add_to_cart', {value: product.props.price, currency:'usd', items: [product]});
+    } catch(err) {console.log(err)}
     // facebook track event
     try {
       fbq('track', 'AddToCart', {

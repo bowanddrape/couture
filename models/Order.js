@@ -160,7 +160,7 @@ class Order {
           if (result && result.rows)
             shipment.id = result.rows[0].id;
           // success!
-          callback(null);
+          callback(null, shipment);
 
           // log that a purchase was made
           console.log(`${email} purchased ${shipment.id}`);
@@ -191,13 +191,13 @@ class Order {
       });
       // finally, place the order
       tasks.push((client, callback) => {
-        handleCreateShipment(client, (err) => {
-          callback(err, client);
+        handleCreateShipment(client, (err, shipment) => {
+          callback(err, client, shipment);
         });
       });
       // we're done! go respond to the web request that we're good
-      tasks.push((client, callback) => {
-        res.json({ok: "ok"}).end();
+      tasks.push((client, shipment, callback) => {
+        res.json({ok: "ok", shipment}).end();
         callback(null);
       });
       let onError = (err) => {

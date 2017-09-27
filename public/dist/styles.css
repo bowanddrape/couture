@@ -1027,11 +1027,6 @@ product_options switch.expanded {
 .icon {
   background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
 }
-.purchase_complete {
-  width: 700px;
-  clear: both;
-  margin: auto;
-}
 .purchase_complete > div {
   width: 600px;
   margin: auto;

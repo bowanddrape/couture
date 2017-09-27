@@ -1,6 +1,7 @@
 
 const React = require('react');
 const bcrypt = require('bcryptjs');
+const jwt_decode = require('jwt-decode');
 
 const FacebookLogin = require('./FacebookLogin.jsx');
 const Errors = require('./Errors.jsx');
@@ -42,6 +43,12 @@ class UserLogin extends React.Component {
         if (err)
           Errors.emitError("login", err);
         BowAndDrape.dispatcher.handleAuth(response);
+
+        // google analytics event
+        try {
+          let user = jwt_decode(BowAndDrape.token);
+          gtag('event', 'login', {'method': user.props.login_mode});
+        } catch (err) { console.log(err); }
       });
     });
   }

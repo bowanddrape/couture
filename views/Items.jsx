@@ -22,11 +22,14 @@ class Items extends React.Component {
         amount: 7,
         currency_local: "USD",
       },
-      promo_code: "",
+      promo: {
+        code: "",
+      },
       account_credit: 0,
     }
   }
 
+  // TODO maybe put this in ItemUtils.js
   updateShipping(callback) {
     if (!this.props.is_cart) return;
     this.setState((prevState) => {
@@ -42,8 +45,8 @@ class Items extends React.Component {
       if (!contents.length) {
         return ({contents: contents});
       }
-      // don't include account credits in this price
       let total_price = ItemUtils.getPrice(contents, (item)=>{
+        // don't include account credits in this price
         if (new RegExp("^Account balance", "i").test(item.props.name))
           return false;
         return true;
@@ -51,6 +54,8 @@ class Items extends React.Component {
       let shipping_cost = shipping_quote.amount;
       // free domestic shipping for 75+ orders
       if (total_price>=75 && shipping_quote.currency_local.toLowerCase()=="usd")
+        shipping_cost = 0;
+      if (this.state.promo.props && this.state.promo.props.free_ship)
         shipping_cost = 0;
       contents.push({
         props: {
@@ -78,6 +83,10 @@ class Items extends React.Component {
           let contents = JSON.parse(JSON.stringify(prevState.contents));
           ItemUtils.applyCredits(prevState.account_credit, contents);
           return ({contents});
+        }, () => {
+          // as a final callback, call onUpdate from parent?
+          if (this.props.onUpdate)
+            this.props.onUpdate(this);
         });
       });
     });
@@ -127,10 +136,11 @@ class Items extends React.Component {
 
   handleApplyDiscountCode() {
     if (!BowAndDrape) return;
-    BowAndDrape.api("GET", "/promocode", {code:this.state.promo_code.toLowerCase()}, (err, result) => {
+    BowAndDrape.api("GET", "/promocode", {code:this.state.promo.code.toLowerCase()}, (err, result) => {
       if (err) return Errors.emitError("promo", err.toString());
       if (!result.length) return Errors.emitError("promo", "no such promo code");
       let promo = result[0];
+      this.setState({promo: promo});
       // FIXME this is a race as contents could be modified between
       // clone and set, but I can't figure out how to wrap this properly
       let contents = JSON.parse(JSON.stringify(this.state.contents));
@@ -208,7 +218,7 @@ class Items extends React.Component {
             <div className="item promo" style={Object.assign({},style_summary.item,{padding:"none"})}>
               <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
               <div className="deets" style={style_summary.deets}>
-                <input placeholder="Promo code" type="text" style={{marginTop:"20px",width:"90px"}} value={this.state.promo_code} onChange={(event)=>{this.setState({promo_code:event.target.value})}}/>
+                <input placeholder="Promo code" type="text" style={{marginTop:"20px",width:"90px"}} value={this.state.promo.code} onChange={(event)=>{this.setState({promo:{code:event.target.value}})}}/>
                 <button style={{position:"absolute",top:"-12px", left:"95px", width:"90px"}} onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
               </div>
             </div>

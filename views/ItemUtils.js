@@ -38,6 +38,7 @@ let applyPromoCode = (items, promo, callback) => {
   });
   let total_price = getPrice(items, (item) => {return item.sku});
   // TODO see if the promo is applicable
+  // TODO if the promo is a percent, maybe decrease the cost of cart items (for tax)
   // figure out value of our promo
   promo.props.price = -1 * Math.max((Math.round(total_price*promo.props.percent)/100||0), (promo.props.absolute||0));
   if (!new RegExp("^promo:", "i").test(promo.props.name)) {

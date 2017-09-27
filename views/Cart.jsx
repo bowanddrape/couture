@@ -28,6 +28,7 @@ class Cart extends React.Component {
 
     this.state = {
       user: {},
+      items: this.props.items,
       card: {
         number: "",
         cvc: "",
@@ -104,7 +105,8 @@ class Cart extends React.Component {
         }
         this.setState({shipping, billing, same_billing});
       });
-      this.refs.Items.updateCredit(user.credits);
+      if (this.refs.Items)
+        this.refs.Items.updateCredit(user.credits);
     });
   }
 
@@ -214,6 +216,24 @@ class Cart extends React.Component {
         // save our successfully placed order payload
         this.order_payload = payload;
 
+        // google track event
+        try {
+          let total_price = ItemUtils.getPrice(resp.shipment.contents)
+          let google_items = resp.shipment.contents.map((item) => {
+            return {
+              id: item.sku,
+              name: item.props.name,
+              price: item.props.price,
+              quantity: (item.quantity || 1),
+            }
+          });
+          gtag('event', 'purchase', {
+            transaction_id: resp.shipment.id,
+            value: total_price,
+            currency: 'usd',
+            items: google_items,
+          });
+        } catch(err) {console.log(err)}
         // facebook track event
         try {
           let total_price = ItemUtils.getPrice(this.order_payload.contents)
@@ -250,6 +270,7 @@ class Cart extends React.Component {
 
   render() {
     if (this.state.done){
+      if (document) document.querySelector("body").scrollTop = 0;
       return <ThanksPurchaseComplete
         items={this.order_payload.contents}
         email={this.order_payload.email}
@@ -275,7 +296,12 @@ class Cart extends React.Component {
 
     return (
       <div>
-        <Items ref="Items" contents={this.props.items} is_cart="true" />
+        <Items
+          ref="Items"
+          contents={this.state.items}
+          onUpdate={(items)=>{this.setState({items:items.contents})}}
+          is_cart="true"
+        />
 
         { this.state.user.email ? null :
           <div className="checkout_section">
