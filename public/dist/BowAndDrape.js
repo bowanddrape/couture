@@ -94682,11 +94682,19 @@ var Cart = function (_React$Component) {
           // google track event
           try {
             var total_price = ItemUtils.getPrice(resp.shipment.contents);
+            var google_items = resp.shipment.contents.map(function (item) {
+              return {
+                id: item.sku,
+                name: item.props.name,
+                price: item.props.price,
+                quantity: item.quantity || 1
+              };
+            });
             gtag('event', 'purchase', {
               transaction_id: resp.shipment.id,
               value: total_price,
               currency: 'usd',
-              items: resp.shipment.contents
+              items: google_items
             });
           } catch (err) {
             console.log(err);
@@ -100261,16 +100269,17 @@ var Shipment = function (_React$Component) {
             { className: 'payment_info', style: Object.assign({}, Item.style.item, { borderBottom: "none", fontSize: "18px", justifyContent: "space-between" }) },
             React.createElement(
               'div',
-              null,
+              { style: { float: "left" } },
               'Billing Information',
               React.createElement(Address, this.props.billing_address)
             ),
             React.createElement(
               'div',
-              null,
+              { style: { float: "right" } },
               'Shipping Address',
               React.createElement(Address, this.props.address)
-            )
+            ),
+            React.createElement('div', { style: { clear: "both" } })
           )
         );
       }

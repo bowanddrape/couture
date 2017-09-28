@@ -9,10 +9,23 @@ if (process.env.ENV!="prod")
   process.exit(0);
 
 // FIXME paginate this
-Shipment.getAll({tracking_code:"not_null",address:"not_null"}, (err, shipments) => {
+Shipment.getAll({address:"not_null"}, (err, shipments) => {
   if (err) return console.log(err);
   if (!shipments) return;
   shipments.forEach((shipment) => {
+
+    // ignore all non-native orders?
+    if (shipment.props && shipment.props.imported)
+      return;
+
+    // send order confirmation email
+    if (!shipment.props || !shipment.props.email_confirmed) {
+      return Mail.sendPlacedEmail(shipment, () => {
+        shipment.props = shipment.props || {};
+        shipment.props.email_confirmed = true;
+        shipment.upsert();
+      });
+    }
 
     // send shipping confirmation email if not shipped yet
     if (!shipment.props.email_shipment && shipment.received>(new Date().getTime()/1000) && shipment.tracking_code) {
@@ -23,7 +36,7 @@ Shipment.getAll({tracking_code:"not_null",address:"not_null"}, (err, shipments) 
     }
 
     // send survey email 1 day after receipt
-    if (!shipment.props.email_survey && (shipment.received+86400)<(new Date().getTime()/1000)) {
+    if (!shipment.props.email_survey && shipment.received && (shipment.received+86400)<(new Date().getTime()/1000)) {
       return Mail.sendSurveyEmail(shipment, () => {
         shipment.props.email_survey = true;
         shipment.upsert();

@@ -223,14 +223,15 @@ class Shipment extends React.Component {
         <div>
           <h1 style={Object.assign({},Item.style.item,{borderBottom:"none",borderTop:"solid 1px #000",margin:"12px auto"})}>PAYMENT INFO</h1>
           <div className="payment_info" style={Object.assign({},Item.style.item,{borderBottom:"none",fontSize:"18px",justifyContent:"space-between"})}>
-            <div>
+            <div style={{float:"left"}}>
               Billing Information
               <Address {...this.props.billing_address}/>
             </div>
-            <div>
+            <div style={{float:"right"}}>
               Shipping Address
               <Address {...this.props.address}/>
             </div>
+            <div style={{clear:"both"}}/>
           </div>
         </div>
       );

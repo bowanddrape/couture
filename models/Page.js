@@ -129,7 +129,7 @@ class Page extends JSONAPI {
 
               // render react component
               if (whitelisted_components.indexOf(element.type)==-1)
-                return callbackn({error:"page component not whitelisted"});
+                return callback({error:"page component not whitelisted"});
               let component = require(`../views/${element.type}.jsx`);
               // have a place for optional async preprocessing?
               if (component.preprocessProps) {

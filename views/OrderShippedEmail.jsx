@@ -1,6 +1,7 @@
 
 const React = require('react');
 const Items = require('./Items.jsx');
+const styles = require('./EmailStyles.js');
 
 /***
 Transactional email. Send this when an order is shipped
@@ -13,31 +14,29 @@ class OrderShippedEmail extends React.Component {
   render() {
     return (
       <table align="center" style={{width:"100%"}}><tbody>
-        <tr><td style={styles.fullwidth}>
-          Dear {this.props.username},<br/><br/>
-          Your order <a href={this.props.order_href} style={styles.link}>{this.props.order_id}</a> has shipped!
-        </td></tr>
-        <tr><td style={styles.fullwidth}>
+        <tr><td>
+          <h1 style={styles.h1}>YOUR ORDER</h1>
+          <h1 style={styles.h1}>HAS LEFT THE BUILDING</h1>
+          <img src={"https://couture.bowanddrape.com/Icon-Envelope-Red-Hearts.png"} style={{width:"150px",margin:"auto",display:"block"}}/>
+          <div style={{textAlign:"center"}}>
+            <div style={styles.text}>Click (and obsessively keep clicking) below</div>
+            <div style={styles.text}>to track your package</div>
+          </div>
+          <a href={this.props.tracking_link} style={{textDecoration:"none"}}>
+            <div style={{margin:"10px 20px",display:"block",border:"1px solid #000",padding:"10px 20px",textAlign:"center",fontSize:"12px",width:"150px",margin:"20px auto",color:"#000"}}>
+              LOVE TRACK, BABY!
+            </div>
+          </a>
           {/* this should work, but doesn't with our styles:
             <Items contents={this.props.contents}/>
             so let's just use an image instead
           */}
-          <img src={`${this.props.order_link}?layout=image&token=${this.props.token}`} style={{width:"600px"}}/>
-          <a href={this.props.tracking_link} style={styles.link}>
-            <div style={{margin:"10px 0px",display:"block",border:"1px solid #bababa",padding:"10px",textAlign:"center",fontSize:"12px"}}>
-              TRACK YOUR SHIPMENT
-            </div>
-          </a>
+          <img src={`${this.props.order_link}?layout=image&token=${this.props.token}`} style={{width:"600px", margin:"20px auto"}}/>
         </td></tr>
       </tbody></table>
     );
   }
 }
 
-let styles = {
-  link: {
-    color: "#F5C9CA"
-  }
-}
 
 module.exports = OrderShippedEmail;

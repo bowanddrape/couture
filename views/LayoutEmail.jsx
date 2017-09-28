@@ -1,6 +1,13 @@
 
 
 const React = require('react');
+const styles = require('./EmailStyles.js');
+
+const reasons_to_contact_us = [
+  'Do it even if you just want to say "Heyyyy!" Srsly tho. We get lonely sometimes...',
+  'Even if the question is "Would you rather have a free wifi forever or a lifetime supply of pizza?" Srsly. Ask us anything!',
+  "Do it just to be sure we're still alive and haven't yet died gloriously in battle against the patriarchy",
+];
 
 /***
 Use this layout when rendering an email
@@ -27,19 +34,26 @@ class LayoutEmail extends React.Component {
         <center style={styles.wrapper}>
           <div style={styles.innerwrapper}>
             <table style={styles.table} className="outer"><tbody>
-              <tr><td style={{width: "100%", margin: "auto"}}>
-                <a href="http://www.bowanddrape.com"><img src="http://staging.bowanddrape.com/logo.jpg?cachebust=1" alt="" style={{maxWidth: "300px", margin:"auto", display:"block"}} /></a>
-              </td></tr>
+              {/* do we want any sort of header? */}
+              {/*<tr><td style={{width: "100%", margin: "auto"}}>
+                <a href="http://www.bowanddrape.com"><img src="https://couture.bowanddrape.com/logo.jpg" alt="" style={{maxWidth: "300px", margin:"auto", display:"block"}} /></a>
+              </td></tr>*/}
               <tr><td>
                 {content}
+              </td></tr>
+              <tr><td>
+              <div style={styles.text}>If you have any questions please <a href="https://couture.bowanddrape.com/contact">contact us</a></div>
+              <div style={styles.text}>{reasons_to_contact_us[Math.floor(Math.random()*reasons_to_contact_us.length)]}</div>
+              <div style={Object.assign({}, styles.text, {marginTop: "20px"})}>Xx,</div>
+              <div style={Object.assign({}, styles.text, {marginTop: "10px",marginBottom: "20px"})}>The Bow & Drape Team</div>
               </td></tr>
               {/*TODO needs an unsubscribe link*/}
               <tr><td style={{width: "100%", maxWidth: "600px", backgroundColor: "#F5C9CA"}}>
                 <table style={{width:"100%", align:"center"}}><tbody><tr>
                   <td style={{textAlign:"right"}}>Follow & Share:</td>
-                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="http://staging.bowanddrape.com/instagram.png" alt="instagram" /></a></td>
-                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="http://staging.bowanddrape.com/facebook.png" alt="facebook" /></a></td>
-                  <td style={{textAlign:"center"}}><a href="https://twitter.com/bowanddrape"><img src="http://staging.bowanddrape.com/twitter.png" alt="twitter" /></a></td>
+                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="https://couture.bowanddrape.com/instagram.png" alt="instagram" /></a></td>
+                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="https://couture.bowanddrape.com/facebook.png" alt="facebook" /></a></td>
+                  <td style={{textAlign:"center"}}><a href="https://twitter.com/bowanddrape"><img src="https://couture.bowanddrape.com/twitter.png" alt="twitter" /></a></td>
                 </tr></tbody></table>
               </td></tr>
             </tbody></table>
@@ -49,32 +63,6 @@ class LayoutEmail extends React.Component {
       </html>
     );
   }
-}
-
-var styles = {
-  body: {
-    margin: "0 !important",
-    padding: "0",
-    backgroundColor: "#ffffff",
-  },
-  table: {
-    borderSpacing: "0",
-    fontFamily: "sans-serif",
-    color: "#333333",
-    align: "center",
-  },
-  td: {
-    padding: "0",
-  },
-  wrapper: {
-    width: "100%",
-    tableLayout: "fixed",
-    textSizeAdjust: "100%",
-  },
-  innerwrapper: {
-    width: "100%",
-    margin: "0 auto",
-  },
 }
 
 module.exports = LayoutEmail;

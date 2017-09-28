@@ -222,6 +222,7 @@ class User extends SQLTable {
   }
 
   static generateJwtToken(user, callback) {
+    if (!user) return "no user";
     user.populateRoles();
     delete user.passhash; // strip off the password part
     user.props.name = user.props.name ? user.props.name : user.email; // default name to email
