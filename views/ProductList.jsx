@@ -144,7 +144,7 @@ class ProductList extends React.Component {
         currency: product.props.price,
         content_ids: product.sku,
       });
-    } catch(err) {console.log(err)}
+    } catch(err) {}
 
     return (
       <customize>

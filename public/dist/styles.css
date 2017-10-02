@@ -311,6 +311,31 @@ address postal {
 .payment_info address {
   margin-top: 6px;
 }
+/* for ios input zoom */
+input[type="color"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+select:focus,
+textarea {
+  font-size: 16px;
+  border-radius: 0px;
+}
+/* for mac chrome */
+button:focus,
+input[type="button"]:focus {
+  outline: none;
+}
 shipments {
   display: block;
   padding: 10px;
@@ -840,7 +865,8 @@ signup > div:last-of-type {
 switch {
   z-index: 1;
   display: flex;
-  flex-flow: row wrap;
+  flex-direction: row;
+  flex-wrap: wrap;
   padding: 8px;
 }
 switch switch_option {
