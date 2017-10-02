@@ -313,7 +313,7 @@ class Cart extends React.Component {
         <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
         {payment_info}
 
-        <Errors style={{width:"460px"}}/>
+        <Errors/>
         <BADButton className="primary" onClick={this.handlePay.bind(this)}>
           Get it!
         </BADButton>

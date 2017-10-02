@@ -94793,7 +94793,7 @@ var Cart = function (_React$Component) {
         ),
         React.createElement(InputAddress, _extends({ section_title: 'Shipping Address', errors: React.createElement(Errors, { label: 'shipping' }), handleFieldChange: this.handleFieldChange.bind(this, "shipping"), handleSetSectionState: this.handleSetSectionState.bind(this, "shipping") }, this.state.shipping)),
         payment_info,
-        React.createElement(Errors, { style: { width: "460px" } }),
+        React.createElement(Errors, null),
         React.createElement(
           BADButton,
           { className: 'primary', onClick: this.handlePay.bind(this) },
@@ -97534,7 +97534,9 @@ var LayoutMain = function (_React$Component) {
       });
 
       BowAndDrape.dispatcher.emit("loaded");
-      BowAndDrape.dispatcher.emit("resize");
+      window.addEventListener("load", function () {
+        BowAndDrape.dispatcher.emit("resize");
+      });
     }
   }, {
     key: 'render',
@@ -98453,6 +98455,7 @@ var ProductCanvas = function (_React$Component) {
       this.forceUpdate();
       BowAndDrape.dispatcher.on("resize", function () {
         _this2.customizer.resizeViewport();
+        _this2.setState({ bodyWidth: document.body.offsetWidth });
       });
     }
 

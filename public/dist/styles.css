@@ -28,6 +28,9 @@ body {
   color: #000;
   font-size: 14px;
 }
+.layout {
+  overflow-x: hidden;
+}
 a {
   text-decoration: none;
   color: #000;
@@ -336,6 +339,14 @@ button:focus,
 input[type="button"]:focus {
   outline: none;
 }
+.warning404 {
+  text-align: center;
+  width: 100%;
+  background-color: #a00;
+  padding: 5px;
+  margin: 3px auto;
+  border-radius: 5px;
+}
 shipments {
   display: block;
   padding: 10px;
@@ -403,6 +414,17 @@ comments message {
   color: #000;
   opacity: 0.5;
   width: 180px;
+}
+@media print {
+  shipments {
+    border: none;
+  }
+  .action_bar {
+    display: none;
+  }
+  shipment {
+    page-break-after: always;
+  }
 }
 .item .deets .remove {
   clear: both;
@@ -673,8 +695,7 @@ customize hud_controls button:after {
 .checkout_section {
   max-width: 460px;
   display: block;
-  margin: auto;
-  margin-top: 35px;
+  margin: 20px auto;
   position: relative;
   border: solid 3px #c79e6a;
   padding: 5px;
@@ -701,8 +722,7 @@ customize hud_controls button:after {
 input_address {
   max-width: 460px;
   display: block;
-  margin: auto;
-  margin-top: 35px;
+  margin: 20px auto;
   position: relative;
   border: solid 3px #c79e6a;
   padding: 5px;
@@ -739,8 +759,7 @@ input_address [name="postal"] {
 input_credit {
   max-width: 460px;
   display: block;
-  margin: auto;
-  margin-top: 35px;
+  margin: 20px auto;
   position: relative;
   border: solid 3px #c79e6a;
   padding: 5px;

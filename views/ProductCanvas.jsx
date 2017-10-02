@@ -40,6 +40,7 @@ class ProductCanvas extends React.Component {
     this.forceUpdate();
     BowAndDrape.dispatcher.on("resize", () => {
       this.customizer.resizeViewport();
+      this.setState({bodyWidth: document.body.offsetWidth});
     });
   }
 

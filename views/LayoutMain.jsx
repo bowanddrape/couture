@@ -34,7 +34,9 @@ class LayoutMain extends React.Component {
     window.addEventListener("resize", () => {BowAndDrape.dispatcher.emit("resize");});
 
     BowAndDrape.dispatcher.emit("loaded");
-    BowAndDrape.dispatcher.emit("resize");
+    window.addEventListener("load", () => {
+      BowAndDrape.dispatcher.emit("resize");
+    });
   }
 
   render() {
