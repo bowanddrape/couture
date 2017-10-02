@@ -20,6 +20,7 @@ class Mail {
       'shelly+testing@bowanddrape.com',
       'renee+testing@bowanddrape.com'
     ]
+    
     let options = {
       from: 'no-reply@bowanddrape.com',
       to: to,
