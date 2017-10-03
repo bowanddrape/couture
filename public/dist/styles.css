@@ -219,7 +219,7 @@ input[type="password"] {
   position: relative;
   height: 200px;
   width: 200px;
-  margin: 35px;
+  margin: 35px 15px;
   border-radius: 4px;
   background-size: contain;
   background-position: center;
@@ -227,28 +227,44 @@ input[type="password"] {
 }
 .card label,
 .card .label {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
+  font-weight: normal;
+  font-size: 18px;
+  display: block;
   position: absolute;
-  opacity: 0.5;
-  cursor: inherit;
   text-align: center;
-  height: 200px;
-  width: 200px;
-  border: solid 3px #000;
-  transform: rotate(-30deg);
-  left: -30px;
-  z-index: -1;
+  width: 100%;
+  bottom: -22px;
 }
 .card price,
 .card .price {
   position: absolute;
   right: 0px;
-  bottom: 0px;
-  display: inline-block;
-  padding: 7px;
-  width: auto;
-  border: 1px solid #000;
-  background-color: #fff;
-  font-size: 12px;
+  top: 0px;
+  background-image: url(/heart.svg);
+  padding: 10px 13px 15px 13px;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: #fff;
+}
+.card swatches {
+  position: absolute;
+  bottom: 2px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.card swatches > div {
+  overflow: hidden;
+  width: 15px;
+  height: 20px;
+  margin: 0px 2px;
+  border: solid 1px #000;
+}
+.card swatches > div img {
+  margin-left: -9px;
+  margin-top: -6px;
 }
 .card .autocomplete {
   position: relative;

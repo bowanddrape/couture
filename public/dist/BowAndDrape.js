@@ -99194,9 +99194,11 @@ var ProductList = function (_React$Component) {
           }
         };
         // memory intensive, but make a map of all components?
-        traverse_item_options(product.compatible_components, function (component) {
-          if (component && component.sku) components[component.sku] = component;
-        });
+        if (product) {
+          traverse_item_options(product.compatible_components, function (component) {
+            if (component && component.sku) components[component.sku] = component;
+          });
+        }
         // fill in things we just have the sku for
         traverse_item_options(initial_assembly, function (component) {
           if (component && component.sku && components[component.sku]) {
@@ -99295,7 +99297,7 @@ var ProductList = function (_React$Component) {
         }
       };
       for (var _i = 1; _i < this.state.selected_product.length; _i++) {
-        product_raw = product_raw.options[this.state.selected_product[_i]];
+        if (product_raw.options[this.state.selected_product[_i]]) product_raw = product_raw.options[this.state.selected_product[_i]];
       }
       return product_raw;
     }
@@ -99366,6 +99368,18 @@ var ProductList = function (_React$Component) {
 
       var products = [];
       this.props.store.products.forEach(function (product) {
+        var swatches = [];
+        if (true || product.props.preview_swatch) {
+          Object.keys(product.options).forEach(function (option) {
+            swatches.push(React.createElement(
+              'div',
+              { key: swatches.length },
+              React.createElement('img', { src: "/" + option.toString().replace(/ /g, "_").toLowerCase() + ".svg", onError: function onError(event) {
+                  event.target.parentNode.style.display = "none";
+                } })
+            ));
+          });
+        }
         products.push(React.createElement(
           'a',
           { className: 'card', onClick: function onClick(event) {
@@ -99381,6 +99395,11 @@ var ProductList = function (_React$Component) {
             null,
             '$',
             product.props.price
+          ),
+          React.createElement(
+            'swatches',
+            null,
+            swatches
           )
         ));
       });
