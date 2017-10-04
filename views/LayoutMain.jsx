@@ -2,7 +2,10 @@
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 
+const LayoutBorderWrap = require('./LayoutBorderWrap.jsx');
 const LayoutHeader = require('./LayoutHeader.jsx');
+const LayoutFooter = require('./LayoutFooter.jsx');
+
 
 /***
 The most common of layout. Renders a react component
@@ -68,13 +71,13 @@ class LayoutMain extends React.Component {
     let zoom = 1;
     if (typeof(document)!="undefined")
       zoom = document.body.clientWidth / window.innerWidth;
-
     return (
       <div className="layout">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
+        <LayoutBorderWrap />
         <LayoutHeader user={this.state.user}/>
         {content}
+        <LayoutFooter user={this.state.user}/>
 
         <script src="/BowAndDrape.js"></script>
         <script src="/masonry.pkgd.min.js"></script>

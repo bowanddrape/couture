@@ -4,17 +4,27 @@
 @user_img_width: 50px;
 @menu_handle_width: 36px;
 .header {
+  border-bottom: 5px solid transparent;
+  border-image: @gradient-rainbow;
+  border-image-slice: 1;
+
   handle {
-    background-image: url(/pizza.svg);
+    background-image: url(/hamburger_menu.png);
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
-    top: 3px;
-    left: 11px;
+    top: 10px;
+    left: 15px;
     display: block;
-    width: @menu_handle_width;
-    height: @menu_handle_width + 4px;
+    width: @menu_handle_width - 6px;
+    height: @menu_handle_width - 6px;
   }
+
+  handle.expanded {
+    background-image: url(/hamburger_close.png);
+  }
+
+
   img.logo {
     display: block;
     margin: auto;
@@ -26,8 +36,8 @@
     background-repeat: no-repeat;
     position: absolute;
     overflow: visible;
-    top: 3px;
-    right: 11px;
+    top: 10px;
+    right: 15px;
     width: @menu_handle_width;
     height: @menu_handle_width + 4px;
     cart_bug {
@@ -67,7 +77,9 @@
   }
   menu.expanded {
     max-height: 500px;
-    border-bottom: solid 3px rgba(0,0,0,1);
+    //border-bottom: 5px solid transparent;
+    //border-image: @gradient-rainbow;
+    border-image-slice: 1;
   }
   menu user {
     display: block;
@@ -86,10 +98,13 @@
 
 
 
-@media (min-width: @desktop_min_width) { .header {
+@media (min-width: @desktop_min_width) {
+.header {
+  border-bottom: none;
   handle {
     left: auto;
     right: 55px;
+    background-image: url(/pizza.svg);
   }
   menu {
     max-height: initial;

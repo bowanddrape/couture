@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,600,800');
 @font-face {
   font-family: Zurich-Condensed-Bold;
   src: url(/Zurich__Condensed_BT.ttf) format('truetype');
@@ -14,6 +15,25 @@
   font-weight: normal;
   letter-spacing: 0px;
 }
+h1,
+h2,
+h3 {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+h4 {
+  font-family: "Open Sans", Arial, sans-serif;
+  font-weight: 800;
+  line-height: 1.43;
+  letter-spacing: 1.3px;
+  color: #000;
+  text-transform: uppercase;
+}
+.center {
+  text-align: center;
+}
 @keyframes busyState {
   0% {
     opacity: 1;
@@ -21,6 +41,11 @@
   50% {
     opacity: 0.2;
   }
+}
+html {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
 }
 body {
   font-family: "Open Sans", Arial, sans-serif;
@@ -104,37 +129,17 @@ button:before,
 }
 button:hover:after,
 .button:hover:after {
-  top: -7px;
-  left: -7px;
+  top: 0px;
+  left: 10px;
 }
 button:hover:before,
 .button:hover:before {
-  top: -3px;
-  left: 7px;
+  top: -10px;
+  left: 16px;
 }
 button.primary,
 .button.primary {
   margin: 12px auto;
-}
-button.primary:after,
-.button.primary:after {
-  top: 0px;
-  left: 10px;
-}
-button.primary:before,
-.button.primary:before {
-  top: -10px;
-  left: 15px;
-}
-button.primary:hover:after,
-.button.primary:hover:after {
-  top: -10px;
-  left: -10px;
-}
-button.primary:hover:before,
-.button.primary:hover:before {
-  top: 0px;
-  left: 10px;
 }
 button.primary.busyState,
 .button.primary.busyState {
@@ -202,11 +207,13 @@ input.error {
 input[type="text"],
 input[type="password"] {
   background-color: #fff;
-  border: none;
-  border-bottom: solid 5px #000;
-  width: 230px;
+  border: 1px solid #000;
+  min-width: 230px;
+  width: auto;
+  min-height: 53px;
   margin: 10px auto;
-  padding: 5px 0;
+  padding: 5px 22px;
+  text-transform: capitalize;
   outline: none;
 }
 .deck {
@@ -367,6 +374,21 @@ input[type="button"]:focus {
   margin: 3px auto;
   border-radius: 5px;
 }
+@media (min-width: 1000px) {
+  .border-wrap {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: calc(100vw - 10px);
+    height: calc(100vh - 10px);
+    z-index: 99;
+    background: transparent;
+    pointer-events: none;
+    border: 5px solid transparent;
+    border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+    border-image-slice: 1;
+  }
+}
 shipments {
   display: block;
   padding: 10px;
@@ -523,8 +545,8 @@ customize .component_container div {
   cursor: pointer;
 }
 customize .component_container div.backspace {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -155px;
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -535,8 +557,8 @@ customize .component_container div.backspace {
   border: none;
 }
 customize .component_container div.enter {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -203px;
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -567,8 +589,8 @@ customize .component_virtual_keyboard_container div {
   cursor: pointer;
 }
 customize .component_virtual_keyboard_container div.backspace {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -155px;
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -579,8 +601,8 @@ customize .component_virtual_keyboard_container div.backspace {
   border: none;
 }
 customize .component_virtual_keyboard_container div.enter {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -203px;
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -602,8 +624,8 @@ customize .component_virtual_keyboard_container row div {
   flex: 0 1 auto;
 }
 customize .component_virtual_keyboard_container div.spacebar {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -251px;
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-position: 0px -214px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -965,16 +987,24 @@ product_options switch.expanded {
   justify-content: flex-begin;
   margin-bottom: 10px;
 }
+.header {
+  border-bottom: 5px solid transparent;
+  border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  border-image-slice: 1;
+}
 .header handle {
-  background-image: url(/pizza.svg);
+  background-image: url(/hamburger_menu.png);
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
-  top: 3px;
-  left: 11px;
+  top: 10px;
+  left: 15px;
   display: block;
-  width: 36px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
+}
+.header handle.expanded {
+  background-image: url(/hamburger_close.png);
 }
 .header img.logo {
   display: block;
@@ -987,8 +1017,8 @@ product_options switch.expanded {
   background-repeat: no-repeat;
   position: absolute;
   overflow: visible;
-  top: 3px;
-  right: 11px;
+  top: 10px;
+  right: 15px;
   width: 36px;
   height: 40px;
 }
@@ -1043,7 +1073,7 @@ product_options switch.expanded {
 }
 .header menu.expanded {
   max-height: 500px;
-  border-bottom: solid 3px #000000;
+  border-image-slice: 1;
 }
 .header menu user {
   display: block;
@@ -1059,9 +1089,13 @@ product_options switch.expanded {
   margin-top: 25px;
 }
 @media (min-width: 1000px) {
+  .header {
+    border-bottom: none;
+  }
   .header handle {
     left: auto;
     right: 55px;
+    background-image: url(/pizza.svg);
   }
   .header menu {
     max-height: initial;
@@ -1089,8 +1123,85 @@ product_options switch.expanded {
     max-height: 300px;
   }
 }
+.footer .footer-inner {
+  border-top: 5px solid transparent;
+  border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  border-image-slice: 1;
+  padding: 50px 0;
+}
+.footer .footer-menu {
+  text-align: center;
+  padding: 0;
+}
+.footer .footer-menu a {
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  font-weight: normal;
+  vertical-align: middle;
+  transition: color .5s ease;
+}
+.footer .footer-menu a:hover {
+  text-decoration: none;
+  color: #7f5cff;
+}
+.footer .footer-menu .social {
+  width: 25px;
+  height: 25px;
+  margin-right: 20px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.footer .footer-menu .social:last-of-type {
+  margin-right: 60px;
+}
+.footer .footer-menu .social:first-of-type {
+  margin-left: 60px;
+}
+.footer .footer-menu .facebook {
+  background-image: url(/facebook.png);
+  margin-right: 60px;
+}
+.footer .footer-menu .instagram {
+  background-image: url(/instagram.png);
+}
+.footer .footer-menu .twitter {
+  background-image: url(/twitter.png);
+}
+.footer .newsletter-pencil {
+  width: 45px;
+  margin: 0 auto;
+  display: block;
+}
+.footer signup div:last-of-type {
+  display: inline-block;
+  margin-right: 15px;
+}
+.footer signup div:last-of-type input {
+  border: none;
+  border-bottom: 3px solid #000;
+  text-transform: lowercase;
+}
+.footer signup button {
+  display: inline-block;
+}
+@media (min-width: 1000px) {
+  .footer .footer-menu a {
+    margin-right: 60px;
+    display: inline-block;
+    margin-bottom: 0;
+  }
+  .footer .footer-menu .social:last-of-type {
+    margin-right: 60px;
+  }
+  .footer .footer-menu .social:first-of-type {
+    margin-left: 0;
+  }
+}
 .icon {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
 }
 .purchase_complete > div {
   width: 600px;

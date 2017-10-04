@@ -9,6 +9,12 @@
   50%   { opacity: 0.2;}
 }
 
+
+html {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
 body {
   .bodyfont;
   font-size: 14px;
@@ -85,32 +91,32 @@ button, .button {
     transition: top .2s ease, left .2s linear;
   }
   &:hover:after {
-    top: -7px;
-    left: -7px;
+    top: 0px;
+    left: 10px;
   }
   &:hover:before {
-    top: -3px;
-    left: 7px;
+    top: -10px;
+    left: 16px;
   }
   &.primary {
     margin: 12px auto;
   }
-  &.primary:after {
-    top: 0px;
-    left: 10px;
-  }
-  &.primary:before {
-    top: -10px;
-    left: 15px;
-  }
-  &.primary:hover:after {
-    top: -10px;
-    left: -10px;
-  }
-  &.primary:hover:before {
-    top: 0px;
-    left: 10px;
-  }
+  // &.primary:after {
+  //   top: 0px;
+  //   left: 10px;
+  // }
+  // &.primary:before {
+  //   top: -10px;
+  //   left: 15px;
+  // }
+  // &.primary:hover:after {
+  //   top: -10px;
+  //   left: -10px;
+  // }
+  // &.primary:hover:before {
+  //   top: 0px;
+  //   left: 10px;
+  // }
   /* CSS for button busy states */
   &.primary.busyState {
     background-color: @color_support_0;
@@ -180,11 +186,13 @@ input.error {
 }
 input[type="text"], input[type="password"] {
   background-color: @color_primary;
-  border: none;
-  border-bottom: solid 5px @color_secondary;
-  width: 230px;
+  border: 1px solid @color_secondary;
+  min-width: 230px;
+  width: auto;
+  min-height: 53px;
   margin: 10px auto;
-  padding: 5px 0;
+  padding: 5px 22px;
+  text-transform: capitalize;
   outline: none;
 }
 
@@ -339,4 +347,22 @@ button:focus, input[type="button"]:focus {
   padding: 5px;
   margin: 3px auto;
   border-radius: 5px;
+}
+
+
+// Gradient Border Around Elements
+@media (min-width: @desktop_min_width) {
+.border-wrap {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width:  ~"calc(100vw - 10px)";
+  height: ~"calc(100vh - 10px)";
+  z-index: 99;
+  background: transparent;
+  pointer-events: none;
+  border: 5px solid transparent;
+  border-image: @gradient-rainbow;
+  border-image-slice: 1;
+}
 }

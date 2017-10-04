@@ -3,7 +3,7 @@
   "scripts": {
     "build_js": "mkdir -p public/dist && ./node_modules/browserify/bin/cmd.js --exclude ./model/* -t [ babelify --presets [ react es2015 ] ] -r ./views/BowAndDrape.jsx:BowAndDrape -o public/dist/BowAndDrape.js",
     "build_sprites": "./node_modules/.bin/sprity create public/dist/ public/*.png -c / -p less -s sprite.less --cachebuster --engine sprity-gm",
-    "build_styles": "/usr/bin/lessc ./styles/styles.less public/dist/styles.css",
+    "build_styles": "lessc ./styles/styles.less public/dist/styles.css",
     "build": "npm run build_js && npm run build_sprites && npm run build_styles",
     "start": "npm run build && sudo node server.js"
   },
