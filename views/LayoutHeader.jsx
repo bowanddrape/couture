@@ -42,9 +42,12 @@ class LayoutHeader extends React.Component {
       )
     }
 
+
+
     return (
+
       <div className="header">
-        <handle onClick={()=>{this.setState({expanded:!this.state.expanded})}}/>
+        <handle className={this.state.expanded?"expanded":""} onClick={()=>{this.setState({expanded:!this.state.expanded})}}/>
         <a href="/"><img className="logo" src="/logo_mini.svg" /></a>
         <CartMenu key={menu_items.length} />
         <menu className={this.state.expanded?"expanded":""}>
@@ -54,6 +57,7 @@ class LayoutHeader extends React.Component {
           </menu_items>
         </menu>
       </div>
+
     );
   }
 
