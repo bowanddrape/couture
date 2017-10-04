@@ -73,6 +73,7 @@ class ComponentEdit extends React.Component {
       {name:"props_price",type:"text"},
       {name:"props_imagewidth", type:"text"},
       {name:"props_imageheight", type:"text"},
+      {name:"props_details", type:"textarea"},
       {name:"props_image",type:"file"},
     ].forEach((spec) => {
       // use underscores to navigate child fields
@@ -86,7 +87,7 @@ class ComponentEdit extends React.Component {
           placeholder = placeholder[name_toks[i]] || "";
       }
 
-
+      // FIXME make this ugly shit a switch
       if (spec.type=="readonly")
         return fields.push(<div key={fields.length}>
           <label>{spec.name}</label>
@@ -96,6 +97,11 @@ class ComponentEdit extends React.Component {
         return fields.push(<div key={fields.length}>
           <label>{spec.name}</label>
           <input type="text" onChange={this.handleFieldChange.bind(this)} value={value} placeholder={placeholder} name={spec.name}/>
+        </div>);
+      if (spec.type=="textarea")
+        return fields.push(<div key={fields.length}>
+          <label>{spec.name}</label>
+          <textarea onChange={this.handleFieldChange.bind(this)} name={spec.name} placeholder={placeholder} value={value}/>
         </div>);
       if (spec.type=="file") {
         return fields.push(<div key={fields.length}>

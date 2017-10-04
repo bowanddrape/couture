@@ -210,7 +210,6 @@ input[type="password"] {
   min-height: 53px;
   margin: 10px auto;
   padding: 5px 22px;
-  text-transform: capitalize;
   outline: none;
 }
 .deck {
@@ -684,6 +683,36 @@ customize hud_controls button:before {
 customize hud_controls button:after {
   display: none;
 }
+customize .product_details {
+  display: flex;
+  flex-wrap: wrap;
+}
+customize .product_details .description {
+  margin: 20px auto;
+  font-family: sans-serif;
+  letter-spacing: 2px;
+  line-height: 23px;
+  text-align: center;
+  max-width: 600px;
+}
+customize .product_details .size_chart {
+  margin: 20px auto;
+  display: table;
+}
+customize .product_details .size_chart row {
+  display: table-row;
+}
+customize .product_details .size_chart row:first-child {
+  background-color: #eaeaea;
+}
+customize .product_details .size_chart row span {
+  display: table-cell;
+  padding: 5px;
+  border: solid 1px #fff;
+}
+customize .product_details .size_chart row span:first-child {
+  background-color: #eaeaea;
+}
 @media (min-width: 1000px) {
   customize product_options {
     left: auto;
@@ -865,8 +894,7 @@ component_edit {
   flex-wrap: wrap;
 }
 component_edit div {
-  margin-right: 10px;
-  margin-bottom: 10px;
+  margin: 20px 5px;
   height: 23px;
 }
 component_edit div label {
@@ -877,6 +905,11 @@ component_edit div label {
   border-radius: 15px 0 0 15px;
   padding-left: 10px;
   box-sizing: border-box;
+}
+component_edit textarea {
+  position: relative;
+  top: 20px;
+  z-index: 2;
 }
 component_edit input[type="text"] {
   width: 50px;

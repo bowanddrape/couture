@@ -163,6 +163,12 @@ class ProductList extends React.Component {
         {this.props.edit ?
           null : <div className="add_to_cart" style={{textAlign:"center"}}><BADButton className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart ${product.props.price}</BADButton></div>
         }
+        {product.props.details ?
+          <div className="product_details" dangerouslySetInnerHTML={{
+            __html:unescape(product.props.details)
+          }} /> :
+          null
+        }
         <ClickForMore href={`/pdp/${product.sku.split('_').slice(0, 2).join('_')}?layout=basic`} />
       </customize>
     );

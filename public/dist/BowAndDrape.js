@@ -95064,7 +95064,7 @@ var ClickForMore = function (_React$Component) {
         ),
         this.state.content ? React.createElement("div", { dangerouslySetInnerHTML: { __html: this.state.content } }) : React.createElement(
           "div",
-          { className: "cta", style: { textAlign: "center", width: "55px", margin: "10px auto" }, onClick: this.handleLoad },
+          { className: "cta", style: { textAlign: "center", width: "60px", margin: "10px auto" }, onClick: this.handleLoad },
           "SEE MORE"
         )
       );
@@ -95519,7 +95519,7 @@ var ComponentEdit = function (_React$Component) {
 
       var fields = [];
 
-      [{ name: "sku", type: "readonly" }, { name: "props_name", type: "text" }, { name: "props_price", type: "text" }, { name: "props_imagewidth", type: "text" }, { name: "props_imageheight", type: "text" }, { name: "props_image", type: "file" }].forEach(function (spec) {
+      [{ name: "sku", type: "readonly" }, { name: "props_name", type: "text" }, { name: "props_price", type: "text" }, { name: "props_imagewidth", type: "text" }, { name: "props_imageheight", type: "text" }, { name: "props_details", type: "textarea" }, { name: "props_image", type: "file" }].forEach(function (spec) {
         // use underscores to navigate child fields
         var name_toks = spec.name.split('_');
         var value = _this2.state[name_toks[0]] || "";
@@ -95529,6 +95529,7 @@ var ComponentEdit = function (_React$Component) {
           if (placeholder) placeholder = placeholder[name_toks[i]] || "";
         }
 
+        // FIXME make this ugly shit a switch
         if (spec.type == "readonly") return fields.push(React.createElement(
           'div',
           { key: fields.length },
@@ -95548,6 +95549,16 @@ var ComponentEdit = function (_React$Component) {
             spec.name
           ),
           React.createElement('input', { type: 'text', onChange: _this2.handleFieldChange.bind(_this2), value: value, placeholder: placeholder, name: spec.name })
+        ));
+        if (spec.type == "textarea") return fields.push(React.createElement(
+          'div',
+          { key: fields.length },
+          React.createElement(
+            'label',
+            null,
+            spec.name
+          ),
+          React.createElement('textarea', { onChange: _this2.handleFieldChange.bind(_this2), name: spec.name, placeholder: placeholder, value: value })
         ));
         if (spec.type == "file") {
           return fields.push(React.createElement(
@@ -97831,7 +97842,10 @@ var LayoutMain = function (_React$Component) {
         content = [];
         var props_contents = this.props.content;
         var static_server_render = false;
-        if (typeof props_contents == 'string') props_contents = JSON.parse(props_contents);
+        if (typeof props_contents == 'string') {
+          props_contents = props_contents.replace(/\n/g, "\\n");
+          props_contents = JSON.parse(props_contents);
+        }
         for (var i = 0; i < props_contents.length; i++) {
           // if we didn't get a client-side component, use the server-side render
           if (!BowAndDrape.views[props_contents[i].name]) {
@@ -97856,7 +97870,7 @@ var LayoutMain = function (_React$Component) {
         React.createElement(LayoutFooter, { user: this.state.user }),
         React.createElement('script', { src: '/BowAndDrape.js' }),
         React.createElement('script', { src: '/masonry.pkgd.min.js' }),
-        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = `' + JSON.stringify(this.props.content) + '`;\n          if (content != "undefined") {\n            content = content.replace(/\\n/g, "");\n            var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n              content_string: `' + escape(this.props.content_string) + '`,\n              content,\n            });\n            ReactDOM.render(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
+        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n              content_string: `' + escape(this.props.content_string) + '`,\n              content,\n            });\n            ReactDOM.render(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
       );
     }
   }]);
@@ -99538,6 +99552,9 @@ var ProductList = function (_React$Component) {
             product.props.price
           )
         ),
+        product.props.details ? React.createElement('div', { className: 'product_details', dangerouslySetInnerHTML: {
+            __html: unescape(product.props.details)
+          } }) : null,
         React.createElement(ClickForMore, { href: '/pdp/' + product.sku.split('_').slice(0, 2).join('_') + '?layout=basic' })
       );
     }

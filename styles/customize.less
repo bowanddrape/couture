@@ -136,6 +136,36 @@ customize {
       display: none;
     }
   }
+  .product_details {
+    display: flex;
+    flex-wrap: wrap;
+    .description {
+      margin: 20px auto;
+      font-family: sans-serif;
+      letter-spacing: 2px;
+      line-height: 23px;
+      text-align: center;
+      max-width: 600px;
+    }
+    .size_chart {
+      margin: 20px auto;
+      display: table;
+      row {
+        &:first-child {
+          background-color: @color_support_0;
+        }
+        display: table-row;
+        span {
+          &:first-child {
+            background-color: @color_support_0;
+          }
+          display: table-cell;
+          padding: 5px;
+          border: solid 1px @color_primary;
+        }
+      }
+    }
+  }
 }
 
 @media (min-width: @desktop_min_width) { customize {

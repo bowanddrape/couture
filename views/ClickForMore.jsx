@@ -84,7 +84,7 @@ class ClickForMore extends React.Component {
         <div className="blurb">{this.props.blurb}</div>
         { this.state.content ?
           <div dangerouslySetInnerHTML={{__html:this.state.content}} /> :
-          <div className="cta" style={{textAlign:"center",width:"55px",margin:"10px auto"}} onClick={this.handleLoad}>SEE MORE</div>
+          <div className="cta" style={{textAlign:"center",width:"60px",margin:"10px auto"}} onClick={this.handleLoad}>SEE MORE</div>
         }
       </clickformore>
     );
