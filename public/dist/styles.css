@@ -69,10 +69,6 @@ a.button {
 }
 button,
 .button {
-  font-family: Arvo;
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: 2px;
   text-align: center;
   white-space: nowrap;
   height: 56px;
@@ -162,6 +158,7 @@ button.primary.busyState:after,
   letter-spacing: 2px;
   padding: 6px 0px;
   text-decoration: none;
+  cursor: pointer;
   border: none;
   border-bottom: solid 1px #000;
 }
@@ -545,7 +542,7 @@ customize .component_container div {
   cursor: pointer;
 }
 customize .component_container div.backspace {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -557,7 +554,7 @@ customize .component_container div.backspace {
   border: none;
 }
 customize .component_container div.enter {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -589,7 +586,7 @@ customize .component_virtual_keyboard_container div {
   cursor: pointer;
 }
 customize .component_virtual_keyboard_container div.backspace {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -601,7 +598,7 @@ customize .component_virtual_keyboard_container div.backspace {
   border: none;
 }
 customize .component_virtual_keyboard_container div.enter {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -624,7 +621,7 @@ customize .component_virtual_keyboard_container row div {
   flex: 0 1 auto;
 }
 customize .component_virtual_keyboard_container div.spacebar {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -214px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -1052,6 +1049,7 @@ product_options switch.expanded {
   letter-spacing: 2px;
   padding: 6px 0px;
   text-decoration: none;
+  cursor: pointer;
   border: none;
   border-bottom: solid 1px #000;
   height: auto;
@@ -1201,7 +1199,7 @@ product_options switch.expanded {
   }
 }
 .icon {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
 }
 .purchase_complete > div {
   width: 600px;

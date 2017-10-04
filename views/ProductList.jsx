@@ -9,6 +9,7 @@ const ComponentEdit = require('./ComponentEdit.jsx');
 const Switch = require('./Switch.jsx');
 const ComponentSerializer = require('./ComponentSerializer.js');
 const BADButton = require('./BADButton.jsx');
+const ClickForMore = require('./ClickForMore.jsx');
 
 /***
 Draws List of products available in a store.
@@ -160,8 +161,9 @@ class ProductList extends React.Component {
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
         </div>
         {this.props.edit ?
-          null : <div className="add_to_cart" style={{textAlign:"center"}}><BADButton className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</BADButton></div>
+          null : <div className="add_to_cart" style={{textAlign:"center"}}><BADButton className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart ${product.props.price}</BADButton></div>
         }
+        <ClickForMore href={`/pdp/${product.sku.split('_').slice(0, 2).join('_')}?layout=basic`} />
       </customize>
     );
   }
@@ -388,7 +390,7 @@ class ProductList extends React.Component {
         url += '?' + querystring.stringify(query_params);
         history.replaceState(history.state, "", url);
       });
-    }, 100);
+    }, 500);
   }
 
 }

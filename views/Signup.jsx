@@ -4,6 +4,10 @@ const Switch = require('./Switch.jsx');
 
 /***
 Display a signup
+props:
+  unique_keys: array // array of strings
+  hidden_keys: object // key-value pairs to preset specific unique key values
+  misc_keys: array // array of strings for prompts that can be entered multiple times
 ***/
 class Signup extends React.Component {
 
