@@ -1,0 +1,100 @@
+
+@import "./boilerplate.less";
+
+.footer {
+  .footer-inner {
+    border-top: 5px solid transparent;
+    border-image: @gradient-rainbow;
+    border-image-slice: 1;
+    padding: 50px 0;
+  }
+
+  .footer-menu {
+    text-align: center;
+    padding:0;
+    a {
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: block;
+      font-family: "Zurich-Condensed-Bold", sans-serif;
+      font-weight: normal;
+      vertical-align: middle;
+      transition: color .5s ease;
+
+      &:hover{
+        text-decoration: none;
+        color: @color_highlight;
+      }
+    }
+
+    .social {
+      width: 25px;
+      height: 25px;
+      margin-right: 20px;
+      display: inline-block;
+      background-size: contain;
+      background-repeat: no-repeat;
+      &:last-of-type {
+        margin-right: 60px;
+      }
+      &:first-of-type {
+        margin-left: 60px;
+      }
+    }
+
+    .facebook {
+      background-image: url(/facebook.png);
+      margin-right: 60px;
+    }
+
+    .instagram {
+      background-image: url(/instagram.png);
+    }
+
+    .twitter {
+      background-image: url(/twitter.png);
+    }
+
+  }
+
+  .newsletter-pencil {
+    width: 45px;
+    margin:0 auto;
+    display: block;
+  }
+
+   signup {
+     div:last-of-type {
+     display: inline-block;
+     margin-right: 15px;
+       input {
+         border:none;
+         border-bottom: 3px solid @color_secondary;
+         text-transform: lowercase;
+       }
+   }
+     button {
+       display: inline-block;
+     }
+   }
+}
+
+@media (min-width: @desktop_min_width) {
+  .footer {
+      .footer-menu {
+        a {
+          margin-right: 60px;
+          display: inline-block;
+          margin-bottom: 0;
+        }
+        .social {
+          &:last-of-type {
+            margin-right: 60px;
+          }
+          &:first-of-type {
+            margin-left: 0;
+          }
+        }
+      }
+  }
+}
