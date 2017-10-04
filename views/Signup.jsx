@@ -111,7 +111,7 @@ class Signup extends React.Component {
           {unique_keys}
           {selectors}
           {misc_keys}
-          <button className="primary" onClick={this.handleSubmit.bind(this)}>ENTER NOW</button>
+          <button className="primary" onClick={this.handleSubmit.bind(this)}>{this.props.BtnText}</button>
         </signup>
       </div>
     );
