@@ -9,8 +9,9 @@
   .deets {
     .remove {
       clear: both;
-      background-color: #eaeaea;
-      padding: 5px 10px;
+      background-color: none;
+      padding: 0;
+      text-transform: capitalize;
       cursor: pointer;
       width: auto;
       font-weight: normal;
@@ -19,8 +20,13 @@
       &:hover {
         color: @color_secondary;
       }
-      &.confirm {
-        background-color: @color_support_2;
+
+      &:before {
+        display: none;
+      }
+
+      &:after {
+        display: none;
       }
     }
   }

@@ -19,8 +19,7 @@ class Item extends React.Component {
         <div className="item">{JSON.stringify(this.props)}</div>
       );
     }
-
-    let className = "item";
+    let className = "item-product";
     if (new RegExp("^promo:", "i").test(this.props.props.name) && this.props.onRemove)
       className += " promo";
     let inline_style = this.props.style?this.props.style:style;

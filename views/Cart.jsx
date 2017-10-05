@@ -115,7 +115,7 @@ class Cart extends React.Component {
     items = items || [];
 
     if (this.refs.Items)
-      this.refs.Items.updateContents(items);
+          this.refs.Items.updateContents(items);
 
     if (!items.length)
       Errors.emitError(null, "Cart is empty");
