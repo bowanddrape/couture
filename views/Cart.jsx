@@ -9,8 +9,8 @@ const UserLogin = require('./UserLogin.jsx');
 const Errors = require('./Errors.jsx');
 const BADButton = require('./BADButton.jsx');
 
-//const payment_method_client = require('./PayStripeClient.js');
-const payment_method_client = require('./PayBraintreeClient.js');
+const payment_method_client = require('./PayStripeClient.js');
+//const payment_method_client = require('./PayBraintreeClient.js');
 
 /***
 Draws the cart page.
@@ -318,14 +318,13 @@ class Cart extends React.Component {
           Get it!
         </BADButton>
 
-{/* Needed by stripe, not needed by braintree
+{/* Needed by stripe, not needed by braintree */}
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
         <script dangerouslySetInnerHTML={{__html:`
           if ("${process.env.STRIPE_KEY}"!="undefined")
             Stripe.setPublishableKey("${process.env.STRIPE_KEY}");
         `}} >
         </script>
-*/}
       </div>
     );
   }
