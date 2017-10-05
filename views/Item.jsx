@@ -5,73 +5,8 @@ const Price = require('./Price.jsx');
 
 /* I moved the styles to inline for email compatibility, but currently the item
 design is still relying on unsupported styles and thus doesn't work */
-const color_secondary = "#000";
-const item_preview_width = "150px";
-const item_width = "700px";
-const item_padding = "13px";
-const item_margin = "5px";
-const style = {
-  item: {
-    display: "flex",
-    position: "relative",
-    maxWidth: item_width,
-    margin: "0px auto 0px auto",
-    padding: item_padding+" 0",
-    borderBottom: "solid 1px "+color_secondary,
-  },
-  img_preview_container: {
-    display: "block",
-    width: item_preview_width,
-  },
-  img_preview: {
-    backgroundSize: "contain",
-    backgroundRepeat: "no-repeat",
-    width: item_preview_width,
-  },
-  deets: {
-    display: "block",
-    fontSize: "18px",
-    lineHeight: "16px",
-    position: "absolute",
-    top: "0",
-    bottom: "0",
-    right: "0",
-    left: parseInt(item_preview_width)+parseInt(item_margin)+"px",
-    margin: item_margin+" 0",
-    fontFamily: "sans-serif",
-    fontSize: "18px",
-  },
-  price: {
-    position: "absolute",
-    bottom: "0px",
-    fontFamily: "arvo",
-    fontSize: "14px",
-  },
-  price_total: {
-    position: "absolute",
-    bottom: "0px",
-    right: "0px",
-    fontFamily: "arvo",
-    fontSize: "14px",
-  },
-};
-const style_summary = {
-  item: Object.assign({}, style.item, {
-    borderBottom: "none",
-  }),
-  img_preview_container: {
-    position: "absolute",
-    left: "0px",
-    top: "0px",
-    bottom: "-2px",
-    width: item_preview_width,
-    backgroundColor: "#fff",
-  },
-  deets: Object.assign({}, style.deets, {
-    fontFamily: "arvo",
-    fontSize: "14px",
-  }),
-}
+const style = {};
+const style_summary = {}
 /***
 Draw an Item. Used in views/Items.jsx
 props: will mirror a Component model
@@ -147,18 +82,18 @@ class Item extends React.Component {
     }
 
     return (
-      <div style={inline_style.item} className={className}>
-        <a href={this.props.props.url} style={inline_style.img_preview_container}>
-          <img style={style.img_preview} className="preview" src={this.props.props.image?this.props.props.image:""} onError={(event)=>{event.target.style.display='none'}}/>
-          <img style={style.img_preview} className="preview" src={this.props.props.image?this.props.props.image+"&camera=1":""} onError={(event)=>{event.target.style.display='none'}}/>
+      <div className={className}>
+        <a href={this.props.props.url}>
+          <img className="preview" src={this.props.props.image?this.props.props.image:""} onError={(event)=>{event.target.style.display='none'}}/>
+          <img className="preview" src={this.props.props.image?this.props.props.image+"&camera=1":""} onError={(event)=>{event.target.style.display='none'}}/>
           {/*for legacy haute orders, draw the back*/}
           {
             /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ?
-              <img style={style.img_preview} className="preview" src={this.props.props.image?this.props.props.image.replace("_front","_back").replace("_f.jpg","_b.jpg"):undefined} onError={(event)=>{event.target.style.display='none'}}/>
+              <img className="preview" src={this.props.props.image?this.props.props.image.replace("_front","_back").replace("_f.jpg","_b.jpg"):undefined} onError={(event)=>{event.target.style.display='none'}}/>
               : null
           }
         </a>
-        <div className="deets" style={inline_style.deets}>
+        <div className="deets" >
           <a href={this.props.props.url}>
             <div className="name">{this.props.props.name}</div>
           </a>
@@ -167,10 +102,10 @@ class Item extends React.Component {
 
           {assembly}
           {this.props.sku ?
-            <Price style={inline_style.price} price={this.props.props.price} quantity={quantity} />
+            <Price price={this.props.props.price} quantity={quantity} />
             : null
           }
-          <Price style={inline_style.price_total} price={this.props.props.price*quantity} />
+          <Price  price={this.props.props.price*quantity} />
         </div>
       </div>
     )

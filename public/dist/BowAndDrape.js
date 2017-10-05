@@ -83862,7 +83862,7 @@ var Cart = function (_React$Component) {
             null,
             'Login'
           ),
-          React.createElement(UserLogin, { style: { width: "230px", display: "block" }, cta: '...or proceed as Guest' })
+          React.createElement(UserLogin, { cta: '...or proceed as Guest' })
         ),
         React.createElement(InputAddress, _extends({ section_title: 'Shipping Address', errors: React.createElement(Errors, { label: 'shipping' }), handleFieldChange: this.handleFieldChange.bind(this, "shipping"), handleSetSectionState: this.handleSetSectionState.bind(this, "shipping") }, this.state.shipping)),
         payment_info,
@@ -85846,84 +85846,19 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var React = require('react');
 var ItemUtils = require('./ItemUtils.js');
 var Price = require('./Price.jsx');
 
 /* I moved the styles to inline for email compatibility, but currently the item
 design is still relying on unsupported styles and thus doesn't work */
-var color_secondary = "#000";
-var item_preview_width = "150px";
-var item_width = "700px";
-var item_padding = "13px";
-var item_margin = "5px";
-var style = {
-  item: {
-    display: "flex",
-    position: "relative",
-    maxWidth: item_width,
-    margin: "0px auto 0px auto",
-    padding: item_padding + " 0",
-    borderBottom: "solid 1px " + color_secondary
-  },
-  img_preview_container: {
-    display: "block",
-    width: item_preview_width
-  },
-  img_preview: {
-    backgroundSize: "contain",
-    backgroundRepeat: "no-repeat",
-    width: item_preview_width
-  },
-  deets: _defineProperty({
-    display: "block",
-    fontSize: "18px",
-    lineHeight: "16px",
-    position: "absolute",
-    top: "0",
-    bottom: "0",
-    right: "0",
-    left: parseInt(item_preview_width) + parseInt(item_margin) + "px",
-    margin: item_margin + " 0",
-    fontFamily: "sans-serif"
-  }, 'fontSize', "18px"),
-  price: {
-    position: "absolute",
-    bottom: "0px",
-    fontFamily: "arvo",
-    fontSize: "14px"
-  },
-  price_total: {
-    position: "absolute",
-    bottom: "0px",
-    right: "0px",
-    fontFamily: "arvo",
-    fontSize: "14px"
-  }
-};
-var style_summary = {
-  item: Object.assign({}, style.item, {
-    borderBottom: "none"
-  }),
-  img_preview_container: {
-    position: "absolute",
-    left: "0px",
-    top: "0px",
-    bottom: "-2px",
-    width: item_preview_width,
-    backgroundColor: "#fff"
-  },
-  deets: Object.assign({}, style.deets, {
-    fontFamily: "arvo",
-    fontSize: "14px"
-  })
-  /***
-  Draw an Item. Used in views/Items.jsx
-  props: will mirror a Component model
-  ***/
-};
+var style = {};
+var style_summary = {};
+/***
+Draw an Item. Used in views/Items.jsx
+props: will mirror a Component model
+***/
+
 var Item = function (_React$Component) {
   _inherits(Item, _React$Component);
 
@@ -86010,23 +85945,23 @@ var Item = function (_React$Component) {
 
       return React.createElement(
         'div',
-        { style: inline_style.item, className: className },
+        { className: className },
         React.createElement(
           'a',
-          { href: this.props.props.url, style: inline_style.img_preview_container },
-          React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image : "", onError: function onError(event) {
+          { href: this.props.props.url },
+          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image : "", onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
-          React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image + "&camera=1" : "", onError: function onError(event) {
+          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image + "&camera=1" : "", onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
-          /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
+          /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
               event.target.style.display = 'none';
             } }) : null
         ),
         React.createElement(
           'div',
-          { className: 'deets', style: inline_style.deets },
+          { className: 'deets' },
           React.createElement(
             'a',
             { href: this.props.props.url },
@@ -86043,8 +85978,8 @@ var Item = function (_React$Component) {
             'Remove'
           ) : null,
           assembly,
-          this.props.sku ? React.createElement(Price, { style: inline_style.price, price: this.props.props.price, quantity: quantity }) : null,
-          React.createElement(Price, { style: inline_style.price_total, price: this.props.props.price * quantity })
+          this.props.sku ? React.createElement(Price, { price: this.props.props.price, quantity: quantity }) : null,
+          React.createElement(Price, { price: this.props.props.price * quantity })
         )
       );
     }

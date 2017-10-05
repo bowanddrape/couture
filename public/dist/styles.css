@@ -779,6 +779,22 @@ customize .product_details .size_chart row span:first-child {
     /* cancel out the dumb in the mobile styles */
   }
 }
+cart {
+  border: 5px solid black;
+  padding: 10px;
+  display: inline-block;
+  float: left;
+}
+.summary_items {
+  display: inline-block;
+  border: 5px solid red;
+  float: left;
+}
+.remove {
+  text-decoration: underline;
+  border: none;
+  font-family: "Open Sans", Arial, sans-serif;
+}
 .checkout_section {
   max-width: 460px;
   display: block;

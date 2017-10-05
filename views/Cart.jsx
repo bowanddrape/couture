@@ -306,7 +306,7 @@ class Cart extends React.Component {
         { this.state.user.email ? null :
           <div className="checkout_section">
             <section>Login</section>
-            <UserLogin style={{width:"230px",display:"block"}} cta="...or proceed as Guest" />
+            <UserLogin cta="...or proceed as Guest" />
           </div>
         }
 
