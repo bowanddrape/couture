@@ -345,6 +345,28 @@ button:focus, input[type="button"]:focus {
   border-radius: 5px;
 }
 
+// Desktop carousel
+.carousel_container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+// Mobile carousel
+@media (min-width: @desktop_min_width) {
+  .carousel_container {
+    width: 100%;
+    & > .slide {
+      margin: 18px 20px;
+    }
+    & > div {
+      margin: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 1204px;
+    }
+  }
+}
 
 // Gradient Border Around Elements
 @media (min-width: @desktop_min_width) {
@@ -360,5 +382,5 @@ button:focus, input[type="button"]:focus {
   border: 5px solid transparent;
   border-image: @gradient-rainbow;
   border-image-slice: 1;
-}
+  }
 }

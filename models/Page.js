@@ -28,6 +28,7 @@ const whitelisted_components = [
   "Signup",
   "TextContent",
   "WarningNotice",
+  "Carousel",
 ]
 
 /*
