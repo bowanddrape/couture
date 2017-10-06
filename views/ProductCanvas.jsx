@@ -40,6 +40,7 @@ class ProductCanvas extends React.Component {
     this.forceUpdate();
     BowAndDrape.dispatcher.on("resize", () => {
       this.customizer.resizeViewport();
+      this.setState({bodyWidth: document.body.offsetWidth});
     });
   }
 
@@ -381,7 +382,7 @@ class ProductCanvas extends React.Component {
           </button>
         );
       });
-      hud_controls.push(<button onClick={this.autoLayout.bind(this, true)}>AUTO</button>);
+      hud_controls.push(<button key={hud_controls.length} onClick={this.autoLayout.bind(this, true)}>AUTO</button>);
     }
 
     return (

@@ -5,8 +5,7 @@ component_edit {
   display: flex;
   flex-wrap: wrap;
   div {
-    margin-right: 10px;
-    margin-bottom: 10px;
+    margin: 20px 5px;
     height: 23px;
     label {
       background-color: #eaeaea;
@@ -17,6 +16,11 @@ component_edit {
       padding-left: 10px;
       box-sizing: border-box;
     }
+  }
+  textarea {
+    position: relative;
+    top: 20px;
+    z-index: 2;
   }
   input[type="text"] {
     width: 50px;

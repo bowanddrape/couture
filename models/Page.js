@@ -100,7 +100,7 @@ class Page extends JSONAPI {
   render(req, res){
     let render_elements = [];
     this.elements.forEach((element) => {
-      if (!element) return;
+      if (!element || !element.type) return;
       render_elements.push(function(callback) {
 
         // there are 2 ways of specifying prop data, immediate or from db
@@ -165,9 +165,9 @@ class Page extends JSONAPI {
 
     }); //go through all elements on page
     return async.parallel(render_elements, function(err, data) {
-      if(err) return res.status(500).end(err.toString());
+      if(err) return res.status(500).end(JSON.stringify(err));
       let head = Page.getHTMLHead(req, res, data[0].props);
-      let body = Page.renderString(data, req.query.embed?LayoutBasic:LayoutMain);
+      let body = Page.renderString(data, Page.getLayout(req));
       return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
     });
   }
@@ -257,12 +257,12 @@ class Page extends JSONAPI {
     `;
   }
 
-  // respond to a req by rendering page contents
-  static render(req, res, component, props, layout=LayoutMain) {
-    // if json was requested, just return the props object
-    if (!req.accepts('*/*') && req.accepts('application/json'))
-      return res.json(props).end();
+  static getLayout(req) {
+    let layout = LayoutMain;
+
     // allow query to override layout
+    if (req.query.embed)
+      layout = "basic";
     if (req.query.layout)
       layout = req.query.layout;
 
@@ -283,8 +283,16 @@ class Page extends JSONAPI {
         layout = LayoutMain;
         break;
     }
+    return layout;
+  }
+
+  // respond to a req by rendering page contents
+  static render(req, res, component, props) {
+    // if json was requested, just return the props object
+    if (!req.accepts('*/*') && req.accepts('application/json'))
+      return res.json(props).end();
     let head = Page.getHTMLHead(req, res, props);
-    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], layout);
+    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], Page.getLayout(req));
     return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
   }
 

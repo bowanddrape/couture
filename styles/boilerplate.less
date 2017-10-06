@@ -9,9 +9,19 @@
   50%   { opacity: 0.2;}
 }
 
+
+html {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
 body {
   .bodyfont;
   font-size: 14px;
+}
+
+.layout {
+  overflow-x: hidden;
 }
 
 a {
@@ -25,10 +35,6 @@ a.button {
   padding: 16px 0 0 0;
 }
 button, .button {
-  font-family: Arvo;
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: 2px;
   text-align: center;
   white-space: nowrap;
 
@@ -81,32 +87,32 @@ button, .button {
     transition: top .2s ease, left .2s linear;
   }
   &:hover:after {
-    top: -7px;
-    left: -7px;
+    top: 0px;
+    left: 10px;
   }
   &:hover:before {
-    top: -3px;
-    left: 7px;
+    top: -10px;
+    left: 16px;
   }
   &.primary {
     margin: 12px auto;
   }
-  &.primary:after {
-    top: 0px;
-    left: 10px;
-  }
-  &.primary:before {
-    top: -10px;
-    left: 15px;
-  }
-  &.primary:hover:after {
-    top: -10px;
-    left: -10px;
-  }
-  &.primary:hover:before {
-    top: 0px;
-    left: 10px;
-  }
+  // &.primary:after {
+  //   top: 0px;
+  //   left: 10px;
+  // }
+  // &.primary:before {
+  //   top: -10px;
+  //   left: 15px;
+  // }
+  // &.primary:hover:after {
+  //   top: -10px;
+  //   left: -10px;
+  // }
+  // &.primary:hover:before {
+  //   top: 0px;
+  //   left: 10px;
+  // }
   /* CSS for button busy states */
   &.primary.busyState {
     background-color: @color_support_0;
@@ -128,6 +134,7 @@ button, .button {
   letter-spacing: 2px;
   padding: 6px 0px;
   text-decoration: none;
+  cursor: pointer;
   border: none;
   border-bottom: solid 1px @color_secondary;
 }
@@ -176,11 +183,12 @@ input.error {
 }
 input[type="text"], input[type="password"] {
   background-color: @color_primary;
-  border: none;
-  border-bottom: solid 5px @color_secondary;
-  width: 230px;
+  border: 1px solid @color_secondary;
+  min-width: 230px;
+  width: auto;
+  min-height: 53px;
   margin: 10px auto;
-  padding: 5px 0;
+  padding: 5px 22px;
   outline: none;
 }
 
@@ -192,39 +200,53 @@ input[type="text"], input[type="password"] {
   align-items: center;
 }
 
-@card_width: 200px;
+@card_width: 205px;
 @card_height: 200px;
 .card {
   position: relative;
   height: @card_height;
   width: @card_width;
-  margin: 35px;
+  margin: 35px 15px;
   border-radius: 4px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   label, .label {
+    .headerfont;
+    font-size: 18px;
+    display: block;
     position: absolute;
-    opacity: 0.5;
-    cursor: inherit;
     text-align: center;
-    height: @card_height;
-    width: @card_width;
-    border: solid 3px #000;
-    transform: rotate(-30deg);
-    left: -30px;
-    z-index: -1;
+    width: 100%;
+    bottom: -22px;
   }
   price, .price {
     position: absolute;
     right: 0px;
-    bottom: 0px;
-    display: inline-block;
-    padding: 7px;
-    width: auto;
-    border: 1px solid @color_secondary;
-    background-color: @color_primary;
-    font-size: 12px;
+    top: 0px;
+    background-image: url(/heart.svg);
+    padding: 10px 13px 15px 13px;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: @color_primary;
+  }
+  swatches {
+    position: absolute;
+    bottom: 2px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    & > div {
+      overflow: hidden;
+      width: 15px;
+      height: 20px;
+      margin: 0px 2px;
+      border: solid 1px @color_secondary;
+      img {
+        margin-left: -9px;
+        margin-top: -6px;
+      }
+    }
   }
   .autocomplete {
     position: relative;
@@ -339,4 +361,21 @@ button:focus, input[type="button"]:focus {
 .carousel_container {
   width: 100%;
   overflow-x: scroll;
+}
+
+// Gradient Border Around Elements
+@media (min-width: @desktop_min_width) {
+.border-wrap {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width:  ~"calc(100vw - 10px)";
+  height: ~"calc(100vh - 10px)";
+  z-index: 99;
+  background: transparent;
+  pointer-events: none;
+  border: 5px solid transparent;
+  border-image: @gradient-rainbow;
+  border-image-slice: 1;
+  }
 }

@@ -75,3 +75,14 @@ comments {
   width: 180px;
 }
 
+@media print {
+  shipments {
+    border: none;
+  }
+  .action_bar {
+    display: none;
+  }
+  shipment {
+    page-break-after: always;
+  }
+}

@@ -2,7 +2,10 @@
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 
+const LayoutBorderWrap = require('./LayoutBorderWrap.jsx');
 const LayoutHeader = require('./LayoutHeader.jsx');
+const LayoutFooter = require('./LayoutFooter.jsx');
+
 
 /***
 The most common of layout. Renders a react component
@@ -34,7 +37,9 @@ class LayoutMain extends React.Component {
     window.addEventListener("resize", () => {BowAndDrape.dispatcher.emit("resize");});
 
     BowAndDrape.dispatcher.emit("loaded");
-    BowAndDrape.dispatcher.emit("resize");
+    window.addEventListener("load", () => {
+      BowAndDrape.dispatcher.emit("resize");
+    });
   }
 
   render() {
@@ -46,8 +51,10 @@ class LayoutMain extends React.Component {
       content = [];
       let props_contents = this.props.content;
       let static_server_render = false;
-      if (typeof(props_contents)=='string')
+      if (typeof(props_contents)=='string') {
+        props_contents = props_contents.replace(/\n/g, "\\n");
         props_contents = JSON.parse(props_contents);
+      }
       for (let i=0; i<props_contents.length; i++) {
         // if we didn't get a client-side component, use the server-side render
         if (!BowAndDrape.views[props_contents[i].name]) {
@@ -66,13 +73,13 @@ class LayoutMain extends React.Component {
     let zoom = 1;
     if (typeof(document)!="undefined")
       zoom = document.body.clientWidth / window.innerWidth;
-
     return (
       <div className="layout">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
+        <LayoutBorderWrap />
         <LayoutHeader user={this.state.user}/>
         {content}
+        <LayoutFooter user={this.state.user}/>
 
         <script src="/BowAndDrape.js"></script>
         <script src="/masonry.pkgd.min.js"></script>
@@ -82,9 +89,8 @@ class LayoutMain extends React.Component {
           var BowAndDrape = require("BowAndDrape");
           var React = BowAndDrape.React;
           var ReactDOM = BowAndDrape.ReactDOM;
-          var content = \`${JSON.stringify(this.props.content)}\`;
+          var content = ${JSON.stringify(this.props.content)};
           if (content != "undefined") {
-            content = content.replace(/\\n/g, "");
             var layout = React.createElement(BowAndDrape.views.LayoutMain, {
               content_string: \`${escape(this.props.content_string)}\`,
               content,

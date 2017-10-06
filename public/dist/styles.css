@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,600,800');
 @font-face {
   font-family: Zurich-Condensed-Bold;
   src: url(/Zurich__Condensed_BT.ttf) format('truetype');
@@ -12,6 +13,26 @@
   font-family: "Zurich-Condensed-Bold", sans-serif;
   color: #000;
   font-weight: normal;
+  letter-spacing: 0px;
+}
+h1,
+h2,
+h3 {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+h4 {
+  font-family: "Open Sans", Arial, sans-serif;
+  font-weight: 800;
+  line-height: 1.43;
+  letter-spacing: 1.3px;
+  color: #000;
+  text-transform: uppercase;
+}
+.center {
+  text-align: center;
 }
 @keyframes busyState {
   0% {
@@ -21,12 +42,20 @@
     opacity: 0.2;
   }
 }
+html {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
 body {
   font-family: "Open Sans", Arial, sans-serif;
   line-height: 1.43;
   letter-spacing: 1.3px;
   color: #000;
   font-size: 14px;
+}
+.layout {
+  overflow-x: hidden;
 }
 a {
   text-decoration: none;
@@ -40,10 +69,6 @@ a.button {
 }
 button,
 .button {
-  font-family: Arvo;
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: 2px;
   text-align: center;
   white-space: nowrap;
   height: 56px;
@@ -100,37 +125,17 @@ button:before,
 }
 button:hover:after,
 .button:hover:after {
-  top: -7px;
-  left: -7px;
+  top: 0px;
+  left: 10px;
 }
 button:hover:before,
 .button:hover:before {
-  top: -3px;
-  left: 7px;
+  top: -10px;
+  left: 16px;
 }
 button.primary,
 .button.primary {
   margin: 12px auto;
-}
-button.primary:after,
-.button.primary:after {
-  top: 0px;
-  left: 10px;
-}
-button.primary:before,
-.button.primary:before {
-  top: -10px;
-  left: 15px;
-}
-button.primary:hover:after,
-.button.primary:hover:after {
-  top: -10px;
-  left: -10px;
-}
-button.primary:hover:before,
-.button.primary:hover:before {
-  top: 0px;
-  left: 10px;
 }
 button.primary.busyState,
 .button.primary.busyState {
@@ -153,6 +158,7 @@ button.primary.busyState:after,
   letter-spacing: 2px;
   padding: 6px 0px;
   text-decoration: none;
+  cursor: pointer;
   border: none;
   border-bottom: solid 1px #000;
 }
@@ -198,11 +204,12 @@ input.error {
 input[type="text"],
 input[type="password"] {
   background-color: #fff;
-  border: none;
-  border-bottom: solid 5px #000;
-  width: 230px;
+  border: 1px solid #000;
+  min-width: 230px;
+  width: auto;
+  min-height: 53px;
   margin: 10px auto;
-  padding: 5px 0;
+  padding: 5px 22px;
   outline: none;
 }
 .deck {
@@ -215,8 +222,8 @@ input[type="password"] {
 .card {
   position: relative;
   height: 200px;
-  width: 200px;
-  margin: 35px;
+  width: 205px;
+  margin: 35px 15px;
   border-radius: 4px;
   background-size: contain;
   background-position: center;
@@ -224,28 +231,45 @@ input[type="password"] {
 }
 .card label,
 .card .label {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
+  font-weight: normal;
+  letter-spacing: 0px;
+  font-size: 18px;
+  display: block;
   position: absolute;
-  opacity: 0.5;
-  cursor: inherit;
   text-align: center;
-  height: 200px;
-  width: 200px;
-  border: solid 3px #000;
-  transform: rotate(-30deg);
-  left: -30px;
-  z-index: -1;
+  width: 100%;
+  bottom: -22px;
 }
 .card price,
 .card .price {
   position: absolute;
   right: 0px;
-  bottom: 0px;
-  display: inline-block;
-  padding: 7px;
-  width: auto;
-  border: 1px solid #000;
-  background-color: #fff;
-  font-size: 12px;
+  top: 0px;
+  background-image: url(/heart.svg);
+  padding: 10px 13px 15px 13px;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: #fff;
+}
+.card swatches {
+  position: absolute;
+  bottom: 2px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.card swatches > div {
+  overflow: hidden;
+  width: 15px;
+  height: 20px;
+  margin: 0px 2px;
+  border: solid 1px #000;
+}
+.card swatches > div img {
+  margin-left: -9px;
+  margin-top: -6px;
 }
 .card .autocomplete {
   position: relative;
@@ -277,6 +301,7 @@ a.card.not_link {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   color: #000;
   font-weight: normal;
+  letter-spacing: 0px;
   z-index: 1;
   background-color: #fff;
   width: 100%;
@@ -287,6 +312,7 @@ h2 {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   color: #000;
   font-weight: normal;
+  letter-spacing: 0px;
 }
 h1 {
   font-size: 24px;
@@ -335,6 +361,29 @@ textarea {
 button:focus,
 input[type="button"]:focus {
   outline: none;
+}
+.warning404 {
+  text-align: center;
+  width: 100%;
+  background-color: #a00;
+  padding: 5px;
+  margin: 3px auto;
+  border-radius: 5px;
+}
+@media (min-width: 1000px) {
+  .border-wrap {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: calc(100vw - 10px);
+    height: calc(100vh - 10px);
+    z-index: 99;
+    background: transparent;
+    pointer-events: none;
+    border: 5px solid transparent;
+    border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+    border-image-slice: 1;
+  }
 }
 shipments {
   display: block;
@@ -403,6 +452,17 @@ comments message {
   color: #000;
   opacity: 0.5;
   width: 180px;
+}
+@media print {
+  shipments {
+    border: none;
+  }
+  .action_bar {
+    display: none;
+  }
+  shipment {
+    page-break-after: always;
+  }
 }
 .item .deets .remove {
   clear: both;
@@ -481,8 +541,8 @@ customize .component_container div {
   cursor: pointer;
 }
 customize .component_container div.backspace {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -155px;
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -493,8 +553,8 @@ customize .component_container div.backspace {
   border: none;
 }
 customize .component_container div.enter {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -203px;
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -525,8 +585,8 @@ customize .component_virtual_keyboard_container div {
   cursor: pointer;
 }
 customize .component_virtual_keyboard_container div.backspace {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -155px;
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -537,8 +597,8 @@ customize .component_virtual_keyboard_container div.backspace {
   border: none;
 }
 customize .component_virtual_keyboard_container div.enter {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -203px;
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -560,8 +620,8 @@ customize .component_virtual_keyboard_container row div {
   flex: 0 1 auto;
 }
 customize .component_virtual_keyboard_container div.spacebar {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
-  background-position: 0px -251px;
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-position: 0px -214px;
   background-repeat: no-repeat;
   overflow: hidden;
   display: block;
@@ -623,6 +683,36 @@ customize hud_controls button:before {
 customize hud_controls button:after {
   display: none;
 }
+customize .product_details {
+  display: flex;
+  flex-wrap: wrap;
+}
+customize .product_details .description {
+  margin: 20px auto;
+  font-family: sans-serif;
+  letter-spacing: 2px;
+  line-height: 23px;
+  text-align: center;
+  max-width: 600px;
+}
+customize .product_details .size_chart {
+  margin: 20px auto;
+  display: table;
+}
+customize .product_details .size_chart row {
+  display: table-row;
+}
+customize .product_details .size_chart row:first-child {
+  background-color: #eaeaea;
+}
+customize .product_details .size_chart row span {
+  display: table-cell;
+  padding: 5px;
+  border: solid 1px #fff;
+}
+customize .product_details .size_chart row span:first-child {
+  background-color: #eaeaea;
+}
 @media (min-width: 1000px) {
   customize product_options {
     left: auto;
@@ -673,8 +763,7 @@ customize hud_controls button:after {
 .checkout_section {
   max-width: 460px;
   display: block;
-  margin: auto;
-  margin-top: 35px;
+  margin: 20px auto;
   position: relative;
   border: solid 3px #c79e6a;
   padding: 5px;
@@ -701,8 +790,7 @@ customize hud_controls button:after {
 input_address {
   max-width: 460px;
   display: block;
-  margin: auto;
-  margin-top: 35px;
+  margin: 20px auto;
   position: relative;
   border: solid 3px #c79e6a;
   padding: 5px;
@@ -739,8 +827,7 @@ input_address [name="postal"] {
 input_credit {
   max-width: 460px;
   display: block;
-  margin: auto;
-  margin-top: 35px;
+  margin: 20px auto;
   position: relative;
   border: solid 3px #c79e6a;
   padding: 5px;
@@ -807,8 +894,7 @@ component_edit {
   flex-wrap: wrap;
 }
 component_edit div {
-  margin-right: 10px;
-  margin-bottom: 10px;
+  margin: 20px 5px;
   height: 23px;
 }
 component_edit div label {
@@ -819,6 +905,11 @@ component_edit div label {
   border-radius: 15px 0 0 15px;
   padding-left: 10px;
   box-sizing: border-box;
+}
+component_edit textarea {
+  position: relative;
+  top: 20px;
+  z-index: 2;
 }
 component_edit input[type="text"] {
   width: 50px;
@@ -926,16 +1017,24 @@ product_options switch.expanded {
   justify-content: flex-begin;
   margin-bottom: 10px;
 }
+.header {
+  border-bottom: 5px solid transparent;
+  border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  border-image-slice: 1;
+}
 .header handle {
-  background-image: url(/pizza.svg);
+  background-image: url(/hamburger_menu.png);
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
-  top: 3px;
-  left: 11px;
+  top: 10px;
+  left: 15px;
   display: block;
-  width: 36px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
+}
+.header handle.expanded {
+  background-image: url(/hamburger_close.png);
 }
 .header img.logo {
   display: block;
@@ -948,8 +1047,8 @@ product_options switch.expanded {
   background-repeat: no-repeat;
   position: absolute;
   overflow: visible;
-  top: 3px;
-  right: 11px;
+  top: 10px;
+  right: 15px;
   width: 36px;
   height: 40px;
 }
@@ -983,6 +1082,7 @@ product_options switch.expanded {
   letter-spacing: 2px;
   padding: 6px 0px;
   text-decoration: none;
+  cursor: pointer;
   border: none;
   border-bottom: solid 1px #000;
   height: auto;
@@ -1004,7 +1104,7 @@ product_options switch.expanded {
 }
 .header menu.expanded {
   max-height: 500px;
-  border-bottom: solid 3px #000000;
+  border-image-slice: 1;
 }
 .header menu user {
   display: block;
@@ -1020,9 +1120,13 @@ product_options switch.expanded {
   margin-top: 25px;
 }
 @media (min-width: 1000px) {
+  .header {
+    border-bottom: none;
+  }
   .header handle {
     left: auto;
     right: 55px;
+    background-image: url(/pizza.svg);
   }
   .header menu {
     max-height: initial;
@@ -1050,8 +1154,85 @@ product_options switch.expanded {
     max-height: 300px;
   }
 }
+.footer .footer-inner {
+  border-top: 5px solid transparent;
+  border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  border-image-slice: 1;
+  padding: 50px 0;
+}
+.footer .footer-menu {
+  text-align: center;
+  padding: 0;
+}
+.footer .footer-menu a {
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  font-weight: normal;
+  vertical-align: middle;
+  transition: color .5s ease;
+}
+.footer .footer-menu a:hover {
+  text-decoration: none;
+  color: #7f5cff;
+}
+.footer .footer-menu .social {
+  width: 25px;
+  height: 25px;
+  margin-right: 20px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.footer .footer-menu .social:last-of-type {
+  margin-right: 60px;
+}
+.footer .footer-menu .social:first-of-type {
+  margin-left: 60px;
+}
+.footer .footer-menu .facebook {
+  background-image: url(/facebook.png);
+  margin-right: 60px;
+}
+.footer .footer-menu .instagram {
+  background-image: url(/instagram.png);
+}
+.footer .footer-menu .twitter {
+  background-image: url(/twitter.png);
+}
+.footer .newsletter-pencil {
+  width: 45px;
+  margin: 0 auto;
+  display: block;
+}
+.footer signup div:last-of-type {
+  display: inline-block;
+  margin-right: 15px;
+}
+.footer signup div:last-of-type input {
+  border: none;
+  border-bottom: 3px solid #000;
+  text-transform: lowercase;
+}
+.footer signup button {
+  display: inline-block;
+}
+@media (min-width: 1000px) {
+  .footer .footer-menu a {
+    margin-right: 60px;
+    display: inline-block;
+    margin-bottom: 0;
+  }
+  .footer .footer-menu .social:last-of-type {
+    margin-right: 60px;
+  }
+  .footer .footer-menu .social:first-of-type {
+    margin-left: 0;
+  }
+}
 .icon {
-  background-image: url('/sprite.PNG?f87bf7282f0a9228c2a8555425da2e7dcf6044c9');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
 }
 .purchase_complete > div {
   width: 600px;
@@ -1066,6 +1247,7 @@ product_options switch.expanded {
   font-family: "Zurich-Condensed-Bold", sans-serif;
   color: #000;
   font-weight: normal;
+  letter-spacing: 0px;
   text-align: center;
 }
 .purchase_complete p {

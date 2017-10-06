@@ -4,6 +4,10 @@ const Switch = require('./Switch.jsx');
 
 /***
 Display a signup
+props:
+  unique_keys: array // array of strings
+  hidden_keys: object // key-value pairs to preset specific unique key values
+  misc_keys: array // array of strings for prompts that can be entered multiple times
 ***/
 class Signup extends React.Component {
 
@@ -111,7 +115,7 @@ class Signup extends React.Component {
           {unique_keys}
           {selectors}
           {misc_keys}
-          <button className="primary" onClick={this.handleSubmit.bind(this)}>ENTER NOW</button>
+          <button className="primary" onClick={this.handleSubmit.bind(this)}>{this.props.BtnText}</button>
         </signup>
       </div>
     );

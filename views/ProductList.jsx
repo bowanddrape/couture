@@ -9,6 +9,7 @@ const ComponentEdit = require('./ComponentEdit.jsx');
 const Switch = require('./Switch.jsx');
 const ComponentSerializer = require('./ComponentSerializer.js');
 const BADButton = require('./BADButton.jsx');
+const ClickForMore = require('./ClickForMore.jsx');
 
 /***
 Draws List of products available in a store.
@@ -114,10 +115,12 @@ class ProductList extends React.Component {
         }
       };
       // memory intensive, but make a map of all components?
-      traverse_item_options(product.compatible_components, (component) => {
-        if (component && component.sku)
-          components[component.sku] = component;
-      });
+      if (product) {
+        traverse_item_options(product.compatible_components, (component) => {
+          if (component && component.sku)
+            components[component.sku] = component;
+        });
+      }
       // fill in things we just have the sku for
       traverse_item_options(initial_assembly, (component) => {
         if (component && component.sku && components[component.sku]) {
@@ -158,8 +161,15 @@ class ProductList extends React.Component {
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
         </div>
         {this.props.edit ?
-          null : <div className="add_to_cart" style={{textAlign:"center"}}><BADButton className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</BADButton></div>
+          null : <div className="add_to_cart" style={{textAlign:"center"}}><BADButton className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart ${product.props.price}</BADButton></div>
         }
+        {product.props.details ?
+          <div className="product_details" dangerouslySetInnerHTML={{
+            __html:unescape(product.props.details)
+          }} /> :
+          null
+        }
+        <ClickForMore href={`/pdp/${product.sku.split('_').slice(0, 2).join('_')}?layout=basic`} />
       </customize>
     );
   }
@@ -201,7 +211,8 @@ class ProductList extends React.Component {
       }
     };
     for (let i=1; i<this.state.selected_product.length; i++) {
-      product_raw = product_raw.options[this.state.selected_product[i]];
+      if (product_raw.options[this.state.selected_product[i]])
+        product_raw = product_raw.options[this.state.selected_product[i]];
     }
     return product_raw;
   }
@@ -261,9 +272,16 @@ class ProductList extends React.Component {
   renderProductList() {
     let products = [];
     this.props.store.products.forEach((product) => {
+      let swatches = [];
+      if (true || product.props.preview_swatch) {
+        Object.keys(product.options).forEach((option) => {
+          swatches.push(<div key={swatches.length}><img src={"/"+option.toString().replace(/ /g,"_").toLowerCase()+".svg"} onError={(event)=>{event.target.parentNode.style.display="none"}} /></div>);
+        });
+      }
       products.push(<a className="card" onClick={(event)=>{this.handleOptionChange(0, product.sku)}} key={products.length} style={{backgroundImage:`url(${product.props.image})`}}>
         <label>{product.props.name}</label>
         <price>${product.props.price}</price>
+        <swatches>{swatches}</swatches>
       </a>);
     });
     if (this.props.edit) {
@@ -378,7 +396,7 @@ class ProductList extends React.Component {
         url += '?' + querystring.stringify(query_params);
         history.replaceState(history.state, "", url);
       });
-    }, 100);
+    }, 500);
   }
 
 }
