@@ -17,7 +17,7 @@ class ImageCarousel extends React.Component {
     let items = this.props.items || [];
     let slides = [];
     items.forEach((item, index) => {
-      let name = 'slide slide_${index}';
+      let name = `slide slide_${index}`;
       slides.push(
         <div className={name} key={index}>
           <img src={item.href} alt={item.legend} />

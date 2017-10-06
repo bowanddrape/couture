@@ -370,6 +370,25 @@ input[type="button"]:focus {
   margin: 3px auto;
   border-radius: 5px;
 }
+.carousel_container {
+  width: 100%;
+  overflow-x: auto;
+}
+@media (min-width: 1000px) {
+  .carousel_container {
+    width: 100%;
+  }
+  .carousel_container .slide {
+    margin: 18px 20px;
+  }
+  .carousel_container > div {
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 1204px;
+  }
+}
 @media (min-width: 1000px) {
   .border-wrap {
     position: fixed;
