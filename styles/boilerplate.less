@@ -345,22 +345,27 @@ button:focus, input[type="button"]:focus {
   border-radius: 5px;
 }
 
+// Desktop carousel
+.carousel_container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+// Mobile carousel
 @media (min-width: @desktop_min_width) {
   .carousel_container {
     width: 100%;
+    & > .slide {
+      margin: 18px 20px;
+    }
     & > div {
       margin: auto;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      width: 1440px;
+      width: 1204px;
     }
   }
-}
-
-.carousel_container {
-  width: 100%;
-  overflow-x: scroll;
 }
 
 // Gradient Border Around Elements
