@@ -322,3 +322,21 @@ button:focus, input[type="button"]:focus {
   margin: 3px auto;
   border-radius: 5px;
 }
+
+@media (min-width: @desktop_min_width) {
+  .carousel_container {
+    width: 100%;
+    & > div {
+      margin: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 1440px;
+    }
+  }
+}
+
+.carousel_container {
+  width: 100%;
+  overflow-x: scroll;
+}
