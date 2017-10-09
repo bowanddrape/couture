@@ -14537,7 +14537,7 @@ module.exports={
         "spec": ">=2.1.1 <3.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/renee"
+      "/home/default/bowndrape/couture"
     ]
   ],
   "_from": "braintree@>=2.1.1 <3.0.0",
@@ -14573,7 +14573,7 @@ module.exports={
   "_shasum": "654534a2f4751ecfc611992f16abf364d4471b2a",
   "_shrinkwrap": null,
   "_spec": "braintree@^2.1.1",
-  "_where": "/home/default/bowanddrape/renee",
+  "_where": "/home/default/bowndrape/couture",
   "author": {
     "name": "Braintree",
     "email": "code@braintreepayments.com",
@@ -30010,7 +30010,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/renee/node_modules/browserify-sign"
+      "/home/default/bowndrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -30045,7 +30045,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/renee/node_modules/browserify-sign",
+  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -43872,7 +43872,7 @@ module.exports={
         "spec": ">=1.10.0 <2.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/renee"
+      "/home/default/bowndrape/couture"
     ]
   ],
   "_from": "pg-native@>=1.10.0 <2.0.0",
@@ -43910,7 +43910,7 @@ module.exports={
   "_shasum": "94e61ccbb85a7f3436b2e526315c7581107fe40c",
   "_shrinkwrap": null,
   "_spec": "pg-native@^1.10.0",
-  "_where": "/home/default/bowanddrape/renee",
+  "_where": "/home/default/bowndrape/couture",
   "author": {
     "name": "Brian M. Carlson"
   },
@@ -48106,7 +48106,7 @@ module.exports={
         "spec": ">=6.1.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/renee"
+      "/home/default/bowndrape/couture"
     ]
   ],
   "_from": "pg@>=6.1.0 <7.0.0",
@@ -48140,7 +48140,7 @@ module.exports={
   "_shasum": "c364011060eac7a507a2ae063eb857ece910e27f",
   "_shrinkwrap": null,
   "_spec": "pg@^6.1.0",
-  "_where": "/home/default/bowanddrape/renee",
+  "_where": "/home/default/bowndrape/couture",
   "author": {
     "name": "Brian Carlson",
     "email": "brian.m.carlson@gmail.com"
@@ -90195,7 +90195,7 @@ var Switch = function (_React$Component) {
       var _loop = function _loop(index) {
         var child = children[index];
         if (child.type != "option") return 'continue';
-        var child_content = child.props.children;
+        if (!child.props.children) return 'continue';
         options.push(React.createElement(
           'switch_option',
           _extends({ className: child.props.value == _this2.props.value ? "selected" : "", ref: index, key: index }, child.props, { onClick: function onClick() {
