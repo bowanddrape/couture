@@ -198,6 +198,9 @@ class ProductList extends React.Component {
       }
     }
     this.setState({selected_product});
+
+    // if the product changed, scroll to the top?
+    document.body.scrollY = 0;
   }
 
   // get the non-inherited version of the selected product (used for saving)
