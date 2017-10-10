@@ -375,9 +375,6 @@ input[type="button"]:focus {
   overflow-x: auto;
 }
 @media (min-width: 1000px) {
-  .carousel_container {
-    width: 100%;
-  }
   .carousel_container .slide {
     margin: 18px 20px;
   }

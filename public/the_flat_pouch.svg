@@ -1,12 +1,67 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generator: Adobe Illustrator 20.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 612 792" style="enable-background:new 0 0 612 792;" xml:space="preserve">
-<style type="text/css">
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 32 32"
+   xml:space="preserve"
+   inkscape:version="0.48.4 r9939"
+   width="100%"
+   height="100%"
+   sodipodi:docname="the_mini_flat_pouch.svg"><metadata
+     id="metadata15"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs13" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1117"
+     inkscape:window-height="529"
+     id="namedview11"
+     showgrid="false"
+     inkscape:zoom="1.6856283"
+     inkscape:cx="81.01424"
+     inkscape:cy="32.664316"
+     inkscape:window-x="147"
+     inkscape:window-y="24"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="Layer_1" /><style
+     type="text/css"
+     id="style3">
 	.st0{fill:#FFFFFF;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-</style>
-<path class="st0" d="M233.6,327.6h157.6c6.6,0,11.9,5.3,11.9,11.9v117.7c0,7.3-6,14.3-13.4,14.1l-160.9,0.2
-	c-4.3-0.1-7.8-3.6-7.8-7.9V340.1C221.1,333.2,226.7,327.6,233.6,327.6z"/>
-<polygon class="st0" points="258,327.6 258,320.5 230.9,320.5 231.6,327.6 "/>
-<line class="st0" x1="208.5" y1="324.1" x2="230.9" y2="320.5"/>
-</svg>
+</style><path
+     class="st0"
+     d="M 28.467217,25.553106 H 7.0761071 c -0.546203,0 -0.9920814,-0.445883 -0.9920814,-0.992086 V 11.061992 c 0,-0.546203 0.4458784,-0.992081 0.9920814,-0.992081 H 28.467217 c 0.546203,0 0.992087,0.445878 0.992087,0.992081 V 24.56102 c 0,0.546203 -0.445884,0.992086 -0.992087,0.992086 z"
+     id="path5"
+     inkscape:connector-curvature="0"
+     style="fill:#ffffff;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none" /><rect
+     x="7.0761085"
+     y="9.1112738"
+     class="st0"
+     width="4.4699502"
+     height="0.95864278"
+     id="rect7"
+     style="fill:#ffffff;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none" /><line
+     class="st0"
+     x1="2.1045449"
+     y1="10.237117"
+     x2="7.020371"
+     y2="9.1447096"
+     id="line9"
+     style="fill:#ffffff;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none" /></svg>
