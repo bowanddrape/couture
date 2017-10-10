@@ -200,6 +200,7 @@ class Shipment extends React.Component {
           <div className="header_menu">
             <shipping_details>
               <div><label>Order_id: </label><a href={`/shipment/${this.props.id}`}>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</a></div>
+              <div><label>Label: </label>{this.props.name}</div>
               <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
               {to}
               <div><label>User: </label>{this.props.email}</div>
@@ -240,7 +241,12 @@ class Shipment extends React.Component {
     return (
       <shipment>
         {fulfillment_tools}
-        <h1 style={Object.assign({},Item.style.item,{borderBottom:"none",margin:"34px auto",justifyContent:"space-between"})}><div>ORDER SUMMARY</div><div>ITEMS ( {product_quantity} )</div></h1>
+        <h1 style={Object.assign(
+          {},
+          Item.style.item,
+          {borderBottom:"none",margin:"34px auto",justifyContent:"space-between"})}>
+          <div>ORDER SUMMARY</div><div>ITEMS ( {product_quantity} )</div>
+        </h1>
         <contents>
           {line_items}
           <Items contents={this.props.contents} fulfillment={this.props.fulfillment} packing_slip={this.props.packing_slip}/>

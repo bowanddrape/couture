@@ -108,9 +108,12 @@ class Item extends React.Component {
           if (component.props && component.props.image && component.text) {
             let letters = {};
             component.text.split("").forEach((letter) => {
-              if (letters[letter])
-                return letters[letter].quantity += 1;
-              letters[letter] = {letter, quantity:1};
+              // Skip spaces
+              if (letter != " "){
+                if (letters[letter])
+                  return letters[letter].quantity += 1;
+                letters[letter] = {letter, quantity:1};
+              }
             });
             let letter_strings = [];
             Object.keys(letters).sort().forEach((letter) => {
@@ -119,7 +122,7 @@ class Item extends React.Component {
               letter_strings.push(letters[letter].letter+"x"+letters[letter].quantity);
             });
             assembly.push(
-              <div key={assembly.length}><img src={component.props.image}/>{letter_strings.join(" ")}</div>
+              <div key={assembly.length}><img src={component.props.image}/>{letter_strings.join("  ")}</div>
             );
           } else if (component.props && component.props.image) {
             let sku = component.sku || component.props.name;
