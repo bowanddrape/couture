@@ -87,6 +87,20 @@ class Component extends JSONAPI {
     }
   }
 
+  // populate us with another component model's fields
+  overrideDefaults(component) {
+    if (!component) return;
+    inherited_props.forEach((prop_name) => {
+      this.props[prop_name] = component.props[prop_name] || this.props[prop_name];
+    });
+    if (component.compatible_components) {
+      this.compatible_components = this.compatible_components || [];
+      this.compatible_components = component.compatible_components.length ?
+                                   component.compatible_components :
+                                   this.compatible_components;
+    }
+  }
+
   populateFromDB(callback) {
     // TODO flag to shortcut lookup if we know we have everything
     let option_tasks = [];
@@ -96,7 +110,8 @@ class Component extends JSONAPI {
         item.get(item.sku, function(err, db_item) {
           if (!db_item) return callback(err);
 
-          item.inheritDefaults(db_item);
+          // FIXME trusing DB as it's easier to setup, in the future inherit?
+          item.overrideDefaults(db_item);
           // also grab product options
           if (db_item.options) {
             item.options = item.options || db_item.options;
