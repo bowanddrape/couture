@@ -733,6 +733,7 @@ customize .product_details .size_chart row span:first-child {
   customize product_options {
     left: auto;
     right: 0;
+    max-width: 750px;
   }
   customize product_options switch {
     justify-content: flex-end;
@@ -745,20 +746,20 @@ customize .product_details .size_chart row span:first-child {
     position: absolute;
     top: 0px;
     left: 0px;
+    bottom: 0px;
   }
   customize .component_picker .components {
     display: flex;
     flex-direction: row-reverse;
+    height: 100%;
   }
   customize .component_picker .components switch {
     flex-direction: column;
   }
   customize .component_picker .components .component_container.letters {
-    position: fixed;
-    left: 50%;
-    bottom: 100px;
     width: 300px;
-    margin-left: -150px;
+    margin-left: 48px;
+    margin-top: 118px;
   }
   customize .component_picker .components .component_container:not(.letters) {
     height: 400px;
@@ -766,6 +767,9 @@ customize .product_details .size_chart row span:first-child {
     flex-direction: row;
     overflow-x: hidden;
     overflow-y: scroll;
+  }
+  customize .component_picker .components .rainbow_border[name='Emoji'] {
+    margin-left: 50px;
   }
   customize .canvas_container canvas {
     height: 400px;
@@ -986,6 +990,7 @@ switch switch_option {
   max-width: 165px;
   box-sizing: border-box;
   cursor: pointer;
+  display: block;
 }
 switch switch_option.selected,
 switch.expanded switch_option {

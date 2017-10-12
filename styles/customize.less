@@ -172,6 +172,7 @@ customize {
   product_options {
     left: auto;
     right: 0;
+    max-width: 750px;
     switch {
       justify-content: flex-end;
       margin-bottom: 10px;
@@ -184,18 +185,18 @@ customize {
     position: absolute;
     top: 0px;
     left: 0px;
+    bottom: 0px;
     .components {
       display: flex;
       flex-direction: row-reverse;
+      height: 100%;
       switch {
         flex-direction: column;
       }
       .component_container.letters {
-        position: fixed;
-        left: 50%;
-        bottom: 100px;
         width: 300px;
-        margin-left: -150px;
+        margin-left: 48px;
+        margin-top: 118px;
       }
       .component_container:not(.letters) {
         height: 400px;
@@ -203,6 +204,9 @@ customize {
         flex-direction: row;
         overflow-x: hidden;
         overflow-y: scroll;
+      }
+      .rainbow_border[name='Emoji'] {
+        margin-left: 50px;
       }
     }
   }
