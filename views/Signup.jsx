@@ -108,6 +108,7 @@ class Signup extends React.Component {
         );
       });
     }
+    let text = this.props.button_text || "Submit";
 
     return (
       <div>
@@ -115,7 +116,7 @@ class Signup extends React.Component {
           {unique_keys}
           {selectors}
           {misc_keys}
-          <button className="primary" onClick={this.handleSubmit.bind(this)}>{this.props.BtnText}</button>
+          <button className="primary" onClick={this.handleSubmit.bind(this)}>{text}</button>
         </signup>
       </div>
     );

@@ -41,7 +41,7 @@ class LayoutFooter extends React.Component {
       <div className="footer">
         <div className="footer-inner">
           <img src="/pencil.svg" className="newsletter-pencil" /><h3 className="center">Get The Latest From Bow & Drape</h3>
-            <Signup BtnText="Get It, Get It" unique_keys={["email"]} hidden_keys={{newsletter:true,source:"footer"}}/>
+            <Signup button_text="Get It, Get It" unique_keys={["email"]} hidden_keys={{newsletter:true,source:"footer"}}/>
           <menu className="footer-menu">
             <menu_items>
                 {menu_items}

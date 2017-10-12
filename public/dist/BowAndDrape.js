@@ -86663,7 +86663,7 @@ var LayoutFooter = function (_React$Component) {
             { className: 'center' },
             'Get The Latest From Bow & Drape'
           ),
-          React.createElement(Signup, { BtnText: 'Get It, Get It', unique_keys: ["email"], hidden_keys: { newsletter: true, source: "footer" } }),
+          React.createElement(Signup, { button_text: 'Get It, Get It', unique_keys: ["email"], hidden_keys: { newsletter: true, source: "footer" } }),
           React.createElement(
             'menu',
             { className: 'footer-menu' },
@@ -89999,6 +89999,7 @@ var Signup = function (_React$Component) {
           ));
         });
       }
+      var text = this.props.button_text || "Submit";
 
       return React.createElement(
         'div',
@@ -90012,7 +90013,7 @@ var Signup = function (_React$Component) {
           React.createElement(
             'button',
             { className: 'primary', onClick: this.handleSubmit.bind(this) },
-            this.props.BtnText
+            text
           )
         )
       );
