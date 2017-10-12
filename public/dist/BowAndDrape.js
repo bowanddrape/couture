@@ -86623,22 +86623,22 @@ var LayoutFooter = function (_React$Component) {
       menu_items.push(React.createElement('a', { className: 'social facebook', key: menu_items.length, href: '//facebook.com/BowAndDrape/' }));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own' },
+        { key: menu_items.length, href: '/customize-your-own.html' },
         'About Us'
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own' },
+        { key: menu_items.length, href: '/customize-your-own.html' },
         'Customer Service'
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own' },
+        { key: menu_items.length, href: '/customize-your-own.html' },
         'Gift Cards'
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own' },
+        { key: menu_items.length, href: '/customize-your-own.html' },
         'Press'
       ));
       menu_items.push(React.createElement(
@@ -86729,7 +86729,7 @@ var LayoutHeader = function (_React$Component) {
 
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own' },
+        { key: menu_items.length, href: '/customize-your-own.html' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -86738,7 +86738,7 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own' },
+        { key: menu_items.length, href: '/customize-your-own.html' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -86747,7 +86747,7 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own' },
+        { key: menu_items.length, href: '/customize-your-own.html' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -86756,7 +86756,7 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own' },
+        { key: menu_items.length, href: '/customize-your-own.html' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -86938,7 +86938,7 @@ var LayoutMain = function (_React$Component) {
       if (typeof document != "undefined") zoom = document.body.clientWidth / window.innerWidth;
       return React.createElement(
         'div',
-        { className: 'layout' },
+        null,
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         React.createElement(LayoutBorderWrap, null),
         React.createElement(LayoutHeader, { user: this.state.user }),
@@ -86946,7 +86946,7 @@ var LayoutMain = function (_React$Component) {
         React.createElement(LayoutFooter, { user: this.state.user }),
         React.createElement('script', { src: '/BowAndDrape.js' }),
         React.createElement('script', { src: '/masonry.pkgd.min.js' }),
-        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n              content_string: `' + escape(this.props.content_string) + '`,\n              content,\n            });\n            ReactDOM.render(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
+        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n              content_string: `' + escape(this.props.content_string) + '`,\n              content,\n            });\n            ReactDOM.render(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
       );
     }
   }]);
@@ -88664,7 +88664,11 @@ var ProductList = function (_React$Component) {
       // a customization out of this class and into ComponentSerializer, probably
       // also moving over the some of the recursive inheriting out of
       // preprocessProps as well!
-      var customization = ComponentSerializer.parse(this.props.c);
+      var customization_string = this.props.c;
+      if (typeof location != "undefined") {
+        customization_string = querystring.parse(location.search.slice(1)).c;
+      }
+      var customization = ComponentSerializer.parse(customization_string);
       if (customization) {
         // disable logging for this statement as it whines and I can't shut it up
         var log = console.error;
@@ -88792,8 +88796,17 @@ var ProductList = function (_React$Component) {
       }
       this.setState({ selected_product: selected_product });
 
-      // if the product changed, scroll to the top?
-      window.scroll(0, 0);
+      // if the product changed
+      if (depth == 0) {
+        // scroll to the top?
+        window.scroll(0, 0);
+        // count as google pageview
+        try {
+          gtag('event', 'page_view');
+        } catch (err) {
+          console.log(err);
+        }
+      }
     }
 
     // get the non-inherited version of the selected product (used for saving)

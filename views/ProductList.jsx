@@ -80,7 +80,11 @@ class ProductList extends React.Component {
     // a customization out of this class and into ComponentSerializer, probably
     // also moving over the some of the recursive inheriting out of
     // preprocessProps as well!
-    let customization = ComponentSerializer.parse(this.props.c);
+    let customization_string = this.props.c;
+    if (typeof(location)!="undefined") {
+      customization_string = querystring.parse(location.search.slice(1)).c;
+    }
+    let customization = ComponentSerializer.parse(customization_string);
     if (customization) {
       // disable logging for this statement as it whines and I can't shut it up
       let log = console.error;
@@ -199,8 +203,15 @@ class ProductList extends React.Component {
     }
     this.setState({selected_product});
 
-    // if the product changed, scroll to the top?
-    window.scroll(0, 0);
+    // if the product changed
+    if (depth==0) {
+      // scroll to the top?
+      window.scroll(0, 0);
+      // count as google pageview
+      try {
+        gtag('event', 'page_view');
+      } catch (err) {console.log(err)}
+    }
   }
 
   // get the non-inherited version of the selected product (used for saving)

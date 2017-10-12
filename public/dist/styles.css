@@ -53,6 +53,9 @@ body {
   letter-spacing: 1.3px;
   color: #000;
   font-size: 14px;
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 .layout {
   overflow-x: hidden;
