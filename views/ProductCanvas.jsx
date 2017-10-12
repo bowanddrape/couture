@@ -91,8 +91,11 @@ class ProductCanvas extends React.Component {
         letter = letter.toLowerCase();
         letter = character_to_skutext[letter] || letter;
         // deep copy and set the quantity of this component to be used to 1
-        let component = JSON.parse(JSON.stringify(componentMap[letter]));
-        component.quantity = 1;
+        let component = undefined;
+        try {
+          component = JSON.parse(JSON.stringify(componentMap[letter]));
+          component.quantity = 1;
+        } catch (err) {}
         return component;
       }).filter((component) => {
         return component;
@@ -373,7 +376,7 @@ class ProductCanvas extends React.Component {
       hud_controls.push(<button key={hud_controls.length} onClick={this.handleComponentCenter.bind(this)}>▣</button>);
       hud_controls.push(<button key={hud_controls.length} onClick={this.handleSelectComponent.bind(this, -1)}>✔</button>);
     }
-    else if (this.cameras) {
+    else if (this.cameras && this.cameras.length>1) {
       this.cameras.forEach((camera) => {
         let camera_label = camera.name.toUpperCase() || `Camera ${hud_controls.length}`;
         hud_controls.push(

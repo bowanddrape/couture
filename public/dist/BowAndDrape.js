@@ -88012,8 +88012,11 @@ var ProductCanvas = function (_React$Component) {
           letter = letter.toLowerCase();
           letter = character_to_skutext[letter] || letter;
           // deep copy and set the quantity of this component to be used to 1
-          var component = JSON.parse(JSON.stringify(componentMap[letter]));
-          component.quantity = 1;
+          var component = undefined;
+          try {
+            component = JSON.parse(JSON.stringify(componentMap[letter]));
+            component.quantity = 1;
+          } catch (err) {}
           return component;
         }).filter(function (component) {
           return component;
@@ -88330,7 +88333,7 @@ var ProductCanvas = function (_React$Component) {
           { key: hud_controls.length, onClick: this.handleSelectComponent.bind(this, -1) },
           '\u2714'
         ));
-      } else if (this.cameras) {
+      } else if (this.cameras && this.cameras.length > 1) {
         this.cameras.forEach(function (camera) {
           var camera_label = camera.name.toUpperCase() || 'Camera ' + hud_controls.length;
           hud_controls.push(React.createElement(
@@ -88790,7 +88793,7 @@ var ProductList = function (_React$Component) {
       this.setState({ selected_product: selected_product });
 
       // if the product changed, scroll to the top?
-      document.body.scrollY = 0;
+      window.scroll(0, 0);
     }
 
     // get the non-inherited version of the selected product (used for saving)
@@ -90192,7 +90195,7 @@ var Switch = function (_React$Component) {
         var a_order_override = override_option_order.indexOf(a.props.children);
         var b_order_override = override_option_order.indexOf(b.props.children);
         if (a_order_override != b_order_override) return a_order_override - b_order_override;
-        return -1;
+        return a.props.value - b.props.value;
       });
 
       var _loop = function _loop(index) {

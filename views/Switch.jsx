@@ -33,7 +33,7 @@ class Switch extends React.Component {
       let b_order_override = override_option_order.indexOf(b.props.children);
       if (a_order_override != b_order_override)
         return a_order_override - b_order_override;
-      return -1;
+      return a.props.value - b.props.value;
     });
     for (let index=0; index<children.length; index++) {
       let child = children[index];
