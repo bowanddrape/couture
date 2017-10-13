@@ -21,9 +21,9 @@ class LayoutFooter extends React.Component {
   render() {
     let menu_items = [];
 
-    menu_items.push(<a className="social twitter" key={menu_items.length} href="//twitter.com/bowanddrape"></a>);
-    menu_items.push(<a className="social instagram" key={menu_items.length} href="//instagram.com/bowanddrape/"></a>);
-    menu_items.push(<a className="social facebook" key={menu_items.length} href="//facebook.com/BowAndDrape/"></a>);
+    menu_items.push(<a className="social twitter" key={menu_items.length} href="//twitter.com/bowanddrape" target="_blank"></a>);
+    menu_items.push(<a className="social instagram" key={menu_items.length} href="//instagram.com/bowanddrape/" target="_blank"></a>);
+    menu_items.push(<a className="social facebook" key={menu_items.length} href="//facebook.com/BowAndDrape/" target="_blank"></a>);
     menu_items.push(<a key={menu_items.length} href="/customize-your-own">About Us</a>);
     menu_items.push(<a key={menu_items.length} href="/customize-your-own">Customer Service</a>);
     menu_items.push(<a key={menu_items.length} href="/customize-your-own">Gift Cards</a>);

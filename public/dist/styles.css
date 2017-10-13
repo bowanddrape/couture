@@ -56,6 +56,7 @@ body {
 }
 .layout {
   overflow-x: hidden;
+  padding: 50px 20px 20px 20px;
 }
 a {
   text-decoration: none;
@@ -1208,28 +1209,42 @@ product_options switch.expanded {
   margin-bottom: 10px;
 }
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
   border-bottom: 5px solid transparent;
   border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
   border-image-slice: 1;
+  z-index: 100;
+}
+.header .headerInner {
+  padding-top: 25px;
 }
 .header handle {
-  background-image: url(/hamburger_menu.png);
+  background-image: url(/hamburger.svg);
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
-  top: 10px;
-  left: 15px;
+  top: 22px;
+  left: 25px;
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
 }
 .header handle.expanded {
-  background-image: url(/hamburger_close.png);
+  background-image: url(/hamburger_close.svg);
 }
 .header img.logo {
   display: block;
   margin: auto;
-  width: 200px;
+  width: 180px;
+}
+@media (min-width: 1000px) {
+  .header .img-logo {
+    width: 200px;
+  }
 }
 .header .cartmenu {
   background-image: url(/cart.svg);
@@ -1237,8 +1252,8 @@ product_options switch.expanded {
   background-repeat: no-repeat;
   position: absolute;
   overflow: visible;
-  top: 10px;
-  right: 15px;
+  top: 17px;
+  right: 25px;
   width: 36px;
   height: 40px;
 }
@@ -1275,6 +1290,7 @@ product_options switch.expanded {
   cursor: pointer;
   border: none;
   border-bottom: solid 1px #000;
+  font-size: 12px;
   height: auto;
   width: auto;
   border-bottom: none;
@@ -1294,17 +1310,19 @@ product_options switch.expanded {
 }
 .header menu.expanded {
   max-height: 500px;
-  border-image-slice: 1;
 }
 .header menu user {
   display: block;
 }
 .header menu user img {
   border-radius: 5px;
+  margin-right: 20px;
   border: solid 2px #fff;
   width: 50px;
   position: relative;
   top: 20px;
+  display: block;
+  margin: 0 auto 50px;
 }
 .header menu user name {
   margin-top: 25px;
@@ -1312,10 +1330,17 @@ product_options switch.expanded {
 @media (min-width: 1000px) {
   .header {
     border-bottom: none;
+    top: 5px;
+    left: 5px;
+    right: 5px;
   }
   .header handle {
     left: auto;
-    right: 55px;
+    right: 70px;
+    top: 20px;
+    background-image: url(/pizza.svg);
+  }
+  .header handle.expanded {
     background-image: url(/pizza.svg);
   }
   .header menu {
@@ -1338,11 +1363,22 @@ product_options switch.expanded {
     max-height: 0px;
     transition: max-height 1s ease, border-bottom 1s ease;
   }
+  .header menu.expanded {
+    border-bottom: 5px solid transparent;
+    border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+    border-image-slice: 1;
+  }
   .header menu.expanded login,
   .header menu.expanded user {
     opacity: 1;
     max-height: 300px;
   }
+}
+.footer {
+  margin-top: 20px;
+  position: absolute;
+  left: 0;
+  right: 0;
 }
 .footer .footer-inner {
   border-top: 5px solid transparent;
@@ -1353,6 +1389,7 @@ product_options switch.expanded {
 .footer .footer-menu {
   text-align: center;
   padding: 0;
+  margin-top: 40px;
 }
 .footer .footer-menu a {
   text-transform: uppercase;
@@ -1382,14 +1419,14 @@ product_options switch.expanded {
   margin-left: 60px;
 }
 .footer .footer-menu .facebook {
-  background-image: url(/facebook.png);
+  background-image: url(/facebook.svg);
   margin-right: 60px;
 }
 .footer .footer-menu .instagram {
-  background-image: url(/instagram.png);
+  background-image: url(/instagram.svg);
 }
 .footer .footer-menu .twitter {
-  background-image: url(/twitter.png);
+  background-image: url(/twitter.svg);
 }
 .footer .newsletter-pencil {
   width: 45px;
@@ -1402,7 +1439,7 @@ product_options switch.expanded {
 }
 .footer signup div:last-of-type input {
   border: none;
-  border-bottom: 3px solid #000;
+  border-bottom: 5px solid #000;
   text-transform: lowercase;
 }
 .footer signup button {

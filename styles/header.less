@@ -3,32 +3,51 @@
 
 @user_img_width: 50px;
 @menu_handle_width: 36px;
+
+
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
   border-bottom: 5px solid transparent;
   border-image: @gradient-rainbow;
   border-image-slice: 1;
+  z-index: 100;
+
+  .headerInner {
+    padding-top: 25px;
+  }
 
   handle {
-    background-image: url(/hamburger_menu.png);
+    background-image: url(/hamburger.svg);
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
-    top: 10px;
-    left: 15px;
+    top: 22px;
+    left: 25px;
     display: block;
-    width: @menu_handle_width - 6px;
-    height: @menu_handle_width - 6px;
+    width: @menu_handle_width - 10px;
+    height: @menu_handle_width - 10px;
   }
 
-  handle.expanded {
-    background-image: url(/hamburger_close.png);
-  }
+
+    handle.expanded {
+      background-image: url(/hamburger_close.svg);
+    }
 
 
   img.logo {
     display: block;
     margin: auto;
-    width: 200px;
+    width: 180px;
+  }
+
+  @media (min-width: @desktop_min_width) {
+    .img-logo {
+      width: 200px;
+    }
   }
   .cartmenu {
     background-image: url(/cart.svg);
@@ -36,8 +55,8 @@
     background-repeat: no-repeat;
     position: absolute;
     overflow: visible;
-    top: 10px;
-    right: 15px;
+    top: 17px;
+    right: 25px;
     width: @menu_handle_width;
     height: @menu_handle_width + 4px;
     cart_bug {
@@ -64,6 +83,7 @@
     }
     button, .button {
       .cta;
+      font-size: 12px;
       height: auto;
       width: auto;
       border-bottom: none;
@@ -77,18 +97,18 @@
   }
   menu.expanded {
     max-height: 500px;
-    //border-bottom: 5px solid transparent;
-    //border-image: @gradient-rainbow;
-    border-image-slice: 1;
   }
   menu user {
     display: block;
     img {
       border-radius: 5px;
+      margin-right: 20px;
       border: solid 2px @color_primary;
       width: @user_img_width;
       position: relative;
       top: @user_img_width/2 - 5px;
+      display: block;
+      margin: 0 auto 50px;
     }
     name {
       margin-top: @user_img_width/2;
@@ -101,11 +121,20 @@
 @media (min-width: @desktop_min_width) {
 .header {
   border-bottom: none;
+  top: 5px;
+  left: 5px;
+  right: 5px;
   handle {
     left: auto;
-    right: 55px;
+    right: 70px;
+    top: 20px;
     background-image: url(/pizza.svg);
   }
+
+  handle.expanded {
+      background-image: url(/pizza.svg);
+  }
+
   menu {
     max-height: initial;
     display: flex;
@@ -125,6 +154,9 @@
       transition: max-height 1s ease, border-bottom 1s ease;
     }
     &.expanded {
+      border-bottom: 5px solid transparent;
+      border-image: @gradient-rainbow;
+      border-image-slice: 1;
       login, user {
         opacity: 1;
         max-height: 300px;

@@ -87062,13 +87062,7 @@ var LayoutBorderWrap = function (_React$Component) {
     function LayoutBorderWrap(props) {
         _classCallCheck(this, LayoutBorderWrap);
 
-        var _this = _possibleConstructorReturn(this, (LayoutBorderWrap.__proto__ || Object.getPrototypeOf(LayoutBorderWrap)).call(this, props));
-
-        _this.state = {
-            expanded: false,
-            desktop_mode: false
-        };
-        return _this;
+        return _possibleConstructorReturn(this, (LayoutBorderWrap.__proto__ || Object.getPrototypeOf(LayoutBorderWrap)).call(this, props));
     }
 
     _createClass(LayoutBorderWrap, [{
@@ -87123,9 +87117,9 @@ var LayoutFooter = function (_React$Component) {
     value: function render() {
       var menu_items = [];
 
-      menu_items.push(React.createElement('a', { className: 'social twitter', key: menu_items.length, href: '//twitter.com/bowanddrape' }));
-      menu_items.push(React.createElement('a', { className: 'social instagram', key: menu_items.length, href: '//instagram.com/bowanddrape/' }));
-      menu_items.push(React.createElement('a', { className: 'social facebook', key: menu_items.length, href: '//facebook.com/BowAndDrape/' }));
+      menu_items.push(React.createElement('a', { className: 'social twitter', key: menu_items.length, href: '//twitter.com/bowanddrape', target: '_blank' }));
+      menu_items.push(React.createElement('a', { className: 'social instagram', key: menu_items.length, href: '//instagram.com/bowanddrape/', target: '_blank' }));
+      menu_items.push(React.createElement('a', { className: 'social facebook', key: menu_items.length, href: '//facebook.com/BowAndDrape/', target: '_blank' }));
       menu_items.push(React.createElement(
         'a',
         { key: menu_items.length, href: '/customize-your-own' },
@@ -87317,23 +87311,27 @@ var LayoutHeader = function (_React$Component) {
       return React.createElement(
         'div',
         { className: 'header' },
-        React.createElement('handle', { className: this.state.expanded ? "expanded" : "", onClick: function onClick() {
-            _this2.setState({ expanded: !_this2.state.expanded });
-          } }),
         React.createElement(
-          'a',
-          { href: '/' },
-          React.createElement('img', { className: 'logo', src: '/logo_mini.svg' })
-        ),
-        React.createElement(CartMenu, { key: menu_items.length }),
-        React.createElement(
-          'menu',
-          { className: this.state.expanded ? "expanded" : "" },
-          React.createElement(UserProfile, this.props),
+          'div',
+          { className: 'headerInner' },
+          React.createElement('handle', { className: this.state.expanded ? "expanded" : "", onClick: function onClick() {
+              _this2.setState({ expanded: !_this2.state.expanded });
+            } }),
           React.createElement(
-            'menu_items',
-            null,
-            menu_items
+            'a',
+            { href: '/' },
+            React.createElement('img', { className: 'logo', src: '/logo_mini.svg' })
+          ),
+          React.createElement(CartMenu, { key: menu_items.length }),
+          React.createElement(
+            'menu',
+            { className: this.state.expanded ? "expanded" : "" },
+            React.createElement(UserProfile, this.props),
+            React.createElement(
+              'menu_items',
+              null,
+              menu_items
+            )
           )
         )
       );
