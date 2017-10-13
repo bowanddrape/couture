@@ -3,6 +3,7 @@
 @import "./fonts.less";
 
 @desktop_min_width: 1000px;
+@mobile_max_width: 737px;
 
 @keyframes busyState {
   0%    { opacity: 1;}
@@ -183,6 +184,7 @@ input.error {
 }
 input[type="text"], input[type="password"] {
   background-color: @color_primary;
+  .bodyfont;
   border: 1px solid @color_secondary;
   min-width: 230px;
   width: auto;

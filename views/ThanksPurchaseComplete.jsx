@@ -41,6 +41,7 @@ class ThanksPurchaseComplete extends React.Component {
         <div style={{width:"600px",margin:"20px auto",borderBottom:"solid 1px #000"}}/>
         <Signup
           hidden_keys={{email:this.props.email}}
+          BtnText="Send Now!"
           misc_keys={["Other comments?"]}
           selectors={{"From 1 being \"that's a hard nope\" to 10 being \"absolutely\", how likely are you to recommend Bow & Drape to your friends?": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}}
         />

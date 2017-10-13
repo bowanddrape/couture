@@ -81,12 +81,14 @@ class UserLogin extends React.Component {
     return (
       <login style={this.props.style}>
         <Errors label="login" />
-        <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text" name="email" style={{display:"block"}}/>
-        <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password" style={{display:"block"}}/>
-        <button onClick={this.login.bind(this)}>Login / Register</button>
-        <button onClick={this.verify.bind(this)}>Verify / Forgot Pass</button>
+        <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text" name="email"/>
+        <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password"/>
+        <section className="btnWrap">
+          <button className="loginBtn" onClick={this.login.bind(this)}>Login / Register</button>
+          <button className="loginBtn" onClick={this.verify.bind(this)}>Verify / Forgot Pass</button>
+          <FacebookLogin user={this.state.user}/>
+        </section>
         {this.props.cta ? <div className="cta">{this.props.cta}</div> : null}
-        <FacebookLogin user={this.state.user}/>
       </login>
     );
   }

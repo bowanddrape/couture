@@ -28,6 +28,7 @@ class Cart extends React.Component {
 
     this.state = {
       user: {},
+      guestcheckout: false,
       items: this.props.items,
       card: {
         number: "",
@@ -94,6 +95,8 @@ class Cart extends React.Component {
       this.setState({user});
       if (!user.email) return;
       // if the user is signed in, get latest shipping/billing info
+      console.log('loggedin');
+      this.setState({guestcheckout:true});
       let query = {email:user.email, page:JSON.stringify({sort:"requested", direction:"DESC", limit:1})};
       BowAndDrape.api("GET", "/shipment", query, (err, result) => {
         if (err || !result || !result.length) return;
@@ -122,8 +125,19 @@ class Cart extends React.Component {
   }
 
   handleSameBillingToggle(e) {
-    this.setState({same_billing:!this.state.same_billing});
+    this.setState({
+      same_billing:!this.state.same_billing
+    });
   }
+
+
+  handleGuestCheckout(e) {
+    this.setState({
+      guestcheckout:!this.state.guestcheckout
+    });
+  }
+
+
 
   handleFieldChange(section, event) {
     let update = {};
@@ -155,25 +169,20 @@ class Cart extends React.Component {
   renderInputCredit() {
     return (
       <input_credit>
-        <section>Payment Info</section>
+        <section className="sectionTitle">Payment Info</section>
         <Errors label="card" />
-        <row>
-          <div>
-            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.number} name="number" placeholder="Card Number"/>
+        <div className="paymentWrap">
+          <div className="cardNumWrap">
+            <h5 style={{margin:"0"}}>Card Number</h5>
+            <input className="cardNum" type="text" maxLength="22" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.number} name="number" placeholder="Card Number"/>
+            <input className="cardCvc" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.cvc} name="cvc" placeholder="CVC"/>
           </div>
-          <div>
-            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.cvc} name="cvc" placeholder="cvc"/>
+          <div className="cardExpWrap">
+            <h5 style={{margin:"0"}}>Expiry</h5>
+            <input className="expMonth" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_month} name="exp_month" placeholder="MM"/>
+            <input className="expYear" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_year} name="exp_year" placeholder="YY"/>
           </div>
-        </row><row style={{justifyContent:"start"}}>
-          <div style={{marginTop:"13px"}}>Expiration</div>
-          <div>
-            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_month} name="exp_month" placeholder="Month"/>
-          </div>
-          <div style={{marginTop:"13px"}}>/</div>
-          <div>
-            <input type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_year} name="exp_year" placeholder="Year"/>
-          </div>
-        </row>
+      </div>
       </input_credit>
     );
   }
@@ -286,37 +295,51 @@ class Cart extends React.Component {
     }
     if (total_price > 0) {
       payment_info = (
-        <div>
-          <div style={{margin:"auto",width:"480px"}}>same billing address <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} /></div>
-          {this.state.same_billing?null:<InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}
-          {this.renderInputCredit()}
-        </div>
+          <div className="cardInput">
+            {this.renderInputCredit()}
+          </div>
       );
+
     } // total_price > 0
 
     return (
-      <div>
-        <Items
-          ref="Items"
-          contents={this.state.items}
-          onUpdate={(items)=>{this.setState({items:items.contents})}}
-          is_cart="true"
-        />
+      <div className="cart-wrapper grid">
+          <Items
+            ref="Items"
+            contents={this.state.items}
+            onUpdate={(items)=>{this.setState({items:items.contents})}}
+            is_cart="true"
+          />
 
         { this.state.user.email ? null :
           <div className="checkout_section">
-            <section>Login</section>
-            <UserLogin cta="...or proceed as Guest" />
+            <section className="loginHeader">
+              <h4>Check Out</h4>
+            </section>
+            <section className="loginToggle">
+                <input type="radio" name="checkout" value="false" defaultChecked={true} onChange={this.handleGuestCheckout.bind(this)}/> <span className="radioLabel">Login</span>
+                    <input type="radio" name="checkout" value="true" onChange={this.handleGuestCheckout.bind(this)}/><span className="radioLabel">Checkout As Guest</span>
+            </section>
+            <section className={this.state.guestcheckout?"hide--loginWrap":""} >
+              <UserLogin  />
+            </section>
           </div>
         }
 
-        <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
-        {payment_info}
-
         <Errors/>
-        <BADButton className="primary" onClick={this.handlePay.bind(this)}>
-          Get it!
-        </BADButton>
+        <section className={this.state.guestcheckout?"show--addressArea addressArea":"addressArea"}>
+          <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
+          <div className="billing-check">
+                <div className="sameCheckbox">My Shipping and Billing Information is the same <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} /></div>
+                {this.state.same_billing?null:<InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}
+              </div>
+            {payment_info}
+            <BADButton className="primary checkout_btn" onClick={this.handlePay.bind(this)}>
+              Get it!
+            </BADButton>
+        </section>
+
+
 
 {/* Needed by stripe, not needed by braintree */}
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>

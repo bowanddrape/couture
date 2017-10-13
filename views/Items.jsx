@@ -16,6 +16,7 @@ class Items extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      expanded: false,
       contents: this.props.contents || [],
       shipping_quote: {
         days: 5,
@@ -72,6 +73,7 @@ class Items extends React.Component {
       this.updateContents(this.state.contents);
     });
   };
+
 
   updateContents(contents) {
     contents = contents || [];
@@ -199,41 +201,48 @@ class Items extends React.Component {
 
     return (
       <cart>
-        {this.props.is_cart ?
-          <div className="item" style={style.item}><span style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></div>
-          : null
-        }
+        <h2 className="cart-header">My Cart</h2>
+          <div className="productWrapper">
         {line_items}
+          </div>
         <div className="summary_items">
+          <div className="summary_items__inner">
+            <h4 className="summary_items__header">Summary</h4>
           {/* item subtotal */}
           <div className="item" style={style_summary.item}>
             <div style={style_summary.img_preview_container} />
+              {this.props.is_cart ?
+                  <div className="item shippingDate" style={style.item}><span className="sum-bold" style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></div>
+                : null
+              }
             <div className="deets" style={style_summary.deets}>
-              Item Subtotal
-              <Price style={style_summary.price_total} price={subtotal}/>
+              <span className="sum-bold">Cart Subtotal:</span>
+              <Price  style={style_summary.price_total} price={subtotal}/>
             </div>
-          </div>
 
-          {has_promo || !this.props.is_cart ? null :
-            <div className="item promo" style={Object.assign({},style_summary.item,{padding:"none"})}>
-              <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
-              <div className="deets" style={style_summary.deets}>
-                <input placeholder="Promo code" type="text" style={{marginTop:"20px",width:"90px"}} value={this.state.promo.code} onChange={(event)=>{this.setState({promo:{code:event.target.value}})}}/>
-                <button style={{position:"absolute",top:"-12px", left:"95px", width:"90px"}} onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
-              </div>
-            </div>
-          }
+          </div>
           {summary_items}
 
           {/* item price total */}
           <div className="item" style={Object.assign({},style_summary.item,{minHeight: "28px"})}>
             <div style={style_summary.img_preview_container} />
             <div className="deets" style={Object.assign({}, style_summary.deets, {paddingTop: "28px"})}>
-              Package Total
-              <Price style={style_summary.price_total} price={total}/>
+              <span className="sum-bold">Total:</span>
+              <Price  style={style_summary.price_total} price={total}/>
             </div>
           </div>
-        </div>
+
+          {has_promo || !this.props.is_cart ? null :
+            <div className="item promo" style={Object.assign({},style_summary.item,{padding:"none"})}>
+              <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
+              <div className="promoInput" style={style_summary.deets}>
+                <input placeholder="Promo code" type="text" value={this.state.promo.code} onChange={(event)=>{this.setState({promo:{code:event.target.value}})}}/>
+                <button onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
+              </div>
+            </div>
+          }
+        </div>  
+      </div>
       </cart>
     );
   }
