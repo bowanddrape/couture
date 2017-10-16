@@ -2,8 +2,7 @@
 @import "./colors.less";
 @import "./fonts.less";
 
-@desktop_min_width: 1000px;
-@mobile_max_width: 737px;
+@desktop_min_width: 737px;
 
 @keyframes busyState {
   0%    { opacity: 1;}
@@ -99,22 +98,6 @@ button, .button {
   &.primary {
     margin: 12px auto;
   }
-  // &.primary:after {
-  //   top: 0px;
-  //   left: 10px;
-  // }
-  // &.primary:before {
-  //   top: -10px;
-  //   left: 15px;
-  // }
-  // &.primary:hover:after {
-  //   top: -10px;
-  //   left: -10px;
-  // }
-  // &.primary:hover:before {
-  //   top: 0px;
-  //   left: 10px;
-  // }
   /* CSS for button busy states */
   &.primary.busyState {
     background-color: @color_support_0;
@@ -297,6 +280,17 @@ h1 {
   font-size: 24px;
 }
 
+.hidden {
+  display: none;
+}
+
+input[type="radio"] {
+  margin-right: 5px;
+}
+.radio_label {
+  margin-right: 15px;
+}
+
 address {
   display: block;
   font-family: Arvo;
@@ -373,17 +367,17 @@ button:focus, input[type="button"]:focus {
 
 // Gradient Border Around Elements
 @media (min-width: @desktop_min_width) {
-.border-wrap {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width:  ~"calc(100vw - 10px)";
-  height: ~"calc(100vh - 10px)";
-  z-index: 99;
-  background: transparent;
-  pointer-events: none;
-  border: 5px solid transparent;
-  border-image: @gradient-rainbow;
-  border-image-slice: 1;
+  .border-wrap {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width:  ~"calc(100vw - 10px)";
+    height: ~"calc(100vh - 10px)";
+    z-index: 99;
+    background: transparent;
+    pointer-events: none;
+    border: 5px solid transparent;
+    border-image: @gradient-rainbow;
+    border-image-slice: 1;
   }
 }

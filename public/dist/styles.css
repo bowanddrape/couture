@@ -322,6 +322,15 @@ h2 {
 h1 {
   font-size: 24px;
 }
+.hidden {
+  display: none;
+}
+input[type="radio"] {
+  margin-right: 5px;
+}
+.radio_label {
+  margin-right: 15px;
+}
 address {
   display: block;
   font-family: Arvo;
@@ -379,7 +388,7 @@ input[type="button"]:focus {
   width: 100%;
   overflow-x: auto;
 }
-@media (min-width: 1000px) {
+@media (min-width: 737px) {
   .carousel_container {
     width: 100%;
   }
@@ -394,7 +403,7 @@ input[type="button"]:focus {
     width: 1204px;
   }
 }
-@media (min-width: 1000px) {
+@media (min-width: 737px) {
   .border-wrap {
     position: fixed;
     top: 0;
@@ -569,7 +578,7 @@ customize .component_container div {
   cursor: pointer;
 }
 customize .component_container div.backspace {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -581,7 +590,7 @@ customize .component_container div.backspace {
   border: none;
 }
 customize .component_container div.enter {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -613,7 +622,7 @@ customize .component_virtual_keyboard_container div {
   cursor: pointer;
 }
 customize .component_virtual_keyboard_container div.backspace {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -625,7 +634,7 @@ customize .component_virtual_keyboard_container div.backspace {
   border: none;
 }
 customize .component_virtual_keyboard_container div.enter {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -648,7 +657,7 @@ customize .component_virtual_keyboard_container row div {
   flex: 0 1 auto;
 }
 customize .component_virtual_keyboard_container div.spacebar {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
   background-position: 0px -214px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -741,7 +750,7 @@ customize .product_details .size_chart row span {
 customize .product_details .size_chart row span:first-child {
   background-color: #eaeaea;
 }
-@media (min-width: 1000px) {
+@media (min-width: 737px) {
   customize product_options {
     left: auto;
     right: 0;
@@ -980,14 +989,7 @@ input_credit [name="exp_year"] {
   background: black;
   height: 2px;
 }
-.hide--loginWrap {
-  display: none;
-  visibility: hidden;
-}
 .addressArea {
-  display: none;
-}
-.show--addressArea {
   display: inline-block;
   grid-column-start: 1;
   grid-column-end: -1;
@@ -995,7 +997,7 @@ input_credit [name="exp_year"] {
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: auto;
 }
-.show--addressArea input_address {
+.addressArea input_address {
   grid-column-start: 1;
   grid-column-end: 6;
 }
@@ -1025,12 +1027,6 @@ input_credit [name="exp_year"] {
 .cart-wrapper login input[type="text"],
 .cart-wrapper login input[type="password"] {
   margin-right: 20px;
-}
-.loginToggle input[type="radio"] {
-  margin-right: 5px;
-}
-.loginToggle .radioLabel {
-  margin-right: 15px;
 }
 .paymentWrap input[type="text"].cardNum {
   display: inline-block;
@@ -1241,7 +1237,7 @@ product_options switch.expanded {
   margin: auto;
   width: 180px;
 }
-@media (min-width: 1000px) {
+@media (min-width: 737px) {
   .header .img-logo {
     width: 200px;
   }
@@ -1327,7 +1323,7 @@ product_options switch.expanded {
 .header menu user name {
   margin-top: 25px;
 }
-@media (min-width: 1000px) {
+@media (min-width: 737px) {
   .header {
     border-bottom: none;
     top: 5px;
@@ -1445,7 +1441,7 @@ product_options switch.expanded {
 .footer signup button {
   display: inline-block;
 }
-@media (min-width: 1000px) {
+@media (min-width: 737px) {
   .footer .footer-menu a {
     margin-right: 60px;
     display: inline-block;
@@ -1459,7 +1455,7 @@ product_options switch.expanded {
   }
 }
 .icon {
-  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
+  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
 }
 .purchase_complete > div {
   width: 600px;

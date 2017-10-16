@@ -28,7 +28,7 @@ class Cart extends React.Component {
 
     this.state = {
       user: {},
-      guestcheckout: false,
+      no_login_prompt: false,
       items: this.props.items,
       card: {
         number: "",
@@ -95,8 +95,7 @@ class Cart extends React.Component {
       this.setState({user});
       if (!user.email) return;
       // if the user is signed in, get latest shipping/billing info
-      console.log('loggedin');
-      this.setState({guestcheckout:true});
+      this.setState({no_login_prompt:true});
       let query = {email:user.email, page:JSON.stringify({sort:"requested", direction:"DESC", limit:1})};
       BowAndDrape.api("GET", "/shipment", query, (err, result) => {
         if (err || !result || !result.length) return;
@@ -124,16 +123,15 @@ class Cart extends React.Component {
       Errors.emitError(null, "Cart is empty");
   }
 
-  handleSameBillingToggle(e) {
-    this.setState({
-      same_billing:!this.state.same_billing
+  handleToggleSameBilling(e) {
+    this.setState((prevState) => {
+      return {same_billing:!prevState.same_billing};
     });
   }
 
-
-  handleGuestCheckout(e) {
-    this.setState({
-      guestcheckout:!this.state.guestcheckout
+  handleToggleGuestCheckout(e) {
+    this.setState((prevState) => {
+      return {no_login_prompt:!prevState.no_login_prompt};
     });
   }
 
@@ -316,27 +314,32 @@ class Cart extends React.Component {
             <section className="loginHeader">
               <h4>Check Out</h4>
             </section>
-            <section className="loginToggle">
-                <input type="radio" name="checkout" value="false" defaultChecked={true} onChange={this.handleGuestCheckout.bind(this)}/> <span className="radioLabel">Login</span>
-                    <input type="radio" name="checkout" value="true" onChange={this.handleGuestCheckout.bind(this)}/><span className="radioLabel">Checkout As Guest</span>
-            </section>
-            <section className={this.state.guestcheckout?"hide--loginWrap":""} >
-              <UserLogin  />
+            <section className="loginToggle"><form>
+              <input type="radio" name="checkout" value="false" defaultChecked={true} onChange={this.handleToggleGuestCheckout.bind(this)}/> <span className="radio_label">Login</span>
+              <input type="radio" name="checkout" value="true" onChange={this.handleToggleGuestCheckout.bind(this)}/><span className="radio_label">Checkout As Guest</span>
+            </form></section>
+            <section className={this.state.no_login_prompt?"hidden":""} >
+              <UserLogin />
             </section>
           </div>
         }
 
         <Errors/>
-        <section className={this.state.guestcheckout?"show--addressArea addressArea":"addressArea"}>
+        <section className={this.state.no_login_prompt?"addressArea":"hidden"}>
           <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
           <div className="billing-check">
-                <div className="sameCheckbox">My Shipping and Billing Information is the same <input onChange={this.handleSameBillingToggle.bind(this)} type="checkbox" checked={this.state.same_billing} /></div>
-                {this.state.same_billing?null:<InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>}
-              </div>
-            {payment_info}
-            <BADButton className="primary checkout_btn" onClick={this.handlePay.bind(this)}>
-              Get it!
-            </BADButton>
+            <form>
+              <input type="radio" name="checkout" defaultChecked={this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/> <span className="radio_label">Same Billing address</span>
+              <input type="radio" name="checkout" defaultChecked={!this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/> <span className="radio_label">Different Billing address</span>
+            </form>
+            { this.state.same_billing ? null :
+              <InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>
+            }
+          </div>
+          {payment_info}
+          <BADButton className="primary checkout_btn" onClick={this.handlePay.bind(this)}>
+            Get it!
+          </BADButton>
         </section>
 
 

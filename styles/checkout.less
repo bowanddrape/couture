@@ -52,7 +52,7 @@ cart {
 }
 
 .cart-header {
-    grid-column: span 6;
+  grid-column: span 6;
 }
 
 .sum-bold, .name {
@@ -76,11 +76,11 @@ cart {
     display: inline-block;
     margin-left: 20px;
     }
-}
+  }
 }
 
 
-@media (max-width: @mobile_max_width) {
+@media (max-width: @desktop_min_width) {
   .productWrapper {
     grid-column: span 6;
     border-bottom: none;
@@ -105,7 +105,7 @@ cart {
   padding: 0 0 0 40px;
 }
 
-@media (max-width: @mobile_max_width) {
+@media (max-width: @desktop_min_width) {
   .summary_items {
     grid-column: span 6;
     padding: 0;
@@ -139,14 +139,11 @@ cart {
 
 
 .checkout_section {
-
   section {
   }
   row {
     display: flex;
     flex-flow: row wrap;
-    // align-content: center;
-    // justify-content: space-between;
   }
   label {
     text-align: right;
@@ -188,20 +185,8 @@ input_credit {
     height: 2px;
   }
 }
-//Login
-
-
-.hide--loginWrap {
-  display: none;
-  visibility: hidden;
-}
-
 
 .addressArea {
-  display: none;
-}
-
-.show--addressArea {
   display: inline-block;
   grid-column-start: 1;
   grid-column-end: -1;
@@ -222,16 +207,13 @@ input_credit {
   grid-column-end: -1;
   padding: 10px 0;
   border-top: 2px solid black;
-
 }
-
 
 .billing-check {
   .sectionTitle {
     margin-top: 20px;
   }
 }
-
 
 .cart-wrapper{
   input[type="text"], input[type="password"] {
@@ -252,20 +234,8 @@ input_credit {
   }
 }
 
-
-
-
-.loginToggle {
-  input[type="radio"] {
-    margin-right: 5px;
-  }
-  .radioLabel {
-      margin-right: 15px;
-  }
-}
-
 .paymentWrap {
-    input[type="text"].cardNum {
+  input[type="text"].cardNum {
     display: inline-block;
     margin-right: 10px;
   }
