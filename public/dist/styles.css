@@ -883,6 +883,9 @@ cart {
     padding: 0;
     margin-top: 30px;
   }
+  .summary_items__inner {
+    display: block;
+  }
 }
 .summary_items__inner {
   padding: 20px;
@@ -1477,4 +1480,10 @@ product_options switch.expanded {
 }
 .purchase_complete p {
   text-align: center;
+}
+@media (max-width: 737px) {
+  .purchase_complete > div {
+    width: auto;
+    margin: auto;
+  }
 }
