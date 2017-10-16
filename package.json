@@ -5,6 +5,7 @@
     "build_sprites": "./node_modules/.bin/sprity create public/dist/ public/*.png -c / -p less -s sprite.less --cachebuster --engine sprity-gm",
     "build_styles": "lessc ./styles/styles.less public/dist/styles.css",
     "build": "npm run build_js && npm run build_sprites && npm run build_styles",
+    "fs_cache": "curl -s -o public/dist/customize-your-own.html http://localhost/customize-your-own",
     "start": "npm run build && sudo node server.js"
   },
   "dependencies": {

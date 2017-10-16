@@ -74,7 +74,7 @@ class LayoutMain extends React.Component {
     if (typeof(document)!="undefined")
       zoom = document.body.clientWidth / window.innerWidth;
     return (
-      <div className="layout">
+      <div>
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
         <LayoutBorderWrap />
         <LayoutHeader user={this.state.user}/>
@@ -85,7 +85,6 @@ class LayoutMain extends React.Component {
         <script src="/masonry.pkgd.min.js"></script>
 
         <script dangerouslySetInnerHTML={{__html:`
-
           var BowAndDrape = require("BowAndDrape");
           var React = BowAndDrape.React;
           var ReactDOM = BowAndDrape.ReactDOM;

@@ -24,11 +24,10 @@ class LayoutFooter extends React.Component {
     menu_items.push(<a className="social twitter" key={menu_items.length} href="//twitter.com/bowanddrape" target="_blank"></a>);
     menu_items.push(<a className="social instagram" key={menu_items.length} href="//instagram.com/bowanddrape/" target="_blank"></a>);
     menu_items.push(<a className="social facebook" key={menu_items.length} href="//facebook.com/BowAndDrape/" target="_blank"></a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own">About Us</a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own">Customer Service</a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own">Gift Cards</a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own">Press</a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own">Make Your Own</a>);
+    menu_items.push(<a key={menu_items.length} href="/about">About Us</a>);
+    menu_items.push(<a key={menu_items.length} href="/customizer-service">Customer Service</a>);
+    menu_items.push(<a key={menu_items.length} href="/press">Press</a>);
+    menu_items.push(<a key={menu_items.length} href="/customize-your-own.html">Make Your Own</a>);
 
     if (this.state.desktop_mode) {
       return (
