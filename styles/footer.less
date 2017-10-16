@@ -2,6 +2,11 @@
 @import "./boilerplate.less";
 
 .footer {
+  margin-top: 20px;
+  position: absolute;
+  left: 0;
+  right: 0;
+
   .footer-inner {
     border-top: 5px solid transparent;
     border-image: @gradient-rainbow;
@@ -12,6 +17,7 @@
   .footer-menu {
     text-align: center;
     padding:0;
+    margin-top: 40px;
     a {
       text-transform: uppercase;
       margin-bottom: 10px;
@@ -43,16 +49,16 @@
     }
 
     .facebook {
-      background-image: url(/facebook.png);
+      background-image: url(/facebook.svg);
       margin-right: 60px;
     }
 
     .instagram {
-      background-image: url(/instagram.png);
+      background-image: url(/instagram.svg);
     }
 
     .twitter {
-      background-image: url(/twitter.png);
+      background-image: url(/twitter.svg);
     }
 
   }
@@ -69,7 +75,7 @@
      margin-right: 15px;
        input {
          border:none;
-         border-bottom: 3px solid @color_secondary;
+         border-bottom: 5px solid @color_secondary;
          text-transform: lowercase;
        }
    }

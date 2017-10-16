@@ -83543,6 +83543,7 @@ var Cart = function (_React$Component) {
 
     _this.state = {
       user: {},
+      no_login_prompt: false,
       items: _this.props.items,
       card: {
         number: "",
@@ -83597,6 +83598,7 @@ var Cart = function (_React$Component) {
         _this2.setState({ user: user });
         if (!user.email) return;
         // if the user is signed in, get latest shipping/billing info
+        _this2.setState({ no_login_prompt: true });
         var query = { email: user.email, page: JSON.stringify({ sort: "requested", direction: "DESC", limit: 1 }) };
         BowAndDrape.api("GET", "/shipment", query, function (err, result) {
           if (err || !result || !result.length) return;
@@ -83622,9 +83624,18 @@ var Cart = function (_React$Component) {
       if (!items.length) Errors.emitError(null, "Cart is empty");
     }
   }, {
-    key: 'handleSameBillingToggle',
-    value: function handleSameBillingToggle(e) {
-      this.setState({ same_billing: !this.state.same_billing });
+    key: 'handleToggleSameBilling',
+    value: function handleToggleSameBilling(e) {
+      this.setState(function (prevState) {
+        return { same_billing: !prevState.same_billing };
+      });
+    }
+  }, {
+    key: 'handleToggleGuestCheckout',
+    value: function handleToggleGuestCheckout(e) {
+      this.setState(function (prevState) {
+        return { no_login_prompt: !prevState.no_login_prompt };
+      });
     }
   }, {
     key: 'handleFieldChange',
@@ -83664,46 +83675,34 @@ var Cart = function (_React$Component) {
         null,
         React.createElement(
           'section',
-          null,
+          { className: 'sectionTitle' },
           'Payment Info'
         ),
         React.createElement(Errors, { label: 'card' }),
         React.createElement(
-          'row',
-          null,
+          'div',
+          { className: 'paymentWrap' },
           React.createElement(
             'div',
-            null,
-            React.createElement('input', { type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.number, name: 'number', placeholder: 'Card Number' })
+            { className: 'cardNumWrap' },
+            React.createElement(
+              'h5',
+              { style: { margin: "0" } },
+              'Card Number'
+            ),
+            React.createElement('input', { className: 'cardNum', type: 'text', maxLength: '22', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.number, name: 'number', placeholder: 'Card Number' }),
+            React.createElement('input', { className: 'cardCvc', type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.cvc, name: 'cvc', placeholder: 'CVC' })
           ),
           React.createElement(
             'div',
-            null,
-            React.createElement('input', { type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.cvc, name: 'cvc', placeholder: 'cvc' })
-          )
-        ),
-        React.createElement(
-          'row',
-          { style: { justifyContent: "start" } },
-          React.createElement(
-            'div',
-            { style: { marginTop: "13px" } },
-            'Expiration'
-          ),
-          React.createElement(
-            'div',
-            null,
-            React.createElement('input', { type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.exp_month, name: 'exp_month', placeholder: 'Month' })
-          ),
-          React.createElement(
-            'div',
-            { style: { marginTop: "13px" } },
-            '/'
-          ),
-          React.createElement(
-            'div',
-            null,
-            React.createElement('input', { type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.exp_year, name: 'exp_year', placeholder: 'Year' })
+            { className: 'cardExpWrap' },
+            React.createElement(
+              'h5',
+              { style: { margin: "0" } },
+              'Expiry'
+            ),
+            React.createElement('input', { className: 'expMonth', type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.exp_month, name: 'exp_month', placeholder: 'MM' }),
+            React.createElement('input', { className: 'expYear', type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.exp_year, name: 'exp_year', placeholder: 'YY' })
           )
         )
       );
@@ -83831,21 +83830,14 @@ var Cart = function (_React$Component) {
       if (total_price > 0) {
         payment_info = React.createElement(
           'div',
-          null,
-          React.createElement(
-            'div',
-            { style: { margin: "auto", width: "480px" } },
-            'same billing address ',
-            React.createElement('input', { onChange: this.handleSameBillingToggle.bind(this), type: 'checkbox', checked: this.state.same_billing })
-          ),
-          this.state.same_billing ? null : React.createElement(InputAddress, _extends({ section_title: 'Billing Address', errors: React.createElement(Errors, { label: 'billing' }), handleFieldChange: this.handleFieldChange.bind(this, "billing"), handleSetSectionState: this.handleSetSectionState.bind(this, "billing") }, this.state.billing)),
+          { className: 'cardInput' },
           this.renderInputCredit()
         );
       } // total_price > 0
 
       return React.createElement(
         'div',
-        null,
+        { className: 'cart-wrapper grid' },
         React.createElement(Items, {
           ref: 'Items',
           contents: this.state.items,
@@ -83859,18 +83851,74 @@ var Cart = function (_React$Component) {
           { className: 'checkout_section' },
           React.createElement(
             'section',
-            null,
-            'Login'
+            { className: 'loginHeader' },
+            React.createElement(
+              'h4',
+              null,
+              'Check Out'
+            )
           ),
-          React.createElement(UserLogin, { style: { width: "230px", display: "block" }, cta: '...or proceed as Guest' })
+          React.createElement(
+            'section',
+            { className: 'loginToggle' },
+            React.createElement(
+              'form',
+              null,
+              React.createElement('input', { type: 'radio', name: 'checkout', value: 'false', defaultChecked: true, onChange: this.handleToggleGuestCheckout.bind(this) }),
+              ' ',
+              React.createElement(
+                'span',
+                { className: 'radio_label' },
+                'Login'
+              ),
+              React.createElement('input', { type: 'radio', name: 'checkout', value: 'true', onChange: this.handleToggleGuestCheckout.bind(this) }),
+              React.createElement(
+                'span',
+                { className: 'radio_label' },
+                'Checkout As Guest'
+              )
+            )
+          ),
+          React.createElement(
+            'section',
+            { className: this.state.no_login_prompt ? "hidden" : "" },
+            React.createElement(UserLogin, null)
+          )
         ),
-        React.createElement(InputAddress, _extends({ section_title: 'Shipping Address', errors: React.createElement(Errors, { label: 'shipping' }), handleFieldChange: this.handleFieldChange.bind(this, "shipping"), handleSetSectionState: this.handleSetSectionState.bind(this, "shipping") }, this.state.shipping)),
-        payment_info,
         React.createElement(Errors, null),
         React.createElement(
-          BADButton,
-          { className: 'primary', onClick: this.handlePay.bind(this) },
-          'Get it!'
+          'section',
+          { className: this.state.no_login_prompt ? "addressArea" : "hidden" },
+          React.createElement(InputAddress, _extends({ section_title: 'Shipping Address', errors: React.createElement(Errors, { label: 'shipping' }), handleFieldChange: this.handleFieldChange.bind(this, "shipping"), handleSetSectionState: this.handleSetSectionState.bind(this, "shipping") }, this.state.shipping)),
+          React.createElement(
+            'div',
+            { className: 'billing-check' },
+            React.createElement(
+              'form',
+              null,
+              React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
+              ' ',
+              React.createElement(
+                'span',
+                { className: 'radio_label' },
+                'Same Billing address'
+              ),
+              React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: !this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
+              ' ',
+              React.createElement(
+                'span',
+                { className: 'radio_label' },
+                'Different Billing address'
+              )
+            ),
+            this.state.same_billing ? null : React.createElement(InputAddress, _extends({ section_title: 'Billing Address', errors: React.createElement(Errors, { label: 'billing' }), handleFieldChange: this.handleFieldChange.bind(this, "billing"), handleSetSectionState: this.handleSetSectionState.bind(this, "billing") }, this.state.billing))
+          ),
+          payment_info,
+          React.createElement(
+            BADButton,
+            { className: 'primary checkout_btn', onClick: this.handlePay.bind(this) },
+            'Get it!'
+          )
         ),
         React.createElement('script', { type: 'text/javascript', src: 'https://js.stripe.com/v2/' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          if ("' + process.env.STRIPE_KEY + '"!="undefined")\n            Stripe.setPublishableKey("' + process.env.STRIPE_KEY + '");\n        ' } })
@@ -85382,7 +85430,7 @@ var FacebookLogin = function (_React$Component) {
       // otherwise show login button
       return React.createElement(
         'button',
-        { onClick: this.fbLogin },
+        { className: 'loginBtn', onClick: this.fbLogin },
         'Login with Facebook'
       );
     }
@@ -85761,7 +85809,7 @@ var InputAddress = function (_React$Component) {
         null,
         React.createElement(
           "section",
-          null,
+          { className: "sectionTitle" },
           this.props.section_title
         ),
         this.props.errors ? this.props.errors : null,
@@ -85846,84 +85894,19 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var React = require('react');
 var ItemUtils = require('./ItemUtils.js');
 var Price = require('./Price.jsx');
 
 /* I moved the styles to inline for email compatibility, but currently the item
 design is still relying on unsupported styles and thus doesn't work */
-var color_secondary = "#000";
-var item_preview_width = "150px";
-var item_width = "700px";
-var item_padding = "13px";
-var item_margin = "5px";
-var style = {
-  item: {
-    display: "flex",
-    position: "relative",
-    maxWidth: item_width,
-    margin: "0px auto 0px auto",
-    padding: item_padding + " 0",
-    borderBottom: "solid 1px " + color_secondary
-  },
-  img_preview_container: {
-    display: "block",
-    width: item_preview_width
-  },
-  img_preview: {
-    backgroundSize: "contain",
-    backgroundRepeat: "no-repeat",
-    width: item_preview_width
-  },
-  deets: _defineProperty({
-    display: "block",
-    fontSize: "18px",
-    lineHeight: "16px",
-    position: "absolute",
-    top: "0",
-    bottom: "0",
-    right: "0",
-    left: parseInt(item_preview_width) + parseInt(item_margin) + "px",
-    margin: item_margin + " 0",
-    fontFamily: "sans-serif"
-  }, 'fontSize', "18px"),
-  price: {
-    position: "absolute",
-    bottom: "0px",
-    fontFamily: "arvo",
-    fontSize: "14px"
-  },
-  price_total: {
-    position: "absolute",
-    bottom: "0px",
-    right: "0px",
-    fontFamily: "arvo",
-    fontSize: "14px"
-  }
-};
-var style_summary = {
-  item: Object.assign({}, style.item, {
-    borderBottom: "none"
-  }),
-  img_preview_container: {
-    position: "absolute",
-    left: "0px",
-    top: "0px",
-    bottom: "-2px",
-    width: item_preview_width,
-    backgroundColor: "#fff"
-  },
-  deets: Object.assign({}, style.deets, {
-    fontFamily: "arvo",
-    fontSize: "14px"
-  })
-  /***
-  Draw an Item. Used in views/Items.jsx
-  props: will mirror a Component model
-  ***/
-};
+var style = {};
+var style_summary = {};
+/***
+Draw an Item. Used in views/Items.jsx
+props: will mirror a Component model
+***/
+
 var Item = function (_React$Component) {
   _inherits(Item, _React$Component);
 
@@ -85943,8 +85926,7 @@ var Item = function (_React$Component) {
           JSON.stringify(this.props)
         );
       }
-
-      var className = "item";
+      var className = "item-product";
       if (new RegExp("^promo:", "i").test(this.props.props.name) && this.props.onRemove) className += " promo";
       var inline_style = this.props.style ? this.props.style : style;
 
@@ -86010,23 +85992,23 @@ var Item = function (_React$Component) {
 
       return React.createElement(
         'div',
-        { style: inline_style.item, className: className },
+        { className: className },
         React.createElement(
           'a',
-          { href: this.props.props.url, style: inline_style.img_preview_container },
-          React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image : "", onError: function onError(event) {
+          { href: this.props.props.url },
+          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image : "", onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
-          React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image + "&camera=1" : "", onError: function onError(event) {
+          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image + "&camera=1" : "", onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
-          /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement('img', { style: style.img_preview, className: 'preview', src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
+          /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
               event.target.style.display = 'none';
             } }) : null
         ),
         React.createElement(
           'div',
-          { className: 'deets', style: inline_style.deets },
+          { className: 'deets' },
           React.createElement(
             'a',
             { href: this.props.props.url },
@@ -86043,8 +86025,8 @@ var Item = function (_React$Component) {
             'Remove'
           ) : null,
           assembly,
-          this.props.sku ? React.createElement(Price, { style: inline_style.price, price: this.props.props.price, quantity: quantity }) : null,
-          React.createElement(Price, { style: inline_style.price_total, price: this.props.props.price * quantity })
+          this.props.sku ? React.createElement(Price, { price: this.props.props.price, quantity: quantity }) : null,
+          React.createElement(Price, { price: this.props.props.price * quantity })
         )
       );
     }
@@ -86191,6 +86173,7 @@ var Items = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Items.__proto__ || Object.getPrototypeOf(Items)).call(this, props));
 
     _this.state = {
+      expanded: false,
       contents: _this.props.contents || [],
       shipping_quote: {
         days: 5,
@@ -86389,64 +86372,90 @@ var Items = function (_React$Component) {
       return React.createElement(
         'cart',
         null,
-        this.props.is_cart ? React.createElement(
+        React.createElement(
+          'h2',
+          { className: 'cart-header' },
+          'My Cart'
+        ),
+        React.createElement(
           'div',
-          { className: 'item', style: style.item },
-          React.createElement(
-            'span',
-            { style: { marginRight: "5px" } },
-            'Shipping on or before:'
-          ),
-          React.createElement(Timestamp, { time: this.countBusinessDays(this.estimateManufactureTime()) })
-        ) : null,
-        line_items,
+          { className: 'productWrapper' },
+          line_items
+        ),
         React.createElement(
           'div',
           { className: 'summary_items' },
           React.createElement(
             'div',
-            { className: 'item', style: style_summary.item },
-            React.createElement('div', { style: style_summary.img_preview_container }),
+            { className: 'summary_items__inner' },
             React.createElement(
-              'div',
-              { className: 'deets', style: style_summary.deets },
-              'Item Subtotal',
-              React.createElement(Price, { style: style_summary.price_total, price: subtotal })
-            )
-          ),
-          has_promo || !this.props.is_cart ? null : React.createElement(
-            'div',
-            { className: 'item promo', style: Object.assign({}, style_summary.item, { padding: "none" }) },
-            React.createElement(
-              'div',
-              { style: style_summary.img_preview_container },
-              React.createElement(Errors, { label: 'promo' })
+              'h4',
+              { className: 'summary_items__header' },
+              'Summary'
             ),
             React.createElement(
               'div',
-              { className: 'deets', style: style_summary.deets },
-              React.createElement('input', { placeholder: 'Promo code', type: 'text', style: { marginTop: "20px", width: "90px" }, value: this.state.promo.code, onChange: function onChange(event) {
-                  _this6.setState({ promo: { code: event.target.value } });
-                } }),
+              { className: 'item', style: style_summary.item },
+              React.createElement('div', { style: style_summary.img_preview_container }),
+              this.props.is_cart ? React.createElement(
+                'div',
+                { className: 'item shippingDate', style: style.item },
+                React.createElement(
+                  'span',
+                  { className: 'sum-bold', style: { marginRight: "5px" } },
+                  'Shipping on or before:'
+                ),
+                React.createElement(Timestamp, { time: this.countBusinessDays(this.estimateManufactureTime()) })
+              ) : null,
               React.createElement(
-                'button',
-                { style: { position: "absolute", top: "-12px", left: "95px", width: "90px" }, onClick: function onClick() {
-                    _this6.handleApplyDiscountCode();
-                  } },
-                'Apply'
+                'div',
+                { className: 'deets', style: style_summary.deets },
+                React.createElement(
+                  'span',
+                  { className: 'sum-bold' },
+                  'Cart Subtotal:'
+                ),
+                React.createElement(Price, { style: style_summary.price_total, price: subtotal })
               )
-            )
-          ),
-          summary_items,
-          React.createElement(
-            'div',
-            { className: 'item', style: Object.assign({}, style_summary.item, { minHeight: "28px" }) },
-            React.createElement('div', { style: style_summary.img_preview_container }),
+            ),
+            summary_items,
             React.createElement(
               'div',
-              { className: 'deets', style: Object.assign({}, style_summary.deets, { paddingTop: "28px" }) },
-              'Package Total',
-              React.createElement(Price, { style: style_summary.price_total, price: total })
+              { className: 'item', style: Object.assign({}, style_summary.item, { minHeight: "28px" }) },
+              React.createElement('div', { style: style_summary.img_preview_container }),
+              React.createElement(
+                'div',
+                { className: 'deets', style: Object.assign({}, style_summary.deets, { paddingTop: "28px" }) },
+                React.createElement(
+                  'span',
+                  { className: 'sum-bold' },
+                  'Total:'
+                ),
+                React.createElement(Price, { style: style_summary.price_total, price: total })
+              )
+            ),
+            has_promo || !this.props.is_cart ? null : React.createElement(
+              'div',
+              { className: 'item promo', style: Object.assign({}, style_summary.item, { padding: "none" }) },
+              React.createElement(
+                'div',
+                { style: style_summary.img_preview_container },
+                React.createElement(Errors, { label: 'promo' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'promoInput', style: style_summary.deets },
+                React.createElement('input', { placeholder: 'Promo code', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
+                    _this6.setState({ promo: { code: event.target.value } });
+                  } }),
+                React.createElement(
+                  'button',
+                  { onClick: function onClick() {
+                      _this6.handleApplyDiscountCode();
+                    } },
+                  'Apply'
+                )
+              )
             )
           )
         )
@@ -86557,13 +86566,7 @@ var LayoutBorderWrap = function (_React$Component) {
     function LayoutBorderWrap(props) {
         _classCallCheck(this, LayoutBorderWrap);
 
-        var _this = _possibleConstructorReturn(this, (LayoutBorderWrap.__proto__ || Object.getPrototypeOf(LayoutBorderWrap)).call(this, props));
-
-        _this.state = {
-            expanded: false,
-            desktop_mode: false
-        };
-        return _this;
+        return _possibleConstructorReturn(this, (LayoutBorderWrap.__proto__ || Object.getPrototypeOf(LayoutBorderWrap)).call(this, props));
     }
 
     _createClass(LayoutBorderWrap, [{
@@ -86618,9 +86621,9 @@ var LayoutFooter = function (_React$Component) {
     value: function render() {
       var menu_items = [];
 
-      menu_items.push(React.createElement('a', { className: 'social twitter', key: menu_items.length, href: '//twitter.com/bowanddrape' }));
-      menu_items.push(React.createElement('a', { className: 'social instagram', key: menu_items.length, href: '//instagram.com/bowanddrape/' }));
-      menu_items.push(React.createElement('a', { className: 'social facebook', key: menu_items.length, href: '//facebook.com/BowAndDrape/' }));
+      menu_items.push(React.createElement('a', { className: 'social twitter', key: menu_items.length, href: '//twitter.com/bowanddrape', target: '_blank' }));
+      menu_items.push(React.createElement('a', { className: 'social instagram', key: menu_items.length, href: '//instagram.com/bowanddrape/', target: '_blank' }));
+      menu_items.push(React.createElement('a', { className: 'social facebook', key: menu_items.length, href: '//facebook.com/BowAndDrape/', target: '_blank' }));
       menu_items.push(React.createElement(
         'a',
         { key: menu_items.length, href: '/customize-your-own' },
@@ -86812,23 +86815,27 @@ var LayoutHeader = function (_React$Component) {
       return React.createElement(
         'div',
         { className: 'header' },
-        React.createElement('handle', { className: this.state.expanded ? "expanded" : "", onClick: function onClick() {
-            _this2.setState({ expanded: !_this2.state.expanded });
-          } }),
         React.createElement(
-          'a',
-          { href: '/' },
-          React.createElement('img', { className: 'logo', src: '/logo_mini.svg' })
-        ),
-        React.createElement(CartMenu, { key: menu_items.length }),
-        React.createElement(
-          'menu',
-          { className: this.state.expanded ? "expanded" : "" },
-          React.createElement(UserProfile, this.props),
+          'div',
+          { className: 'headerInner' },
+          React.createElement('handle', { className: this.state.expanded ? "expanded" : "", onClick: function onClick() {
+              _this2.setState({ expanded: !_this2.state.expanded });
+            } }),
           React.createElement(
-            'menu_items',
-            null,
-            menu_items
+            'a',
+            { href: '/' },
+            React.createElement('img', { className: 'logo', src: '/logo_mini.svg' })
+          ),
+          React.createElement(CartMenu, { key: menu_items.length }),
+          React.createElement(
+            'menu',
+            { className: this.state.expanded ? "expanded" : "" },
+            React.createElement(UserProfile, this.props),
+            React.createElement(
+              'menu_items',
+              null,
+              menu_items
+            )
           )
         )
       );
@@ -90468,6 +90475,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
         React.createElement('div', { style: { width: "600px", margin: "20px auto", borderBottom: "solid 1px #000" } }),
         React.createElement(Signup, {
           hidden_keys: { email: this.props.email },
+          BtnText: 'Send Now!',
           misc_keys: ["Other comments?"],
           selectors: { "From 1 being \"that's a hard nope\" to 10 being \"absolutely\", how likely are you to recommend Bow & Drape to your friends?": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] }
         })
@@ -90626,30 +90634,34 @@ var UserLogin = function (_React$Component) {
         React.createElement(Errors, { label: 'login' }),
         React.createElement('input', { ref: function ref(input) {
             _this3.fields.email = input;
-          }, placeholder: 'email address', type: 'text', name: 'email', style: { display: "block" } }),
+          }, placeholder: 'email address', type: 'text', name: 'email' }),
         React.createElement('input', { ref: function ref(input) {
             _this3.fields.password = input;
           }, placeholder: 'password', onKeyUp: function onKeyUp(event) {
             if (event.which == 13) {
               _this3.login();
             }
-          }, type: 'password', name: 'password', style: { display: "block" } }),
+          }, type: 'password', name: 'password' }),
         React.createElement(
-          'button',
-          { onClick: this.login.bind(this) },
-          'Login / Register'
-        ),
-        React.createElement(
-          'button',
-          { onClick: this.verify.bind(this) },
-          'Verify / Forgot Pass'
+          'section',
+          { className: 'btnWrap' },
+          React.createElement(
+            'button',
+            { className: 'loginBtn', onClick: this.login.bind(this) },
+            'Login / Register'
+          ),
+          React.createElement(
+            'button',
+            { className: 'loginBtn', onClick: this.verify.bind(this) },
+            'Verify / Forgot Pass'
+          ),
+          React.createElement(FacebookLogin, { user: this.state.user })
         ),
         this.props.cta ? React.createElement(
           'div',
           { className: 'cta' },
           this.props.cta
-        ) : null,
-        React.createElement(FacebookLogin, { user: this.state.user })
+        ) : null
       );
     }
   }], [{

@@ -1,25 +1,149 @@
 
 @import "./colors.less";
 
+.grid {
+  display: grid;
+  width: 80vw;
+  margin: 0 auto;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto;
+}
+
+cart {
+  grid-column-start: 1;
+  grid-column-end: -1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto;
+}
+
+.billing-check {
+  grid-column-start: 1;
+  grid-column-end: -1;
+  margin-top: 40px;
+}
+
+
+.sameCheckbox {
+  margin-bottom: 20px;
+}
 .checkout_section {
-  max-width: 460px;
-  display: block;
-  margin: 20px auto;
-  position: relative;
-  border: solid 3px @color_tertiary;
-  padding: 5px;
+  grid-column-start: 1;
+  grid-column-end: -1;
+  margin-top: 40px;
+
+  input {
+    display: inline-block;
+  }
+
+  login {
+    input {
+      margin-right: 10px;
+    }
+
+    .btnWrap {
+      button {
+        display: inline-block;
+          margin-right: 20px;
+      }
+    }
+  }
+
+}
+
+.cart-header {
+  grid-column: span 6;
+}
+
+.sum-bold, .name {
+  font-weight: 800;
+}
+
+.productWrapper {
+  border-top:2px solid black;
+  border-bottom: 2px solid black;
+  padding: 10px;
+  grid-column: span 4;
+
+  .item-product {
+    border-bottom: 2px solid black;
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+
+    .deets {
+    display: inline-block;
+    margin-left: 20px;
+    }
+  }
+}
+
+
+@media (max-width: @desktop_min_width) {
+  .productWrapper {
+    grid-column: span 6;
+    border-bottom: none;
+  }
+}
+
+.promoInput {
+  input {
+    border: none;
+    border-bottom: 3px solid #000;
+    text-transform: lowercase;
+  }
+
+  button {
+    display: inline-block;
+  }
+}
+
+.summary_items {
+  display: inline-block;
+  grid-column: span 2;
+  padding: 0 0 0 40px;
+}
+
+@media (max-width: @desktop_min_width) {
+  .summary_items {
+    grid-column: span 6;
+    padding: 0;
+    margin-top: 30px;
+  }
+}
+
+.summary_items__inner {
+  padding: 20px;
+  border: 1px solid black;
+  display: inline-block;
+}
+
+
+.summary_items__header {
+  border-bottom: 2px solid black;
+}
+
+.remove {
+  text-decoration: underline;
+  border: none;
+  font-family: "Open Sans", Arial, sans-serif;
+  text-align: left;
+  width: auto;
+  display: initial;
+
+  &:after, &:before {
+    background-color: white;
+  }
+}
+
+
+.checkout_section {
   section {
-    color: @color_tertiary;
-    position: absolute;
-    top: -35px;
-    display: block;
-    font-size: 22px;
   }
   row {
     display: flex;
     flex-flow: row wrap;
-    align-content: center;
-    justify-content: space-between;
   }
   label {
     text-align: right;
@@ -47,4 +171,82 @@ input_credit {
   [name="cvc"], [name="exp_month"], [name="exp_year"] {
     width: 40px;
   }
+}
+
+.sectionTitle {
+  font-weight: bold;
+  font-size: 18px;
+
+  &:after {
+    position: relative;
+    content: '';
+    width: 30px;
+    background: black;
+    height: 2px;
+  }
+}
+
+.addressArea {
+  display: inline-block;
+  grid-column-start: 1;
+  grid-column-end: -1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto;
+
+  input_address{
+    grid-column-start: 1;
+    grid-column-end: 6;
+  }
+}
+
+.cardInput {
+  margin-top: 20px;
+  display: inline-block;
+  grid-column-start: 1;
+  grid-column-end: -1;
+  padding: 10px 0;
+  border-top: 2px solid black;
+}
+
+.billing-check {
+  .sectionTitle {
+    margin-top: 20px;
+  }
+}
+
+.cart-wrapper{
+  input[type="text"], input[type="password"] {
+    background-color: #fff;
+    border: 1px solid lightgrey;
+    min-width: 230px;
+    width: auto;
+    min-height: 40px;
+    margin: 10px auto;
+    padding: 5px 10px;
+    outline: none;
+    font-size: 14px
+  }
+  login{
+    input[type="text"], input[type="password"] {
+      margin-right: 20px;
+    }
+  }
+}
+
+.paymentWrap {
+  input[type="text"].cardNum {
+    display: inline-block;
+    margin-right: 10px;
+  }
+  input[type="text"].cardCvc, input[type="text"].expMonth, input[type="text"].expYear {
+    display: inline-block;
+    margin-right: 10px;
+    width: 60px;
+    min-width: 60px;
+  }
+}
+
+.checkout_btn {
+  margin: 0 0 10px 0;
 }

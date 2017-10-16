@@ -51,7 +51,7 @@ class InputAddress extends React.Component {
   render() {
     return (
       <input_address>
-        <section>{this.props.section_title}</section>
+        <section className="sectionTitle">{this.props.section_title}</section>
         {this.props.errors?this.props.errors:null}
 
         {this.props.section_title=="Shipping Address" ?
