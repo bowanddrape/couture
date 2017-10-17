@@ -248,7 +248,7 @@ input[type="password"] {
   position: absolute;
   text-align: center;
   width: 100%;
-  bottom: -22px;
+  bottom: -44px;
 }
 .card price,
 .card .price {
@@ -263,17 +263,19 @@ input[type="password"] {
 }
 .card swatches {
   position: absolute;
-  bottom: 2px;
+  bottom: -20px;
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
 }
 .card swatches > div {
   overflow: hidden;
   width: 15px;
-  height: 20px;
+  height: 15px;
   margin: 0px 2px;
-  border: solid 1px #000;
+  border: solid 2px #000;
+  border-radius: 10px;
 }
 .card swatches > div img {
   margin-left: -9px;
@@ -551,7 +553,6 @@ customize .canvas_container canvas {
   height: 300px;
   width: 100%;
   display: block;
-  min-width: 400px;
   max-height: 100%;
 }
 customize .canvas_container .component_selected canvas,
