@@ -85541,7 +85541,7 @@ var FulfillShipments = function (_React$Component) {
             React.createElement(
               'h2',
               null,
-              'For Production'
+              'Picking'
             ),
             React.createElement(Scrollable, {
               component: Shipment,
@@ -85556,7 +85556,16 @@ var FulfillShipments = function (_React$Component) {
             React.createElement(
               'h2',
               null,
-              'Picked'
+              'Pressing'
+            )
+          ),
+          React.createElement(
+            'shipments',
+            null,
+            React.createElement(
+              'h2',
+              null,
+              'Reviewing'
             ),
             React.createElement(Scrollable, {
               component: Shipment,
@@ -85571,7 +85580,7 @@ var FulfillShipments = function (_React$Component) {
             React.createElement(
               'h2',
               null,
-              'Inspected'
+              'Packing'
             ),
             React.createElement(Scrollable, {
               component: Shipment,
@@ -86263,24 +86272,27 @@ var Items = function (_React$Component) {
   }, {
     key: 'estimateManufactureTime',
     value: function estimateManufactureTime() {
-      var days_needed = 1;
+      var days_needed_parallel = 5;
+      var days_needed_serial = 0;
       var items = this.state.contents;
       ItemUtils.recurseAssembly(items, function (component) {
         // hardcoded defaults, if not set.
         var default_manufacture_time = {
-          parallel: 3,
+          parallel: 7,
           serial: 0
+          // FIXME
           // embroidery and airbrush will take longer, too lazy to update the db
-        };if (/letter_embroidery/.test(component.sku) || /letter_airbrush/.test(component.sku)) default_manufacture_time.parallel = 7;
+        };if (/letter_embroidery/.test(component.sku)) default_manufacture_time.parallel = 10;
+        if (/letter_airbrush/.test(component.sku)) default_manufacture_time.parallel = 15;
         // extract the manufacture_time for this component
         var manufacture_time = component.props.manufacture_time || {};
         manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
         manufacture_time.serial = manufacture_time.serial || default_manufacture_time.serial;
         // update our accumulator
-        days_needed = Math.max(days_needed, manufacture_time.parallel);
-        days_needed += manufacture_time.serial;
+        days_needed_parallel = Math.max(days_needed_parallel, manufacture_time.parallel);
+        days_needed_serial += manufacture_time.serial;
       });
-      return days_needed;
+      return days_needed_parallel + days_needed_serial;
     }
 
     // estimate date from now, takes days, returns time in seconds
@@ -86337,10 +86349,6 @@ var Items = function (_React$Component) {
       var style_summary = Item.style_summary;
       // hide irrelevant things on packing slip
       if (this.props.packing_slip) {
-        style.price.price = { display: "none" };
-        style.price.right = "0px";
-        style.price_total = { display: "none" };
-        style.img_preview = { display: "none" };
         style.deets = Object.assign({}, style.deets, { position: "relative", left: "-64px", width: "100%" });
         style_summary.item = Object.assign({}, style_summary.item, { display: "none" });
       }
@@ -86371,7 +86379,7 @@ var Items = function (_React$Component) {
 
       return React.createElement(
         'cart',
-        null,
+        { className: this.props.packing_slip ? "packing_slip" : "" },
         React.createElement(
           'h2',
           { className: 'cart-header' },
@@ -86531,7 +86539,7 @@ var LayoutBasic = function (_React$Component) {
 
       return React.createElement(
         'div',
-        { className: 'layout' },
+        null,
         React.createElement('link', { href: 'https://fonts.googleapis.com/css?family=Open+Sans', rel: 'stylesheet' }),
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         content,
@@ -87877,7 +87885,7 @@ var Price = function (_React$Component) {
 
       return React.createElement(
         "div",
-        { style: style },
+        { style: style, className: "price" },
         React.createElement(
           "span",
           { style: style.price },

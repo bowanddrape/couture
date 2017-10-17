@@ -46,7 +46,7 @@ class LayoutBasic extends React.Component {
     }
 
     return (
-      <div className="layout">
+      <div>
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
         {content}
