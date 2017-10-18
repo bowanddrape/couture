@@ -16,9 +16,11 @@ Draw a shipment. Used in lists of orders/shipments
 class Shipment extends React.Component {
   constructor(props) {
     super(props);
+    console.log(props);
     this.state = {
       from_id: this.props.from_id,
       to_id: this.props.to_id,
+      fulfillment_id: this.props.fulfillment_id,
       packed: this.props.packed,
       approved: this.props.approved,
       on_hold: this.props.on_hold,
@@ -200,7 +202,7 @@ class Shipment extends React.Component {
           <div className="header_menu">
             <shipping_details>
               <div><label>Order_id: </label><a href={`/shipment/${this.props.id}`}>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</a></div>
-              <div><label>Label: </label>{this.props.name}</div>
+              <div><label>Fulfillment_id: </label> {this.props.fulfillment_id} </div>
               <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
               {to}
               <div><label>User: </label>{this.props.email}</div>
