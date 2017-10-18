@@ -3,8 +3,26 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,600,800');
 
 
+@font-face {
+    font-family: 'zurichbold_condensed';
+    src: url('zurichbt-boldcondensed-webfont.woff2') format('woff2'),
+         url('zurichbt-boldcondensed-webfont.woff') format('woff'),
+         url('zurichbt-boldcondensed-webfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 
-@font-face {font-family:Zurich-Condensed-Bold; src: url(/Zurich__Condensed_BT.ttf) format('truetype');}
+}
+
+@font-face {
+    font-family: 'zurich_condensedregular';
+    src: url('zurichbt-romancondensed-webfont.woff2') format('woff2'),
+         url('zurichbt-romancondensed-webfont.woff') format('woff'),
+         url('zurichbt-romancondensed-webfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
 .bodyfont {
   font-family: "Open Sans", Arial, sans-serif;
   line-height: 1.43;
@@ -12,15 +30,20 @@
   color: @color_secondary;
 }
 .headerfont {
-  font-family: "Zurich-Condensed-Bold", sans-serif;
+  font-family: "zurichbold_condensed", sans-serif;
   color: @color_secondary;
   font-weight: normal;
   letter-spacing: 0px;
 }
 
+.zurichroman {
+  font-family: 'zurich_condensedregular', sans-serif;
+  font-weight: normal;
+}
+
 
 h1, h2, h3 {
-  font-family: "Zurich-Condensed-Bold", sans-serif;
+  font-family: "zurichbold_condensed", sans-serif;
   color: @color_secondary;
   font-weight: bold;
   text-transform: uppercase;

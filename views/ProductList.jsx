@@ -165,10 +165,10 @@ class ProductList extends React.Component {
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
         </div>
         {this.props.edit ?
-          null : <div className="add_to_cart" style={{textAlign:"center"}}><BADButton className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart ${product.props.price}</BADButton></div>
+          null : <div className="add_to_cart"><div className="productName">{product.props.name} ${product.props.price}</div><BADButton className="primary addCart" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</BADButton></div>
         }
         {product.props.details ?
-          <div className="product_details" dangerouslySetInnerHTML={{
+          <div className="product_details grid" dangerouslySetInnerHTML={{
             __html:unescape(product.props.details)
           }} /> :
           null

@@ -60,7 +60,7 @@ class Items extends React.Component {
         shipping_cost = 0;
       contents.push({
         props: {
-          name: "Shipping & Handling",
+          name: "Shipping & Handling:",
           price: shipping_cost
         }
       });
@@ -241,7 +241,7 @@ class Items extends React.Component {
               </div>
             </div>
           }
-        </div>  
+        </div>
       </div>
       </cart>
     );

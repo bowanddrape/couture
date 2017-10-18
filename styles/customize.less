@@ -117,11 +117,109 @@ customize {
     .rainbow_border;
   }
 
+
+//Right Hand Btns
+  .cameraBtn {
+    border: 0;
+    font-weight: 700;
+    height: auto;
+    display: block;
+    padding-top: 10px;
+    &:before {
+      content: "";
+      display: block;
+      height: 30px;
+      width: 40px;
+      margin: 0 auto 10px auto;
+      position: initial;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-color: white;
+
+    }
+  }
+
+  .frontview {
+    &:before {
+      background-image: url(/frontview.svg);
+    }
+  }
+
+  .backview {
+    &:before {
+      content: "";
+        background-image: url(/backview.svg);
+    }
+  }
+
+  .centerBtn{
+    &:before {
+      content: "";
+        background-image: url(/centerview.svg);
+    }
+  }
+
+  .hudBtn {
+    border: none;
+    font-weight: 700;
+    height: auto;
+    display: block;
+    padding-top: 10px;
+    &:before {
+      content: "";
+      display: block;
+      height: 30px;
+      width: 40px;
+      margin: 0 auto 10px auto;
+      position: initial;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-color: white;
+    }
+  }
+
+  .hudBtn--delete {
+    &:before {
+      content: "";
+        background-image: url(/bin.svg);
+    }
+  }
+
+  .hudBtn--rotateLeft{
+    &:before {
+      content: "";
+        background-image: url(/frontview.svg);
+    }
+  }
+
+  .hudBtn--rotateRight{
+    &:before {
+      content: "";
+        background-image: url(/backview.svg);
+    }
+  }
+
+  .hudBtn--done{
+    &:before {
+      content: "";
+        background-image: url(/tick.svg);
+    }
+  }
+
+  .hudBtn--center{
+    &:before {
+      content: "";
+        background-image: url(/centerview.svg);
+    }
+  }
+
   hud_controls {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 0px;
+    top: 185px;
     right: 0px;
     min-width: 83px;
     &.rainbow_border {
@@ -137,31 +235,35 @@ customize {
     }
   }
   .product_details {
-    display: flex;
-    flex-wrap: wrap;
     .description {
       margin: 20px auto;
-      font-family: sans-serif;
       letter-spacing: 2px;
       line-height: 23px;
       text-align: center;
-      max-width: 600px;
+      grid-column-start: 1;
+      grid-column-end: 4;
+      margin-top: 40px;
     }
     .size_chart {
       margin: 20px auto;
       display: table;
+      border-collapse: collapse;
+      font-family: 'zurich_condensedregular', sans-serif;
+      grid-column-start: 4;
+      grid-column-end: 6;
+      margin-top: 40px;
       row {
-        &:first-child {
-          background-color: @color_support_0;
+          border-bottom: 1px solid @color_support_0;
+        &:last-child {
+          border-bottom:none;
         }
         display: table-row;
         span {
-          &:first-child {
-            background-color: @color_support_0;
-          }
           display: table-cell;
-          padding: 5px;
-          border: solid 1px @color_primary;
+          padding: 5px 5px 5px 10px;
+          &:first-child {
+            border-right: 1px solid @color_support_0;
+          }
         }
       }
     }
@@ -171,7 +273,7 @@ customize {
 @media (min-width: @desktop_min_width) { customize {
   product_options {
     left: auto;
-    right: 0;
+    right: 33px;
     max-width: 750px;
     switch {
       justify-content: flex-end;
@@ -179,7 +281,7 @@ customize {
     }
   }
   hud_controls:not(.rainbow_border) {
-    top: 165px;
+    top: 185px;
   }
   .component_picker {
     position: absolute;
@@ -221,3 +323,48 @@ customize {
     }
   }
 }}
+
+.component_wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 170px;
+}
+
+switch_option img {
+  font-weight: 700;
+}
+
+
+.add_to_cart {
+  position: fixed;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  border-top: 1px solid black;
+  z-index: 10;
+  background: white;
+  border-top: 5px solid transparent;
+  border-image: @gradient-rainbow;
+  border-image-slice: 1;
+
+
+  .productName {
+    position: relative;
+    display: inline-block;
+    font-size: 42px;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 3px solid #7f5cff;
+    margin: 35px 60px 0 0;
+  }
+
+  .addCart {
+    font-size: 20px;
+    display: inline-block;
+  }
+}
+
+
+//Product Details

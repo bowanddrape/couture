@@ -176,7 +176,7 @@ class Cart extends React.Component {
             <input className="cardCvc" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.cvc} name="cvc" placeholder="CVC"/>
           </div>
           <div className="cardExpWrap">
-            <h5 style={{margin:"0"}}>Expiry</h5>
+            <h5 style={{margin:"0"}}>Expiration Date</h5>
             <input className="expMonth" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_month} name="exp_month" placeholder="MM"/>
             <input className="expYear" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_year} name="exp_year" placeholder="YY"/>
           </div>

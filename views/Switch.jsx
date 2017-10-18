@@ -51,7 +51,7 @@ class Switch extends React.Component {
     }
     return (
       <switch
-        className={this.state.expanded||this.props.always_expanded?"expanded":""}
+        className={this.state.expanded||this.props.always_expanded?"expanded":null}
         onClick={()=>{this.setState({expanded:!this.state.expanded})}}
         style={this.props.style}
       >
