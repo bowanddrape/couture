@@ -8,6 +8,7 @@ const Address = require('./Address');
 const ShipProvider = require('./ShipProvider.js');
 const Page = require('./Page');
 const ShipmentView = require('../views/Shipment.jsx');
+const SQLTable = require('./SQLTable.js');
 var aws = require('aws-sdk');
 var s3 = new aws.S3({ accessKeyId: process.env.AWS_ACCESS_KEY, secretAccessKey: process.env.AWS_SECRET_KEY, region: process.env.AWS_REGION })
 
@@ -31,7 +32,7 @@ class Shipment extends JSONAPI {
     return {
       tablename: "shipments",
       pkey: "id",
-      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address", "billing_address"]
+      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address", "billing_address", "fulfillment_id"]
     };
   }
 
@@ -56,6 +57,20 @@ class Shipment extends JSONAPI {
 
   // extends JSONAPI
   onApiSave(req, res, object, callback) {
+    // TODO in the future check if we already have a fulfillment_id
+    if (object.id && object.approved){
+        let s = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 RETURNING *"
+        return SQLTable.sqlExec(s, [object.approved, object.id], (err, result) => {
+        if (err) {
+          console.log(err);
+          return callback(err);
+        }
+        let next_fulfillment_id = result.rows[0].fulfillment_id || 1;
+        object.fulfillment_id = next_fulfillment_id;
+        super.onApiSave(req, res, object, callback);
+        });
+    };
+
     // if this was a request for shipping rates, return that instead
     if (req.path=="/shipment/quote") {
       return this.constructor.get(object.id, (err, shipment) => {
@@ -78,7 +93,6 @@ class Shipment extends JSONAPI {
         });
       });
     }
-
     super.onApiSave(req, res, object, callback);
   }
 
