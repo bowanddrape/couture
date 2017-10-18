@@ -85899,6 +85899,18 @@ var recurseAssembly = function recurseAssembly(component, foreach) {
   }
 };
 
+var recurseOptions = function recurseOptions(component, foreach) {
+  if (!component) return;
+  // run callback
+  foreach(component);
+  // walk through our assembly
+  if (component.options) {
+    for (var option in component.options) {
+      recurseOptions(component.options[option], foreach);
+    }
+  }
+};
+
 // get price of an item list, optionally only counting ones that pass filter
 var getPrice = function getPrice(items, filter) {
   var total_price = 0;
@@ -85955,6 +85967,7 @@ var applyCredits = function applyCredits(credits, items) {
 
 module.exports = {
   recurseAssembly: recurseAssembly,
+  recurseOptions: recurseOptions,
   getPrice: getPrice,
   applyPromoCode: applyPromoCode,
   applyCredits: applyCredits
@@ -86461,7 +86474,12 @@ var LayoutFooter = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own.html' },
+        { key: menu_items.length, href: '/legal' },
+        'Legal'
+      ));
+      menu_items.push(React.createElement(
+        'a',
+        { key: menu_items.length, href: '/customize-your-own' },
         'Make Your Own'
       ));
 
@@ -86547,7 +86565,7 @@ var LayoutHeader = function (_React$Component) {
 
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own.html' },
+        { key: menu_items.length, href: '/customize-your-own' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -86556,7 +86574,7 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own.html' },
+        { key: menu_items.length, href: '/customize-your-own' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -86565,7 +86583,7 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own.html' },
+        { key: menu_items.length, href: '/customize-your-own' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -86574,7 +86592,7 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize-your-own.html' },
+        { key: menu_items.length, href: '/customize-your-own' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -88170,7 +88188,7 @@ var ProductCanvas = function (_React$Component) {
           { className: this.state.assembly[this.state.selected_component] ? "rainbow_border" : "" },
           hud_controls
         ),
-        React.createElement(ProductComponentPicker, { product: this.props.product, productCanvas: this })
+        React.createElement(ProductComponentPicker, { product: this.props.product, productCanvas: this, compatible_component_map: this.props.compatible_component_map })
       );
     }
   }]);
@@ -88262,14 +88280,15 @@ var ProductComponentPicker = function (_React$Component) {
       var misc_components = [];
 
       var _loop = function _loop(i) {
-        if (product.compatible_components[i].options) {
+        var compatible_component = _this2.props.compatible_component_map[product.compatible_components[i]];
+        if (compatible_component.options) {
           // handle if virtual keyboard
-          if (false && product.compatible_components[i].props.is_letters) {
+          if (false && compatible_component.props.is_letters) {
             // array => map
             var component_letters = {};
             var _tab_components = [];
-            for (var j = 0; j < product.compatible_components[i].options.length; j++) {
-              var letter = product.compatible_components[i].options[j];
+            for (var j = 0; j < compatible_component.options.length; j++) {
+              var letter = compatible_component.options[j];
               var toks = letter.props.name.split('_');
               var character = toks[toks.length - 1].toLowerCase();
               if (character.match(/^[a-z]$/)) component_letters[character] = letter;else {
@@ -88279,7 +88298,7 @@ var ProductComponentPicker = function (_React$Component) {
             }
             components.push(React.createElement(
               'div',
-              { key: components.length, name: product.compatible_components[i].props.name, className: 'component_virtual_keyboard_container' },
+              { key: components.length, name: compatible_component.props.name, className: 'component_virtual_keyboard_container' },
               React.createElement(
                 'row',
                 null,
@@ -88319,25 +88338,25 @@ var ProductComponentPicker = function (_React$Component) {
             ));
             components.push(React.createElement(
               'div',
-              { key: components.length, name: product.compatible_components[i].props.name + "_cont", className: 'component_container', style: { overflow: "hidden" } },
+              { key: components.length, name: compatible_component.props.name + "_cont", className: 'component_container', style: { overflow: "hidden" } },
               _tab_components
             ));
             return 'continue';
           } // is_letters
 
           // handle if native keyboard
-          if (product.compatible_components[i].props.is_letters) {
+          if (compatible_component.props.is_letters) {
             // array => map
             var _component_letters = {};
-            for (var _j = 0; _j < product.compatible_components[i].options.length; _j++) {
-              var _letter = product.compatible_components[i].options[_j];
+            for (var _j = 0; _j < compatible_component.options.length; _j++) {
+              var _letter = compatible_component.options[_j];
               var _toks = _letter.sku.split('_');
               var _character = _toks[_toks.length - 1].toLowerCase();
               _component_letters[_character] = _letter;
             }
             components.push(React.createElement(
               'div',
-              { key: components.length, name: product.compatible_components[i].props.name || product.compatible_components[i].sku, style: { height: "auto", overflow: "hidden" }, className: 'component_container letters' },
+              { key: components.length, name: compatible_component.props.name || compatible_component.sku, style: { height: "auto", overflow: "hidden" }, className: 'component_container letters' },
               React.createElement('input', { type: 'text', style: { width: "90%", margin: "auto" }, placeholder: 'Say Something Punny',
                 onChange: function onChange(event) {
                   _this2.handleSetComponentText(event.target.value, _component_letters);
@@ -88364,20 +88383,20 @@ var ProductComponentPicker = function (_React$Component) {
           var tab_components = [];
 
           var _loop2 = function _loop2(_j2) {
-            var backgroundImage = 'url(' + product.compatible_components[i].options[_j2].props.image + ')';
-            var backgroundSize = product.compatible_components[i].options[_j2].props.imagewidth / product.compatible_components[i].options[_j2].props.imageheight * 100 + '% 100%';
-            if (product.compatible_components[i].options[_j2].props.imagewidth > product.compatible_components[i].options[_j2].props.imageheight) backgroundSize = '100% ' + product.compatible_components[i].options[_j2].props.imageheight / product.compatible_components[i].options[_j2].props.imagewidth * 100 + '%';
+            var backgroundImage = 'url(' + compatible_component.options[_j2].props.image + ')';
+            var backgroundSize = compatible_component.options[_j2].props.imagewidth / compatible_component.options[_j2].props.imageheight * 100 + '% 100%';
+            if (compatible_component.options[_j2].props.imagewidth > compatible_component.options[_j2].props.imageheight) backgroundSize = '100% ' + compatible_component.options[_j2].props.imageheight / compatible_component.options[_j2].props.imagewidth * 100 + '%';
             tab_components.push(React.createElement('div', { key: i + '_' + _j2, style: { backgroundImage: backgroundImage, backgroundSize: backgroundSize }, onClick: function onClick() {
-                _this2.handleSelectComponent(-1);_this2.handleAddComponent(product.compatible_components[i].options[_j2]);
+                _this2.handleSelectComponent(-1);_this2.handleAddComponent(compatible_component.options[_j2]);
               } }));
           };
 
-          for (var _j2 = 0; _j2 < product.compatible_components[i].options.length; _j2++) {
+          for (var _j2 = 0; _j2 < compatible_component.options.length; _j2++) {
             _loop2(_j2);
           }
           components.push(React.createElement(
             'div',
-            { key: components.length, name: product.compatible_components[i].props.name, className: 'rainbow_border' },
+            { key: components.length, name: compatible_component.props.name, className: 'rainbow_border' },
             React.createElement(
               'div',
               { className: 'component_container' },
@@ -88386,7 +88405,7 @@ var ProductComponentPicker = function (_React$Component) {
           ));
           return 'continue';
         }
-        misc_components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + product.compatible_components[i].props.image + ')' } }));
+        misc_components.push(React.createElement('div', { key: i + '_0', style: { backgroundImage: 'url(' + compatible_component.props.image + ')' } }));
       };
 
       for (var i = 0; product.compatible_components && i < product.compatible_components.length; i++) {
@@ -88438,6 +88457,7 @@ var Switch = require('./Switch.jsx');
 var ComponentSerializer = require('./ComponentSerializer.js');
 var BADButton = require('./BADButton.jsx');
 var ClickForMore = require('./ClickForMore.jsx');
+var ItemUtils = require('./ItemUtils.js');
 
 /***
 Draws List of products available in a store.
@@ -88471,6 +88491,8 @@ var ProductList = function (_React$Component) {
   _createClass(ProductList, [{
     key: 'componentWillMount',
     value: function componentWillMount() {
+      var _this2 = this;
+
       // TODO we should probably figure out a way to pull this reconstitution of
       // a customization out of this class and into ComponentSerializer, probably
       // also moving over the some of the recursive inheriting out of
@@ -88493,6 +88515,30 @@ var ProductList = function (_React$Component) {
         }
         // fill in our customization
         var initial_assembly = customization.assembly;
+        ItemUtils.recurseAssembly(initial_assembly, function (component) {
+          if (component.sku) {
+            var _ret = function () {
+              var hydrated = null;
+              // search through compatible_component_map for match
+              var compatible_component_skus = Object.keys(_this2.props.compatible_component_map);
+              for (var _i = 0; _i < compatible_component_skus.length; _i++) {
+                ItemUtils.recurseOptions(_this2.props.compatible_component_map[compatible_component_skus[_i]], function (compatible_component) {
+                  if (hydrated) return;
+                  if (component.sku == compatible_component.sku) {
+                    hydrated = compatible_component;
+                    return;
+                  }
+                });
+              }
+              if (!hydrated) return {
+                  v: void 0
+                };
+              component.props = hydrated.props;
+            }();
+
+            if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+          }
+        });
         var components = {};
         // slow, but touch all of everything?
         var traverse_item_options = function traverse_item_options(item_collection, foreach) {
@@ -88563,7 +88609,7 @@ var ProductList = function (_React$Component) {
             null,
             product_options
           ),
-          React.createElement(ProductCanvas, { ref: 'ProductCanvas', product: product, handleUpdateProduct: this.handleUpdateProduct.bind(this), assembly: this.initial_assembly })
+          React.createElement(ProductCanvas, { ref: 'ProductCanvas', product: product, handleUpdateProduct: this.handleUpdateProduct.bind(this), assembly: this.initial_assembly, compatible_component_map: this.props.compatible_component_map })
         ),
         this.props.edit ? null : React.createElement(
           'div',
@@ -88633,8 +88679,8 @@ var ProductList = function (_React$Component) {
           break;
         }
       };
-      for (var _i = 1; _i < this.state.selected_product.length; _i++) {
-        if (product_raw.options[this.state.selected_product[_i]]) product_raw = product_raw.options[this.state.selected_product[_i]];
+      for (var _i2 = 1; _i2 < this.state.selected_product.length; _i2++) {
+        if (product_raw.options[this.state.selected_product[_i2]]) product_raw = product_raw.options[this.state.selected_product[_i2]];
       }
       return product_raw;
     }
@@ -88701,7 +88747,7 @@ var ProductList = function (_React$Component) {
   }, {
     key: 'renderProductList',
     value: function renderProductList() {
-      var _this2 = this;
+      var _this3 = this;
 
       var products = [];
       this.props.store.products.forEach(function (product) {
@@ -88720,7 +88766,7 @@ var ProductList = function (_React$Component) {
         products.push(React.createElement(
           'a',
           { className: 'card', onClick: function onClick(event) {
-              _this2.handleOptionChange(0, product.sku);
+              _this3.handleOptionChange(0, product.sku);
             }, key: products.length, style: { backgroundImage: 'url(' + product.props.image + ')' } },
           React.createElement(
             'label',
@@ -88756,7 +88802,7 @@ var ProductList = function (_React$Component) {
   }, {
     key: 'populateProductOptions',
     value: function populateProductOptions() {
-      var _this3 = this;
+      var _this4 = this;
 
       var product_options = [];
       // initialize selected_product
@@ -88778,7 +88824,7 @@ var ProductList = function (_React$Component) {
         product_options.push(React.createElement(
           Switch,
           { onChange: function onChange(value) {
-              _this3.handleOptionChange(0, value);
+              _this4.handleOptionChange(0, value);
             }, value: this.state.selected_product[0], key: product_options.length },
           options
         ));
@@ -88789,51 +88835,51 @@ var ProductList = function (_React$Component) {
         var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
         // if we're not editing, select whatever product we end up on
-        if (!_this3.props.edit) product = option_product;
+        if (!_this4.props.edit) product = option_product;
         // if at a leaf, we're done
         if (!option_product.options) {
-          if (_this3.props.edit) {
+          if (_this4.props.edit) {
             // allow adding new option
-            product_options.push(React.createElement('input', { type: 'text', key: Math.random(), placeholder: 'New Option', onKeyDown: _this3.handleNewProductOption.bind(_this3) }));
+            product_options.push(React.createElement('input', { type: 'text', key: Math.random(), placeholder: 'New Option', onKeyDown: _this4.handleNewProductOption.bind(_this4) }));
           }
           return;
         }
 
         var options = [];
         var available_options = Object.keys(option_product.options);
-        if (_this3.props.edit) {
+        if (_this4.props.edit) {
           available_options.unshift("no option selected");
         }
         // if no option is otherwise selected, default to the first option
-        var selected_option = _this3.state.selected_product[depth];
+        var selected_option = _this4.state.selected_product[depth];
         if (!selected_option && available_options.length) {
           selected_option = available_options[0];
-          _this3.setState(function (prevState) {
+          _this4.setState(function (prevState) {
             var selected_product = prevState.selected_product.slice(0);
             selected_product[depth] = available_options[0];
             return { selected_product: selected_product };
           });
         }
         // populate options
-        for (var _i2 = 0; _i2 < available_options.length; _i2++) {
+        for (var _i3 = 0; _i3 < available_options.length; _i3++) {
           options.push(React.createElement(
             'option',
-            { key: options.length, value: available_options[_i2] },
-            available_options[_i2]
+            { key: options.length, value: available_options[_i3] },
+            available_options[_i3]
           ));
         };
         if (options.length) {
           product_options.push(React.createElement(
             Switch,
             { onChange: function onChange(value) {
-                _this3.handleOptionChange(depth, value);
+                _this4.handleOptionChange(depth, value);
               }, value: selected_option, key: product_options.length },
             options
           ));
         }
         if (selected_option == "no option selected") {
           // allow adding new option
-          product_options.push(React.createElement('input', { type: 'text', key: Math.random(), placeholder: 'New Option', onKeyDown: _this3.handleNewProductOption.bind(_this3) }));
+          product_options.push(React.createElement('input', { type: 'text', key: Math.random(), placeholder: 'New Option', onKeyDown: _this4.handleNewProductOption.bind(_this4) }));
         }
         // recurse in next option depth
         if (selected_option && option_product.options[selected_option]) {
@@ -88851,7 +88897,7 @@ var ProductList = function (_React$Component) {
   }, {
     key: 'handleUpdateProduct',
     value: function handleUpdateProduct() {
-      var _this4 = this;
+      var _this5 = this;
 
       // this is slow on crappy computers, so don't update coninuously
       window.clearTimeout(this.updateProductTimeout);
@@ -88859,8 +88905,8 @@ var ProductList = function (_React$Component) {
         // call this whenever there was an update to base_product or assembly
         // TODO only do the following when done with a component drag!
         var item = {
-          selected_product: _this4.state.selected_product,
-          assembly: _this4.refs.ProductCanvas.state.assembly
+          selected_product: _this5.state.selected_product,
+          assembly: _this5.refs.ProductCanvas.state.assembly
         };
         ComponentSerializer.stringify(item, function (err, serialized) {
           var toks = location.href.split('?');
@@ -88887,7 +88933,7 @@ var ProductList = function (_React$Component) {
         // deep clone initial specification (needed for admin)
         store.products_raw = JSON.parse(JSON.stringify(store.products));
         // convert compatible_component from sku list to component list
-        store.products.hydrateCompatibleComponents(function (err) {
+        store.products.hydrateCompatibleComponents(function (err, compatible_component_map) {
           // get store inventory
           Inventory.get(store.facility_id, function (err, store_inventory) {
             if (err) return callback(err);
@@ -88897,10 +88943,10 @@ var ProductList = function (_React$Component) {
               item.quantity = store_inventory.inventory[item.sku] || 0;
               // inherit props through product families
               item.inheritDefaults(ancestor);
-              // get inventory for any compatible families
-              if (!item.compatible_components) return;
-              item.compatible_components.forEach(function (component) {
-                component.quantity = store_inventory.inventory[component.sku] ? store_inventory.inventory[component.sku] : 0;
+              // get inventory for any compatible component families
+              Object.keys(compatible_component_map).forEach(function (sku) {
+                var component = compatible_component_map[sku];
+                component.quantity = store_inventory.inventory[sku] || 0;
                 if (!component.options) return;
                 component.options.forEach(function (option) {
                   option.recurseProductFamily(function (item, ancestor) {
@@ -88908,6 +88954,7 @@ var ProductList = function (_React$Component) {
                   });
                 });
               });
+              options.compatible_component_map = compatible_component_map;
             }); // inherit unset fields through product families
 
             callback(null, options);
@@ -88922,7 +88969,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":1,"./BADButton.jsx":451,"./ClickForMore.jsx":454,"./ComponentEdit.jsx":457,"./ComponentSerializer.js":458,"./ProductCanvas.jsx":483,"./ProductListEdit.jsx":486,"./Switch.jsx":491,"async":23,"querystring":368,"react":377}],486:[function(require,module,exports){
+},{"../models/Inventory.js":1,"./BADButton.jsx":451,"./ClickForMore.jsx":454,"./ComponentEdit.jsx":457,"./ComponentSerializer.js":458,"./ItemUtils.js":467,"./ProductCanvas.jsx":483,"./ProductListEdit.jsx":486,"./Switch.jsx":491,"async":23,"querystring":368,"react":377}],486:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();

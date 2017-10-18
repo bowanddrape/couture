@@ -87,20 +87,7 @@ class Item extends Array {
         });
       };
 
-      async.parallel(option_query, (err) => {
-        // replace sku string array with array of components
-        this.forEach((item) => {
-          let hydrated_components = [];
-          if (!item.compatible_components)
-            item.compatible_components = [];
-          item.compatible_components.forEach((sku) => {
-            if (typeof(sku)!="string") return;
-            if (components[sku]) hydrated_components.push(components[sku]);
-          });
-          item.compatible_components = hydrated_components;
-        });
-        callback(err);
-      }); // hydrate component's options
+      callback(err, components);
     }); // hydrate component skus
   } // hydrateCompatibleComponents()
 

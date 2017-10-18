@@ -10,6 +10,7 @@ const Switch = require('./Switch.jsx');
 const ComponentSerializer = require('./ComponentSerializer.js');
 const BADButton = require('./BADButton.jsx');
 const ClickForMore = require('./ClickForMore.jsx');
+const ItemUtils = require('./ItemUtils.js');
 
 /***
 Draws List of products available in a store.
@@ -45,7 +46,7 @@ class ProductList extends React.Component {
       // deep clone initial specification (needed for admin)
       store.products_raw = JSON.parse(JSON.stringify(store.products));
       // convert compatible_component from sku list to component list
-      store.products.hydrateCompatibleComponents(function(err) {
+      store.products.hydrateCompatibleComponents(function(err, compatible_component_map) {
         // get store inventory
         Inventory.get(store.facility_id, function(err, store_inventory) {
           if (err) return callback(err);
@@ -55,10 +56,10 @@ class ProductList extends React.Component {
             item.quantity = store_inventory.inventory[item.sku] || 0;
             // inherit props through product families
             item.inheritDefaults(ancestor);
-            // get inventory for any compatible families
-            if (!item.compatible_components) return;
-            item.compatible_components.forEach((component) => {
-              component.quantity = store_inventory.inventory[component.sku] ? store_inventory.inventory[component.sku] : 0;
+            // get inventory for any compatible component families
+            Object.keys(compatible_component_map).forEach((sku) => {
+              let component = compatible_component_map[sku];
+              component.quantity = store_inventory.inventory[sku] || 0;
               if (!component.options) return;
               component.options.forEach((option) => {
                 option.recurseProductFamily(function(item, ancestor) {
@@ -66,6 +67,7 @@ class ProductList extends React.Component {
                 });
               });
             });
+            options.compatible_component_map = compatible_component_map;
           }); // inherit unset fields through product families
 
           callback(null, options);
@@ -98,6 +100,24 @@ class ProductList extends React.Component {
       }
       // fill in our customization
       let initial_assembly = customization.assembly;
+      ItemUtils.recurseAssembly(initial_assembly, (component) => {
+        if (component.sku) {
+          let hydrated = null;
+          // search through compatible_component_map for match
+          let compatible_component_skus = Object.keys(this.props.compatible_component_map);
+          for (let i=0; i<compatible_component_skus.length; i++) {
+            ItemUtils.recurseOptions(this.props.compatible_component_map[compatible_component_skus[i]], (compatible_component) =>  {
+              if (hydrated) return;
+              if (component.sku == compatible_component.sku) {
+                hydrated = compatible_component;
+                return;
+              }
+            });
+          }
+          if (!hydrated) return;
+          component.props = hydrated.props;
+        }
+      });
       let components = {};
       // slow, but touch all of everything?
       let traverse_item_options = (item_collection, foreach) => {
@@ -162,7 +182,7 @@ class ProductList extends React.Component {
           <product_options>
             {product_options}
           </product_options>
-          <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly}/>
+          <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly} compatible_component_map={this.props.compatible_component_map}/>
         </div>
         {this.props.edit ?
           null : <div className="add_to_cart" style={{textAlign:"center"}}><BADButton className="primary" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart ${product.props.price}</BADButton></div>

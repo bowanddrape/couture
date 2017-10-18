@@ -27,7 +27,8 @@ class LayoutFooter extends React.Component {
     menu_items.push(<a key={menu_items.length} href="/about">About Us</a>);
     menu_items.push(<a key={menu_items.length} href="/customizer-service">Customer Service</a>);
     menu_items.push(<a key={menu_items.length} href="/press">Press</a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own.html">Make Your Own</a>);
+    menu_items.push(<a key={menu_items.length} href="/legal">Legal</a>);
+    menu_items.push(<a key={menu_items.length} href="/customize-your-own">Make Your Own</a>);
 
     if (this.state.desktop_mode) {
       return (
