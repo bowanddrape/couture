@@ -287,7 +287,7 @@ class ProductList extends React.Component {
     let products = [];
     this.props.store.products.forEach((product) => {
       let swatches = [];
-      if (true || product.props.preview_swatch) {
+      if (product.props.preview_swatch) {
         Object.keys(product.options).forEach((option) => {
           swatches.push(<div key={swatches.length}><img src={"/"+option.toString().replace(/ /g,"_").toLowerCase()+".svg"} onError={(event)=>{event.target.parentNode.style.display="none"}} /></div>);
         });

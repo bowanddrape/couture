@@ -1,6 +1,5 @@
 
 const React = require('react');
-const Swipeable = require('react-swipeable');
 const SylvestorGlUtils = require('sylvester-es6');
 const Matrix = SylvestorGlUtils.Matrix;
 const Vector = SylvestorGlUtils.Vector;
