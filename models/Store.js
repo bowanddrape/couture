@@ -145,6 +145,9 @@ class Store extends SQLTable {
         let resolution = 2;
         let customizer = new Customizer({width:width*resolution, height:height*resolution});
         customizer.init();
+        // set our camera, 404 if invalid
+        if (camera_index && !product_list.initial_product.props.cameras)
+          return Page.renderNotFound(req, res);
         if (product_list.initial_product.props.cameras) {
           if (!product_list.initial_product.props.cameras[camera_index])
             return Page.renderNotFound(req, res);

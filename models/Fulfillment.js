@@ -6,10 +6,12 @@ const Page = require('./Page');
 
 const FulfillShipments = require('../views/FulfillShipments.jsx');
 const GenericList = require('../views/GenericList.jsx');
+const FulfillmentStation = require('../views/FulfillmentStation.jsx');
 
 /***
 Handle requests to /fulfillment/
 ***/
+
 class Fulfillment {
 
   static handleHTTP(req, res, next) {
@@ -28,6 +30,9 @@ class Fulfillment {
     if (req.method=="GET" && req.path_tokens.length == 2)
       return Fulfillment.handleGetDetails(req, res);
 
+    if (req.method=="GET" && req.path_tokens.length == 3)
+      return Fulfillment.handleGetStation(req, res);
+
     res.json({error: "invalid endpoint"}).end();
   }
 
@@ -44,6 +49,21 @@ class Fulfillment {
         data: stores
       });
     });
+  }
+
+  static handleGetStation(req, res){
+    // Check for a valid station type
+    let stationType = req.path_tokens[2].toLowerCase();
+    let validTypes = ["pick","press","qa"];
+    let isValid = (validTypes.indexOf(stationType) > -1);
+
+    if (isValid){
+      return Page.render(req, res, FulfillmentStation, {
+        station: stationType
+        });
+    } else {
+        return Page.renderNotFound(req, res);
+    }
   }
 
   static handleGetDetails(req, res) {

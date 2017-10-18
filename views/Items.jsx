@@ -96,26 +96,30 @@ class Items extends React.Component {
 
   // estimate manufacturing time
   estimateManufactureTime() {
-    let days_needed = 1;
+    let days_needed_parallel = 5;
+    let days_needed_serial = 0;
     let items = this.state.contents;
     ItemUtils.recurseAssembly(items, (component) => {
       // hardcoded defaults, if not set.
       let default_manufacture_time = {
-        parallel: 3,
+        parallel: 7,
         serial: 0,
       }
+      // FIXME
       // embroidery and airbrush will take longer, too lazy to update the db
-      if (/letter_embroidery/.test(component.sku) || /letter_airbrush/.test(component.sku))
-        default_manufacture_time.parallel = 7;
+      if (/letter_embroidery/.test(component.sku))
+        default_manufacture_time.parallel = 10
+      if (/letter_airbrush/.test(component.sku))
+        default_manufacture_time.parallel = 15;
       // extract the manufacture_time for this component
       let manufacture_time = component.props.manufacture_time || {};
       manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
       manufacture_time.serial = manufacture_time.serial || default_manufacture_time.serial;
       // update our accumulator
-      days_needed = Math.max(days_needed, manufacture_time.parallel);
-      days_needed += manufacture_time.serial;
+      days_needed_parallel = Math.max(days_needed_parallel, manufacture_time.parallel);
+      days_needed_serial += manufacture_time.serial;
     });
-    return days_needed;
+    return days_needed_parallel + days_needed_serial;
   }
 
   // estimate date from now, takes days, returns time in seconds
@@ -164,10 +168,6 @@ class Items extends React.Component {
     let style_summary = Item.style_summary;
     // hide irrelevant things on packing slip
     if (this.props.packing_slip) {
-      style.price.price = {display:"none"};
-      style.price.right = "0px";
-      style.price_total = {display:"none"};
-      style.img_preview = {display:"none"};
       style.deets = Object.assign({}, style.deets, {position:"relative", left:"-64px",width:"100%"});
       style_summary.item = Object.assign({}, style_summary.item, {display:"none"});
     }
@@ -200,7 +200,7 @@ class Items extends React.Component {
       return null;
 
     return (
-      <cart>
+      <cart className={this.props.packing_slip?"packing_slip":""}>
         <h2 className="cart-header">My Cart</h2>
           <div className="productWrapper">
         {line_items}

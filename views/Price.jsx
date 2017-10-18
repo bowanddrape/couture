@@ -15,7 +15,7 @@ class Price extends React.Component {
     style = Object.assign({}, this.props.style, style);
 
     return (
-      <div style={style}>
+      <div style={style} className="price">
         <span style={style.price}>{price?`$${price.toFixed(2)}`:`Free!`}</span>
         {this.props.quantity?` x ${this.props.quantity}`:null}
       </div>

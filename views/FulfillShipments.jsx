@@ -52,7 +52,7 @@ class FulfillShipments extends React.Component {
             />
           </shipments>
           <shipments>
-            <h2>For Production</h2>
+            <h2>Picking</h2>
             <Scrollable
               component={Shipment}
               component_props={{fulfillment:true}}
@@ -61,7 +61,10 @@ class FulfillShipments extends React.Component {
             />
           </shipments>
           <shipments>
-            <h2>Picked</h2>
+            <h2>Pressing</h2>
+          </shipments>
+          <shipments>
+            <h2>Reviewing</h2>
             <Scrollable
               component={Shipment}
               component_props={{fulfillment:true}}
@@ -70,7 +73,7 @@ class FulfillShipments extends React.Component {
             />
           </shipments>
           <shipments>
-            <h2>Inspected</h2>
+            <h2>Packing</h2>
             <Scrollable
               component={Shipment}
               component_props={{fulfillment:true}}

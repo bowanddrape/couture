@@ -11,10 +11,9 @@ class ShipProvider {
 
   static quote(shipment, callback) {
     var addressFrom  = {
-      name: "Shelly",
-      company: "Bow & Drape",
-      street1: "67 West St",
-      street2: "209",
+      name: "Bow & Drape",
+      street1: "216",
+      street2: "67 West St",
       city: "Brooklyn",
       state: "NY",
       zip: "11222",
@@ -48,9 +47,9 @@ class ShipProvider {
 
     // parcel object dict
     var parcel = {
-      length: "5",
-      width: "5",
-      height: "5",
+      length: "20",
+      width: "17",
+      height: "1",
       distance_unit: "in",
       weight: (weight*0.00220462).toFixed(3).toString(),
       mass_unit: "lb",

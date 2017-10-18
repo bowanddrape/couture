@@ -48,14 +48,15 @@ class ProductComponentPicker extends React.Component {
     let components = [];
     let misc_components = [];
     for (let i=0; product.compatible_components && i<product.compatible_components.length; i++) {
-      if (product.compatible_components[i].options) {
+      let compatible_component = this.props.compatible_component_map[product.compatible_components[i]];
+      if (compatible_component.options) {
         // handle if virtual keyboard
-        if (false && product.compatible_components[i].props.is_letters) {
+        if (false && compatible_component.props.is_letters) {
           // array => map
           let component_letters = {};
           let tab_components = [];
-          for (let j=0; j<product.compatible_components[i].options.length; j++) {
-            let letter = product.compatible_components[i].options[j];
+          for (let j=0; j<compatible_component.options.length; j++) {
+            let letter = compatible_component.options[j];
             let toks = letter.props.name.split('_');
             let character = toks[toks.length-1].toLowerCase();
             if (character.match(/^[a-z]$/))
@@ -68,7 +69,7 @@ class ProductComponentPicker extends React.Component {
             }
           }
           components.push(
-            <div key={components.length} name={product.compatible_components[i].props.name} className="component_virtual_keyboard_container">
+            <div key={components.length} name={compatible_component.props.name} className="component_virtual_keyboard_container">
               <row>{['q','w','e','r','t','y','u','i','o','p'].map((character)=>{
                 return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
               })}</row>
@@ -98,23 +99,23 @@ class ProductComponentPicker extends React.Component {
             </div>
           );
           components.push(
-            <div key={components.length} name={product.compatible_components[i].props.name+"_cont"} className="component_container" style={{overflow:"hidden"}}>{tab_components}</div>
+            <div key={components.length} name={compatible_component.props.name+"_cont"} className="component_container" style={{overflow:"hidden"}}>{tab_components}</div>
           );
           continue;
         } // is_letters
 
         // handle if native keyboard
-        if (product.compatible_components[i].props.is_letters) {
+        if (compatible_component.props.is_letters) {
           // array => map
           let component_letters = {};
-          for (let j=0; j<product.compatible_components[i].options.length; j++) {
-            let letter = product.compatible_components[i].options[j];
+          for (let j=0; j<compatible_component.options.length; j++) {
+            let letter = compatible_component.options[j];
             let toks = letter.sku.split('_');
             let character = toks[toks.length-1].toLowerCase();
             component_letters[character] = letter;
           }
           components.push(
-            <div key={components.length} name={product.compatible_components[i].props.name||product.compatible_components[i].sku} style={{height:"auto",overflow:"hidden"}} className="component_container letters">
+            <div key={components.length} name={compatible_component.props.name||compatible_component.sku} style={{height:"auto",overflow:"hidden"}} className="component_container letters">
               <input type="text" style={{width:"90%",margin:"auto"}} placeholder="Say Something Punny"
                 onChange={(event) => {
                   this.handleSetComponentText(event.target.value, component_letters);
@@ -140,24 +141,24 @@ class ProductComponentPicker extends React.Component {
 
         // otherwise just list them
         let tab_components = [];
-        for (let j=0; j<product.compatible_components[i].options.length; j++) {
-          let backgroundImage = `url(${product.compatible_components[i].options[j].props.image})`;
-          let backgroundSize = `${product.compatible_components[i].options[j].props.imagewidth/product.compatible_components[i].options[j].props.imageheight*100}% 100%`;
-          if (product.compatible_components[i].options[j].props.imagewidth>product.compatible_components[i].options[j].props.imageheight)
-            backgroundSize = `100% ${product.compatible_components[i].options[j].props.imageheight/product.compatible_components[i].options[j].props.imagewidth*100}%`;
+        for (let j=0; j<compatible_component.options.length; j++) {
+          let backgroundImage = `url(${compatible_component.options[j].props.image})`;
+          let backgroundSize = `${compatible_component.options[j].props.imagewidth/compatible_component.options[j].props.imageheight*100}% 100%`;
+          if (compatible_component.options[j].props.imagewidth>compatible_component.options[j].props.imageheight)
+            backgroundSize = `100% ${compatible_component.options[j].props.imageheight/compatible_component.options[j].props.imagewidth*100}%`;
           tab_components.push(
-            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={() => {this.handleSelectComponent(-1); this.handleAddComponent(product.compatible_components[i].options[j]);}}/>
+            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={() => {this.handleSelectComponent(-1); this.handleAddComponent(compatible_component.options[j]);}}/>
           );
         }
         components.push(
-          <div key={components.length} name={product.compatible_components[i].props.name} className="rainbow_border"><div className="component_container">
+          <div key={components.length} name={compatible_component.props.name} className="rainbow_border"><div className="component_container">
             {tab_components}
           </div></div>
         );
         continue;
       }
       misc_components.push(
-        <div key={i+'_0'}  style={{backgroundImage:`url(${product.compatible_components[i].props.image})`}}/>
+        <div key={i+'_0'}  style={{backgroundImage:`url(${compatible_component.props.image})`}}/>
       );
     }
 
