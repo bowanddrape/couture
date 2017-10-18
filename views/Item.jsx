@@ -104,6 +104,13 @@ class Item extends React.Component {
     if (this.props.fulfillment && this.props.assembly) {
       for (let i=0; i<this.props.assembly.length; i++) {
         ItemUtils.recurseAssembly(this.props.assembly[i], (component) => {
+          // component.sku example: "letter_sequin_white2_n"
+          // split along the _ and grab the last character
+          // if the last char is a space, skip it
+          if (component.hasOwnProperty('sku')){
+            let lastChar = component.sku.split("_").pop();
+            if (lastChar == " ") return;
+          }
           // haute imported entries will have "text" set
           if (component.props && component.props.image && component.text) {
             let letters = {};
@@ -142,7 +149,18 @@ class Item extends React.Component {
         if (assembly_contents[sku].props.imagewidth>assembly_contents[sku].props.imageheight)
           backgroundSize = `100% ${assembly_contents[sku].props.imageheight/assembly_contents[sku].props.imagewidth*100}%`;
         assembly.push(
-          <span key={assembly.length}><span style={{display:"inline-block",width:"20px",height:"20px",backgroundPosition:"center",backgroundRepeat:"no-repeat",backgroundImage,backgroundSize}}/>{assembly_contents[sku].quantity>1?"x"+assembly_contents[sku].quantity:null}</span>
+          <span key={assembly.length} style={{marginRight:"8px"}}>
+          <span style={{
+            display:"inline-block",
+            width:"20px",
+            height:"20px",
+            backgroundPosition:"center",
+            backgroundRepeat:"no-repeat",
+            backgroundImage,
+            backgroundSize}}
+          />
+            {assembly_contents[sku].quantity>1?"x"+assembly_contents[sku].quantity:null}
+          </span>
         );
       });
       if (assembly.length)
