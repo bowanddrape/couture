@@ -20,10 +20,11 @@ class Tabs extends React.Component {
   }
 
   handleTabChange(value) {
-    this.setState({selected_tab:value});
-    // fire an onChange on click as well as on change?
-    if (typeof(this.props.onChange) == "function")
-      this.props.onChange();
+    this.setState({selected_tab:value}, () =>{
+      // fire an onChange on click as well as on change?
+      if (typeof(this.props.onChange) == "function")
+        this.props.onChange();
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
