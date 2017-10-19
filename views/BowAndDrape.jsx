@@ -146,6 +146,8 @@ module.exports = {
     TextContent: require('./TextContent.jsx'),
     VSSAdmin: require('./VSSAdmin.jsx'),
     Shipment: require('./Shipment.jsx'),
+    FulfillmentStation: require('./FulfillmentStation.jsx'),
+
   },
   dispatcher,
   api,

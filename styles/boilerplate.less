@@ -208,7 +208,7 @@ input[type="text"], input[type="password"] {
     position: absolute;
     text-align: center;
     width: 100%;
-    bottom: -22px;
+    bottom: -44px;
   }
   price, .price {
     position: absolute;
@@ -222,16 +222,18 @@ input[type="text"], input[type="password"] {
   }
   swatches {
     position: absolute;
-    bottom: 2px;
+    bottom: -20px;
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     & > div {
       overflow: hidden;
       width: 15px;
-      height: 20px;
+      height: 15px;
       margin: 0px 2px;
-      border: solid 1px @color_secondary;
+      border: solid 2px @color_secondary;
+      border-radius: 10px;
       img {
         margin-left: -9px;
         margin-top: -6px;
@@ -401,4 +403,11 @@ button:focus, input[type="button"]:focus {
   margin: 0 auto;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: auto;
+}
+
+
+@media print {
+  .layout {
+    padding-top: 0px;
+  }
 }

@@ -1,6 +1,5 @@
 
 const React = require('react');
-const Swipeable = require('react-swipeable');
 const SylvestorGlUtils = require('sylvester-es6');
 const Matrix = SylvestorGlUtils.Matrix;
 const Vector = SylvestorGlUtils.Vector;
@@ -395,7 +394,7 @@ class ProductCanvas extends React.Component {
         </canvas>
         {component_hitboxes}
         <hud_controls className={this.state.assembly[this.state.selected_component]?"rainbow_border":""}>{hud_controls}</hud_controls>
-        <ProductComponentPicker product={this.props.product} productCanvas={this}/>
+        <ProductComponentPicker product={this.props.product} productCanvas={this} compatible_component_map={this.props.compatible_component_map}/>
       </div>
     );
   }

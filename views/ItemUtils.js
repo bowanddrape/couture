@@ -17,6 +17,18 @@ let recurseAssembly = (component, foreach) => {
   }
 }
 
+let recurseOptions = (component, foreach) => {
+  if (!component) return;
+  // run callback
+  foreach(component);
+  // walk through our assembly
+  if (component.options) {
+    for (let option in component.options) {
+      recurseOptions(component.options[option], foreach);
+    }
+  }
+}
+
 // get price of an item list, optionally only counting ones that pass filter
 let getPrice = (items, filter) => {
   let total_price = 0;
@@ -73,6 +85,7 @@ let applyCredits = (credits, items) => {
 
 module.exports = {
   recurseAssembly,
+  recurseOptions,
   getPrice,
   applyPromoCode,
   applyCredits,

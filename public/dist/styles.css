@@ -260,7 +260,7 @@ input[type="password"] {
   position: absolute;
   text-align: center;
   width: 100%;
-  bottom: -22px;
+  bottom: -44px;
 }
 .card price,
 .card .price {
@@ -275,17 +275,19 @@ input[type="password"] {
 }
 .card swatches {
   position: absolute;
-  bottom: 2px;
+  bottom: -20px;
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
 }
 .card swatches > div {
   overflow: hidden;
   width: 15px;
-  height: 20px;
+  height: 15px;
   margin: 0px 2px;
-  border: solid 1px #000;
+  border: solid 2px #000;
+  border-radius: 10px;
 }
 .card swatches > div img {
   margin-left: -9px;
@@ -443,6 +445,11 @@ input[type="button"]:focus {
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: auto;
 }
+@media print {
+  .layout {
+    padding-top: 0px;
+  }
+}
 shipments {
   display: block;
   padding: 10px;
@@ -566,7 +573,6 @@ customize .canvas_container canvas {
   height: 300px;
   width: 100%;
   display: block;
-  min-width: 400px;
   max-height: 100%;
 }
 customize .canvas_container .component_selected canvas,
@@ -1178,6 +1184,12 @@ input_credit [name="exp_year"] {
   margin: 0 0 10px 0;
   min-width: 160px;
 }
+.packing_slip img.preview,
+.packing_slip .cart-header,
+.packing_slip div.price,
+.packing_slip div.summary_items {
+  display: none;
+}
 page_edit {
   display: block;
   border: solid 3px #f5c9ca;
@@ -1585,7 +1597,7 @@ product_options switch.expanded {
   }
   .footer .footer-menu .social {
     display: inline-block;
-    margin-right: 60px;
+    margin-right: 20px;
   }
 }
 .icon {
