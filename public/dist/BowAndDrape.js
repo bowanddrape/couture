@@ -84361,11 +84361,15 @@ var Component = function () {
       var position = new Vector([this.position[0], this.position[1], this.position[2], 1]);
 
       var top_left = new Vector([-dims[0] / 2, -dims[1] / 2, 0, 1]);
+      var bottom_left = new Vector([-dims[0] / 2, dims[1] / 2, 0, 1]);
+      var top_right = new Vector([dims[0] / 2, -dims[1] / 2, 0, 1]);
       var bottom_right = new Vector([dims[0] / 2, dims[1] / 2, 0, 1]);
 
       top_left = position.add(this.rotation.x(top_left));
+      bottom_left = position.add(this.rotation.x(bottom_left));
+      top_right = position.add(this.rotation.x(top_right));
       bottom_right = position.add(this.rotation.x(bottom_right));
-      return { top_left: top_left, bottom_right: bottom_right };
+      return { top_left: top_left, bottom_left: bottom_left, top_right: top_right, bottom_right: bottom_right };
     }
   }]);
 
@@ -84904,12 +84908,14 @@ var Customizer = function () {
     key: 'getScreenBoundingBox',
     value: function getScreenBoundingBox(component) {
       var world_bb = component.getWorldBoundingBox();
+      var bottom_left = this.worldToScreen(world_bb.bottom_left);
       var bottom_right = this.worldToScreen(world_bb.bottom_right);
       var top_left = this.worldToScreen(world_bb.top_left);
+      var top_right = this.worldToScreen(world_bb.top_right);
 
       return {
-        top_left: top_left,
-        bottom_right: bottom_right
+        top_left: [Math.min(bottom_left[0], bottom_right[0], top_left[0], top_right[0]), Math.max(bottom_left[1], bottom_right[1], top_left[1], top_right[1])],
+        bottom_right: [Math.max(bottom_left[0], bottom_right[0], top_left[0], top_right[0]), Math.min(bottom_left[1], bottom_right[1], top_left[1], top_right[1])]
       };
     }
   }, {

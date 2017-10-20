@@ -286,11 +286,15 @@ class Component {
     ]);
 
     let top_left = new Vector([-dims[0]/2, -dims[1]/2, 0, 1]);
+    let bottom_left = new Vector([-dims[0]/2, dims[1]/2, 0, 1]);
+    let top_right = new Vector([dims[0]/2, -dims[1]/2, 0, 1]);
     let bottom_right = new Vector([dims[0]/2, dims[1]/2, 0, 1]);
 
     top_left = position.add(this.rotation.x(top_left));
+    bottom_left = position.add(this.rotation.x(bottom_left));
+    top_right = position.add(this.rotation.x(top_right));
     bottom_right = position.add(this.rotation.x(bottom_right));
-    return {top_left, bottom_right};
+    return {top_left, bottom_left, top_right, bottom_right};
   }
 }
 

@@ -184,12 +184,20 @@ class Customizer {
 
   getScreenBoundingBox(component) {
     let world_bb = component.getWorldBoundingBox();
+    let bottom_left = this.worldToScreen(world_bb.bottom_left);
     let bottom_right = this.worldToScreen(world_bb.bottom_right);
     let top_left = this.worldToScreen(world_bb.top_left);
+    let top_right = this.worldToScreen(world_bb.top_right);
 
     return {
-      top_left,
-      bottom_right,
+      top_left: [
+        Math.min(bottom_left[0],bottom_right[0],top_left[0],top_right[0]),
+        Math.max(bottom_left[1],bottom_right[1],top_left[1],top_right[1]),
+      ],
+      bottom_right: [
+        Math.max(bottom_left[0],bottom_right[0],top_left[0],top_right[0]),
+        Math.min(bottom_left[1],bottom_right[1],top_left[1],top_right[1]),
+      ],
     }
   }
 
