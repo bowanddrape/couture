@@ -89,7 +89,7 @@ class Page extends JSONAPI {
 
     let pages = Page.getAll(null, function(err, pages) {
       for (let i=0; i<pages.length; i++) {
-        let matches = req.path.match(new RegExp("^"+pages[i].path+"$"));
+        let matches = req.path.match(new RegExp("^"+pages[i].path+"$", "i"));
         if (!matches) continue;
         return pages[i].render(req, res);
       } // for pages

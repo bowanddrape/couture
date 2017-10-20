@@ -556,6 +556,9 @@ comments message {
 .items .product_wrapper .item:last-of-type {
   border-bottom: none;
 }
+.items .product_wrapper .item .preview {
+  min-height: 200px;
+}
 .items .product_wrapper .item .deets {
   display: inline-block;
   margin-left: 20px;
