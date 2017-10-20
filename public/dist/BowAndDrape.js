@@ -85686,13 +85686,7 @@ var Gallery = function (_React$Component) {
 
   _createClass(Gallery, [{
     key: "componentDidMount",
-    value: function componentDidMount() {
-      var masonry = new Masonry(this.element, {
-        itemSelector: ".card",
-        columnWidth: 150,
-        fitWidth: true
-      });
-    }
+    value: function componentDidMount() {}
   }, {
     key: "render",
     value: function render() {
@@ -85701,21 +85695,21 @@ var Gallery = function (_React$Component) {
       var items = this.props.items || [];
       var gallery_cards = [];
 
+      var border = this.props.border || "0px";
+
       items.forEach(function (item) {
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
-              margin: "0px",
-              border: "solid " + _this2.props.border + " #fff",
-              boxSizing: "border-box",
-              width: item.width || "300px",
-              height: item.height || "400px",
-              backgroundImage: "url(" + item.image + ")",
-              backgroundSize: "cover"
+              width: item.width || "150px",
+              border: "solid " + border + " #fff"
             } },
+          React.createElement("img", { src: item.image, style: {
+              width: item.width || "150px"
+            } }),
           item.caption ? React.createElement(
             "div",
-            { className: "caption" },
+            { className: "caption", style: { border: "solid " + border + " #fff", borderTop: "none" } },
             item.caption
           ) : null
         ));
@@ -86593,7 +86587,6 @@ var LayoutBasic = function (_React$Component) {
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         content,
         React.createElement('script', { src: '/BowAndDrape.js' }),
-        React.createElement('script', { src: '/masonry.pkgd.min.js' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutBasic, {\n              content_string: `' + (typeof document != "undefined" ? this.props.content_string : escape(this.props.content_string)) + '`,\n              content,\n            });\n            ReactDOM.hydrate(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
       );
     }
@@ -86999,7 +86992,6 @@ var LayoutMain = function (_React$Component) {
         content,
         React.createElement(LayoutFooter, { user: this.state.user }),
         React.createElement('script', { src: '/BowAndDrape.js' }),
-        React.createElement('script', { src: '/masonry.pkgd.min.js' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n              content_string: `' + (typeof document != "undefined" ? this.props.content_string : escape(this.props.content_string)) + '`,\n              content,\n            });\n            ReactDOM.hydrate(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
       );
     }
@@ -87423,19 +87415,7 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "width", event.target.value);
-                  }, value: item.width, placeholder: "300px" })
-              ),
-              React.createElement(
-                "div",
-                null,
-                React.createElement(
-                  "label",
-                  null,
-                  "height"
-                ),
-                React.createElement("input", { type: "text", onChange: function onChange(event) {
-                    _this2.handleUpdateItem(index, "height", event.target.value);
-                  }, value: item.height, placeholder: "400px" })
+                  }, value: item.width, placeholder: "150px" })
               ),
               React.createElement(
                 "div",

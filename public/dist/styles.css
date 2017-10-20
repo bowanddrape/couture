@@ -304,30 +304,6 @@ a.card:hover label {
 a.card.not_link {
   cursor: default;
 }
-.gallery a.card {
-  border-radius: 0;
-}
-.gallery a.card.not_link:hover {
-  text-decoration: none;
-}
-.gallery .caption {
-  font-family: "Zurich-Condensed-Bold", sans-serif;
-  color: #000;
-  font-weight: normal;
-  letter-spacing: 0px;
-  font-size: 8px;
-  position: absolute;
-  bottom: 0px;
-  z-index: 1;
-  background-color: #fff;
-  width: 100%;
-  text-align: center;
-}
-@media (min-width: 737px) {
-  .gallery {
-    zoom: 300%;
-  }
-}
 h1,
 h2 {
   font-family: "Zurich-Condensed-Bold", sans-serif;
@@ -1509,4 +1485,39 @@ product_options switch.expanded {
 }
 .purchase_complete p {
   text-align: center;
+}
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.gallery .card {
+  height: auto;
+  width: auto;
+}
+.gallery a.card {
+  margin: 0px;
+  box-sizing: border-box;
+  border-radius: 0;
+}
+.gallery a.card.not_link:hover {
+  text-decoration: none;
+}
+.gallery .caption {
+  font-family: "Zurich-Condensed-Bold", sans-serif;
+  color: #000;
+  font-weight: normal;
+  letter-spacing: 0px;
+  font-size: 8px;
+  position: absolute;
+  bottom: 0px;
+  z-index: 1;
+  background-color: #fff;
+  width: 100%;
+  text-align: center;
+}
+@media (min-width: 737px) {
+  .gallery {
+    zoom: 300%;
+  }
 }
