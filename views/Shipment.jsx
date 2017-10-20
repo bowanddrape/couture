@@ -16,7 +16,6 @@ Draw a shipment. Used in lists of orders/shipments
 class Shipment extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = {
       from_id: this.props.from_id,
       to_id: this.props.to_id,
@@ -193,16 +192,9 @@ class Shipment extends React.Component {
     if (this.props.fulfillment) {
       fulfillment_tools = (
         <div>
-          <div className="time_bar">
-            <div>requested: <Timestamp time={this.props.requested} /></div>
-            <div>approved: <Timestamp time={this.props.approved} /></div>
-            <div>packed: <Timestamp time={this.state.packed} /></div>
-            <div>received: <Timestamp time={this.state.received} /></div>
-          </div>
           <div className="header_menu">
             <shipping_details>
               <div><label>Order_id: </label><a href={`/shipment/${this.props.id}`}>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</a></div>
-              <div><label>Fulfillment_id: </label> {this.props.fulfillment_id} </div>
               <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
               {to}
               <div><label>User: </label>{this.props.email}</div>
@@ -242,12 +234,13 @@ class Shipment extends React.Component {
 
     return (
       <shipment>
+        <div><label>Fulfillment_id: </label> {this.props.fulfillment_id} </div>
         {fulfillment_tools}
         <h1 style={Object.assign(
           {},
           Item.style.item,
           {borderBottom:"none",margin:"34px auto",justifyContent:"space-between"})}>
-          <div>ORDER SUMMARY</div><div>ITEMS ( {product_quantity} )</div>
+          <div>ITEMS ( {product_quantity} )</div>
         </h1>
         <contents>
           {line_items}

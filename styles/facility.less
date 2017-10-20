@@ -44,11 +44,18 @@ shipment {
       }
     }
   }
-  assembly {
-    display: block;
-    padding: 10px;
-    img {
-      height: 20px;
+  .assembly {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    max-height: 400px;
+    margin: 10px 0;
+    .quant {
+      font-weight: bold;
+    }
+    .label {
+      font-size: 12px;
+      margin-left: 5px;
     }
   }
 }
@@ -83,6 +90,9 @@ comments {
     display: none;
   }
   shipment {
+    page-break-after: always;
+  }
+  .item {
     page-break-after: always;
   }
 }

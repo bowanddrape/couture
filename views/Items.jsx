@@ -168,7 +168,6 @@ class Items extends React.Component {
     let style_summary = Item.style_summary;
     // hide irrelevant things on packing slip
     if (this.props.packing_slip) {
-      style.deets = Object.assign({}, style.deets, {position:"relative", left:"-64px",width:"100%"});
       style_summary.item = Object.assign({}, style_summary.item, {display:"none"});
     }
 
@@ -199,51 +198,56 @@ class Items extends React.Component {
     if (typeof(window)!="undefined" && !line_items.length)
       return null;
 
+    let classname = "items";
+    if (this.props.packing_slip)
+      classname += " packing_slip";
+    if (this.props.fulfillment)
+      classname += " fulfillment";
+
     return (
-      <cart className={this.props.packing_slip?"packing_slip":""}>
-        <h2 className="cart-header">My Cart</h2>
-          <div className="productWrapper">
-        {line_items}
-          </div>
+      <div className={classname}>
+        <div className="product_wrapper">
+          {line_items}
+        </div>
         <div className="summary_items">
-          <div className="summary_items__inner">
-            <h4 className="summary_items__header">Summary</h4>
-          {/* item subtotal */}
-          <div className="item" style={style_summary.item}>
-            <div style={style_summary.img_preview_container} />
-              {this.props.is_cart ?
-                  <div className="item shippingDate" style={style.item}><span className="sum-bold" style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></div>
-                : null
-              }
-            <div className="deets" style={style_summary.deets}>
-              <span className="sum-bold">Cart Subtotal:</span>
-              <Price  style={style_summary.price_total} price={subtotal}/>
+          <div className="summary_items_inner">
+            <h4 className="summary_items_header">Summary</h4>
+            {/* item subtotal */}
+            <div className="item" style={style_summary.item}>
+              <div style={style_summary.img_preview_container} />
+                {this.props.is_cart ?
+                    <div className="item shippingDate" style={style.item}><span className="sum-bold" style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></div>
+                  : null
+                }
+              <div className="deets" style={style_summary.deets}>
+                <span className="sum-bold">Cart Subtotal:</span>
+                <Price  style={style_summary.price_total} price={subtotal}/>
+              </div>
+
             </div>
+            {summary_items}
 
-          </div>
-          {summary_items}
-
-          {/* item price total */}
-          <div className="item" style={Object.assign({},style_summary.item,{minHeight: "28px"})}>
-            <div style={style_summary.img_preview_container} />
-            <div className="deets" style={Object.assign({}, style_summary.deets, {paddingTop: "28px"})}>
-              <span className="sum-bold">Total:</span>
-              <Price  style={style_summary.price_total} price={total}/>
-            </div>
-          </div>
-
-          {has_promo || !this.props.is_cart ? null :
-            <div className="item promo" style={Object.assign({},style_summary.item,{padding:"none"})}>
-              <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
-              <div className="promoInput" style={style_summary.deets}>
-                <input placeholder="Promo code" type="text" value={this.state.promo.code} onChange={(event)=>{this.setState({promo:{code:event.target.value}})}}/>
-                <button onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
+            {/* item price total */}
+            <div className="item" style={Object.assign({},style_summary.item,{minHeight: "28px"})}>
+              <div style={style_summary.img_preview_container} />
+              <div className="deets" style={Object.assign({}, style_summary.deets, {paddingTop: "28px"})}>
+                <span className="sum-bold">Total:</span>
+                <Price  style={style_summary.price_total} price={total}/>
               </div>
             </div>
-          }
-        </div>  
+
+            {has_promo || !this.props.is_cart ? null :
+              <div className="item promo" style={Object.assign({},style_summary.item,{padding:"none"})}>
+                <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
+                <div className="promo_input" style={style_summary.deets}>
+                  <input placeholder="Promo code" type="text" value={this.state.promo.code} onChange={(event)=>{this.setState({promo:{code:event.target.value}})}}/>
+                  <button onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
+                </div>
+              </div>
+            }
+          </div> {/* .summary_items_inner */}
+        </div> {/* .summary_items_outer */}
       </div>
-      </cart>
     );
   }
 }

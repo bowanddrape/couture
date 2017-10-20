@@ -83651,6 +83651,11 @@ var Cart = function (_React$Component) {
       return React.createElement(
         'div',
         { className: 'cart-wrapper grid' },
+        React.createElement(
+          'h2',
+          { className: 'cart_header' },
+          'My Cart'
+        ),
         React.createElement(Items, {
           ref: 'Items',
           contents: this.state.items,
@@ -85704,7 +85709,7 @@ var Gallery = function (_React$Component) {
             } },
           item.caption ? React.createElement(
             "div",
-            { className: "caption", style: { fontSize: "20px", marginTop: item.height ? parseInt(item.height) - 24 + "px" : "376px" } },
+            { className: "caption" },
             item.caption
           ) : null
         ));
@@ -85920,8 +85925,11 @@ var Item = function (_React$Component) {
           JSON.stringify(this.props)
         );
       }
-      var className = "item-product";
+      var className = "item";
       if (new RegExp("^promo:", "i").test(this.props.props.name) && this.props.onRemove) className += " promo";
+      if (this.props.fulfillment) {
+        className += " fulfillment";
+      }
       var inline_style = this.props.style ? this.props.style : style;
 
       var quantity = this.props.quantity || 1;
@@ -85935,18 +85943,12 @@ var Item = function (_React$Component) {
         ));
       }
 
+      var assembly_phrase = "";
       var assembly = [];
       var assembly_contents = {};
       if (this.props.fulfillment && this.props.assembly) {
         for (var _i = 0; _i < this.props.assembly.length; _i++) {
           ItemUtils.recurseAssembly(this.props.assembly[_i], function (component) {
-            // component.sku example: "letter_sequin_white2_n"
-            // split along the _ and grab the last character
-            // if the last char is a space, skip it
-            if (component.hasOwnProperty('sku')) {
-              var lastChar = component.sku.split("_").pop();
-              if (lastChar == " ") return;
-            }
             // haute imported entries will have "text" set
             if (component.props && component.props.image && component.text) {
               var letters = {};
@@ -85968,14 +85970,24 @@ var Item = function (_React$Component) {
                 React.createElement('img', { src: component.props.image }),
                 letter_strings.join("  ")
               ));
-            } else if (component.props && component.props.image) {
-              var sku = component.sku || component.props.name;
-              component.quantity = component.quantity || 1;
-              if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
+              return;
             }
+
+            // ignore anything you can't see
+            if (!component.props || !component.props.image) return;
+            var last_sku_tok = component.sku.split("_").pop();
+            assembly_phrase += last_sku_tok;
+            // skip skus corresponding to spaces
+            if (last_sku_tok == " ") return;
+
+            var sku = component.sku || component.props.name;
+            component.quantity = component.quantity || 1;
+            if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
           }); // recurseAssembly
+          assembly_phrase += " ";
         } // this.props.assembly.forEach
         Object.keys(assembly_contents).sort().forEach(function (sku) {
+          var label = assembly_contents[sku].props.name || sku;
           var backgroundImage = 'url(' + assembly_contents[sku].props.image + ')';
           var backgroundSize = 'contain';
           if (assembly_contents[sku].props.imagewidth < assembly_contents[sku].props.imageheight) backgroundSize = assembly_contents[sku].props.imagewidth / assembly_contents[sku].props.imageheight * 100 + '% 100%';
@@ -85987,17 +85999,28 @@ var Item = function (_React$Component) {
                 display: "inline-block",
                 width: "20px",
                 height: "20px",
+                border: "solid 4px #ccc",
+                backgroundColor: "#ccc",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
                 backgroundImage: backgroundImage,
                 backgroundSize: backgroundSize }
             }),
-            assembly_contents[sku].quantity > 1 ? "x" + assembly_contents[sku].quantity : null
+            assembly_contents[sku].quantity > 1 ? React.createElement(
+              'span',
+              { className: 'quant' },
+              "x" + assembly_contents[sku].quantity
+            ) : null,
+            React.createElement(
+              'span',
+              { className: 'label' },
+              label
+            )
           ));
         });
         if (assembly.length) assembly = React.createElement(
-          'assembly',
-          null,
+          'div',
+          { className: 'assembly' },
           assembly
         );
       }
@@ -86035,6 +86058,11 @@ var Item = function (_React$Component) {
             'button',
             { className: 'remove', onClick: this.handleRemovePromptConfirm.bind(this), onBlur: this.handleRemoveBlur },
             'Remove'
+          ) : null,
+          assembly_phrase ? React.createElement(
+            'div',
+            { className: 'assembly_phrase' },
+            assembly_phrase
           ) : null,
           assembly,
           this.props.sku ? React.createElement(Price, { price: this.props.props.price, quantity: quantity }) : null,
@@ -86365,7 +86393,6 @@ var Items = function (_React$Component) {
       var style_summary = Item.style_summary;
       // hide irrelevant things on packing slip
       if (this.props.packing_slip) {
-        style.deets = Object.assign({}, style.deets, { position: "relative", left: "-64px", width: "100%" });
         style_summary.item = Object.assign({}, style_summary.item, { display: "none" });
       }
 
@@ -86393,17 +86420,16 @@ var Items = function (_React$Component) {
 
       if (typeof window != "undefined" && !line_items.length) return null;
 
+      var classname = "items";
+      if (this.props.packing_slip) classname += " packing_slip";
+      if (this.props.fulfillment) classname += " fulfillment";
+
       return React.createElement(
-        'cart',
-        { className: this.props.packing_slip ? "packing_slip" : "" },
-        React.createElement(
-          'h2',
-          { className: 'cart-header' },
-          'My Cart'
-        ),
+        'div',
+        { className: classname },
         React.createElement(
           'div',
-          { className: 'productWrapper' },
+          { className: 'product_wrapper' },
           line_items
         ),
         React.createElement(
@@ -86411,10 +86437,10 @@ var Items = function (_React$Component) {
           { className: 'summary_items' },
           React.createElement(
             'div',
-            { className: 'summary_items__inner' },
+            { className: 'summary_items_inner' },
             React.createElement(
               'h4',
-              { className: 'summary_items__header' },
+              { className: 'summary_items_header' },
               'Summary'
             ),
             React.createElement(
@@ -86468,7 +86494,7 @@ var Items = function (_React$Component) {
               ),
               React.createElement(
                 'div',
-                { className: 'promoInput', style: style_summary.deets },
+                { className: 'promo_input', style: style_summary.deets },
                 React.createElement('input', { placeholder: 'Promo code', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
                     _this6.setState({ promo: { code: event.target.value } });
                   } }),
@@ -86481,8 +86507,10 @@ var Items = function (_React$Component) {
                 )
               )
             )
-          )
-        )
+          ),
+          ' '
+        ),
+        ' '
       );
     }
   }]);
@@ -89449,7 +89477,6 @@ var Shipment = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Shipment.__proto__ || Object.getPrototypeOf(Shipment)).call(this, props));
 
-    console.log(props);
     _this.state = {
       from_id: _this.props.from_id,
       to_id: _this.props.to_id,
@@ -89740,34 +89767,6 @@ var Shipment = function (_React$Component) {
           null,
           React.createElement(
             'div',
-            { className: 'time_bar' },
-            React.createElement(
-              'div',
-              null,
-              'requested: ',
-              React.createElement(Timestamp, { time: this.props.requested })
-            ),
-            React.createElement(
-              'div',
-              null,
-              'approved: ',
-              React.createElement(Timestamp, { time: this.props.approved })
-            ),
-            React.createElement(
-              'div',
-              null,
-              'packed: ',
-              React.createElement(Timestamp, { time: this.state.packed })
-            ),
-            React.createElement(
-              'div',
-              null,
-              'received: ',
-              React.createElement(Timestamp, { time: this.state.received })
-            )
-          ),
-          React.createElement(
-            'div',
             { className: 'header_menu' },
             React.createElement(
               'shipping_details',
@@ -89785,18 +89784,6 @@ var Shipment = function (_React$Component) {
                   { href: '/shipment/' + this.props.id },
                   this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
                 )
-              ),
-              React.createElement(
-                'div',
-                null,
-                React.createElement(
-                  'label',
-                  null,
-                  'Fulfillment_id: '
-                ),
-                ' ',
-                this.props.fulfillment_id,
-                ' '
               ),
               React.createElement(
                 'div',
@@ -89914,15 +89901,22 @@ var Shipment = function (_React$Component) {
       return React.createElement(
         'shipment',
         null,
+        React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'label',
+            null,
+            'Fulfillment_id: '
+          ),
+          ' ',
+          this.props.fulfillment_id,
+          ' '
+        ),
         fulfillment_tools,
         React.createElement(
           'h1',
           { style: Object.assign({}, Item.style.item, { borderBottom: "none", margin: "34px auto", justifyContent: "space-between" }) },
-          React.createElement(
-            'div',
-            null,
-            'ORDER SUMMARY'
-          ),
           React.createElement(
             'div',
             null,
@@ -90558,11 +90552,21 @@ var ThanksPurchaseComplete = function (_React$Component) {
           )
         ),
         React.createElement(
+          'h1',
+          null,
+          'ORDER SUMMARY'
+        ),
+        React.createElement(
           'div',
           null,
           React.createElement(Items, { contents: this.state.items })
         ),
         React.createElement('div', { style: { width: "600px", margin: "20px auto", borderBottom: "solid 1px #000" } }),
+        React.createElement(
+          'h1',
+          null,
+          'HOW DID WE DO?'
+        ),
         React.createElement(Signup, {
           hidden_keys: { email: this.props.email },
           BtnText: 'Send Now!',

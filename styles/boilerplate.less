@@ -266,15 +266,26 @@ a.card {
   }
 }
 .gallery {
-  a.card:not(.not_link):hover {
-    border: 3px solid @color_secondary;
+  a.card {
+    border-radius: 0;
+    &.not_link:hover {
+      text-decoration: none;
+    }
   }
   .caption {
     .headerfont;
+    font-size: 8px;
+    position: absolute;
+    bottom: 0px;
     z-index: 1;
     background-color: @color_primary;
     width: 100%;
     text-align: center;
+  }
+}
+@media (min-width: @desktop_min_width) {
+  .gallery {
+    zoom: 300%;
   }
 }
 
@@ -393,6 +404,9 @@ button:focus, input[type="button"]:focus {
 }
 
 @media print {
+  .header, .footer {
+    display: none;
+  }
   .layout {
     padding-top: 0px;
   }

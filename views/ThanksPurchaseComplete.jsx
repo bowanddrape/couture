@@ -35,10 +35,12 @@ class ThanksPurchaseComplete extends React.Component {
         <div>
           <p>Helper puppies have been dispatched to create your order!</p>
         </div>
+        <h1>ORDER SUMMARY</h1>
         <div>
           <Items contents = {this.state.items} />
         </div>
         <div style={{width:"600px",margin:"20px auto",borderBottom:"solid 1px #000"}}/>
+        <h1>HOW DID WE DO?</h1>
         <Signup
           hidden_keys={{email:this.props.email}}
           BtnText="Send Now!"

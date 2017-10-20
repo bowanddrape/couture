@@ -30,7 +30,7 @@ class Gallery extends React.Component {
           backgroundSize: "cover",
         }}>
           {item.caption ?
-            <div className="caption" style={{fontSize:"20px",marginTop:item.height?parseInt(item.height)-24+"px":"376px"}}>{item.caption}</div>
+            <div className="caption">{item.caption}</div>
             : null
           }
         </a>

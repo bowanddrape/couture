@@ -19,9 +19,12 @@ class Item extends React.Component {
         <div className="item">{JSON.stringify(this.props)}</div>
       );
     }
-    let className = "item-product";
+    let className = "item";
     if (new RegExp("^promo:", "i").test(this.props.props.name) && this.props.onRemove)
       className += " promo";
+    if (this.props.fulfillment) {
+      className += " fulfillment";
+    }
     let inline_style = this.props.style?this.props.style:style;
 
     let quantity = this.props.quantity || 1;
@@ -33,18 +36,12 @@ class Item extends React.Component {
       )
     }
 
+    let assembly_phrase = "";
     let assembly = [];
     let assembly_contents = {};
     if (this.props.fulfillment && this.props.assembly) {
       for (let i=0; i<this.props.assembly.length; i++) {
         ItemUtils.recurseAssembly(this.props.assembly[i], (component) => {
-          // component.sku example: "letter_sequin_white2_n"
-          // split along the _ and grab the last character
-          // if the last char is a space, skip it
-          if (component.hasOwnProperty('sku')){
-            let lastChar = component.sku.split("_").pop();
-            if (lastChar == " ") return;
-          }
           // haute imported entries will have "text" set
           if (component.props && component.props.image && component.text) {
             let letters = {};
@@ -65,17 +62,27 @@ class Item extends React.Component {
             assembly.push(
               <div key={assembly.length}><img src={component.props.image}/>{letter_strings.join("  ")}</div>
             );
-          } else if (component.props && component.props.image) {
-            let sku = component.sku || component.props.name;
-            component.quantity = component.quantity || 1;
-            if (!assembly_contents[sku])
-              assembly_contents[sku] = JSON.parse(JSON.stringify(component));
-            else
-              assembly_contents[sku].quantity += component.quantity;
+            return;
           }
+
+          // ignore anything you can't see
+          if (!component.props || !component.props.image) return;
+          let last_sku_tok = component.sku.split("_").pop();
+          assembly_phrase += last_sku_tok;
+          // skip skus corresponding to spaces
+          if (last_sku_tok == " ") return;
+
+          let sku = component.sku || component.props.name;
+          component.quantity = component.quantity || 1;
+          if (!assembly_contents[sku])
+            assembly_contents[sku] = JSON.parse(JSON.stringify(component));
+          else
+            assembly_contents[sku].quantity += component.quantity;
         }); // recurseAssembly
+        assembly_phrase += " ";
       } // this.props.assembly.forEach
       Object.keys(assembly_contents).sort().forEach((sku) => {
+        let label = assembly_contents[sku].props.name || sku;
         let backgroundImage = `url(${assembly_contents[sku].props.image})`;
         let backgroundSize = `contain`;
         if (assembly_contents[sku].props.imagewidth<assembly_contents[sku].props.imageheight)
@@ -84,21 +91,24 @@ class Item extends React.Component {
           backgroundSize = `100% ${assembly_contents[sku].props.imageheight/assembly_contents[sku].props.imagewidth*100}%`;
         assembly.push(
           <span key={assembly.length} style={{marginRight:"8px"}}>
-          <span style={{
-            display:"inline-block",
-            width:"20px",
-            height:"20px",
-            backgroundPosition:"center",
-            backgroundRepeat:"no-repeat",
-            backgroundImage,
-            backgroundSize}}
-          />
-            {assembly_contents[sku].quantity>1?"x"+assembly_contents[sku].quantity:null}
+            <span style={{
+              display: "inline-block",
+              width: "20px",
+              height: "20px",
+              border: "solid 4px #ccc",
+              backgroundColor: "#ccc",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundImage,
+              backgroundSize}}
+            />
+            {assembly_contents[sku].quantity>1?<span className="quant">{"x"+assembly_contents[sku].quantity}</span>:null}
+            <span className="label">{label}</span>
           </span>
         );
       });
       if (assembly.length)
-        assembly = (<assembly>{assembly}</assembly>);
+        assembly = (<div className="assembly">{assembly}</div>);
     }
 
     return (
@@ -120,6 +130,7 @@ class Item extends React.Component {
           {product_options}
           {this.props.onRemove?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
 
+          {assembly_phrase?<div className="assembly_phrase">{assembly_phrase}</div>:null}
           {assembly}
           {this.props.sku ?
             <Price price={this.props.props.price} quantity={quantity} />

@@ -1,36 +1,97 @@
 
-@import "./colors.less";
-@item_preview_width: 200px;
-@item_preview_height: 200px;
-@item_width: 700px;
-@item_padding: 13px;
+@import "./boilerplate.less";
 
-.item {
-  .deets {
-    .remove {
-      clear: both;
-      background-color: none;
-      padding: 0;
-      text-transform: capitalize;
-      cursor: pointer;
-      width: auto;
-      font-weight: normal;
-      font-size: 15px;
-      margin: 6px;
-      &:hover {
-        color: @color_secondary;
+
+.items {
+  grid-column-start: 1;
+  grid-column-end: -1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto;
+
+  .product_wrapper {
+    border-top:2px solid black;
+    border-bottom: 2px solid black;
+    padding: 10px;
+    grid-column: span 4;
+
+    .item {
+      border-bottom: 2px solid black;
+
+      &:last-of-type {
+        border-bottom: none;
       }
 
-      &:before {
-        display: none;
+      .deets {
+        display: inline-block;
+        margin-left: 20px;
       }
-
-      &:after {
+    } /* .item */
+    .item.fulfillment {
+      .price {
         display: none;
       }
     }
+  } /* product_wrapper */
+
+  .summary_items {
+    display: inline-block;
+    grid-column: span 2;
+    padding: 0 0 0 40px;
+
+    .promo_input {
+      input {
+        border: none;
+        border-bottom: 3px solid #000;
+        text-transform: lowercase;
+      }
+
+      button {
+        display: inline-block;
+      }
+    }
+
+    .summary_items_inner {
+      padding: 20px;
+      border: 1px solid black;
+      display: inline-block;
+    }
+
+    .summary_items_header {
+      border-bottom: 2px solid black;
+    }
+  } /* .summary_items */
+  &.fulfillment .summary_items {
+    display: none;
+  }
+
+  .remove {
+    text-decoration: underline;
+    border: none;
+    font-family: "Open Sans", Arial, sans-serif;
+    text-align: left;
+    width: auto;
+    display: initial;
+
+    &:after, &:before {
+      background-color: white;
+    }
+  }
+
+}
+
+@media (max-width: @desktop_min_width) {
+  .items {
+    .productWrapper {
+      grid-column: span 6;
+      border-bottom: none;
+    }
+  }
+
+  .summary_items {
+    grid-column: span 6;
+    padding: 0;
+    margin-top: 30px;
   }
 }
-.item.promo {
-  min-height: 60px;
-}
+

@@ -302,12 +302,13 @@ class Cart extends React.Component {
 
     return (
       <div className="cart-wrapper grid">
-          <Items
-            ref="Items"
-            contents={this.state.items}
-            onUpdate={(items)=>{this.setState({items:items.contents})}}
-            is_cart="true"
-          />
+        <h2 className="cart_header">My Cart</h2>
+        <Items
+          ref="Items"
+          contents={this.state.items}
+          onUpdate={(items)=>{this.setState({items:items.contents})}}
+          is_cart="true"
+        />
 
         { this.state.user.email ? null :
           <div className="checkout_section">
