@@ -19,6 +19,7 @@ customize {
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 100%;
+    border-top: 3px solid #eee;
 
     canvas {
       flex-grow: 1;
@@ -250,6 +251,10 @@ customize {
     }
   }
 
+
+
+
+
   hud_controls {
     display: flex;
     flex-direction: column;
@@ -270,6 +275,13 @@ customize {
       display: none;
     }
   }
+  @media (max-width: @desktop_min_width) {
+    hud_controls {
+      top: 0;
+      right: 0;
+    }
+  }
+
   .product_details {
     .description {
       margin: 20px auto;
@@ -306,6 +318,15 @@ customize {
   }
 }
 
+@media (max-width: @desktop_min_width) {
+  customize .product_details {
+  .description, .size_chart{
+    grid-column-start: 1;
+    grid-column-end: -1;
+  }
+}
+}
+
 @media (min-width: @desktop_min_width) { customize {
   product_options {
     left: auto;
@@ -324,6 +345,9 @@ customize {
     top: 0px;
     left: 0px;
     bottom: 0px;
+    border-right: 3px solid #eee;
+    width: 300px;
+    height: 100%;
     .components {
       display: flex;
       flex-direction: row-reverse;
@@ -381,10 +405,7 @@ switch_option img {
   border-top: 1px solid black;
   z-index: 10;
   background: white;
-  border-top: 5px solid transparent;
-  border-image: @gradient-rainbow;
-  border-image-slice: 1;
-
+  border-top: 3px solid #eee;
 
   .productName {
     position: relative;
@@ -399,5 +420,35 @@ switch_option img {
   .addCart {
     font-size: 20px;
     display: inline-block;
+  }
+}
+
+
+@media (max-width: @desktop_min_width) {
+  .add_to_cart {
+      height: auto;
+    .productName {
+      position: relative;
+      display: inline-block;
+      font-size: 16px;
+      text-transform: uppercase;
+      font-weight: bold;
+      border-bottom: 3px solid #7f5cff;
+      margin: 5px 15px 0 15px;
+    }
+
+    .addCart {
+      font-size: 16px;
+      display: inline-block;
+      height: 40px;
+
+      &:before {
+        height: 40px;
+      }
+
+      &:after {
+        height: 40px;
+      }
+    }
   }
 }

@@ -622,6 +622,7 @@ customize .canvas_container {
   flex-direction: row;
   flex-wrap: wrap;
   max-width: 100%;
+  border-top: 3px solid #eee;
 }
 customize .canvas_container canvas {
   flex-grow: 1;
@@ -886,6 +887,12 @@ customize hud_controls button:before {
 customize hud_controls button:after {
   display: none;
 }
+@media (max-width: 737px) {
+  customize hud_controls {
+    top: 0;
+    right: 0;
+  }
+}
 customize .product_details .description {
   margin: 20px auto;
   letter-spacing: 2px;
@@ -918,6 +925,13 @@ customize .product_details .size_chart row span {
 customize .product_details .size_chart row span:first-child {
   border-right: 1px solid #eaeaea;
 }
+@media (max-width: 737px) {
+  customize .product_details .description,
+  customize .product_details .size_chart {
+    grid-column-start: 1;
+    grid-column-end: -1;
+  }
+}
 @media (min-width: 737px) {
   customize product_options {
     left: auto;
@@ -936,6 +950,9 @@ customize .product_details .size_chart row span:first-child {
     top: 0px;
     left: 0px;
     bottom: 0px;
+    border-right: 3px solid #eee;
+    width: 300px;
+    height: 100%;
   }
   customize .component_picker .components {
     display: flex;
@@ -987,9 +1004,7 @@ switch_option img {
   border-top: 1px solid black;
   z-index: 10;
   background: white;
-  border-top: 5px solid transparent;
-  border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
-  border-image-slice: 1;
+  border-top: 3px solid #eee;
 }
 .add_to_cart .productName {
   position: relative;
@@ -1003,6 +1018,31 @@ switch_option img {
 .add_to_cart .addCart {
   font-size: 20px;
   display: inline-block;
+}
+@media (max-width: 737px) {
+  .add_to_cart {
+    height: auto;
+  }
+  .add_to_cart .productName {
+    position: relative;
+    display: inline-block;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 3px solid #7f5cff;
+    margin: 5px 15px 0 15px;
+  }
+  .add_to_cart .addCart {
+    font-size: 16px;
+    display: inline-block;
+    height: 40px;
+  }
+  .add_to_cart .addCart:before {
+    height: 40px;
+  }
+  .add_to_cart .addCart:after {
+    height: 40px;
+  }
 }
 .grid {
   display: grid;
