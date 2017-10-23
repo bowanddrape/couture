@@ -21,10 +21,12 @@ class JSONAPI extends SQLTable {
       return this.handleHTTPPage(req, res, next);
 
     if (req.method=='GET') {
-      if (!req.query.page) {
-        req.query.page = "{}";
+      req.query.page = req.query.page || "{}";
+      try {
+        req.query.page = JSON.parse(req.query.page);
+      } catch(err) {
+        req.query.page = {};
       }
-      req.query.page = JSON.parse(req.query.page);
       // restrict how many entries we return
       if (!req.query.page.limit)
         req.query.page.limit = 20;
