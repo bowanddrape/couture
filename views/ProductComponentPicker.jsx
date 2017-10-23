@@ -115,8 +115,9 @@ class ProductComponentPicker extends React.Component {
             component_letters[character] = letter;
           }
           components.push(
-            <div key={components.length} name={compatible_component.props.name||compatible_component.sku} style={{height:"auto",overflow:"hidden"}} className="component_container letters">
-              <input type="text" style={{width:"90%",margin:"auto"}} placeholder="Say Something Punny"
+            <div key={components.length} name={compatible_component.props.name||compatible_component.sku} className="component_container letters">
+              <div className="punnyInputWrap">
+              <input type="text" className="punnyInput" placeholder="Say Something Punny"
                 onChange={(event) => {
                   this.handleSetComponentText(event.target.value, component_letters);
                 }}
@@ -135,6 +136,9 @@ class ProductComponentPicker extends React.Component {
                 value={this.props.productCanvas.getComponentText()}
               />
             </div>
+            <button onClick={this.handleSelectComponent.bind(this, -1)} className="sayIt">Say It</button>
+              <img class="punnyClose" onClick={this.handlePopComponent.bind(this, true)} src="/hamburger_close.svg" />
+            </div>
           );
           continue;
         } // is_native_keyboard
@@ -151,9 +155,11 @@ class ProductComponentPicker extends React.Component {
           );
         }
         components.push(
-          <div key={components.length} name={compatible_component.props.name} className="rainbow_border"><div className="component_container">
+          <div key={components.length} name={compatible_component.props.name} className="rainbow_border">
+            <div className="component_container">
             {tab_components}
-          </div></div>
+          </div>
+        </div>
         );
         continue;
       }

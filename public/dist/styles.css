@@ -70,8 +70,7 @@ body {
   image-rendering: crisp-edges;
 }
 .layout {
-  overflow-x: hidden;
-  padding: 80px 20px 10px 20px;
+  padding: 80px 0 0 0;
 }
 a {
   text-decoration: none;
@@ -566,7 +565,6 @@ customize .canvas_container {
   flex-direction: row;
   flex-wrap: wrap;
   max-width: 100%;
-  overflow: hidden;
 }
 customize .canvas_container canvas {
   flex-grow: 1;
@@ -706,11 +704,16 @@ customize .component_virtual_keyboard_container div.halfgap {
   border: none;
 }
 customize .component_container.letters {
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto 20px auto;
   padding: 15px;
+  bottom: 0;
+  left: 30vw;
   z-index: 0;
   position: relative;
+  position: absolute;
+  display: inline-block;
+  height: auto;
 }
 customize .component_container.letters:before {
   content: " ";
@@ -731,6 +734,27 @@ customize .component_container.letters:after {
   bottom: 2px;
   background-color: #fff;
   z-index: -1;
+}
+customize .component_container.letters .punnyInputWrap {
+  display: inline-block;
+  position: relative;
+  float: left;
+  width: 60%;
+  height: auto;
+  margin: 0 3% 0 0;
+}
+customize .component_container.letters input {
+  border: none;
+  border-bottom: 5px solid #000;
+  text-transform: lowercase;
+  display: inline-block;
+  width: 100%;
+}
+customize .component_container.letters .sayIt {
+  display: inline-block;
+  top: 5px;
+  float: left;
+  margin: 0;
 }
 customize .cameraBtn {
   border: 0;
@@ -793,6 +817,10 @@ customize .hudBtn--rotateRight:before {
   content: "";
   background-image: url(/backview.svg);
 }
+customize .hudBtn--edit:before {
+  content: "";
+  background-image: url(/edit.svg);
+}
 customize .hudBtn--done:before {
   content: "";
   background-image: url(/tick.svg);
@@ -806,13 +834,14 @@ customize hud_controls {
   flex-direction: column;
   position: absolute;
   top: 185px;
-  right: 0px;
+  right: 20px;
   min-width: 83px;
 }
 customize hud_controls.rainbow_border {
   padding: 0 10px;
   position: absolute;
   z-index: 1;
+  right: -5px;
 }
 customize hud_controls button:before {
   display: none;
@@ -880,12 +909,12 @@ customize .product_details .size_chart row span:first-child {
     flex-direction: column;
   }
   customize .component_picker .components .component_container.letters {
-    width: 300px;
+    width: 600px;
     margin-left: 48px;
     margin-top: 118px;
   }
   customize .component_picker .components .component_container:not(.letters) {
-    height: 400px;
+    height: 100%;
     width: 119px;
     flex-direction: row;
     overflow-x: hidden;
@@ -895,7 +924,7 @@ customize .product_details .size_chart row span:first-child {
     margin-left: 50px;
   }
   customize .canvas_container canvas {
-    height: 400px;
+    height: 800px;
   }
   customize .canvas_container .component_selected canvas,
   customize .canvas_container .component_selected component_hitbox {
@@ -906,7 +935,7 @@ customize .product_details .size_chart row span:first-child {
 .component_wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 170px;
+  height: 70vh;
 }
 switch_option img {
   font-weight: 700;
@@ -937,6 +966,12 @@ switch_option img {
 .add_to_cart .addCart {
   font-size: 20px;
   display: inline-block;
+}
+.punnyClose {
+  position: absolute;
+  width: 20px;
+  right: 10px;
+  top: 10px;
 }
 cart {
   grid-column-start: 1;
@@ -1352,6 +1387,50 @@ product_options switch.expanded {
   justify-content: flex-begin;
   margin-bottom: 10px;
 }
+.component_picker switch switch_option {
+  background-color: #fff;
+  border: solid 1px #eaeaea;
+  color: #000;
+  border-radius: 50%;
+  padding: 10px;
+  margin: 5px;
+}
+.component_picker switch switch_option.selected,
+.component_picker switch.expanded switch_option {
+  min-width: 36px;
+}
+.component_picker switch.expanded {
+  z-index: 0;
+  position: relative;
+  z-index: 1;
+  background-color: #fff;
+}
+.component_picker switch.expanded:before {
+  content: " ";
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  z-index: -2;
+}
+.component_picker switch.expanded:after {
+  content: " ";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  z-index: -1;
+}
+.component_picker switch.expanded switch_option:not(.selected) {
+  opacity: 1;
+}
+.component_picker switch.expanded .selected {
+  border-color: #7f5cff;
+}
 .header {
   position: fixed;
   top: 0;
@@ -1593,7 +1672,7 @@ product_options switch.expanded {
 @media (min-width: 737px) {
   .footer .footer-menu a {
     display: inline-block;
-    margin-right: 15px;
+    margin-right: 60px;
   }
   .footer .footer-menu .social {
     display: inline-block;

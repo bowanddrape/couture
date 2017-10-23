@@ -19,7 +19,6 @@ customize {
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 100%;
-    overflow: hidden;
 
     canvas {
       flex-grow: 1;
@@ -80,6 +79,7 @@ customize {
       border: none;
     }
   }
+
   .component_virtual_keyboard_container {
     .component_container;
     div {
@@ -109,11 +109,38 @@ customize {
     }
   }
   .component_container.letters {
-    max-width: 400px;
+    max-width: 600px;
     margin: 0 auto 20px auto;
     padding: 15px;
-    position: relative;
+    bottom: 0;
+    left: 30vw;
     .rainbow_border;
+    position: absolute;
+    display: inline-block;
+    height: auto;
+
+    .punnyInputWrap {
+      display: inline-block;
+      position: relative;
+      float: left;
+      width: 60%;
+      height: auto;
+      margin: 0 3% 0 0;
+    }
+    input {
+      border: none;
+      border-bottom: 5px solid #000;
+      text-transform: lowercase;
+      display: inline-block;
+      width: 100%;
+    }
+    .sayIt {
+      display: inline-block;
+      top: 5px;
+      float: left;
+      margin: 0;
+    }
+
   }
 
 
@@ -200,6 +227,14 @@ customize {
     }
   }
 
+  .hudBtn--edit{
+    &:before {
+      content: "";
+        background-image: url(/edit.svg);
+    }
+  }
+
+
   .hudBtn--done{
     &:before {
       content: "";
@@ -219,12 +254,13 @@ customize {
     flex-direction: column;
     position: absolute;
     top: 185px;
-    right: 0px;
+    right: 20px;
     min-width: 83px;
     &.rainbow_border {
       padding: 0 10px;
       position: absolute;
       z-index: 1;
+      right: -5px;
     }
     button:before {
       display: none;
@@ -295,12 +331,12 @@ customize {
         flex-direction: column;
       }
       .component_container.letters {
-        width: 300px;
+        width: 600px;
         margin-left: 48px;
         margin-top: 118px;
       }
       .component_container:not(.letters) {
-        height: 400px;
+        height: 100%;
         width: 119px;
         flex-direction: row;
         overflow-x: hidden;
@@ -313,7 +349,7 @@ customize {
   }
   .canvas_container {
     canvas {
-      height: 400px;
+      height: 800px;
     }
     .component_selected {
       canvas, component_hitbox {
@@ -326,7 +362,7 @@ customize {
 .component_wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 170px;
+  height: 70vh;
 }
 
 switch_option img {
@@ -365,5 +401,9 @@ switch_option img {
   }
 }
 
-
-//Product Details
+.punnyClose {
+  position: absolute;
+    width: 20px;
+    right: 10px;
+    top: 10px;
+}

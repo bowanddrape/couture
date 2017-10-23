@@ -87963,6 +87963,25 @@ var ProductCanvas = function (_React$Component) {
       });
     }
   }, {
+    key: 'handleDelComponent',
+    value: function handleDelComponent() {
+      var cascade = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      this.setState(function (prevState, props) {
+        var assembly = JSON.parse(JSON.stringify(prevState.assembly));
+        var selected = assembly[prevState.selected_component];
+        if (selected) {
+          selected.assembly.pop();
+          if (cascade || !selected.assembly.length) {
+            assembly.splice(prevState.selected_component, 1);
+            return { assembly: assembly, selected_component: -1 };
+          }
+          return { assembly: assembly };
+        }
+        return {};
+      });
+    }
+  }, {
     key: 'handleComponentMove',
     value: function handleComponentMove(index, event) {
       var _this5 = this;
@@ -88197,6 +88216,11 @@ var ProductCanvas = function (_React$Component) {
           'Delete'
         ));
         hud_controls.push(React.createElement(
+          'button',
+          { className: 'hudBtn hudBtn--edit', key: hud_controls.length },
+          'Edit'
+        ));
+        hud_controls.push(React.createElement(
           'div',
           { key: hud_controls.length },
           React.createElement(
@@ -88213,7 +88237,7 @@ var ProductCanvas = function (_React$Component) {
         hud_controls.push(React.createElement(
           'button',
           { className: 'hudBtn hudBtn--center', key: hud_controls.length, onClick: this.handleComponentCenter.bind(this) },
-          'Center All'
+          'Center'
         ));
         hud_controls.push(React.createElement(
           'button',
@@ -88234,7 +88258,7 @@ var ProductCanvas = function (_React$Component) {
         hud_controls.push(React.createElement(
           'button',
           { key: hud_controls.length, className: 'cameraBtn centerBtn', onClick: this.autoLayout.bind(this, true) },
-          'Center'
+          'Center All'
         ));
       }
 
@@ -88416,25 +88440,35 @@ var ProductComponentPicker = function (_React$Component) {
             }
             components.push(React.createElement(
               'div',
-              { key: components.length, name: compatible_component.props.name || compatible_component.sku, style: { height: "auto", overflow: "hidden" }, className: 'component_container letters' },
-              React.createElement('input', { type: 'text', style: { width: "90%", margin: "auto" }, placeholder: 'Say Something Punny',
-                onChange: function onChange(event) {
-                  _this2.handleSetComponentText(event.target.value, _component_letters);
-                },
-                onFocus: function onFocus(event) {
-                  event.persist();
-                  // TODO figure out some better scrolly what-nots?
-                  setTimeout(function () {
-                    event.target.scrollIntoView(false);
-                  }, 1);
-                },
-                onKeyUp: function onKeyUp(event) {
-                  if (event.which != 13) return;
-                  _this2.handleSetComponentText(event.target.value, _component_letters);
-                  _this2.props.productCanvas.handleSelectComponent(-1);
-                },
-                value: _this2.props.productCanvas.getComponentText()
-              })
+              { key: components.length, name: compatible_component.props.name || compatible_component.sku, className: 'component_container letters' },
+              React.createElement(
+                'div',
+                { className: 'punnyInputWrap' },
+                React.createElement('input', { type: 'text', className: 'punnyInput', placeholder: 'Say Something Punny',
+                  onChange: function onChange(event) {
+                    _this2.handleSetComponentText(event.target.value, _component_letters);
+                  },
+                  onFocus: function onFocus(event) {
+                    event.persist();
+                    // TODO figure out some better scrolly what-nots?
+                    setTimeout(function () {
+                      event.target.scrollIntoView(false);
+                    }, 1);
+                  },
+                  onKeyUp: function onKeyUp(event) {
+                    if (event.which != 13) return;
+                    _this2.handleSetComponentText(event.target.value, _component_letters);
+                    _this2.props.productCanvas.handleSelectComponent(-1);
+                  },
+                  value: _this2.props.productCanvas.getComponentText()
+                })
+              ),
+              React.createElement(
+                'button',
+                { onClick: _this2.handleSelectComponent.bind(_this2, -1), className: 'sayIt' },
+                'Say It'
+              ),
+              React.createElement('img', { 'class': 'punnyClose', onClick: _this2.handlePopComponent.bind(_this2, true), src: '/hamburger_close.svg' })
             ));
             return 'continue';
           } // is_native_keyboard
@@ -88676,7 +88710,7 @@ var ProductList = function (_React$Component) {
           { className: 'add_to_cart' },
           React.createElement(
             'div',
-            { className: 'productName' },
+            { className: 'productName bottomSwitch' },
             product.props.name,
             ' $',
             product.props.price
@@ -90162,7 +90196,7 @@ var Switch = function (_React$Component) {
           React.createElement(
             'div',
             { style: { textAlign: "center" } },
-            React.createElement('img', { src: "/" + child.props.children.toString().replace(/ /g, "_").toLowerCase() + ".svg", alt: child.props.children })
+            React.createElement('img', { id: 'test', src: "/" + child.props.children.toString().replace(/ /g, "_").toLowerCase() + ".svg", alt: child.props.children })
           )
         ));
       };

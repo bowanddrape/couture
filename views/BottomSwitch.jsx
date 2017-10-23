@@ -9,16 +9,17 @@ const override_option_order = [
 ];
 
 /***
-This attempts to emulate a select drop-down, but displays options side-by-side
-props:
-  value:"" // the selected value
-  onChange() // called when something else is selected
-children:
-  <option value={}>{content}</option>
+This is the product switcher at the bottom
 ***/
-class Switch extends React.Component {
+class BottomSwitch extends React.Component {
   constructor(props) {
     super(props);
+
+    let product_map = {};
+    this.props.store.products.forEach((product) => {
+      product_map[product.sku] = product;
+    });
+
     this.state = {
       expanded: false,
     }
@@ -44,21 +45,21 @@ class Switch extends React.Component {
           ()=>{this.props.onChange(child.props.value)}
         }>
           <div style={{textAlign:"center"}}>
-            <img id="test" src={"/"+child.props.children.toString().replace(/ /g,"_").toLowerCase()+".svg"} alt={child.props.children} />
+          <p>{child.props.children}</p>
           </div>
         </switch_option>
       );
     }
     return (
-      <switch
+      <BottomSwitch
         className={this.state.expanded||this.props.always_expanded?"expanded":null}
         onClick={()=>{this.setState({expanded:!this.state.expanded})}}
         style={this.props.style}
       >
         {options}
-      </switch>
+      </BottomSwitch>
     )
   }
 }
 
-module.exports = Switch;
+module.exports = BottomSwitch;

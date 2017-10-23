@@ -134,7 +134,24 @@ class ProductCanvas extends React.Component {
       return {assembly, selected_component: assembly.length-1};
     });
   }
+
   handlePopComponent(cascade=false) {
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      let selected = assembly[prevState.selected_component];
+      if (selected) {
+        selected.assembly.pop();
+        if (cascade || !selected.assembly.length) {
+          assembly.splice(prevState.selected_component, 1);
+          return {assembly, selected_component: -1};
+        }
+        return {assembly};
+      }
+      return {};
+    });
+  }
+
+  handleDelComponent(cascade=false) {
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected = assembly[prevState.selected_component];
@@ -369,10 +386,11 @@ class ProductCanvas extends React.Component {
     let hud_controls = [];
     if (this.state.assembly[this.state.selected_component]) {
       hud_controls.push(<button className="hudBtn hudBtn--delete" key={hud_controls.length} onClick={this.handlePopComponent.bind(this, true)}>Delete</button>);
+      hud_controls.push(<button className="hudBtn hudBtn--edit" key={hud_controls.length}>Edit</button>);
       hud_controls.push(<div key={hud_controls.length}><button className="hudBtn hudBtn--rotateLeft" onClick={this.handleComponentRotate.bind(this, -Math.PI/20)}>Rotate</button>
     <button className="hudBtn hudBtn--rotateRight" onClick={this.handleComponentRotate.bind(this, Math.PI/20)}>Rotate</button></div>
       );
-      hud_controls.push(<button className="hudBtn hudBtn--center" key={hud_controls.length} onClick={this.handleComponentCenter.bind(this)}>Center All</button>);
+      hud_controls.push(<button className="hudBtn hudBtn--center" key={hud_controls.length} onClick={this.handleComponentCenter.bind(this)}>Center</button>);
       hud_controls.push(<button className="hudBtn hudBtn--done" key={hud_controls.length} onClick={this.handleSelectComponent.bind(this, -1)}>Done</button>);
     }
     else if (this.cameras && this.cameras.length>1) {
@@ -385,7 +403,7 @@ class ProductCanvas extends React.Component {
           </button>
         );
       });
-      hud_controls.push(<button key={hud_controls.length} className="cameraBtn centerBtn" onClick={this.autoLayout.bind(this, true)}>Center</button>);
+      hud_controls.push(<button key={hud_controls.length} className="cameraBtn centerBtn" onClick={this.autoLayout.bind(this, true)}>Center All</button>);
     }
 
     return (
