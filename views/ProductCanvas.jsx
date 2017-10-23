@@ -64,6 +64,18 @@ class ProductCanvas extends React.Component {
       let selected = assembly[prevState.selected_component];
       if (!selected) {
         // if nothing is selected make a new selected component
+        let position = [0, 0, 0];
+        // if we have other stuff, make a new line below
+        if (assembly.length) {
+          // FIXME this assumes same side and a bunch of wrong shit
+          let prev_line = assembly[assembly.length-1];
+          position[0] = prev_line.props.position[0];
+          position[1] = prev_line.props.position[1];
+          position[2] = prev_line.props.position[2];
+          if (prev_line.assembly.length && prev_line.assembly[prev_line.assembly.length-1].props) {
+            position[1] -= parseFloat(prev_line.assembly[prev_line.assembly.length-1].props.imageheight);
+          }
+        }
         // facing the camera for now TODO get normal of intersected tri
         let rotation = Matrix.I(4);
         if (this.customizer.camera.rotation.angle) {
@@ -74,7 +86,7 @@ class ProductCanvas extends React.Component {
         }
         selected = {
           props: {
-            position: [0,0,0],
+            position,
             rotation,
           },
           assembly: [],
@@ -100,7 +112,7 @@ class ProductCanvas extends React.Component {
         return component;
       });
       return {assembly, selected_component};
-    }, this.autoLayout);
+    });
   }
 
   handleAddComponent(component) {

@@ -74,7 +74,6 @@ class LayoutMain extends React.Component {
         <LayoutFooter user={this.state.user}/>
 
         <script src="/BowAndDrape.js"></script>
-        <script src="/masonry.pkgd.min.js"></script>
 
         <script dangerouslySetInnerHTML={{__html:`
           var BowAndDrape = require("BowAndDrape");

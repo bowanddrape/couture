@@ -265,18 +265,6 @@ a.card {
     cursor: default;
   }
 }
-.gallery {
-  a.card:not(.not_link):hover {
-    border: 3px solid @color_secondary;
-  }
-  .caption {
-    .headerfont;
-    z-index: 1;
-    background-color: @color_primary;
-    width: 100%;
-    text-align: center;
-  }
-}
 
 h1, h2 {
   .headerfont;
@@ -406,6 +394,9 @@ button:focus, input[type="button"]:focus {
 
 
 @media print {
+  .header, .footer {
+    display: none;
+  }
   .layout {
     padding-top: 0px;
   }

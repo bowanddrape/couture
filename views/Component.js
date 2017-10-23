@@ -17,10 +17,12 @@ class Component {
     this.rotation = Matrix.I(4);
     this.props = {};
     this.assembly = [];
+    this.loading_image = false;
   }
 
   loadImage(gl, state, callback) {
     let imageLoadedCallback = (gl, loaded_image) => {
+      gl.deleteTexture(this.texture);
       this.texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
@@ -33,13 +35,16 @@ class Component {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.generateMipmap(gl.TEXTURE_2D);
       gl.bindTexture(gl.TEXTURE_2D, null);
+      this.loading_image = false;
     };
 
+    // bail if we don't have to do anything
     if (!state.props || !state.props.image || state.props.image==this.props.image) {
       if (callback) callback();
       return;
     }
     if (typeof(Image)!="undefined") {
+      this.loading_image = true;
       // client side image load
       let loaded_image = new Image();
       loaded_image.crossOrigin = "";
@@ -205,7 +210,7 @@ class Component {
 
   render(gl, mvMatrix, shaderProgram) {
 
-    if(!this.geometry_vbo || !this.texture_vbo || !this.ibo) {
+    if(!this.geometry_vbo || !this.texture_vbo || !this.ibo || this.loading_image) {
       return;
     }
 
@@ -281,11 +286,15 @@ class Component {
     ]);
 
     let top_left = new Vector([-dims[0]/2, -dims[1]/2, 0, 1]);
+    let bottom_left = new Vector([-dims[0]/2, dims[1]/2, 0, 1]);
+    let top_right = new Vector([dims[0]/2, -dims[1]/2, 0, 1]);
     let bottom_right = new Vector([dims[0]/2, dims[1]/2, 0, 1]);
 
     top_left = position.add(this.rotation.x(top_left));
+    bottom_left = position.add(this.rotation.x(bottom_left));
+    top_right = position.add(this.rotation.x(top_right));
     bottom_right = position.add(this.rotation.x(bottom_right));
-    return {top_left, bottom_right};
+    return {top_left, bottom_left, top_right, bottom_right};
   }
 }
 

@@ -7,30 +7,25 @@ Display a bunch of images
 class Gallery extends React.Component {
 
   componentDidMount() {
-    let masonry = new Masonry(this.element, {
-      itemSelector: ".card",
-      columnWidth: 150,
-      fitWidth: true,
-    });
   }
 
   render() {
     let items = this.props.items || [];
     let gallery_cards = [];
 
+    let border = this.props.border || "0px";
+
     items.forEach((item) => {
       gallery_cards.push(
         <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={{
-          margin: "0px",
-          border: `solid ${this.props.border} #fff`,
-          boxSizing: "border-box",
-          width: item.width || "300px",
-          height: item.height || "400px",
-          backgroundImage: `url(${item.image})`,
-          backgroundSize: "cover",
-        }}>
+          width: item.width || "150px",
+          border: `solid ${border} #fff`,
+        }} >
+          <img src={item.image} style={{
+            width: item.width || "150px",
+          }} />
           {item.caption ?
-            <div className="caption" style={{fontSize:"20px",marginTop:item.height?parseInt(item.height)-24+"px":"376px"}}>{item.caption}</div>
+            <div className="caption" style={{border: `solid ${border} #fff`,borderTop: "none"}}>{item.caption}</div>
             : null
           }
         </a>

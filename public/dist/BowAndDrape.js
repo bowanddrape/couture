@@ -83524,6 +83524,11 @@ var Cart = function (_React$Component) {
       return React.createElement(
         'div',
         { className: 'cart-wrapper grid' },
+        React.createElement(
+          'h2',
+          { className: 'cart_header' },
+          'My Cart'
+        ),
         React.createElement(Items, {
           ref: 'Items',
           contents: this.state.items,
@@ -83990,6 +83995,7 @@ var Component = function () {
     this.rotation = Matrix.I(4);
     this.props = {};
     this.assembly = [];
+    this.loading_image = false;
   }
 
   _createClass(Component, [{
@@ -83998,6 +84004,7 @@ var Component = function () {
       var _this = this;
 
       var imageLoadedCallback = function imageLoadedCallback(gl, loaded_image) {
+        gl.deleteTexture(_this.texture);
         _this.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, _this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loaded_image);
@@ -84010,13 +84017,16 @@ var Component = function () {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D, null);
+        _this.loading_image = false;
       };
 
+      // bail if we don't have to do anything
       if (!state.props || !state.props.image || state.props.image == this.props.image) {
         if (callback) callback();
         return;
       }
       if (typeof Image != "undefined") {
+        this.loading_image = true;
         // client side image load
         var loaded_image = new Image();
         loaded_image.crossOrigin = "";
@@ -84156,7 +84166,7 @@ var Component = function () {
     key: 'render',
     value: function render(gl, mvMatrix, shaderProgram) {
 
-      if (!this.geometry_vbo || !this.texture_vbo || !this.ibo) {
+      if (!this.geometry_vbo || !this.texture_vbo || !this.ibo || this.loading_image) {
         return;
       }
 
@@ -84224,11 +84234,15 @@ var Component = function () {
       var position = new Vector([this.position[0], this.position[1], this.position[2], 1]);
 
       var top_left = new Vector([-dims[0] / 2, -dims[1] / 2, 0, 1]);
+      var bottom_left = new Vector([-dims[0] / 2, dims[1] / 2, 0, 1]);
+      var top_right = new Vector([dims[0] / 2, -dims[1] / 2, 0, 1]);
       var bottom_right = new Vector([dims[0] / 2, dims[1] / 2, 0, 1]);
 
       top_left = position.add(this.rotation.x(top_left));
+      bottom_left = position.add(this.rotation.x(bottom_left));
+      top_right = position.add(this.rotation.x(top_right));
       bottom_right = position.add(this.rotation.x(bottom_right));
-      return { top_left: top_left, bottom_right: bottom_right };
+      return { top_left: top_left, bottom_left: bottom_left, top_right: top_right, bottom_right: bottom_right };
     }
   }]);
 
@@ -84767,12 +84781,14 @@ var Customizer = function () {
     key: 'getScreenBoundingBox',
     value: function getScreenBoundingBox(component) {
       var world_bb = component.getWorldBoundingBox();
+      var bottom_left = this.worldToScreen(world_bb.bottom_left);
       var bottom_right = this.worldToScreen(world_bb.bottom_right);
       var top_left = this.worldToScreen(world_bb.top_left);
+      var top_right = this.worldToScreen(world_bb.top_right);
 
       return {
-        top_left: top_left,
-        bottom_right: bottom_right
+        top_left: [Math.min(bottom_left[0], bottom_right[0], top_left[0], top_right[0]), Math.max(bottom_left[1], bottom_right[1], top_left[1], top_right[1])],
+        bottom_right: [Math.max(bottom_left[0], bottom_right[0], top_left[0], top_right[0]), Math.min(bottom_left[1], bottom_right[1], top_left[1], top_right[1])]
       };
     }
   }, {
@@ -85543,13 +85559,7 @@ var Gallery = function (_React$Component) {
 
   _createClass(Gallery, [{
     key: "componentDidMount",
-    value: function componentDidMount() {
-      var masonry = new Masonry(this.element, {
-        itemSelector: ".card",
-        columnWidth: 150,
-        fitWidth: true
-      });
-    }
+    value: function componentDidMount() {}
   }, {
     key: "render",
     value: function render() {
@@ -85558,21 +85568,21 @@ var Gallery = function (_React$Component) {
       var items = this.props.items || [];
       var gallery_cards = [];
 
+      var border = this.props.border || "0px";
+
       items.forEach(function (item) {
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
-              margin: "0px",
-              border: "solid " + _this2.props.border + " #fff",
-              boxSizing: "border-box",
-              width: item.width || "300px",
-              height: item.height || "400px",
-              backgroundImage: "url(" + item.image + ")",
-              backgroundSize: "cover"
+              width: item.width || "150px",
+              border: "solid " + border + " #fff"
             } },
+          React.createElement("img", { src: item.image, style: {
+              width: item.width || "150px"
+            } }),
           item.caption ? React.createElement(
             "div",
-            { className: "caption", style: { fontSize: "20px", marginTop: item.height ? parseInt(item.height) - 24 + "px" : "376px" } },
+            { className: "caption", style: { border: "solid " + border + " #fff", borderTop: "none" } },
             item.caption
           ) : null
         ));
@@ -85788,8 +85798,11 @@ var Item = function (_React$Component) {
           JSON.stringify(this.props)
         );
       }
-      var className = "item-product";
+      var className = "item";
       if (new RegExp("^promo:", "i").test(this.props.props.name) && this.props.onRemove) className += " promo";
+      if (this.props.fulfillment) {
+        className += " fulfillment";
+      }
       var inline_style = this.props.style ? this.props.style : style;
 
       var quantity = this.props.quantity || 1;
@@ -85803,18 +85816,12 @@ var Item = function (_React$Component) {
         ));
       }
 
+      var assembly_phrase = "";
       var assembly = [];
       var assembly_contents = {};
       if (this.props.fulfillment && this.props.assembly) {
         for (var _i = 0; _i < this.props.assembly.length; _i++) {
           ItemUtils.recurseAssembly(this.props.assembly[_i], function (component) {
-            // component.sku example: "letter_sequin_white2_n"
-            // split along the _ and grab the last character
-            // if the last char is a space, skip it
-            if (component.hasOwnProperty('sku')) {
-              var lastChar = component.sku.split("_").pop();
-              if (lastChar == " ") return;
-            }
             // haute imported entries will have "text" set
             if (component.props && component.props.image && component.text) {
               var letters = {};
@@ -85836,14 +85843,24 @@ var Item = function (_React$Component) {
                 React.createElement('img', { src: component.props.image }),
                 letter_strings.join("  ")
               ));
-            } else if (component.props && component.props.image) {
-              var sku = component.sku || component.props.name;
-              component.quantity = component.quantity || 1;
-              if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
+              return;
             }
+
+            // ignore anything you can't see
+            if (!component.props || !component.props.image) return;
+            var last_sku_tok = component.sku.split("_").pop();
+            assembly_phrase += last_sku_tok;
+            // skip skus corresponding to spaces
+            if (last_sku_tok == " ") return;
+
+            var sku = component.sku || component.props.name;
+            component.quantity = component.quantity || 1;
+            if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
           }); // recurseAssembly
+          assembly_phrase += " ";
         } // this.props.assembly.forEach
         Object.keys(assembly_contents).sort().forEach(function (sku) {
+          var label = assembly_contents[sku].props.name || sku;
           var backgroundImage = 'url(' + assembly_contents[sku].props.image + ')';
           var backgroundSize = 'contain';
           if (assembly_contents[sku].props.imagewidth < assembly_contents[sku].props.imageheight) backgroundSize = assembly_contents[sku].props.imagewidth / assembly_contents[sku].props.imageheight * 100 + '% 100%';
@@ -85855,17 +85872,28 @@ var Item = function (_React$Component) {
                 display: "inline-block",
                 width: "20px",
                 height: "20px",
+                border: "solid 4px #ccc",
+                backgroundColor: "#ccc",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
                 backgroundImage: backgroundImage,
                 backgroundSize: backgroundSize }
             }),
-            assembly_contents[sku].quantity > 1 ? "x" + assembly_contents[sku].quantity : null
+            assembly_contents[sku].quantity > 1 ? React.createElement(
+              'span',
+              { className: 'quant' },
+              "x" + assembly_contents[sku].quantity
+            ) : null,
+            React.createElement(
+              'span',
+              { className: 'label' },
+              label
+            )
           ));
         });
         if (assembly.length) assembly = React.createElement(
-          'assembly',
-          null,
+          'div',
+          { className: 'assembly' },
           assembly
         );
       }
@@ -85903,6 +85931,11 @@ var Item = function (_React$Component) {
             'button',
             { className: 'remove', onClick: this.handleRemovePromptConfirm.bind(this), onBlur: this.handleRemoveBlur },
             'Remove'
+          ) : null,
+          assembly_phrase ? React.createElement(
+            'div',
+            { className: 'assembly_phrase' },
+            assembly_phrase
           ) : null,
           assembly,
           this.props.sku ? React.createElement(Price, { price: this.props.props.price, quantity: quantity }) : null,
@@ -86233,7 +86266,6 @@ var Items = function (_React$Component) {
       var style_summary = Item.style_summary;
       // hide irrelevant things on packing slip
       if (this.props.packing_slip) {
-        style.deets = Object.assign({}, style.deets, { position: "relative", left: "-64px", width: "100%" });
         style_summary.item = Object.assign({}, style_summary.item, { display: "none" });
       }
 
@@ -86261,17 +86293,16 @@ var Items = function (_React$Component) {
 
       if (typeof window != "undefined" && !line_items.length) return null;
 
+      var classname = "items";
+      if (this.props.packing_slip) classname += " packing_slip";
+      if (this.props.fulfillment) classname += " fulfillment";
+
       return React.createElement(
-        'cart',
-        { className: this.props.packing_slip ? "packing_slip" : "" },
-        React.createElement(
-          'h2',
-          { className: 'cart-header' },
-          'My Cart'
-        ),
+        'div',
+        { className: classname },
         React.createElement(
           'div',
-          { className: 'productWrapper' },
+          { className: 'product_wrapper' },
           line_items
         ),
         React.createElement(
@@ -86279,10 +86310,10 @@ var Items = function (_React$Component) {
           { className: 'summary_items' },
           React.createElement(
             'div',
-            { className: 'summary_items__inner' },
+            { className: 'summary_items_inner' },
             React.createElement(
               'h4',
-              { className: 'summary_items__header' },
+              { className: 'summary_items_header' },
               'Summary'
             ),
             React.createElement(
@@ -86336,7 +86367,7 @@ var Items = function (_React$Component) {
               ),
               React.createElement(
                 'div',
-                { className: 'promoInput', style: style_summary.deets },
+                { className: 'promo_input', style: style_summary.deets },
                 React.createElement('input', { placeholder: 'Promo code', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
                     _this6.setState({ promo: { code: event.target.value } });
                   } }),
@@ -86349,8 +86380,11 @@ var Items = function (_React$Component) {
                 )
               )
             )
-          )
-        )
+          ),
+          ' '
+        ),
+        ' ',
+        '}'
       );
     }
   }]);
@@ -86427,7 +86461,6 @@ var LayoutBasic = function (_React$Component) {
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         content,
         React.createElement('script', { src: '/BowAndDrape.js' }),
-        React.createElement('script', { src: '/masonry.pkgd.min.js' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutBasic, {\n              content_string: `' + (typeof document != "undefined" ? this.props.content_string : escape(this.props.content_string)) + '`,\n              content,\n            });\n            ReactDOM.hydrate(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
       );
     }
@@ -86833,7 +86866,6 @@ var LayoutMain = function (_React$Component) {
         content,
         React.createElement(LayoutFooter, { user: this.state.user }),
         React.createElement('script', { src: '/BowAndDrape.js' }),
-        React.createElement('script', { src: '/masonry.pkgd.min.js' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n              content_string: `' + (typeof document != "undefined" ? this.props.content_string : escape(this.props.content_string)) + '`,\n              content,\n            });\n            ReactDOM.hydrate(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
       );
     }
@@ -87257,19 +87289,7 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "width", event.target.value);
-                  }, value: item.width, placeholder: "300px" })
-              ),
-              React.createElement(
-                "div",
-                null,
-                React.createElement(
-                  "label",
-                  null,
-                  "height"
-                ),
-                React.createElement("input", { type: "text", onChange: function onChange(event) {
-                    _this2.handleUpdateItem(index, "height", event.target.value);
-                  }, value: item.height, placeholder: "400px" })
+                  }, value: item.width, placeholder: "150px" })
               ),
               React.createElement(
                 "div",
@@ -87876,6 +87896,18 @@ var ProductCanvas = function (_React$Component) {
         var selected = assembly[prevState.selected_component];
         if (!selected) {
           // if nothing is selected make a new selected component
+          var position = [0, 0, 0];
+          // if we have other stuff, make a new line below
+          if (assembly.length) {
+            // FIXME this assumes same side and a bunch of wrong shit
+            var prev_line = assembly[assembly.length - 1];
+            position[0] = prev_line.props.position[0];
+            position[1] = prev_line.props.position[1];
+            position[2] = prev_line.props.position[2];
+            if (prev_line.assembly.length && prev_line.assembly[prev_line.assembly.length - 1].props) {
+              position[1] -= parseFloat(prev_line.assembly[prev_line.assembly.length - 1].props.imageheight);
+            }
+          }
           // facing the camera for now TODO get normal of intersected tri
           var rotation = Matrix.I(4);
           if (_this3.customizer.camera.rotation.angle) {
@@ -87883,7 +87915,7 @@ var ProductCanvas = function (_React$Component) {
           }
           selected = {
             props: {
-              position: [0, 0, 0],
+              position: position,
               rotation: rotation
             },
             assembly: []
@@ -87909,7 +87941,7 @@ var ProductCanvas = function (_React$Component) {
           return component;
         });
         return { assembly: assembly, selected_component: selected_component };
-      }, this.autoLayout);
+      });
     }
   }, {
     key: 'handleAddComponent',
@@ -88313,7 +88345,14 @@ var ProductComponentPicker = function (_React$Component) {
     key: 'handleTabClick',
     value: function handleTabClick() {
       var text_input = document.querySelector(".components").querySelector('input[type="text"]');
-      if (text_input) text_input.focus();
+      if (text_input) {
+        var value = text_input.value;
+        // cursor to the end
+        text_input.focus();
+        text_input.setSelectionRange(value.length, value.length);
+        // update component letter type
+        this.handleSetComponentText(value, this.component_letter_map[this.tabs.state.selected_tab]);
+      }
     }
   }, {
     key: 'componentDidMount',
@@ -88323,13 +88362,21 @@ var ProductComponentPicker = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       var components = this.populateComponents(this.props.product);
       return React.createElement(
         'div',
         { className: 'component_picker' },
         React.createElement(
           Tabs,
-          { className: 'components', switch_below: true, onChange: this.handleTabClick.bind(this) },
+          { className: 'components',
+            switch_below: true,
+            ref: function ref(element) {
+              _this2.tabs = element;
+            },
+            onChange: this.handleTabClick.bind(this)
+          },
           components
         )
       );
@@ -88357,14 +88404,15 @@ var ProductComponentPicker = function (_React$Component) {
   }, {
     key: 'populateComponents',
     value: function populateComponents(product) {
-      var _this2 = this;
+      var _this3 = this;
 
       // populate components
       var components = [];
       var misc_components = [];
+      this.component_letter_map = [];
 
       var _loop = function _loop(i) {
-        var compatible_component = _this2.props.compatible_component_map[product.compatible_components[i]];
+        var compatible_component = _this3.props.compatible_component_map[product.compatible_components[i]];
         if (compatible_component.options) {
           // handle if virtual keyboard
           if (false && compatible_component.props.is_letters) {
@@ -88377,7 +88425,7 @@ var ProductComponentPicker = function (_React$Component) {
               var character = toks[toks.length - 1].toLowerCase();
               if (character.match(/^[a-z]$/)) component_letters[character] = letter;else {
                 component_letters[character] = letter;
-                _tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + letter.props.image + ')', backgroundSize: letter.props.imagewidth / letter.props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, letter) }));
+                _tab_components.push(React.createElement('div', { key: i + '_' + j, style: { backgroundImage: 'url(' + letter.props.image + ')', backgroundSize: letter.props.imagewidth / letter.props.imageheight * 100 + '% 100%' }, onClick: _this3.handleAddComponent.bind(_this3, letter) }));
               }
             }
             components.push(React.createElement(
@@ -88387,7 +88435,7 @@ var ProductComponentPicker = function (_React$Component) {
                 'row',
                 null,
                 ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'].map(function (character) {
-                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this3.handleAddComponent.bind(_this3, component_letters[character]) });
                 })
               ),
               React.createElement(
@@ -88395,7 +88443,7 @@ var ProductComponentPicker = function (_React$Component) {
                 null,
                 React.createElement('div', { key: 'spacer0', className: 'halfgap' }),
                 ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'].map(function (character) {
-                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this3.handleAddComponent.bind(_this3, component_letters[character]) });
                 }),
                 React.createElement('div', { key: 'spacer1', className: 'halfgap' })
               ),
@@ -88405,19 +88453,19 @@ var ProductComponentPicker = function (_React$Component) {
                 React.createElement('div', { key: 'spacer2', className: 'halfgap' }),
                 React.createElement('div', { key: 'spacer2a', className: 'halfgap' }),
                 ['z', 'x', 'c', 'v', 'b', 'n', 'm'].map(function (character) {
-                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this2.handleAddComponent.bind(_this2, component_letters[character]) });
+                  return React.createElement('div', { key: character, style: { backgroundImage: 'url(' + component_letters[character].props.image + ')', backgroundSize: component_letters[character].props.imagewidth / component_letters[character].props.imageheight * 100 + '% 100%' }, onClick: _this3.handleAddComponent.bind(_this3, component_letters[character]) });
                 }),
                 React.createElement('div', { key: 'spacer3', className: 'halfgap' }),
-                React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this2.handlePopComponent.bind(_this2) })
+                React.createElement('div', { key: 'backspace', className: 'backspace', onClick: _this3.handlePopComponent.bind(_this3) })
               ),
               React.createElement(
                 'row',
                 null,
                 React.createElement('div', { key: 'spacer3a', className: 'halfgap' }),
                 React.createElement('div', { key: 'spacer3b', className: 'halfgap' }),
-                React.createElement('div', { key: 'spacebar', className: 'spacebar', onClick: _this2.handleAddComponent.bind(_this2, component_letters["space"]) }),
+                React.createElement('div', { key: 'spacebar', className: 'spacebar', onClick: _this3.handleAddComponent.bind(_this3, component_letters["space"]) }),
                 React.createElement('div', { key: 'spacer3c', className: 'halfgap' }),
-                React.createElement('div', { key: 'enter', className: 'enter', onClick: _this2.handleSelectComponent.bind(_this2, -1) })
+                React.createElement('div', { key: 'enter', className: 'enter', onClick: _this3.handleSelectComponent.bind(_this3, -1) })
               )
             ));
             components.push(React.createElement(
@@ -88438,15 +88486,16 @@ var ProductComponentPicker = function (_React$Component) {
               var _character = _toks[_toks.length - 1].toLowerCase();
               _component_letters[_character] = _letter;
             }
+            _this3.component_letter_map[i] = _component_letters;
             components.push(React.createElement(
               'div',
               { key: components.length, name: compatible_component.props.name || compatible_component.sku, className: 'component_container letters' },
               React.createElement(
                 'div',
                 { className: 'punnyInputWrap' },
-                React.createElement('input', { type: 'text', className: 'punnyInput', placeholder: 'Say Something Punny',
+                React.createElement('input', { type: 'text', className: 'punnyInput', placeholder: 'Say Something', name: compatible_component.sku,
                   onChange: function onChange(event) {
-                    _this2.handleSetComponentText(event.target.value, _component_letters);
+                    _this3.handleSetComponentText(event.target.value, _component_letters);
                   },
                   onFocus: function onFocus(event) {
                     event.persist();
@@ -88457,18 +88506,18 @@ var ProductComponentPicker = function (_React$Component) {
                   },
                   onKeyUp: function onKeyUp(event) {
                     if (event.which != 13) return;
-                    _this2.handleSetComponentText(event.target.value, _component_letters);
-                    _this2.props.productCanvas.handleSelectComponent(-1);
+                    _this3.handleSetComponentText(event.target.value, _component_letters);
+                    _this3.props.productCanvas.handleSelectComponent(-1);
                   },
-                  value: _this2.props.productCanvas.getComponentText()
+                  value: _this3.props.productCanvas.getComponentText()
                 })
               ),
               React.createElement(
                 'button',
-                { onClick: _this2.handleSelectComponent.bind(_this2, -1), className: 'sayIt' },
+                { onClick: _this3.handleSelectComponent.bind(_this3, -1), className: 'sayIt' },
                 'Say It'
               ),
-              React.createElement('img', { 'class': 'punnyClose', onClick: _this2.handlePopComponent.bind(_this2, true), src: '/hamburger_close.svg' })
+              React.createElement('img', { 'class': 'punnyClose', onClick: _this3.handlePopComponent.bind(_this3, true), src: '/hamburger_close.svg' })
             ));
             return 'continue';
           } // is_native_keyboard
@@ -88481,7 +88530,7 @@ var ProductComponentPicker = function (_React$Component) {
             var backgroundSize = compatible_component.options[_j2].props.imagewidth / compatible_component.options[_j2].props.imageheight * 100 + '% 100%';
             if (compatible_component.options[_j2].props.imagewidth > compatible_component.options[_j2].props.imageheight) backgroundSize = '100% ' + compatible_component.options[_j2].props.imageheight / compatible_component.options[_j2].props.imagewidth * 100 + '%';
             tab_components.push(React.createElement('div', { key: i + '_' + _j2, style: { backgroundImage: backgroundImage, backgroundSize: backgroundSize }, onClick: function onClick() {
-                _this2.handleSelectComponent(-1);_this2.handleAddComponent(compatible_component.options[_j2]);
+                _this3.handleSelectComponent(-1);_this3.handleAddComponent(compatible_component.options[_j2]);
               } }));
           };
 
@@ -89340,7 +89389,6 @@ var Shipment = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Shipment.__proto__ || Object.getPrototypeOf(Shipment)).call(this, props));
 
-    console.log(props);
     _this.state = {
       from_id: _this.props.from_id,
       to_id: _this.props.to_id,
@@ -89631,34 +89679,6 @@ var Shipment = function (_React$Component) {
           null,
           React.createElement(
             'div',
-            { className: 'time_bar' },
-            React.createElement(
-              'div',
-              null,
-              'requested: ',
-              React.createElement(Timestamp, { time: this.props.requested })
-            ),
-            React.createElement(
-              'div',
-              null,
-              'approved: ',
-              React.createElement(Timestamp, { time: this.props.approved })
-            ),
-            React.createElement(
-              'div',
-              null,
-              'packed: ',
-              React.createElement(Timestamp, { time: this.state.packed })
-            ),
-            React.createElement(
-              'div',
-              null,
-              'received: ',
-              React.createElement(Timestamp, { time: this.state.received })
-            )
-          ),
-          React.createElement(
-            'div',
             { className: 'header_menu' },
             React.createElement(
               'shipping_details',
@@ -89676,18 +89696,6 @@ var Shipment = function (_React$Component) {
                   { href: '/shipment/' + this.props.id },
                   this.props.props && this.props.props.legacy_id ? this.props.props.legacy_id : this.props.id
                 )
-              ),
-              React.createElement(
-                'div',
-                null,
-                React.createElement(
-                  'label',
-                  null,
-                  'Fulfillment_id: '
-                ),
-                ' ',
-                this.props.fulfillment_id,
-                ' '
               ),
               React.createElement(
                 'div',
@@ -89805,15 +89813,22 @@ var Shipment = function (_React$Component) {
       return React.createElement(
         'shipment',
         null,
+        React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'label',
+            null,
+            'Fulfillment_id: '
+          ),
+          ' ',
+          this.props.fulfillment_id,
+          ' '
+        ),
         fulfillment_tools,
         React.createElement(
           'h1',
           { style: Object.assign({}, Item.style.item, { borderBottom: "none", margin: "34px auto", justifyContent: "space-between" }) },
-          React.createElement(
-            'div',
-            null,
-            'ORDER SUMMARY'
-          ),
           React.createElement(
             'div',
             null,
@@ -90266,9 +90281,12 @@ var Tabs = function (_React$Component) {
   _createClass(Tabs, [{
     key: 'handleTabChange',
     value: function handleTabChange(value) {
-      this.setState({ selected_tab: value });
-      // fire an onChange on click as well as on change?
-      if (typeof this.props.onChange == "function") this.props.onChange();
+      var _this2 = this;
+
+      this.setState({ selected_tab: value }, function () {
+        // fire an onChange on click as well as on change?
+        if (typeof _this2.props.onChange == "function") _this2.props.onChange();
+      });
     }
   }, {
     key: 'componentDidUpdate',
@@ -90446,11 +90464,21 @@ var ThanksPurchaseComplete = function (_React$Component) {
           )
         ),
         React.createElement(
+          'h1',
+          null,
+          'ORDER SUMMARY'
+        ),
+        React.createElement(
           'div',
           null,
           React.createElement(Items, { contents: this.state.items })
         ),
         React.createElement('div', { style: { width: "600px", margin: "20px auto", borderBottom: "solid 1px #000" } }),
+        React.createElement(
+          'h1',
+          null,
+          'HOW DID WE DO?'
+        ),
         React.createElement(Signup, {
           hidden_keys: { email: this.props.email },
           BtnText: 'Send Now!',

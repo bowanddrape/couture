@@ -12,8 +12,14 @@ class ProductComponentPicker extends React.Component {
 
   handleTabClick() {
     let text_input = document.querySelector(".components").querySelector(`input[type="text"]`);
-    if (text_input)
+    if (text_input) {
+      let value = text_input.value
+      // cursor to the end
       text_input.focus();
+      text_input.setSelectionRange(value.length, value.length);
+      // update component letter type
+      this.handleSetComponentText(value, this.component_letter_map[this.tabs.state.selected_tab]);
+    }
   }
 
   componentDidMount() {
@@ -24,7 +30,11 @@ class ProductComponentPicker extends React.Component {
     let components = this.populateComponents(this.props.product);
     return (
       <div className="component_picker">
-        <Tabs className="components" switch_below={true} onChange={this.handleTabClick.bind(this)}>
+        <Tabs className="components"
+          switch_below={true}
+          ref={(element) => {this.tabs = element;}}
+          onChange={this.handleTabClick.bind(this)}
+        >
           {components}
         </Tabs>
       </div>
@@ -47,6 +57,7 @@ class ProductComponentPicker extends React.Component {
     // populate components
     let components = [];
     let misc_components = [];
+    this.component_letter_map = [];
     for (let i=0; product.compatible_components && i<product.compatible_components.length; i++) {
       let compatible_component = this.props.compatible_component_map[product.compatible_components[i]];
       if (compatible_component.options) {
@@ -114,10 +125,11 @@ class ProductComponentPicker extends React.Component {
             let character = toks[toks.length-1].toLowerCase();
             component_letters[character] = letter;
           }
+          this.component_letter_map[i] = component_letters;
           components.push(
             <div key={components.length} name={compatible_component.props.name||compatible_component.sku} className="component_container letters">
               <div className="punnyInputWrap">
-              <input type="text" className="punnyInput" placeholder="Say Something Punny"
+              <input type="text" className="punnyInput" placeholder="Say Something" name={compatible_component.sku}
                 onChange={(event) => {
                   this.handleSetComponentText(event.target.value, component_letters);
                 }}

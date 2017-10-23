@@ -54,7 +54,6 @@ class LayoutBasic extends React.Component {
         {content}
 
         <script src="/BowAndDrape.js"></script>
-        <script src="/masonry.pkgd.min.js"></script>
 
         <script dangerouslySetInnerHTML={{__html:`
           var BowAndDrape = require("BowAndDrape");

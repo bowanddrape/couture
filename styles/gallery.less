@@ -1,0 +1,36 @@
+
+@import "./boilerplate.less";
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  .card {
+    height: auto;
+    width: auto;
+  }
+  a.card {
+    margin: 0px;
+    box-sizing: border-box;
+    border-radius: 0;
+    &.not_link:hover {
+      text-decoration: none;
+    }
+  }
+  .caption {
+    .headerfont;
+    font-size: 8px;
+    position: absolute;
+    bottom: 0px;
+    z-index: 1;
+    background-color: @color_primary;
+    width: 100%;
+    text-align: center;
+  }
+}
+@media (min-width: @desktop_min_width) {
+  .gallery {
+    zoom: 300%;
+  }
+}
+
