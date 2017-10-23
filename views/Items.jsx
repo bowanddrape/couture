@@ -247,7 +247,7 @@ class Items extends React.Component {
             }
           </div> {/* .summary_items_inner */}
         </div> {/* .summary_items_outer */}
-          }
+        
         </div>
     );
   }

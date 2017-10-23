@@ -44,7 +44,7 @@ class Switch extends React.Component {
           ()=>{this.props.onChange(child.props.value)}
         }>
           <div style={{textAlign:"center"}}>
-            <img id="test" src={"/"+child.props.children.toString().replace(/ /g,"_").toLowerCase()+".svg"} alt={child.props.children} />
+            <img src={"/"+child.props.children.toString().replace(/ /g,"_").toLowerCase()+".svg"} alt={child.props.children} />
           </div>
         </switch_option>
       );

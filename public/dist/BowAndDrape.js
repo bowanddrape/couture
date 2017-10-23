@@ -65849,8 +65849,7 @@ var Items = function (_React$Component) {
           ),
           ' '
         ),
-        ' ',
-        '}'
+        ' '
       );
     }
   }]);
@@ -69692,7 +69691,7 @@ var Switch = function (_React$Component) {
           React.createElement(
             'div',
             { style: { textAlign: "center" } },
-            React.createElement('img', { id: 'test', src: "/" + child.props.children.toString().replace(/ /g, "_").toLowerCase() + ".svg", alt: child.props.children })
+            React.createElement('img', { src: "/" + child.props.children.toString().replace(/ /g, "_").toLowerCase() + ".svg", alt: child.props.children })
           )
         ));
       };

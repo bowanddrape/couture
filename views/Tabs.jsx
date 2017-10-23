@@ -74,4 +74,3 @@ var initDefaultFallback = function() {
 
 
 module.exports = Tabs;
-

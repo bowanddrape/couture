@@ -766,43 +766,23 @@ customize .component_container.letters {
   padding: 15px;
   bottom: 0;
   left: 30vw;
-  z-index: 0;
-  position: relative;
   position: absolute;
   display: inline-block;
   height: auto;
-}
-customize .component_container.letters:before {
-  content: " ";
-  position: absolute;
-  left: 0px;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-  background-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
-  z-index: -2;
-}
-customize .component_container.letters:after {
-  content: " ";
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  bottom: 2px;
-  background-color: #fff;
-  z-index: -1;
 }
 customize .component_container.letters .punnyInputWrap {
   display: inline-block;
   position: relative;
   float: left;
-  width: 60%;
+  width: 100%;
   height: auto;
   margin: 0 3% 0 0;
 }
 customize .component_container.letters input {
   border: none;
-  border-bottom: 5px solid #000;
+  border-bottom: 5px solid transparent;
+  border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  border-image-slice: 1;
   text-transform: lowercase;
   display: inline-block;
   width: 100%;
@@ -949,7 +929,7 @@ customize .product_details .size_chart row span:first-child {
     margin-bottom: 10px;
   }
   customize hud_controls:not(.rainbow_border) {
-    top: 185px;
+    top: 420px;
   }
   customize .component_picker {
     position: absolute;
@@ -1023,12 +1003,6 @@ switch_option img {
 .add_to_cart .addCart {
   font-size: 20px;
   display: inline-block;
-}
-.punnyClose {
-  position: absolute;
-  width: 20px;
-  right: 10px;
-  top: 10px;
 }
 .grid {
   display: grid;
@@ -1579,6 +1553,18 @@ product_options switch.expanded {
   }
   .header menu menu_items button {
     margin: 0px 54px;
+  }
+  .header menu login input {
+    background-color: #fff;
+    border: 1px solid lightgrey;
+    min-width: 230px;
+    width: auto;
+    min-height: 40px;
+    margin: 10px auto;
+    padding: 5px 10px;
+    outline: none;
+    font-size: 14px;
+    display: block;
   }
   .header menu login,
   .header menu user {
