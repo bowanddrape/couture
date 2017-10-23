@@ -33,6 +33,14 @@ class PageEditGallery extends React.Component {
     this.props.onChange({items});
   }
 
+  handleRemoveCard(index) {
+    if (!this.props.onChange) return;
+    let items = this.props.items || [];
+    items = JSON.parse(JSON.stringify(items));
+    items.splice(index, 1);
+    this.props.onChange({items});
+  }
+
   render() {
     let items = [];
     if (this.props.items) {
@@ -46,6 +54,7 @@ class PageEditGallery extends React.Component {
               <div><label>width</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "width", event.target.value)}} value={item.width} placeholder="150px"/></div>
               <div><label>caption</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "caption", event.target.value)}} value={item.caption} /></div>
             </fields>
+            <span style={{cursor:"pointer"}} className="remove" onClick={this.handleRemoveCard.bind(this, index)}>x</span>
           </card>
         );
       });
@@ -57,7 +66,7 @@ class PageEditGallery extends React.Component {
         <deck>
           {items}
         </deck>
-        <card onClick={this.handleNewCard.bind(this)}>New Photo</card>
+        <card style={{cursor:"pointer"}} onClick={this.handleNewCard.bind(this)}>New Photo</card>
       </div>
     );
   }

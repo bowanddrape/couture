@@ -68,8 +68,8 @@ class Cart extends React.Component {
 
   static preprocessProps(options, callback) {
     // TODO select payment method
-    //const payment_method = require('../models/PayStripe.js');
-    const payment_method = require('../models/PayBraintree.js');
+    const payment_method = require('../models/PayStripe.js');
+    //const payment_method = require('../models/PayBraintree.js');
 
     // get braintree client token
     if (payment_method.getClientAuthorization) {

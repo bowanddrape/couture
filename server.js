@@ -178,6 +178,16 @@ app.use(function(req, res, next) {
 });
 
 server.on('request', app);
-server.listen(2000, function () {
+server.listen(80, function () {
   console.log("restarted webserver");
+});
+
+process.on("uncaughtException", (err) => {
+  if (["stag", "prod"].indexOf(process.env.ENV)!=-1) {
+    return Log.message(err.stack, () => {
+      process.exit(99);
+    });
+  }
+  console.log(err.stack);
+  process.exit(99);
 });

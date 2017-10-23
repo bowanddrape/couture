@@ -24,6 +24,12 @@ class PageEdit extends React.Component {
     this.setState({elements});
   }
 
+  handleRemoveElement(index) {
+    let elements = this.state.elements;
+    elements.splice(index, 1);
+    this.setState({elements});
+  }
+
   handleUpdateProps(index, name, value) {
     let elements = this.state.elements;
     elements[index][name] = value;
@@ -98,6 +104,7 @@ class PageEdit extends React.Component {
             {whitelisted_components}
           </select>
           {edit_props}
+          <span style={{cursor:"pointer",position:"absolute",right:"5px",top:"5px"}} className="remove" onClick={this.handleRemoveElement.bind(this, i)}>x</span>
         </element>
       );
     }

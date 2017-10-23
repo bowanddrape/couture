@@ -1232,6 +1232,7 @@ page_edit {
   margin-top: 5px;
 }
 page_edit element {
+  position: relative;
   display: block;
   background-color: #f5c9ca;
   padding: 3px;
