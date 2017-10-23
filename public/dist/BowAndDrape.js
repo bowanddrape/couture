@@ -88248,11 +88248,6 @@ var ProductCanvas = function (_React$Component) {
           'Delete'
         ));
         hud_controls.push(React.createElement(
-          'button',
-          { className: 'hudBtn hudBtn--edit', key: hud_controls.length },
-          'Edit'
-        ));
-        hud_controls.push(React.createElement(
           'div',
           { key: hud_controls.length },
           React.createElement(
@@ -88511,13 +88506,7 @@ var ProductComponentPicker = function (_React$Component) {
                   },
                   value: _this3.props.productCanvas.getComponentText()
                 })
-              ),
-              React.createElement(
-                'button',
-                { onClick: _this3.handleSelectComponent.bind(_this3, -1), className: 'sayIt' },
-                'Say It'
-              ),
-              React.createElement('img', { 'class': 'punnyClose', onClick: _this3.handlePopComponent.bind(_this3, true), src: '/hamburger_close.svg' })
+              )
             ));
             return 'continue';
           } // is_native_keyboard

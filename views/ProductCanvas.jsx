@@ -398,7 +398,6 @@ class ProductCanvas extends React.Component {
     let hud_controls = [];
     if (this.state.assembly[this.state.selected_component]) {
       hud_controls.push(<button className="hudBtn hudBtn--delete" key={hud_controls.length} onClick={this.handlePopComponent.bind(this, true)}>Delete</button>);
-      hud_controls.push(<button className="hudBtn hudBtn--edit" key={hud_controls.length}>Edit</button>);
       hud_controls.push(<div key={hud_controls.length}><button className="hudBtn hudBtn--rotateLeft" onClick={this.handleComponentRotate.bind(this, -Math.PI/20)}>Rotate</button>
     <button className="hudBtn hudBtn--rotateRight" onClick={this.handleComponentRotate.bind(this, Math.PI/20)}>Rotate</button></div>
       );

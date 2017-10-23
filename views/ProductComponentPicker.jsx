@@ -148,8 +148,6 @@ class ProductComponentPicker extends React.Component {
                 value={this.props.productCanvas.getComponentText()}
               />
             </div>
-            <button onClick={this.handleSelectComponent.bind(this, -1)} className="sayIt">Say It</button>
-              <img class="punnyClose" onClick={this.handlePopComponent.bind(this, true)} src="/hamburger_close.svg" />
             </div>
           );
           continue;
