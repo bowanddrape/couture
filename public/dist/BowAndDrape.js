@@ -87049,6 +87049,13 @@ var PageEdit = function (_React$Component) {
       this.setState({ elements: elements });
     }
   }, {
+    key: "handleRemoveElement",
+    value: function handleRemoveElement(index) {
+      var elements = this.state.elements;
+      elements.splice(index, 1);
+      this.setState({ elements: elements });
+    }
+  }, {
     key: "handleUpdateProps",
     value: function handleUpdateProps(index, name, value) {
       var elements = this.state.elements;
@@ -87125,7 +87132,12 @@ var PageEdit = function (_React$Component) {
               }, name: "type" },
             whitelisted_components
           ),
-          edit_props
+          edit_props,
+          React.createElement(
+            "span",
+            { style: { cursor: "pointer", position: "absolute", right: "5px", top: "5px" }, className: "remove", onClick: _this2.handleRemoveElement.bind(_this2, _i) },
+            "x"
+          )
         ));
       };
 
@@ -87367,6 +87379,15 @@ var PageEditGallery = function (_React$Component) {
       this.props.onChange({ items: items });
     }
   }, {
+    key: "handleRemoveCard",
+    value: function handleRemoveCard(index) {
+      if (!this.props.onChange) return;
+      var items = this.props.items || [];
+      items = JSON.parse(JSON.stringify(items));
+      items.splice(index, 1);
+      this.props.onChange({ items: items });
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
@@ -87429,6 +87450,11 @@ var PageEditGallery = function (_React$Component) {
                     _this2.handleUpdateItem(index, "caption", event.target.value);
                   }, value: item.caption })
               )
+            ),
+            React.createElement(
+              "span",
+              { style: { cursor: "pointer" }, className: "remove", onClick: _this2.handleRemoveCard.bind(_this2, index) },
+              "x"
             )
           ));
         });
@@ -87456,7 +87482,7 @@ var PageEditGallery = function (_React$Component) {
         ),
         React.createElement(
           "card",
-          { onClick: this.handleNewCard.bind(this) },
+          { style: { cursor: "pointer" }, onClick: this.handleNewCard.bind(this) },
           "New Photo"
         )
       );
