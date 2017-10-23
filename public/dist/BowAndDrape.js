@@ -68212,14 +68212,6 @@ var ProductList = function (_React$Component) {
 
       var product_raw = this.getSelectedProductRaw();
 
-      // facebook view event
-      try {
-        fbq('track', 'ViewContent', {
-          currency: product.props.price,
-          content_ids: product.sku
-        });
-      } catch (err) {}
-
       return React.createElement(
         'customize',
         null,
@@ -68282,13 +68274,40 @@ var ProductList = function (_React$Component) {
       }
       this.setState({ selected_product: selected_product });
 
+      // facebook ViewContent event
+      try {
+        fbq('track', 'ViewContent', {
+          currency: "USD",
+          value: product.props.price,
+          content_ids: product.sku
+        });
+      } catch (err) {}
+      // google analytics event
+      try {
+        var ga_item = {
+          id: product.sku,
+          name: product.props.name || product.sku,
+          brand: "Bow & Drape",
+          price: product.props.price,
+          quantity: 1
+        };
+        gtag('event', 'view_item', { items: [ga_item] });
+      } catch (err) {
+        console.log(err);
+      }
+
       // if the product changed
       if (depth == 0) {
         // scroll to the top?
         window.scroll(0, 0);
-        // count as google pageview
+        // count as pageview for tracking purposes
         try {
           gtag('event', 'page_view');
+        } catch (err) {
+          console.log(err);
+        }
+        try {
+          fbq('track', 'PageView');
         } catch (err) {
           console.log(err);
         }
@@ -68357,7 +68376,14 @@ var ProductList = function (_React$Component) {
 
       // google track event
       try {
-        gtag('event', 'add_to_cart', { value: product.props.price, currency: 'usd', items: [product] });
+        var ga_item = {
+          id: product.sku,
+          name: product.props.name || product.sku,
+          brand: "Bow & Drape",
+          price: product.props.price,
+          quantity: 1
+        };
+        gtag('event', 'add_to_cart', { value: product.props.price, currency: 'usd', items: [ga_item] });
       } catch (err) {
         console.log(err);
       }
@@ -68548,7 +68574,7 @@ var ProductList = function (_React$Component) {
           url += '?' + querystring.stringify(query_params);
           history.replaceState(history.state, "", url);
         });
-      }, 500);
+      }, 2000);
     }
   }], [{
     key: 'preprocessProps',
@@ -69665,10 +69691,16 @@ var Switch = function (_React$Component) {
   }
 
   _createClass(Switch, [{
+    key: 'handleClick',
+    value: function handleClick(value) {
+      this.setState({ expanded: !this.state.expanded });
+      if (this.props.value != value) {
+        return this.props.onChange(value);
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
-
       var options = [];
       var children = React.Children.toArray(this.props.children);
       // potentially override option order
@@ -69678,36 +69710,25 @@ var Switch = function (_React$Component) {
         if (a_order_override != b_order_override) return a_order_override - b_order_override;
         return a.props.value - b.props.value;
       });
-
-      var _loop = function _loop(index) {
+      for (var index = 0; index < children.length; index++) {
         var child = children[index];
-        if (child.type != "option") return 'continue';
-        if (!child.props.children) return 'continue';
+        if (child.type != "option") continue;
+        if (!child.props.children) continue;
         options.push(React.createElement(
           'switch_option',
-          _extends({ className: child.props.value == _this2.props.value ? "selected" : "", ref: index, key: index }, child.props, { onClick: function onClick() {
-              _this2.props.onChange(child.props.value);
-            } }),
+          _extends({ className: child.props.value == this.props.value ? "selected" : "", ref: index, key: index }, child.props, { onClick: this.handleClick.bind(this, child.props.value)
+          }),
           React.createElement(
             'div',
             { style: { textAlign: "center" } },
             React.createElement('img', { src: "/" + child.props.children.toString().replace(/ /g, "_").toLowerCase() + ".svg", alt: child.props.children })
           )
         ));
-      };
-
-      for (var index = 0; index < children.length; index++) {
-        var _ret = _loop(index);
-
-        if (_ret === 'continue') continue;
       }
       return React.createElement(
         'switch',
         {
-          className: this.state.expanded || this.props.always_expanded ? "expanded" : null,
-          onClick: function onClick() {
-            _this2.setState({ expanded: !_this2.state.expanded });
-          },
+          className: this.state.expanded || this.props.always_expanded ? "expanded" : "",
           style: this.props.style
         },
         options

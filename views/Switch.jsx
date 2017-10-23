@@ -24,6 +24,13 @@ class Switch extends React.Component {
     }
   }
 
+  handleClick(value) {
+    this.setState({expanded:!this.state.expanded});
+    if (this.props.value != value) {
+      return this.props.onChange(value);
+    }
+  }
+
   render() {
     let options = [];
     let children = React.Children.toArray(this.props.children);
@@ -40,9 +47,8 @@ class Switch extends React.Component {
       if (child.type!="option") continue;
       if (!child.props.children) continue;
       options.push(
-        <switch_option className={child.props.value==this.props.value?"selected":""} ref={index} key={index} {...child.props} onClick={
-          ()=>{this.props.onChange(child.props.value)}
-        }>
+        <switch_option className={child.props.value==this.props.value?"selected":""} ref={index} key={index} {...child.props} onClick={this.handleClick.bind(this, child.props.value)}
+        >
           <div style={{textAlign:"center"}}>
             <img src={"/"+child.props.children.toString().replace(/ /g,"_").toLowerCase()+".svg"} alt={child.props.children} />
           </div>
@@ -51,8 +57,7 @@ class Switch extends React.Component {
     }
     return (
       <switch
-        className={this.state.expanded||this.props.always_expanded?"expanded":null}
-        onClick={()=>{this.setState({expanded:!this.state.expanded})}}
+        className={this.state.expanded||this.props.always_expanded?"expanded":""}
         style={this.props.style}
       >
         {options}

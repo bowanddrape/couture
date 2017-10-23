@@ -165,14 +165,6 @@ class ProductList extends React.Component {
 
     let product_raw = this.getSelectedProductRaw();
 
-    // facebook view event
-    try {
-      fbq('track', 'ViewContent', {
-        currency: product.props.price,
-        content_ids: product.sku,
-      });
-    } catch(err) {}
-
     return (
       <customize>
         {this.props.edit ?
@@ -226,13 +218,36 @@ class ProductList extends React.Component {
     }
     this.setState({selected_product});
 
+    // facebook ViewContent event
+    try {
+      fbq('track', 'ViewContent', {
+        currency: "USD",
+        value: product.props.price,
+        content_ids: product.sku,
+      });
+    } catch(err) {}
+    // google analytics event
+    try {
+      let ga_item = {
+        id: product.sku,
+        name: product.props.name || product.sku,
+        brand: "Bow & Drape",
+        price: product.props.price,
+        quantity: 1,
+      }
+      gtag('event', 'view_item', {items: [ga_item]});
+    } catch(err) {console.log(err)}
+
     // if the product changed
     if (depth==0) {
       // scroll to the top?
       window.scroll(0, 0);
-      // count as google pageview
+      // count as pageview for tracking purposes
       try {
         gtag('event', 'page_view');
+      } catch (err) {console.log(err)}
+      try {
+        fbq('track', 'PageView');
       } catch (err) {console.log(err)}
     }
   }
@@ -293,7 +308,14 @@ class ProductList extends React.Component {
 
     // google track event
     try {
-      gtag('event', 'add_to_cart', {value: product.props.price, currency:'usd', items: [product]});
+      let ga_item = {
+        id: product.sku,
+        name: product.props.name || product.sku,
+        brand: "Bow & Drape",
+        price: product.props.price,
+        quantity: 1,
+      }
+      gtag('event', 'add_to_cart', {value: product.props.price, currency:'usd', items: [ga_item]});
     } catch(err) {console.log(err)}
     // facebook track event
     try {
@@ -433,7 +455,7 @@ class ProductList extends React.Component {
         url += '?' + querystring.stringify(query_params);
         history.replaceState(history.state, "", url);
       });
-    }, 500);
+    }, 2000);
   }
 
 }
