@@ -65066,7 +65066,7 @@ var Gallery = function (_React$Component) {
       var items = this.props.items || [];
       var gallery_cards = [];
 
-      var border = this.props.border || "0px";
+      var border = this.props.border || "3px";
 
       items.forEach(function (item) {
         gallery_cards.push(React.createElement(
@@ -65081,7 +65081,16 @@ var Gallery = function (_React$Component) {
           item.caption ? React.createElement(
             "div",
             { className: "caption", style: { border: "solid " + border + " #fff", borderTop: "none" } },
-            item.caption
+            item.caption.split(" ").filter(function (tok) {
+              return tok[0] != '$';
+            }).join(" "),
+            React.createElement(
+              "span",
+              { className: "price" },
+              item.caption.split(" ").filter(function (tok) {
+                return tok[0] == '$';
+              }).join(" ")
+            )
           ) : null
         ));
       });
@@ -66427,6 +66436,30 @@ var PageEdit = function (_React$Component) {
       this.setState({ elements: elements });
     }
   }, {
+    key: "handleMoveElementTop",
+    value: function handleMoveElementTop(index) {
+      var elements = this.state.elements;
+      var moved = elements.splice(index, 1);
+      elements.splice(0, 0, moved[0]);
+      this.setState({ elements: elements });
+    }
+  }, {
+    key: "handleMoveElementUp",
+    value: function handleMoveElementUp(index) {
+      var elements = this.state.elements;
+      var moved = elements.splice(index, 1);
+      elements.splice(index - 1, 0, moved[0]);
+      this.setState({ elements: elements });
+    }
+  }, {
+    key: "handleMoveElementDown",
+    value: function handleMoveElementDown(index) {
+      var elements = this.state.elements;
+      var moved = elements.splice(index, 1);
+      elements.splice(index, 0, moved[0]);
+      this.setState({ elements: elements });
+    }
+  }, {
     key: "handleUpdateProps",
     value: function handleUpdateProps(index, name, value) {
       var elements = this.state.elements;
@@ -66437,6 +66470,7 @@ var PageEdit = function (_React$Component) {
     key: "handleSave",
     value: function handleSave() {
       if (!this.state.path) return alert("please set a path");
+      if (this.state.path[0] != '/') this.state.path = '/' + this.state.path;
       // TODO some validation, maybe don't allow saving over other slugs
       var page = this.state;
       page.elements.forEach(function (element) {
@@ -66506,8 +66540,27 @@ var PageEdit = function (_React$Component) {
           edit_props,
           React.createElement(
             "span",
-            { style: { cursor: "pointer", position: "absolute", right: "5px", top: "5px" }, className: "remove", onClick: _this2.handleRemoveElement.bind(_this2, _i) },
-            "x"
+            { style: { cursor: "pointer", position: "absolute", right: "5px", top: "5px" }, className: "remove", onClick: _this2.handleRemoveElement.bind(_this2, _i), title: "delete" },
+            "\u2718"
+          ),
+          React.createElement(
+            "div",
+            { className: "reorder_actions", style: { position: "absolute", right: "30px", top: "5px", display: "flex", flexDirection: "column" } },
+            _i > 1 ? React.createElement(
+              "span",
+              { style: { cursor: "pointer" }, onClick: _this2.handleMoveElementTop.bind(_this2, _i), title: "move to top" },
+              "\u21EA"
+            ) : null,
+            _i > 0 ? React.createElement(
+              "span",
+              { style: { cursor: "pointer" }, onClick: _this2.handleMoveElementUp.bind(_this2, _i), title: "move up" },
+              "\u21E7"
+            ) : null,
+            _i < _this2.state.elements.length - 1 ? React.createElement(
+              "span",
+              { style: { cursor: "pointer" }, onClick: _this2.handleMoveElementDown.bind(_this2, _i), title: "move down" },
+              "\u21E9"
+            ) : null
           )
         ));
       };
@@ -66527,6 +66580,11 @@ var PageEdit = function (_React$Component) {
         React.createElement("input", { type: "text", onChange: function onChange(e) {
             _this2.setState({ path: e.target.value });
           }, value: this.state.path, name: "path" }),
+        React.createElement(
+          "a",
+          { href: this.state.path, target: "_blank", className: "cta", style: { marginLeft: "30px" } },
+          "preview"
+        ),
         elements,
         React.createElement(
           "element",
@@ -66783,7 +66841,7 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "image", event.target.value);
-                  }, value: item.image })
+                  }, value: item.image || "" })
               ),
               React.createElement(
                 "div",
@@ -66795,7 +66853,7 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "href", event.target.value);
-                  }, value: item.href })
+                  }, value: item.href || "" })
               ),
               React.createElement(
                 "div",
@@ -66807,7 +66865,7 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "width", event.target.value);
-                  }, value: item.width, placeholder: "150px" })
+                  }, value: item.width || "", placeholder: "150px" })
               ),
               React.createElement(
                 "div",
@@ -66819,13 +66877,13 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "caption", event.target.value);
-                  }, value: item.caption })
+                  }, value: item.caption || "" })
               )
             ),
             React.createElement(
               "span",
-              { style: { cursor: "pointer" }, className: "remove", onClick: _this2.handleRemoveCard.bind(_this2, index) },
-              "x"
+              { style: { cursor: "pointer" }, className: "remove", onClick: _this2.handleRemoveCard.bind(_this2, index), title: "delete" },
+              "\u2718"
             )
           ));
         });
@@ -66844,7 +66902,7 @@ var PageEditGallery = function (_React$Component) {
           ),
           React.createElement("input", { type: "text", onChange: function onChange(event) {
               _this2.handleUpdate("border", event.target.value);
-            }, value: this.props.border, placeholder: "0px" })
+            }, value: this.props.border, placeholder: "3px" })
         ),
         React.createElement(
           "deck",
@@ -67132,22 +67190,46 @@ var Scrollable = require('./Scrollable.jsx');
 var PageEdit = require('./PageEdit.jsx');
 var Errors = require('./Errors.jsx');
 
+var PageListElement = function (_React$Component) {
+  _inherits(PageListElement, _React$Component);
+
+  function PageListElement() {
+    _classCallCheck(this, PageListElement);
+
+    return _possibleConstructorReturn(this, (PageListElement.__proto__ || Object.getPrototypeOf(PageListElement)).apply(this, arguments));
+  }
+
+  _createClass(PageListElement, [{
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'a',
+        { href: "/page" + this.props.path, className: 'cta' },
+        this.props.path
+      );
+    }
+  }]);
+
+  return PageListElement;
+}(React.Component);
+
 /***
 Admin page for CMS pages
 ***/
 
-var PageList = function (_React$Component) {
-  _inherits(PageList, _React$Component);
+
+var PageList = function (_React$Component2) {
+  _inherits(PageList, _React$Component2);
 
   function PageList(props) {
     _classCallCheck(this, PageList);
 
-    var _this = _possibleConstructorReturn(this, (PageList.__proto__ || Object.getPrototypeOf(PageList)).call(this, props));
+    var _this2 = _possibleConstructorReturn(this, (PageList.__proto__ || Object.getPrototypeOf(PageList)).call(this, props));
 
-    _this.state = {
+    _this2.state = {
       filter: ""
     };
-    return _this;
+    return _this2;
   }
 
   _createClass(PageList, [{
@@ -67160,7 +67242,7 @@ var PageList = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       return React.createElement(
         'div',
@@ -67168,14 +67250,15 @@ var PageList = function (_React$Component) {
         'Page List',
         React.createElement(Errors, null),
         React.createElement('input', { type: 'text', placeholder: 'filter', style: { marginLeft: "10px" }, onChange: function onChange(event) {
-            _this2.setState({ filter: event.target.value });
+            _this3.setState({ filter: event.target.value });
           }, value: this.state.filter }),
         this.state.filter ? null : React.createElement(PageEdit, { path: '', elements: [], whitelisted_components: this.props.whitelisted_components }),
         React.createElement(Scrollable, {
-          component: PageEdit,
+          component: PageListElement,
           endpoint: this.state.filter ? '/page?search=' + this.state.filter : "/page",
           component_props: { whitelisted_components: this.props.whitelisted_components },
-          page: { sort: "path", direction: "ASC" }
+          page: { sort: "path", direction: "ASC" },
+          style: { display: "flex", flexDirection: "column" }
         })
       );
     }
@@ -68833,7 +68916,7 @@ var Scrollable = function (_React$Component) {
 
       return React.createElement(
         'div',
-        null,
+        { style: this.props.style },
         children,
         React.createElement('div', { ref: function ref(element) {
             _this2.detector = element;

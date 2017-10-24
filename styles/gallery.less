@@ -26,11 +26,24 @@
     background-color: @color_primary;
     width: 100%;
     text-align: center;
+    .price {
+      font-family: Arvo;
+      position: initial;
+      background: none;
+      color: @color_secondary;
+      padding: 0 0 0 2px;
+    }
   }
 }
 @media (min-width: @desktop_min_width) {
   .gallery {
     zoom: 300%;
+    .caption {
+      font-size: 6px;
+      .price {
+      font-size: 5px;
+      }
+    }
   }
 }
 

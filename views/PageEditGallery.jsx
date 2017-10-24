@@ -49,12 +49,12 @@ class PageEditGallery extends React.Component {
           <card key={index} style={{display:"flex"}}>
             <div className="preview" style={{backgroundImage:`url(${item.image})`}} />
             <fields>
-              <div><label>image</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "image", event.target.value)}} value={item.image}/></div>
-              <div><label>href</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "href", event.target.value)}} value={item.href}/></div>
-              <div><label>width</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "width", event.target.value)}} value={item.width} placeholder="150px"/></div>
-              <div><label>caption</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "caption", event.target.value)}} value={item.caption} /></div>
+              <div><label>image</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "image", event.target.value)}} value={item.image||""}/></div>
+              <div><label>href</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "href", event.target.value)}} value={item.href||""}/></div>
+              <div><label>width</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "width", event.target.value)}} value={item.width||""} placeholder="150px"/></div>
+              <div><label>caption</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "caption", event.target.value)}} value={item.caption||""} /></div>
             </fields>
-            <span style={{cursor:"pointer"}} className="remove" onClick={this.handleRemoveCard.bind(this, index)}>x</span>
+            <span style={{cursor:"pointer"}} className="remove" onClick={this.handleRemoveCard.bind(this, index)} title="delete">✘</span>
           </card>
         );
       });
@@ -62,7 +62,7 @@ class PageEditGallery extends React.Component {
 
     return (
       <div>
-        <div><label>border</label><input type="text" onChange={(event)=>{this.handleUpdate("border", event.target.value)}} value={this.props.border} placeholder="0px"/></div>
+        <div><label>border</label><input type="text" onChange={(event)=>{this.handleUpdate("border", event.target.value)}} value={this.props.border} placeholder="3px"/></div>
         <deck>
           {items}
         </deck>

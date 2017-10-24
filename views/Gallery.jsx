@@ -13,7 +13,7 @@ class Gallery extends React.Component {
     let items = this.props.items || [];
     let gallery_cards = [];
 
-    let border = this.props.border || "0px";
+    let border = this.props.border || "3px";
 
     items.forEach((item) => {
       gallery_cards.push(
@@ -25,7 +25,10 @@ class Gallery extends React.Component {
             width: item.width || "150px",
           }} />
           {item.caption ?
-            <div className="caption" style={{border: `solid ${border} #fff`,borderTop: "none"}}>{item.caption}</div>
+            <div className="caption" style={{border: `solid ${border} #fff`,borderTop: "none"}}>
+              {item.caption.split(" ").filter((tok)=>{return (tok[0]!='$')}).join(" ")}
+              <span className="price">{item.caption.split(" ").filter((tok)=>{return (tok[0]=='$')}).join(" ")}</span>
+            </div>
             : null
           }
         </a>

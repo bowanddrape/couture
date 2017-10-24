@@ -56,7 +56,7 @@ class Scrollable extends React.Component {
     }
 
     return (
-      <div>
+      <div style={this.props.style}>
         {children}
         <div ref={(element) => {this.detector = element;}}></div>
         {/* TODO show loading state and error messages */}

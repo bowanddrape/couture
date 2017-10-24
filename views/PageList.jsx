@@ -4,6 +4,16 @@ const Scrollable = require('./Scrollable.jsx');
 const PageEdit = require('./PageEdit.jsx');
 const Errors = require('./Errors.jsx');
 
+class PageListElement extends React.Component {
+  render() {
+    return (
+      <a href={"/page"+this.props.path} className="cta">
+        {this.props.path}
+      </a>
+    )
+  }
+}
+
 /***
 Admin page for CMS pages
 ***/
@@ -31,10 +41,11 @@ class PageList extends React.Component {
       <PageEdit path="" elements={[]} whitelisted_components={this.props.whitelisted_components}/>
       }
       <Scrollable
-        component={PageEdit}
+        component={PageListElement}
         endpoint={this.state.filter?`/page?search=${this.state.filter}`:"/page"}
         component_props={{whitelisted_components:this.props.whitelisted_components}}
         page = {{sort:"path", direction:"ASC"}}
+        style={{display:"flex",flexDirection:"column"}}
       />
       </div>
     )
