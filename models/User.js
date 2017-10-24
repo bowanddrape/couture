@@ -25,7 +25,8 @@ class User extends SQLTable {
   constructor(user) {
     super();
     Object.assign(this, user);
-    this.email = user.email.toLowerCase(); // remember lowercase while selecting
+    if (user.email)
+      this.email = user.email.toLowerCase(); // remember lowercase while selecting
   }
 
   // needed by SQLTable
