@@ -13,16 +13,16 @@ class Gallery extends React.Component {
     let items = this.props.items || [];
     let gallery_cards = [];
 
-    let border = this.props.border || "3px";
+    let border = this.props.border || "5px";
 
     items.forEach((item, index) => {
       gallery_cards.push(
         <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={{
-          width: item.width || "150px",
+          width: item.width || "125px",
           border: `solid ${border} #fff`,
         }} >
           <img src={item.image} style={{
-            width: item.width || "150px",
+            width: item.width || "125px",
           }} />
           {item.caption ?
             <div className="caption" style={{border: `solid ${border} #fff`,borderTop: "none"}}>

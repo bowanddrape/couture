@@ -65066,17 +65066,17 @@ var Gallery = function (_React$Component) {
       var items = this.props.items || [];
       var gallery_cards = [];
 
-      var border = this.props.border || "3px";
+      var border = this.props.border || "5px";
 
       items.forEach(function (item, index) {
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
-              width: item.width || "150px",
+              width: item.width || "125px",
               border: "solid " + border + " #fff"
             } },
           React.createElement("img", { src: item.image, style: {
-              width: item.width || "150px"
+              width: item.width || "125px"
             } }),
           item.caption ? React.createElement(
             "div",
@@ -66869,7 +66869,7 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "width", event.target.value);
-                  }, value: item.width || "", placeholder: "150px" })
+                  }, value: item.width || "", placeholder: "125px" })
               ),
               React.createElement(
                 "div",
@@ -66906,7 +66906,7 @@ var PageEditGallery = function (_React$Component) {
           ),
           React.createElement("input", { type: "text", onChange: function onChange(event) {
               _this2.handleUpdate("border", event.target.value);
-            }, value: this.props.border, placeholder: "3px" })
+            }, value: this.props.border, placeholder: "5px" })
         ),
         React.createElement(
           "deck",
