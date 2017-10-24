@@ -166,7 +166,10 @@ class Page extends JSONAPI {
     }); //go through all elements on page
     return async.parallel(render_elements, function(err, data) {
       if(err) return res.status(500).end(JSON.stringify(err));
-      let head = Page.getHTMLHead(req, res, data[0].props);
+      let head_props = {};
+      if (data.length)
+        head_props = data[0].props;
+      let head = Page.getHTMLHead(req, res, head_props);
       let body = Page.renderString(data, Page.getLayout(req));
       return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
     });
