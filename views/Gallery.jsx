@@ -15,7 +15,7 @@ class Gallery extends React.Component {
 
     let border = this.props.border || "3px";
 
-    items.forEach((item) => {
+    items.forEach((item, index) => {
       gallery_cards.push(
         <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={{
           width: item.width || "150px",
@@ -33,6 +33,12 @@ class Gallery extends React.Component {
           }
         </a>
       );
+      // force breaks after every 3 cards?
+      if (index && !((index+1)%3)) {
+        gallery_cards.push(
+          <div key={gallery_cards.length} className="card linebreak"></div>
+        )
+      }
     });
 
     return (

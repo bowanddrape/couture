@@ -65068,7 +65068,7 @@ var Gallery = function (_React$Component) {
 
       var border = this.props.border || "3px";
 
-      items.forEach(function (item) {
+      items.forEach(function (item, index) {
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
@@ -65093,6 +65093,10 @@ var Gallery = function (_React$Component) {
             )
           ) : null
         ));
+        // force breaks after every 3 cards?
+        if (index && !((index + 1) % 3)) {
+          gallery_cards.push(React.createElement("div", { key: gallery_cards.length, className: "card linebreak" }));
+        }
       });
 
       return React.createElement(

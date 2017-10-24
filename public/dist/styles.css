@@ -1505,6 +1505,9 @@ product_options switch.expanded {
   height: auto;
   width: auto;
 }
+.gallery .card.linebreak {
+  display: none;
+}
 .gallery a.card {
   margin: 0px;
   box-sizing: border-box;
@@ -1518,6 +1521,7 @@ product_options switch.expanded {
   color: #000;
   font-weight: normal;
   letter-spacing: 0px;
+  text-transform: uppercase;
   font-size: 8px;
   position: absolute;
   bottom: 0px;
@@ -1536,6 +1540,11 @@ product_options switch.expanded {
 @media (min-width: 737px) {
   .gallery {
     zoom: 300%;
+  }
+  .gallery .card.linebreak {
+    display: block;
+    flex-basis: 100%;
+    margin: 0px;
   }
   .gallery .caption {
     font-size: 6px;
