@@ -135,7 +135,7 @@ class User extends SQLTable {
         // do a db fetch if we are about to try something
         if (req.method=='POST') {
           return User.get(user.email, (err, user) => {
-            if (err) {
+            if (err || !user) {
               req.user = null;
               return next();
             }
