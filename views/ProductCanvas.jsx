@@ -418,13 +418,14 @@ class ProductCanvas extends React.Component {
     }
 
     return (
-      <div className={this.state.assembly[this.state.selected_component]?"component_selected component_wrapper":"component_wrapper"}>
-        <canvas>
-        </canvas>
-        {component_hitboxes}
+      <section className="canvasWrap">
+        <div className={this.state.assembly[this.state.selected_component]?"component_selected component_wrapper":"component_wrapper"}>
+          <canvas></canvas>
+          {component_hitboxes}
+        </div>
         <hud_controls className={this.state.assembly[this.state.selected_component]?"rainbow_border":""}>{hud_controls}</hud_controls>
         <ProductComponentPicker product={this.props.product} productCanvas={this} compatible_component_map={this.props.compatible_component_map}/>
-      </div>
+      </section>
     );
   }
 }

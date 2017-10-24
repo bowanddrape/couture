@@ -131,7 +131,6 @@ input_credit {
   .sectionTitle {
     margin-top: 20px;
   }
-}
 
 .cart-wrapper{
   input[type="text"], input[type="password"] {
@@ -151,6 +150,7 @@ input_credit {
     }
   }
 }
+}
 
 @media (max-width: @desktop_min_width) {
   .cart-wrapper{
@@ -158,6 +158,34 @@ input_credit {
       font-size: 16px
     }
   }
+
+  .items {
+    .product_wrapper {
+        grid-column: span 6;
+    }
+
+    .summary_items {
+      grid-column: span 6;
+      padding: 0;
+    }
+  }
+}
+
+.loginToggle {
+  grid-column-start: 1;
+  grid-column-end: -1;
+
+  input[type="radio"] {
+    margin-right: 5px;
+  }
+  .radioLabel {
+      margin-right: 15px;
+  }
+}
+
+.loginHeader {
+  grid-column-start: 1;
+  grid-column-end: -1;
 }
 
 

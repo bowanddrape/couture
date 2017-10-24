@@ -67781,10 +67781,14 @@ var ProductCanvas = function (_React$Component) {
       }
 
       return React.createElement(
-        'div',
-        { className: this.state.assembly[this.state.selected_component] ? "component_selected component_wrapper" : "component_wrapper" },
-        React.createElement('canvas', null),
-        component_hitboxes,
+        'section',
+        { className: 'canvasWrap' },
+        React.createElement(
+          'div',
+          { className: this.state.assembly[this.state.selected_component] ? "component_selected component_wrapper" : "component_wrapper" },
+          React.createElement('canvas', null),
+          component_hitboxes
+        ),
         React.createElement(
           'hud_controls',
           { className: this.state.assembly[this.state.selected_component] ? "rainbow_border" : "" },
@@ -70155,12 +70159,17 @@ var UserLogin = function (_React$Component) {
           React.createElement(
             'button',
             { className: 'loginBtn', onClick: this.login.bind(this) },
-            'Login / Register'
+            'Login'
+          ),
+          React.createElement(
+            'button',
+            { className: 'loginBtn', onClick: this.login.bind(this) },
+            'Register'
           ),
           React.createElement(
             'button',
             { className: 'loginBtn', onClick: this.verify.bind(this) },
-            'Verify / Forgot Pass'
+            'Reset Password'
           ),
           React.createElement(FacebookLogin, { user: this.state.user })
         ),

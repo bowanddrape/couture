@@ -8,10 +8,15 @@
   right: 0;
 
   .footer-inner {
-    border-top: 5px solid transparent;
-    border-image: @gradient-rainbow;
-    border-image-slice: 1;
     padding: 50px 0;
+    &:before {
+      content: '';
+      background: @gradient-rainbow;
+      height: 5px;
+      width: 100%;
+      display: block;
+      position: relative;
+    }
   }
 
   .footer-menu {

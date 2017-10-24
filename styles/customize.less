@@ -5,6 +5,12 @@
 @customize_emoji_key_width: 40px;
 @customize_emoji_key_margin: 4px;
 customize {
+  position: relative;
+  display: block;
+  .canvasWrap {
+    width: 100%;
+    display: inline-block;
+  }
   product_options {
     position: absolute;
     left: 0;
@@ -16,22 +22,19 @@ customize {
   }
   .canvas_container {
     display: flex;
+    position: relative;
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 100%;
-    border-top: 3px solid #eee;
+    justify-content: flex-end;
 
     canvas {
-      flex-grow: 1;
-      height: 300px;
+      flex-grow: 0;
+      height: 420px;
       width: 100%;
+      float: right;
       display: block;
       max-height: 100%;
-    }
-    .component_selected {
-      canvas, component_hitbox {
-        margin-left: -30px; /* FIXME this is dumb, comment this out */
-      }
     }
   }
   tabs.components {
@@ -114,7 +117,7 @@ customize {
     margin: 0 auto 20px auto;
     padding: 15px;
     bottom: 0;
-    left: 30vw;
+    left: ~"calc(60vw - 330px)";
     position: absolute;
     display: inline-block;
     height: auto;
@@ -125,13 +128,17 @@ customize {
       float: left;
       width: 100%;
       height: auto;
-      margin: 0 3% 0 0;
+      &:after {
+        content: '';
+        background: @gradient-rainbow;
+        height: 5px;
+        width: 100%;
+        display: block;
+        position: relative;
+      }
     }
     input {
       border: none;
-      border-bottom: 5px solid transparent;
-      border-image: @gradient-rainbow;
-      border-image-slice: 1;
       text-transform: lowercase;
       display: inline-block;
       width: 100%;
@@ -208,6 +215,8 @@ customize {
     }
   }
 
+
+
   .hudBtn--delete {
     &:before {
       content: "";
@@ -252,16 +261,12 @@ customize {
   }
 
 
-
-
-
   hud_controls {
     display: flex;
     flex-direction: column;
     position: absolute;
     top: 185px;
     right: 20px;
-    min-width: 83px;
     &.rainbow_border {
       padding: 0 10px;
       position: absolute;
@@ -279,6 +284,10 @@ customize {
     hud_controls {
       top: 0;
       right: 0;
+    }
+    .hudBtn:before {
+      height: 20px;
+      width: 30px;
     }
   }
 
@@ -318,16 +327,25 @@ customize {
   }
 }
 
-@media (max-width: @desktop_min_width) {
-  customize .product_details {
-  .description, .size_chart{
-    grid-column-start: 1;
-    grid-column-end: -1;
-  }
-}
-}
+@media (min-width: @desktop_min_width) {
+  customize {
+    .component_wrapper {
+      position: relative;
+      width: 80vw;
+      height: 81vh;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+    }
 
-@media (min-width: @desktop_min_width) { customize {
+  .canvasWrap {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
   product_options {
     left: auto;
     right: 33px;
@@ -346,18 +364,23 @@ customize {
     left: 0px;
     bottom: 0px;
     border-right: 3px solid #eee;
-    width: 300px;
+    width: 20vw;
     height: 100%;
     .components {
       display: flex;
-      flex-direction: row-reverse;
+      flex-direction: row;
       height: 100%;
+      padding: 20px;
       switch {
         flex-direction: column;
+
+
+        img {
+          width: 80px;
+        }
       }
       .component_container.letters {
         width: 600px;
-        margin-left: 48px;
         margin-top: 118px;
       }
       .component_container:not(.letters) {
@@ -373,8 +396,10 @@ customize {
     }
   }
   .canvas_container {
+    border-top: 3px solid #eee;
+    border-bottom: 3px solid #eee;
     canvas {
-      height: 800px;
+      height: 80vh;
     }
     .component_selected {
       canvas, component_hitbox {
@@ -382,12 +407,16 @@ customize {
       }
     }
   }
-}}
+}
+
+}
 
 .component_wrapper {
   position: relative;
-  width: 100%;
-  height: 70vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 switch_option img {
@@ -425,8 +454,35 @@ switch_option img {
 
 
 @media (max-width: @desktop_min_width) {
+customize {
+  .component_container.letters {
+    top: -20px;
+    left: 0;
+    position: relative;
+    width: 94%;
+    padding: 0 15px;
+  }
+
+  .cameraBtn {
+    font-size: 10px;
+  }
+   .product_details {
+    .description {
+      grid-column-start: 1;
+      grid-column-end: -1;
+    }
+    .size_chart {
+      grid-column-start: 1;
+      grid-column-end: -1;
+    }
+  }
+}
+
   .add_to_cart {
       height: auto;
+      position: relative;
+      border: none;
+      padding-top: 30px;
     .productName {
       position: relative;
       display: inline-block;
@@ -440,15 +496,7 @@ switch_option img {
     .addCart {
       font-size: 16px;
       display: inline-block;
-      height: 40px;
-
-      &:before {
-        height: 40px;
-      }
-
-      &:after {
-        height: 40px;
-      }
+      margin-top: 15px;
     }
   }
 }
