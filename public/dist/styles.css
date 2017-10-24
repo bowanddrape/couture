@@ -863,7 +863,7 @@ customize .product_details .size_chart row span:first-child {
     margin-left: 50px;
   }
   customize .canvas_container canvas {
-    height: 400px;
+    height: 700px;
   }
   customize .canvas_container .component_selected canvas,
   customize .canvas_container .component_selected component_hitbox {
