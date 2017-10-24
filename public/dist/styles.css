@@ -173,10 +173,12 @@ button.primary.busyState:after,
   font-weight: bold;
   letter-spacing: 2px;
   padding: 6px 0px;
-  text-decoration: none;
   cursor: pointer;
   border: none;
   border-bottom: solid 1px #000;
+}
+.cta:hover {
+  text-decoration: none;
 }
 actions {
   display: flex;
@@ -1322,6 +1324,9 @@ page_edit element {
 page_edit element:last-of-type {
   border-bottom: none;
 }
+page_edit element card {
+  margin-top: 30px;
+}
 page_edit element card .preview {
   width: 150px;
   height: 150px;
@@ -1339,6 +1344,7 @@ page_edit element card fields div {
 page_edit element card fields label {
   position: absolute;
   right: 305px;
+  top: 28px;
 }
 component_edit {
   display: flex;
@@ -1606,7 +1612,6 @@ product_options switch.expanded {
   font-weight: bold;
   letter-spacing: 2px;
   padding: 6px 0px;
-  text-decoration: none;
   cursor: pointer;
   border: none;
   border-bottom: solid 1px #000;
@@ -1615,6 +1620,10 @@ product_options switch.expanded {
   width: auto;
   border-bottom: none;
   margin: 12px auto;
+}
+.header menu button:hover,
+.header menu .button:hover {
+  text-decoration: none;
 }
 .header menu button:hover,
 .header menu .button:hover {
@@ -1825,6 +1834,9 @@ product_options switch.expanded {
   height: auto;
   width: auto;
 }
+.gallery .card.linebreak {
+  display: none;
+}
 .gallery a.card {
   margin: 0px;
   box-sizing: border-box;
@@ -1838,6 +1850,7 @@ product_options switch.expanded {
   color: #000;
   font-weight: normal;
   letter-spacing: 0px;
+  text-transform: uppercase;
   font-size: 8px;
   position: absolute;
   bottom: 0px;
@@ -1846,8 +1859,26 @@ product_options switch.expanded {
   width: 100%;
   text-align: center;
 }
+.gallery .caption .price {
+  font-family: Arvo;
+  position: initial;
+  background: none;
+  color: #000;
+  padding: 0 0 0 2px;
+}
 @media (min-width: 737px) {
   .gallery {
     zoom: 300%;
+  }
+  .gallery .card.linebreak {
+    display: block;
+    flex-basis: 100%;
+    margin: 0px;
+  }
+  .gallery .caption {
+    font-size: 6px;
+  }
+  .gallery .caption .price {
+    font-size: 5px;
   }
 }

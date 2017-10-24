@@ -9,6 +9,9 @@
     height: auto;
     width: auto;
   }
+  .card.linebreak {
+    display: none;
+  }
   a.card {
     margin: 0px;
     box-sizing: border-box;
@@ -19,6 +22,7 @@
   }
   .caption {
     .headerfont;
+    text-transform: uppercase;
     font-size: 8px;
     position: absolute;
     bottom: 0px;
@@ -26,11 +30,29 @@
     background-color: @color_primary;
     width: 100%;
     text-align: center;
+    .price {
+      font-family: Arvo;
+      position: initial;
+      background: none;
+      color: @color_secondary;
+      padding: 0 0 0 2px;
+    }
   }
 }
 @media (min-width: @desktop_min_width) {
   .gallery {
     zoom: 300%;
+    .card.linebreak {
+      display: block;
+      flex-basis: 100%;
+      margin: 0px;
+    }
+    .caption {
+      font-size: 6px;
+      .price {
+      font-size: 5px;
+      }
+    }
   }
 }
 

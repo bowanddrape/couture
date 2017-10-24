@@ -30,6 +30,27 @@ class PageEdit extends React.Component {
     this.setState({elements});
   }
 
+  handleMoveElementTop(index) {
+    let elements = this.state.elements;
+    let moved = elements.splice(index, 1);
+    elements.splice(0, 0, moved[0]);
+    this.setState({elements});
+  }
+
+  handleMoveElementUp(index) {
+    let elements = this.state.elements;
+    let moved = elements.splice(index, 1);
+    elements.splice(index-1, 0, moved[0]);
+    this.setState({elements});
+  }
+
+  handleMoveElementDown(index) {
+    let elements = this.state.elements;
+    let moved = elements.splice(index, 1);
+    elements.splice(index, 0, moved[0]);
+    this.setState({elements});
+  }
+
   handleUpdateProps(index, name, value) {
     let elements = this.state.elements;
     elements[index][name] = value;
@@ -39,6 +60,8 @@ class PageEdit extends React.Component {
   handleSave() {
     if (!this.state.path)
       return alert("please set a path");
+    if (this.state.path[0] != '/')
+      this.state.path = '/'+this.state.path;
     // TODO some validation, maybe don't allow saving over other slugs
     let page = this.state;
     page.elements.forEach((element) => {
@@ -104,7 +127,21 @@ class PageEdit extends React.Component {
             {whitelisted_components}
           </select>
           {edit_props}
-          <span style={{cursor:"pointer",position:"absolute",right:"5px",top:"5px"}} className="remove" onClick={this.handleRemoveElement.bind(this, i)}>x</span>
+          <span style={{cursor:"pointer",position:"absolute",right:"5px",top:"5px"}} className="remove" onClick={this.handleRemoveElement.bind(this, i)} title="delete">✘</span>
+          <div className="reorder_actions" style={{position:"absolute",right:"30px",top:"5px",display:"flex",flexDirection:"column"}}>
+            { (i>1) ?
+              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementTop.bind(this, i)} title="move to top">⇪</span>
+              : null
+            }
+            { (i>0) ?
+              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementUp.bind(this, i)} title="move up">⇧</span>
+              : null
+            }
+            { (i<this.state.elements.length-1) ?
+              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementDown.bind(this, i)} title="move down">⇩</span>
+              : null
+            }
+          </div>
         </element>
       );
     }
@@ -112,6 +149,7 @@ class PageEdit extends React.Component {
     return (
       <page_edit>
         <label>path:</label><input type="text" onChange={(e)=>{this.setState({path:e.target.value});}} value={this.state.path} name="path"/>
+        <a href={this.state.path} target="_blank" className="cta" style={{marginLeft:"30px"}}>preview</a>
         {elements}
         <element onClick={this.handleNewElement.bind(this)}>Add Element</element>
         <actions>
