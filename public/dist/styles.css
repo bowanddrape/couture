@@ -413,7 +413,7 @@ input[type="button"]:focus {
     right: 0;
     width: calc(100vw - 10px);
     height: calc(100vh - 10px);
-    z-index: 99;
+    z-index: 999;
     background: transparent;
     pointer-events: none;
     border: 5px solid transparent;
@@ -615,6 +615,10 @@ customize {
   position: relative;
   display: block;
 }
+customize .rainbow_border {
+  max-width: 94%;
+  margin: 0 auto;
+}
 customize .canvasWrap {
   width: 100%;
   display: inline-block;
@@ -658,14 +662,15 @@ customize .component_container {
   flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
-  height: 223px;
+  height: 227px;
   max-width: 100%;
   overflow-x: scroll;
+  margin: 0 8px;
 }
 customize .component_container div {
   height: 40px;
   width: 40px;
-  margin: 4px;
+  margin: 7px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -701,15 +706,16 @@ customize .component_virtual_keyboard_container {
   flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
-  height: 223px;
+  height: 227px;
   max-width: 100%;
   overflow-x: scroll;
+  margin: 0 8px;
   align-content: center;
 }
 customize .component_virtual_keyboard_container div {
   height: 40px;
   width: 40px;
-  margin: 4px;
+  margin: 7px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -741,7 +747,7 @@ customize .component_virtual_keyboard_container div.enter {
   border: none;
 }
 customize .component_virtual_keyboard_container div {
-  margin: 4px;
+  margin: 7px;
 }
 customize .component_virtual_keyboard_container row {
   display: flex;
@@ -766,7 +772,7 @@ customize .component_virtual_keyboard_container div.spacebar {
 customize .component_virtual_keyboard_container div.halfgap {
   height: 40px;
   width: 20px;
-  margin: 0 4px;
+  margin: 0 7px;
   border: none;
 }
 customize .component_container.letters {
@@ -949,6 +955,14 @@ customize .product_details .size_chart row span:first-child {
     flex-direction: row;
     justify-content: flex-end;
   }
+  customize .component_container div {
+    height: 110px;
+    width: 110px;
+    margin: 10px;
+  }
+  customize div[name=Emoji] {
+    z-index: 100;
+  }
   customize .canvasWrap {
     width: 100%;
     position: relative;
@@ -975,17 +989,24 @@ customize .product_details .size_chart row span:first-child {
     left: 0px;
     bottom: 0px;
     border-right: 3px solid #eee;
-    width: 20vw;
+    width: auto;
     height: 100%;
   }
   customize .component_picker .components {
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     height: 100%;
     padding: 20px;
   }
   customize .component_picker .components switch {
-    flex-direction: column;
+    max-width: 260px;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-flow: row wrap;
+    align-content: flex-start;
   }
   customize .component_picker .components switch img {
     width: 80px;
@@ -995,14 +1016,12 @@ customize .product_details .size_chart row span:first-child {
     margin-top: 118px;
   }
   customize .component_picker .components .component_container:not(.letters) {
-    height: 100%;
-    width: 119px;
+    height: 95%;
+    width: 270px;
+    padding: 10px;
     flex-direction: row;
     overflow-x: hidden;
     overflow-y: scroll;
-  }
-  customize .component_picker .components .rainbow_border[name='Emoji'] {
-    margin-left: 50px;
   }
   customize .canvas_container {
     border-top: 3px solid #eee;
@@ -1055,10 +1074,10 @@ switch_option img {
 @media (max-width: 737px) {
   customize .component_container.letters {
     top: -20px;
-    left: 0;
+    left: 5%;
     position: relative;
-    width: 94%;
-    padding: 0 15px;
+    width: 90%;
+    padding: 0;
   }
   customize .cameraBtn {
     font-size: 10px;
@@ -1473,12 +1492,15 @@ product_options switch.expanded {
   justify-content: flex-begin;
   margin-bottom: 10px;
 }
+.component_picker switch {
+  justify-content: center;
+}
 .component_picker switch switch_option {
   background-color: #fff;
   border: solid 1px #eaeaea;
   color: #000;
   border-radius: 50%;
-  padding: 10px;
+  padding: 8px;
   margin: 10px;
 }
 .component_picker switch switch_option.selected,
@@ -1516,19 +1538,28 @@ product_options switch.expanded {
 .component_picker switch.expanded .selected {
   border-color: #7f5cff;
 }
+@media (min-width: 737px) {
+  .component_picker switch switch_option {
+    width: 110px;
+    height: 110px;
+    padding: 10px;
+  }
+}
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   background: white;
-  border-bottom: 5px solid transparent;
-  border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
-  border-top: 0;
-  border-left: 0;
-  border-right: 0;
-  border-image-slice: 1;
   z-index: 100;
+}
+.header:after {
+  content: '';
+  background: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+  height: 5px;
+  width: 100%;
+  display: block;
+  position: relative;
 }
 .header .headerInner {
   padding-top: 25px;
@@ -1657,11 +1688,9 @@ product_options switch.expanded {
   margin-top: 25px;
 }
 @media (min-width: 737px) {
-  .header {
-    border-bottom: none;
-    top: 5px;
-    left: 5px;
-    right: 5px;
+  .header:after {
+    background: none;
+    height: 0;
   }
   .header handle {
     left: auto;
@@ -1732,6 +1761,7 @@ product_options switch.expanded {
   width: 100%;
   display: block;
   position: relative;
+  margin: 0 0 50px 0;
 }
 .footer .footer-menu {
   text-align: center;

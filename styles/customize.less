@@ -3,10 +3,16 @@
 
 @customize_emoji_key_height: 40px;
 @customize_emoji_key_width: 40px;
-@customize_emoji_key_margin: 4px;
+@customize_emoji_key_margin: 7px;
 customize {
   position: relative;
   display: block;
+
+  .rainbow_border {
+    max-width: 94%;
+    margin: 0 auto;
+  }
+
   .canvasWrap {
     width: 100%;
     display: inline-block;
@@ -54,9 +60,10 @@ customize {
     flex-direction: column;
     flex-wrap: wrap;
     align-content: flex-start;
-    height: (@customize_emoji_key_height + (@customize_emoji_key_margin + 2) * 2) * 4 + 15px;
+    height: (@customize_emoji_key_height + (@customize_emoji_key_margin + 2) * 2) * 4 - 5px;
     max-width: 100%;
     overflow-x: scroll;
+    margin: 0 8px;
 
     div {
       height: @customize_emoji_key_height;
@@ -338,6 +345,19 @@ customize {
       justify-content: flex-end;
     }
 
+    .component_container {
+      div {
+        height: 110px;
+        width: 110px;
+        margin: 10px;
+      }
+    }
+
+    div[name=Emoji] {
+      z-index: 100;
+    }
+
+
   .canvasWrap {
     width: 100%;
     position: relative;
@@ -364,17 +384,22 @@ customize {
     left: 0px;
     bottom: 0px;
     border-right: 3px solid #eee;
-    width: 20vw;
+    width: auto;
     height: 100%;
     .components {
       display: flex;
-      flex-direction: row;
+      flex-direction: row-reverse;
       height: 100%;
       padding: 20px;
       switch {
-        flex-direction: column;
-
-
+      max-width: 260px;
+      display: flex;
+      align-items: left;
+      justify-content: left;
+      flex-direction: row;
+      flex-wrap: wrap;
+      flex-flow: row wrap;
+      align-content: flex-start;
         img {
           width: 80px;
         }
@@ -384,14 +409,12 @@ customize {
         margin-top: 118px;
       }
       .component_container:not(.letters) {
-        height: 100%;
-        width: 119px;
+        height: 95%;
+        width: 270px;
+        padding: 10px;
         flex-direction: row;
         overflow-x: hidden;
         overflow-y: scroll;
-      }
-      .rainbow_border[name='Emoji'] {
-        margin-left: 50px;
       }
     }
   }
@@ -457,11 +480,12 @@ switch_option img {
 customize {
   .component_container.letters {
     top: -20px;
-    left: 0;
+    left: 5%;
     position: relative;
-    width: 94%;
-    padding: 0 15px;
+    width: 90%;
+    padding: 0;
   }
+
 
   .cameraBtn {
     font-size: 10px;
