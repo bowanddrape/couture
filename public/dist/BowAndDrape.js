@@ -65040,15 +65040,15 @@ var Gallery = function (_React$Component) {
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
-              width: item.width || "125px",
-              border: "solid " + border + " #fff"
+              width: item.width || "90px",
+              margin: "" + border
             } },
           React.createElement("img", { src: item.image, style: {
-              width: item.width || "125px"
+              width: item.width || "90px"
             } }),
           item.caption ? React.createElement(
             "div",
-            { className: "caption", style: { border: "solid " + border + " #fff", borderTop: "none" } },
+            { className: "caption" },
             item.caption.split(" ").filter(function (tok) {
               return tok[0] != '$';
             }).join(" "),
@@ -66837,7 +66837,7 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "width", event.target.value);
-                  }, value: item.width || "", placeholder: "125px" })
+                  }, value: item.width || "", placeholder: "90px" })
               ),
               React.createElement(
                 "div",
@@ -68368,8 +68368,8 @@ var ProductList = function (_React$Component) {
       // facebook ViewContent event
       try {
         fbq('track', 'ViewContent', {
+          value: parseFloat(product.props.price),
           currency: "USD",
-          value: product.props.price,
           content_ids: product.sku
         });
       } catch (err) {}
@@ -68481,7 +68481,8 @@ var ProductList = function (_React$Component) {
       // facebook track event
       try {
         fbq('track', 'AddToCart', {
-          currency: product.props.price,
+          value: parseFloat(product.props.price),
+          currency: "USD",
           content_ids: product.sku
         });
       } catch (err) {

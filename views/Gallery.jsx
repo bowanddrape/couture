@@ -18,14 +18,14 @@ class Gallery extends React.Component {
     items.forEach((item, index) => {
       gallery_cards.push(
         <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={{
-          width: item.width || "125px",
-          border: `solid ${border} #fff`,
+          width: item.width || "90px",
+          margin: `${border}`,
         }} >
           <img src={item.image} style={{
-            width: item.width || "125px",
+            width: item.width || "90px",
           }} />
           {item.caption ?
-            <div className="caption" style={{border: `solid ${border} #fff`,borderTop: "none"}}>
+            <div className="caption" >
               {item.caption.split(" ").filter((tok)=>{return (tok[0]!='$')}).join(" ")}
               <span className="price">{item.caption.split(" ").filter((tok)=>{return (tok[0]=='$')}).join(" ")}</span>
             </div>
