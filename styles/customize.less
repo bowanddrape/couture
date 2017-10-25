@@ -22,6 +22,7 @@ customize {
     left: 0;
     display: flex;
     flex-direction: column;
+
     select {
       font-size: 35px;
     }
@@ -162,6 +163,7 @@ customize {
 
 //Right Hand Btns
   .cameraBtn {
+    .zurichroman;
     border: 0;
     font-weight: 700;
     height: auto;
@@ -170,8 +172,8 @@ customize {
     &:before {
       content: "";
       display: block;
-      height: 30px;
-      width: 40px;
+      height: 25px;
+      width: 30px;
       margin: 0 auto 10px auto;
       position: initial;
       background-position: center;
@@ -207,7 +209,8 @@ customize {
     font-weight: 700;
     height: auto;
     display: block;
-    padding-top: 10px;
+    padding: 20px 0;
+    .zurichroman;
     &:before {
       content: "";
       display: block;
@@ -273,9 +276,9 @@ customize {
     flex-direction: column;
     position: absolute;
     top: 185px;
-    right: 20px;
+    right: 30px;
     &.rainbow_border {
-      padding: 0 10px;
+      padding: 0 50px 0 20px;
       position: absolute;
       z-index: 1;
       right: -5px;
@@ -314,7 +317,7 @@ customize {
       border-collapse: collapse;
       font-family: 'zurich_condensedregular', sans-serif;
       grid-column-start: 4;
-      grid-column-end: 6;
+      grid-column-end: -1;
       margin-top: 40px;
       row {
           border-bottom: 1px solid @color_support_0;
@@ -347,14 +350,21 @@ customize {
 
     .component_container {
       div {
-        height: 110px;
-        width: 110px;
-        margin: 10px;
+        height: 50px;
+        width: 50px;
+        margin: 15px;
       }
     }
 
-    div[name=Emoji] {
+    div[name=Emoji].rainbow_border {
       z-index: 100;
+      max-width: 94%;
+      margin: 0 auto;
+      border: none;
+
+      &::before {
+        background-image: none;
+      }
     }
 
 
@@ -368,11 +378,13 @@ customize {
   }
   product_options {
     left: auto;
-    right: 33px;
+    right: 0;
     max-width: 750px;
+    top: 30px;
     switch {
       justify-content: flex-end;
       margin-bottom: 10px;
+      padding-right: 40px;
     }
   }
   hud_controls:not(.rainbow_border) {
@@ -386,10 +398,24 @@ customize {
     border-right: 3px solid #eee;
     width: auto;
     height: 100%;
+    background: white;
+
+    tab_contents {
+      max-width: 260px;
+      display: flex;
+      align-items: left;
+      justify-content: left;
+      flex-direction: row;
+      flex-wrap: wrap;
+      flex-flow: row wrap;
+      align-content: flex-start;
+      overflow-y: scroll;
+    }
     .components {
       display: flex;
-      flex-direction: row-reverse;
-      height: 100%;
+      flex-direction: column-reverse;
+      justify-content: flex-start;
+      height: 95%;
       padding: 20px;
       switch {
       max-width: 260px;
@@ -400,8 +426,9 @@ customize {
       flex-wrap: wrap;
       flex-flow: row wrap;
       align-content: flex-start;
+      height: 100%;
         img {
-          width: 80px;
+          width: 40px;
         }
       }
       .component_container.letters {
@@ -410,11 +437,9 @@ customize {
       }
       .component_container:not(.letters) {
         height: 95%;
-        width: 270px;
+        width: 260px;
         padding: 10px;
         flex-direction: row;
-        overflow-x: hidden;
-        overflow-y: scroll;
       }
     }
   }
@@ -464,13 +489,16 @@ switch_option img {
     display: inline-block;
     font-size: 42px;
     text-transform: uppercase;
-    font-weight: bold;
-    border-bottom: 3px solid #7f5cff;
+    font-weight: 800;
+    border-bottom: 5px solid #7f5cff;
     margin: 35px 60px 0 0;
   }
 
+  .productPrice {
+  font-weight: 600;
+  }
+
   .addCart {
-    font-size: 20px;
     display: inline-block;
   }
 }

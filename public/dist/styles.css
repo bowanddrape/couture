@@ -11,6 +11,18 @@
   font-weight: normal;
   font-style: normal;
 }
+@font-face {
+  font-family: 'arvobold';
+  src: url('arvo-bold-webfont.woff2') format('woff2'), url('arvo-bold-webfont.woff') format('woff'), url('arvo-bold-webfont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'arvoregular';
+  src: url('arvo-regular-webfont.woff2') format('woff2'), url('arvo-regular-webfont.woff') format('woff'), url('arvo-regular-webfont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 .bodyfont {
   font-family: "Open Sans", Arial, sans-serif;
   line-height: 1.43;
@@ -98,6 +110,9 @@ button,
   margin: 6px auto;
   width: 100%;
   max-width: 180px;
+  font-family: 'arvobold';
+  font-weight: normal;
+  letter-spacing: 2px;
   cursor: pointer;
   text-transform: uppercase;
   box-sizing: border-box;
@@ -200,24 +215,26 @@ actions {
 .rainbow_border:after {
   content: " ";
   position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  bottom: 2px;
+  left: 5px;
+  right: 5px;
+  top: 5px;
+  bottom: 5px;
   background-color: #fff;
   z-index: -1;
 }
 errors {
   color: #fff;
-  background-color: #a00;
-  padding: 5px;
-  margin: 3px auto;
+  background-color: #ff5c5c;
   border-radius: 5px;
+  padding: 5px;
+  margin: 15px auto;
+  border-radius: 20px;
   display: block;
+  width: 50%;
 }
 input.error {
-  box-shadow: 0 0 10px #a00;
-  color: #a00;
+  box-shadow: 0 0 10px #ff5c5c;
+  color: #ff5c5c;
 }
 input[type="text"],
 input[type="password"] {
@@ -385,7 +402,7 @@ input[type="button"]:focus {
 .warning404 {
   text-align: center;
   width: 100%;
-  background-color: #a00;
+  background-color: #ff5c5c;
   padding: 5px;
   margin: 3px auto;
   border-radius: 5px;
@@ -423,7 +440,7 @@ input[type="button"]:focus {
 }
 @media (min-width: 737px) {
   .layout {
-    padding-top: 108px;
+    padding-top: 112px;
   }
 }
 .grid {
@@ -813,6 +830,8 @@ customize .component_container.letters .sayIt {
   margin: 0;
 }
 customize .cameraBtn {
+  font-family: 'zurich_condensedregular', sans-serif;
+  font-weight: normal;
   border: 0;
   font-weight: 700;
   height: auto;
@@ -822,8 +841,8 @@ customize .cameraBtn {
 customize .cameraBtn:before {
   content: "";
   display: block;
-  height: 30px;
-  width: 40px;
+  height: 25px;
+  width: 30px;
   margin: 0 auto 10px auto;
   position: initial;
   background-position: center;
@@ -847,7 +866,9 @@ customize .hudBtn {
   font-weight: 700;
   height: auto;
   display: block;
-  padding-top: 10px;
+  padding: 20px 0;
+  font-family: 'zurich_condensedregular', sans-serif;
+  font-weight: normal;
 }
 customize .hudBtn:before {
   content: "";
@@ -890,10 +911,10 @@ customize hud_controls {
   flex-direction: column;
   position: absolute;
   top: 185px;
-  right: 20px;
+  right: 30px;
 }
 customize hud_controls.rainbow_border {
-  padding: 0 10px;
+  padding: 0 50px 0 20px;
   position: absolute;
   z-index: 1;
   right: -5px;
@@ -929,7 +950,7 @@ customize .product_details .size_chart {
   border-collapse: collapse;
   font-family: 'zurich_condensedregular', sans-serif;
   grid-column-start: 4;
-  grid-column-end: 6;
+  grid-column-end: -1;
   margin-top: 40px;
 }
 customize .product_details .size_chart row {
@@ -956,12 +977,18 @@ customize .product_details .size_chart row span:first-child {
     justify-content: flex-end;
   }
   customize .component_container div {
-    height: 110px;
-    width: 110px;
-    margin: 10px;
+    height: 50px;
+    width: 50px;
+    margin: 15px;
   }
-  customize div[name=Emoji] {
+  customize div[name=Emoji].rainbow_border {
     z-index: 100;
+    max-width: 94%;
+    margin: 0 auto;
+    border: none;
+  }
+  customize div[name=Emoji].rainbow_border::before {
+    background-image: none;
   }
   customize .canvasWrap {
     width: 100%;
@@ -973,12 +1000,14 @@ customize .product_details .size_chart row span:first-child {
   }
   customize product_options {
     left: auto;
-    right: 33px;
+    right: 0;
     max-width: 750px;
+    top: 30px;
   }
   customize product_options switch {
     justify-content: flex-end;
     margin-bottom: 10px;
+    padding-right: 40px;
   }
   customize hud_controls:not(.rainbow_border) {
     top: 420px;
@@ -991,11 +1020,24 @@ customize .product_details .size_chart row span:first-child {
     border-right: 3px solid #eee;
     width: auto;
     height: 100%;
+    background: white;
+  }
+  customize .component_picker tab_contents {
+    max-width: 260px;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-flow: row wrap;
+    align-content: flex-start;
+    overflow-y: scroll;
   }
   customize .component_picker .components {
     display: flex;
-    flex-direction: row-reverse;
-    height: 100%;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    height: 95%;
     padding: 20px;
   }
   customize .component_picker .components switch {
@@ -1007,9 +1049,10 @@ customize .product_details .size_chart row span:first-child {
     flex-wrap: wrap;
     flex-flow: row wrap;
     align-content: flex-start;
+    height: 100%;
   }
   customize .component_picker .components switch img {
-    width: 80px;
+    width: 40px;
   }
   customize .component_picker .components .component_container.letters {
     width: 600px;
@@ -1017,11 +1060,9 @@ customize .product_details .size_chart row span:first-child {
   }
   customize .component_picker .components .component_container:not(.letters) {
     height: 95%;
-    width: 270px;
+    width: 260px;
     padding: 10px;
     flex-direction: row;
-    overflow-x: hidden;
-    overflow-y: scroll;
   }
   customize .canvas_container {
     border-top: 3px solid #eee;
@@ -1063,12 +1104,14 @@ switch_option img {
   display: inline-block;
   font-size: 42px;
   text-transform: uppercase;
-  font-weight: bold;
-  border-bottom: 3px solid #7f5cff;
+  font-weight: 800;
+  border-bottom: 5px solid #7f5cff;
   margin: 35px 60px 0 0;
 }
+.add_to_cart .productPrice {
+  font-weight: 600;
+}
 .add_to_cart .addCart {
-  font-size: 20px;
   display: inline-block;
 }
 @media (max-width: 737px) {
@@ -1469,10 +1512,10 @@ switch.expanded:before {
 switch.expanded:after {
   content: " ";
   position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  bottom: 2px;
+  left: 5px;
+  right: 5px;
+  top: 5px;
+  bottom: 5px;
   background-color: #fff;
   z-index: -1;
 }
@@ -1525,10 +1568,10 @@ product_options switch.expanded {
 .component_picker switch.expanded:after {
   content: " ";
   position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  bottom: 2px;
+  left: 5px;
+  right: 5px;
+  top: 5px;
+  bottom: 5px;
   background-color: #fff;
   z-index: -1;
 }
@@ -1540,8 +1583,8 @@ product_options switch.expanded {
 }
 @media (min-width: 737px) {
   .component_picker switch switch_option {
-    width: 110px;
-    height: 110px;
+    width: 65px;
+    height: 65px;
     padding: 10px;
   }
 }
@@ -1551,7 +1594,7 @@ product_options switch.expanded {
   left: 0;
   right: 0;
   background: white;
-  z-index: 100;
+  z-index: 998;
 }
 .header:after {
   content: '';
@@ -1562,7 +1605,7 @@ product_options switch.expanded {
   position: relative;
 }
 .header .headerInner {
-  padding-top: 25px;
+  padding-top: 30px;
 }
 .header handle {
   background-image: url(/hamburger.svg);
@@ -1581,7 +1624,7 @@ product_options switch.expanded {
 .header img.logo {
   display: block;
   margin: auto;
-  width: 180px;
+  width: 260px;
 }
 @media (min-width: 737px) {
   .header .img-logo {
@@ -1638,23 +1681,13 @@ product_options switch.expanded {
 }
 .header menu button,
 .header menu .button {
-  font-family: "zurichbold_condensed", sans-serif;
-  font-size: 10px;
-  font-weight: bold;
-  letter-spacing: 2px;
-  padding: 6px 0px;
-  cursor: pointer;
-  border: none;
-  border-bottom: solid 1px #000;
-  font-size: 12px;
+  font-family: 'zurich_condensedregular', sans-serif;
+  font-weight: normal;
+  font-size: 14px;
   height: auto;
   width: auto;
-  border-bottom: none;
+  border: none;
   margin: 12px auto;
-}
-.header menu button:hover,
-.header menu .button:hover {
-  text-decoration: none;
 }
 .header menu button:hover,
 .header menu .button:hover {
@@ -1694,12 +1727,18 @@ product_options switch.expanded {
   }
   .header handle {
     left: auto;
-    right: 70px;
-    top: 20px;
-    background-image: url(/pizza.svg);
+    right: 100px;
+    top: 65px;
+    background-image: url(/smily_tongue.svg);
+    z-index: 999;
   }
   .header handle.expanded {
-    background-image: url(/pizza.svg);
+    background-image: url(/smily_tongue.svg);
+  }
+  .header .cartmenu {
+    top: 61px;
+    right: 55px;
+    z-index: 999;
   }
   .header menu {
     max-height: initial;

@@ -42,7 +42,6 @@ a.button {
 button, .button {
   text-align: center;
   white-space: nowrap;
-
   height: 56px;
   border: 5px solid @color_secondary;
   display: block;
@@ -54,6 +53,9 @@ button, .button {
   margin: 6px auto;
   width: 100%;
   max-width: 180px;
+  font-family: 'arvobold';
+  font-weight: normal;
+  letter-spacing: 2px;
   cursor: pointer;
   text-transform: uppercase;
     box-sizing: border-box;
@@ -150,10 +152,10 @@ actions {
   &:after {
     content: " ";
     position: absolute;
-    left: 2px;
-    right: 2px;
-    top: 2px;
-    bottom: 2px;
+    left: 5px;
+    right: 5px;
+    top: 5px;
+    bottom: 5px;
     background-color: @color_primary;
     z-index: -1;
   }
@@ -164,9 +166,10 @@ errors {
   background-color: @color_error;
   border-radius: 5px;
   padding: 5px;
-  margin: 3px auto;
-  border-radius: 5px;
+  margin: 15px auto;
+  border-radius: 20px;
   display: block;
+  width: 50%;
 }
 input.error {
   box-shadow: 0 0 10px @color_error;
@@ -379,7 +382,7 @@ button:focus, input[type="button"]:focus {
 
 @media (min-width: @desktop_min_width) {
   .layout {
-    padding-top: 108px;
+    padding-top: 112px;
   }
 }
 

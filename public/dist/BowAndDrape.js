@@ -68324,8 +68324,13 @@ var ProductList = function (_React$Component) {
             'div',
             { className: 'productName bottomSwitch' },
             product.props.name,
-            ' $',
-            product.props.price
+            ' ',
+            React.createElement(
+              'span',
+              { className: 'productPrice' },
+              '$',
+              product.props.price
+            )
           ),
           React.createElement(
             BADButton,

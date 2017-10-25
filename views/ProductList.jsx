@@ -178,7 +178,7 @@ class ProductList extends React.Component {
         </div>
         {this.props.edit ?
           null : <div className="add_to_cart">
-            <div className="productName bottomSwitch">{product.props.name} ${product.props.price}</div>
+            <div className="productName bottomSwitch">{product.props.name} <span className="productPrice">${product.props.price}</span></div>
             <BADButton className="primary addCart" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</BADButton>
             </div>
         }

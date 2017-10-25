@@ -11,7 +11,7 @@
   left: 0;
   right: 0;
   background: white;
-  z-index: 100;
+  z-index: 998;
 
   &:after {
     content: '';
@@ -23,7 +23,7 @@
   }
 
   .headerInner {
-    padding-top: 25px;
+    padding-top: 30px;
   }
 
   handle {
@@ -45,12 +45,12 @@
   img.logo {
     display: block;
     margin: auto;
-    width: 180px;
+    width: 150px;
   }
 
   @media (min-width: @desktop_min_width) {
     .img-logo {
-      width: 200px;
+      width: 260px;
     }
   }
   .cartmenu {
@@ -97,18 +97,18 @@
     }
 
     menu_items {
-      position: relative;
+        position: relative;
         display: inline-block;
     }
     a:hover {
       text-decoration: none;
     }
     button, .button {
-      .cta;
-      font-size: 12px;
+      .zurichroman;
+      font-size: 14px;
       height: auto;
       width: auto;
-      border-bottom: none;
+      border: none;
       margin: 12px auto;
       &:hover {
         color: @color_support_1;
@@ -148,15 +148,21 @@
   }
   handle {
     left: auto;
-    right: 70px;
-    top: 20px;
-    background-image: url(/pizza.svg);
+    right: 100px;
+    top: 65px;
+    background-image: url(/smily_tongue.svg);
+    z-index: 999;
   }
 
   handle.expanded {
-      background-image: url(/pizza.svg);
+      background-image: url(/smily_tongue.svg);
   }
 
+.cartmenu {
+  top: 61px;
+  right: 55px;
+  z-index: 999;
+}
   menu {
     max-height: initial;
     display: flex;
