@@ -66869,7 +66869,7 @@ var PageEditGallery = function (_React$Component) {
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "width", event.target.value);
-                  }, value: item.width || "", placeholder: "125px" })
+                  }, value: item.width || "", placeholder: "90px" })
               ),
               React.createElement(
                 "div",
