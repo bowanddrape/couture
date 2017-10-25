@@ -51,7 +51,7 @@ class PageEditGallery extends React.Component {
             <fields>
               <div><label>image</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "image", event.target.value)}} value={item.image||""}/></div>
               <div><label>href</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "href", event.target.value)}} value={item.href||""}/></div>
-              <div><label>width</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "width", event.target.value)}} value={item.width||""} placeholder="125px"/></div>
+              <div><label>width</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "width", event.target.value)}} value={item.width||""} placeholder="90px"/></div>
               <div><label>caption</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "caption", event.target.value)}} value={item.caption||""} /></div>
             </fields>
             <span style={{cursor:"pointer"}} className="remove" onClick={this.handleRemoveCard.bind(this, index)} title="delete">✘</span>

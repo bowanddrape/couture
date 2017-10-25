@@ -1529,6 +1529,7 @@ product_options switch.expanded {
   background-color: #fff;
   width: 100%;
   text-align: center;
+  padding: 10px 0;
 }
 .gallery .caption .price {
   font-family: Arvo;

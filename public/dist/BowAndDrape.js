@@ -65072,15 +65072,15 @@ var Gallery = function (_React$Component) {
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
-              width: item.width || "125px",
-              border: "solid " + border + " #fff"
+              width: item.width || "90px",
+              margin: "" + border
             } },
           React.createElement("img", { src: item.image, style: {
-              width: item.width || "125px"
+              width: item.width || "90px"
             } }),
           item.caption ? React.createElement(
             "div",
-            { className: "caption", style: { border: "solid " + border + " #fff", borderTop: "none" } },
+            { className: "caption" },
             item.caption.split(" ").filter(function (tok) {
               return tok[0] != '$';
             }).join(" "),
