@@ -218,8 +218,8 @@ class ProductList extends React.Component {
     // facebook ViewContent event
     try {
       fbq('track', 'ViewContent', {
+        value: parseFloat(product.props.price),
         currency: "USD",
-        value: product.props.price,
         content_ids: product.sku,
       });
     } catch(err) {}
@@ -317,7 +317,8 @@ class ProductList extends React.Component {
     // facebook track event
     try {
       fbq('track', 'AddToCart', {
-        currency: product.props.price,
+        value: parseFloat(product.props.price),
+        currency: "USD",
         content_ids: product.sku,
       });
     } catch(err) {console.log(err)}
