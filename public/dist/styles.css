@@ -82,8 +82,9 @@ body {
   image-rendering: crisp-edges;
   margin: 0;
 }
-.layout {
-  padding: 80px 0 0 0;
+.layout_main {
+  overflow-x: hidden;
+  padding: 80px 20px 10px 20px;
 }
 a {
   text-decoration: none;
@@ -439,7 +440,7 @@ input[type="button"]:focus {
   }
 }
 @media (min-width: 737px) {
-  .layout {
+  .layout_main {
     padding-top: 112px;
   }
 }
@@ -456,7 +457,7 @@ input[type="button"]:focus {
   .footer {
     display: none;
   }
-  .layout {
+  .layout_main {
     padding-top: 0px;
   }
 }
@@ -501,22 +502,22 @@ shipment shipping_details div label {
   top: 0px;
   font-weight: normal;
 }
-shipment .assembly {
+shipment:last-child {
+  border-bottom: none;
+}
+.assembly {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   max-height: 400px;
   margin: 10px 0;
 }
-shipment .assembly .quant {
+.assembly .quant {
   font-weight: bold;
 }
-shipment .assembly .label {
+.assembly .label {
   font-size: 12px;
   margin-left: 5px;
-}
-shipment:last-child {
-  border-bottom: none;
 }
 comments {
   margin-top: -20px;
@@ -578,8 +579,22 @@ comments message {
   display: inline-block;
   margin-left: 20px;
 }
+.items .product_wrapper .item.fulfillment .garment_id {
+  font-size: 25px;
+  font-weight: bold;
+}
 .items .product_wrapper .item.fulfillment .price {
   display: none;
+}
+.items .product_wrapper .item.fulfillment .taglist {
+  display: flex;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag {
+  color: #fff;
+  background-color: #000;
+  padding: 2px;
+  border-radius: 3px;
+  margin: 0 2px;
 }
 .items .summary_items {
   display: inline-block;
@@ -1721,10 +1736,10 @@ product_options switch.expanded {
 .header menu.expanded {
   max-height: 500px;
 }
-.header menu user {
+user {
   display: block;
 }
-.header menu user img {
+user img {
   border-radius: 5px;
   margin-right: 20px;
   border: solid 2px #fff;
@@ -1734,7 +1749,7 @@ product_options switch.expanded {
   display: block;
   margin: 0 auto 50px;
 }
-.header menu user name {
+user name {
   margin-top: 25px;
 }
 @media (min-width: 737px) {

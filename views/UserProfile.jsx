@@ -32,7 +32,7 @@ class UserProfile extends React.Component {
       React.createElement("user", {},
         <img src={this.props.user.props.image?this.props.user.props.image:"/nope"} onError={(event)=>{event.target.setAttribute('src', '/smily_tongue.svg')}}/>,
         <name>{this.props.user.props.name}</name>,
-        "! Welcome Home!",
+        ", Welcome Back!",
         <user><a onClick={this.logout.bind(this)}><button>Logout</button></a></user>,
       )
     );

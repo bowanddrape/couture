@@ -147,7 +147,7 @@ module.exports = {
     VSSAdmin: require('./VSSAdmin.jsx'),
     Shipment: require('./Shipment.jsx'),
     FulfillmentStation: require('./FulfillmentStation.jsx'),
-
+    MandateUserLogin: require('./MandateUserLogin.jsx'),
   },
   dispatcher,
   api,

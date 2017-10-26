@@ -63109,7 +63109,7 @@ var Cart = function (_React$Component) {
 module.exports = Cart;
 
 }).call(this,require('_process'))
-},{"../models/PayStripe.js":undefined,"./BADButton.jsx":283,"./Errors.jsx":293,"./InputAddress.jsx":298,"./ItemUtils.js":300,"./Items.jsx":301,"./PayStripeClient.js":313,"./ThanksPurchaseComplete.jsx":327,"./UserLogin.jsx":329,"_process":195,"deep-equal":81,"react":219}],285:[function(require,module,exports){
+},{"../models/PayStripe.js":undefined,"./BADButton.jsx":283,"./Errors.jsx":293,"./InputAddress.jsx":298,"./ItemUtils.js":300,"./Items.jsx":301,"./PayStripeClient.js":314,"./ThanksPurchaseComplete.jsx":328,"./UserLogin.jsx":330,"_process":195,"deep-equal":81,"react":219}],285:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -63431,7 +63431,7 @@ var Comments = function (_React$Component) {
 
 module.exports = Comments;
 
-},{"./Timestamp.jsx":328,"react":219}],288:[function(require,module,exports){
+},{"./Timestamp.jsx":329,"react":219}],288:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -64609,7 +64609,7 @@ var FacebookLogin = function (_React$Component) {
 
 module.exports = FacebookLogin;
 
-},{"./UserProfile.jsx":331,"https":152,"react":219}],295:[function(require,module,exports){
+},{"./UserProfile.jsx":332,"https":152,"react":219}],295:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -64660,6 +64660,28 @@ var FulfillShipments = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
+      var fulfillment_stations = null;
+      if (typeof window != "undefined" && this.props.station_types) {
+        var station_links = [];
+        this.props.station_types.forEach(function (station_type) {
+          station_links.push(React.createElement(
+            'a',
+            { key: station_links.length, className: 'cta', style: { marginLeft: "10px" }, href: window.location.pathname + '/' + station_type },
+            station_type
+          ));
+        });
+        fulfillment_stations = React.createElement(
+          'div',
+          null,
+          'Fullfillment Stations: ',
+          React.createElement(
+            'span',
+            null,
+            station_links
+          )
+        );
+      }
+
       return React.createElement(
         'div',
         null,
@@ -64670,6 +64692,7 @@ var FulfillShipments = function (_React$Component) {
           this.props.store.props.name,
           '"'
         ),
+        fulfillment_stations,
         React.createElement(
           Tabs,
           null,
@@ -64830,7 +64853,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./Scrollable.jsx":320,"./Shipment.jsx":321,"./Tabs.jsx":325,"react":219}],296:[function(require,module,exports){
+},{"./Scrollable.jsx":321,"./Shipment.jsx":322,"./Tabs.jsx":326,"react":219}],296:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -64846,8 +64869,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+
 var Item = require('./Item.jsx');
-//const Items = require('./Items.jsx');
+var UserProfile = require('./UserProfile.jsx');
+var Errors = require('./Errors.jsx');
 
 /*
 garment index garment id
@@ -64886,14 +64911,13 @@ var FulfillmentStation = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (FulfillmentStation.__proto__ || Object.getPrototypeOf(FulfillmentStation)).call(this, props));
 
     _this.state = {
+      search: "office-",
       station: _this.props.station,
-      shipment: null,
-      shipExists: false
+      started: null,
+      shipment: null
     };
     _this.handleInputChange = _this.handleInputChange.bind(_this);
     _this.handleSearch = _this.handleSearch.bind(_this);
-    _this.renderSearch = _this.renderSearch.bind(_this);
-    _this.renderResults = _this.renderResults.bind(_this);
     return _this;
   }
 
@@ -64910,84 +64934,135 @@ var FulfillmentStation = function (_React$Component) {
     value: function handleSearch() {
       var _this2 = this;
 
-      console.log("searching...");
+      Errors.clear();
       var product_tokens = this.state.search.split('-');
-      if (product_tokens.length != 3) return "Invalid search parameters";
+      if (product_tokens.length != 3) return Errors.emitError("lookup", "Invalid search parameters");
       // TODO use product_toks[0] to determine facility_id, hardcoded for now
-      //let from_id = '78f87a89-1bcb-4048-b6e5-68cf4ffcc53a';
-      var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1';
-      //set id to whatever facility it came from
+      var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "office"
 
       var fulfillment_id = product_tokens[1];
       var content_index = product_tokens[2];
       BowAndDrape.api("GET", "/shipment", { from_id: from_id, fulfillment_id: fulfillment_id }, function (err, results) {
         if (err) {
-          console.log("ERROR");
-          console.log(err);
-          return err;
+          return Errors.emitError("lookup", err.toString());
         }
-        console.log("Results:");
-        console.log(results);
 
         if (results.length == 0) {
-          console.log("Nothing Returned");
-          return;
+          return Errors.emitError("lookup", "No garment found, check garment id");
         }
 
+        // TODO handle invalid content index
+
         _this2.setState({
-          shipExists: true,
           shipment: results[0],
           started: new Date().getTime() / 1000,
-          content_index: content_index });
+          content_index: content_index
+        });
+      });
+    }
+  }, {
+    key: 'handleDone',
+    value: function handleDone(add_tags, remove_tags) {
+      var _this3 = this;
+
+      // TODO also log metrics
+      BowAndDrape.api("POST", "/shipment/tagcontent", {
+        id: this.state.shipment.id,
+        content_index: this.state.content_index - 1,
+        add_tags: ["example_next_step"],
+        remove_tags: ["example_previous_step"]
+      }, function (err, results) {
+        if (err) return Errors.emitError(err);
+        _this3.setState({ shipment: null });
       });
     }
   }, {
     key: 'renderSearch',
     value: function renderSearch() {
+      var _this4 = this;
+
       return React.createElement(
         'div',
         null,
         React.createElement(
           'label',
           null,
-          'Order #:'
+          'Garment ID#:'
         ),
         React.createElement('input', {
           type: 'text',
           value: this.state.search,
           onChange: this.handleInputChange,
+          onKeyUp: function onKeyUp(event) {
+            if (event.which == 13) {
+              _this4.handleSearch();
+            }
+          },
           name: 'search'
         }),
         React.createElement(
           'button',
           { onClick: this.handleSearch },
-          'Search'
+          'Lookup'
         )
       );
     }
   }, {
     key: 'renderResults',
     value: function renderResults() {
+      var _this5 = this;
+
       return React.createElement(
         'div',
         null,
-        React.createElement(Item, _extends({ fulfillment: true }, this.state.shipment.contents[this.state.content_index - 1]))
+        React.createElement(
+          'div',
+          { className: 'items' },
+          React.createElement(
+            'div',
+            { className: 'product_wrapper' },
+            React.createElement(Item, _extends({ fulfillment: true, garment_id: 'office-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
+          )
+        ),
+        React.createElement(
+          'button',
+          { onClick: function onClick() {
+              _this5.setState({ shipment: null });
+            } },
+          'Cancel'
+        ),
+        React.createElement(
+          'button',
+          { onClick: this.handleDone.bind(this) },
+          'Done'
+        )
       );
     }
   }, {
     key: 'render',
     value: function render() {
-      var toRender = false;
-      if (this.state.shipExists == true) {
-        toRender = this.renderResults();
+      var to_render = null;
+      if (this.state.shipment) {
+        to_render = this.renderResults();
       } else {
-        toRender = this.renderSearch();
+        to_render = this.renderSearch();
       }
 
       return React.createElement(
         'div',
-        { className: 'fulfillmentStation' },
-        toRender
+        null,
+        React.createElement(UserProfile, { user: this.props.user }),
+        React.createElement(
+          'h1',
+          null,
+          this.props.station
+        ),
+        React.createElement(Errors, null),
+        React.createElement(
+          'div',
+          { className: 'fulfillmentStation' },
+          to_render
+        )
       );
     }
   }]);
@@ -64997,7 +65072,7 @@ var FulfillmentStation = function (_React$Component) {
 
 module.exports = FulfillmentStation;
 
-},{"./Item.jsx":299,"react":219}],297:[function(require,module,exports){
+},{"./Errors.jsx":293,"./Item.jsx":299,"./UserProfile.jsx":332,"react":219}],297:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -65377,6 +65452,23 @@ var Item = function (_React$Component) {
         );
       }
 
+      var tag_list = null;
+      if (this.props.fulfillment && this.props.tags) {
+        var tags = [];
+        this.props.tags.forEach(function (tag) {
+          tags.push(React.createElement(
+            'div',
+            { key: tags.length, className: 'tag' },
+            tag
+          ));
+        });
+        tag_list = React.createElement(
+          'div',
+          { className: 'taglist' },
+          tags
+        );
+      }
+
       return React.createElement(
         'div',
         { className: className },
@@ -65393,9 +65485,16 @@ var Item = function (_React$Component) {
               event.target.style.display = 'none';
             } }) : null
         ),
+        tag_list,
         React.createElement(
           'div',
           { className: 'deets' },
+          this.props.fulfillment ? React.createElement(
+            'div',
+            { className: 'garment_id' },
+            'GarmentID#: ',
+            this.props.garment_id
+          ) : null,
           React.createElement(
             'a',
             { href: this.props.props.url },
@@ -65448,7 +65547,7 @@ Item.style = style;
 Item.style_summary = Object.assign({}, style, style_summary);
 module.exports = Item;
 
-},{"./ItemUtils.js":300,"./Price.jsx":315,"react":219}],300:[function(require,module,exports){
+},{"./ItemUtils.js":300,"./Price.jsx":316,"react":219}],300:[function(require,module,exports){
 "use strict";
 
 var recurseAssembly = function recurseAssembly(component, foreach) {
@@ -65764,7 +65863,7 @@ var Items = function (_React$Component) {
         }
         // if has a base sku or is a legacy imported item
         if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
-          line_items.push(React.createElement(Item, _extends({ style: style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment })));
+          line_items.push(React.createElement(Item, _extends({ style: style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment, garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null })));
         } else {
           summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove })));
         }
@@ -65872,7 +65971,7 @@ var Items = function (_React$Component) {
 
 module.exports = Items;
 
-},{"./Errors.jsx":293,"./Item.jsx":299,"./ItemUtils.js":300,"./Price.jsx":315,"./Timestamp.jsx":328,"react":219}],302:[function(require,module,exports){
+},{"./Errors.jsx":293,"./Item.jsx":299,"./ItemUtils.js":300,"./Price.jsx":316,"./Timestamp.jsx":329,"react":219}],302:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66088,7 +66187,7 @@ var LayoutFooter = function (_React$Component) {
 
 module.exports = LayoutFooter;
 
-},{"./Signup.jsx":322,"react":219}],305:[function(require,module,exports){
+},{"./Signup.jsx":323,"react":219}],305:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66249,7 +66348,7 @@ var LayoutHeader = function (_React$Component) {
 
 module.exports = LayoutHeader;
 
-},{"./CartMenu.jsx":285,"./UserProfile.jsx":331,"react":219}],306:[function(require,module,exports){
+},{"./CartMenu.jsx":285,"./UserProfile.jsx":332,"react":219}],306:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66337,7 +66436,7 @@ var LayoutMain = function (_React$Component) {
       if (typeof document != "undefined") zoom = document.body.clientWidth / window.innerWidth;
       return React.createElement(
         'div',
-        null,
+        { className: 'layout_main' },
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         React.createElement(LayoutBorderWrap, null),
         React.createElement(LayoutHeader, { user: this.state.user }),
@@ -66355,6 +66454,49 @@ var LayoutMain = function (_React$Component) {
 module.exports = LayoutMain;
 
 },{"./LayoutBorderWrap.jsx":303,"./LayoutFooter.jsx":304,"./LayoutHeader.jsx":305,"react":219}],307:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+
+var UserLogin = require('./UserLogin.jsx');
+
+var MandateUserLogin = function (_React$Component) {
+  _inherits(MandateUserLogin, _React$Component);
+
+  function MandateUserLogin() {
+    _classCallCheck(this, MandateUserLogin);
+
+    return _possibleConstructorReturn(this, (MandateUserLogin.__proto__ || Object.getPrototypeOf(MandateUserLogin)).apply(this, arguments));
+  }
+
+  _createClass(MandateUserLogin, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      BowAndDrape.dispatcher.on("user", function (user) {
+        if (user.email) location.reload();
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement(UserLogin, null);
+    }
+  }]);
+
+  return MandateUserLogin;
+}(React.Component);
+
+module.exports = MandateUserLogin;
+
+},{"./UserLogin.jsx":330,"react":219}],308:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -66586,7 +66728,7 @@ var PageEdit = function (_React$Component) {
 
 module.exports = PageEdit;
 
-},{"./PageEditCarousel.jsx":308,"./PageEditGallery.jsx":309,"./PageEditSignup.jsx":310,"./PageEditTextContent.jsx":311,"react":219}],308:[function(require,module,exports){
+},{"./PageEditCarousel.jsx":309,"./PageEditGallery.jsx":310,"./PageEditSignup.jsx":311,"./PageEditTextContent.jsx":312,"react":219}],309:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66727,7 +66869,7 @@ var PageEditCarousel = function (_React$Component) {
 
 module.exports = PageEditCarousel;
 
-},{"react":219}],309:[function(require,module,exports){
+},{"react":219}],310:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -66895,7 +67037,7 @@ var PageEditGallery = function (_React$Component) {
 
 module.exports = PageEditGallery;
 
-},{"react":219}],310:[function(require,module,exports){
+},{"react":219}],311:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -67087,7 +67229,7 @@ var PageEditSignup = function (_React$Component) {
 
 module.exports = PageEditSignup;
 
-},{"react":219}],311:[function(require,module,exports){
+},{"react":219}],312:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -67146,7 +67288,7 @@ var PageEditTextContent = function (_React$Component) {
 
 module.exports = PageEditTextContent;
 
-},{"react":219}],312:[function(require,module,exports){
+},{"react":219}],313:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -67241,7 +67383,7 @@ var PageList = function (_React$Component2) {
 
 module.exports = PageList;
 
-},{"./Errors.jsx":293,"./PageEdit.jsx":307,"./Scrollable.jsx":320,"react":219}],313:[function(require,module,exports){
+},{"./Errors.jsx":293,"./PageEdit.jsx":308,"./Scrollable.jsx":321,"react":219}],314:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -67275,7 +67417,7 @@ var PayStripeClient = function () {
 
 module.exports = PayStripeClient;
 
-},{}],314:[function(require,module,exports){
+},{}],315:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -67324,7 +67466,7 @@ var Placeholder = function (_React$Component) {
 
 module.exports = Placeholder;
 
-},{"./Stroke.jsx":323,"react":219}],315:[function(require,module,exports){
+},{"./Stroke.jsx":324,"react":219}],316:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -67377,7 +67519,7 @@ var Price = function (_React$Component) {
 
 module.exports = Price;
 
-},{"react":219}],316:[function(require,module,exports){
+},{"react":219}],317:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -67894,7 +68036,7 @@ var ProductCanvas = function (_React$Component) {
 
 module.exports = ProductCanvas;
 
-},{"./ProductComponentPicker.jsx":317,"react":219,"sylvester-es6":269}],317:[function(require,module,exports){
+},{"./ProductComponentPicker.jsx":318,"react":219,"sylvester-es6":269}],318:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -68148,7 +68290,7 @@ var ProductComponentPicker = function (_React$Component) {
 
 module.exports = ProductComponentPicker;
 
-},{"./Tabs.jsx":325,"react":219}],318:[function(require,module,exports){
+},{"./Tabs.jsx":326,"react":219}],319:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -68724,7 +68866,7 @@ var ProductList = function (_React$Component) {
 
 module.exports = ProductList;
 
-},{"../models/Inventory.js":undefined,"./BADButton.jsx":283,"./ClickForMore.jsx":286,"./ComponentEdit.jsx":289,"./ComponentSerializer.js":290,"./ItemUtils.js":300,"./ProductCanvas.jsx":316,"./ProductListEdit.jsx":319,"./Switch.jsx":324,"async":16,"querystring":210,"react":219}],319:[function(require,module,exports){
+},{"../models/Inventory.js":undefined,"./BADButton.jsx":283,"./ClickForMore.jsx":286,"./ComponentEdit.jsx":289,"./ComponentSerializer.js":290,"./ItemUtils.js":300,"./ProductCanvas.jsx":317,"./ProductListEdit.jsx":320,"./Switch.jsx":325,"async":16,"querystring":210,"react":219}],320:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -68854,7 +68996,7 @@ var ProductListEdit = function (_React$Component) {
 
 module.exports = ProductListEdit;
 
-},{"async":16,"react":219,"react-autocomplete":213}],320:[function(require,module,exports){
+},{"async":16,"react":219,"react-autocomplete":213}],321:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -68962,7 +69104,7 @@ var Scrollable = function (_React$Component) {
 
 module.exports = Scrollable;
 
-},{"react":219}],321:[function(require,module,exports){
+},{"react":219}],322:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69419,18 +69561,6 @@ var Shipment = function (_React$Component) {
       return React.createElement(
         'shipment',
         null,
-        React.createElement(
-          'div',
-          null,
-          React.createElement(
-            'label',
-            null,
-            'Fulfillment_id: '
-          ),
-          ' ',
-          this.props.fulfillment_id,
-          ' '
-        ),
         fulfillment_tools,
         React.createElement(
           'h1',
@@ -69447,7 +69577,7 @@ var Shipment = function (_React$Component) {
           'contents',
           null,
           line_items,
-          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment, packing_slip: this.props.packing_slip })
+          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment, fulfillment_id: this.props.fulfillment_id ? "office-" + this.props.fulfillment_id : null, packing_slip: this.props.packing_slip })
         ),
         payment_info
       );
@@ -69459,7 +69589,7 @@ var Shipment = function (_React$Component) {
 
 module.exports = Shipment;
 
-},{"./Address.jsx":282,"./Comments.jsx":287,"./Item.jsx":299,"./Items.jsx":301,"./Price.jsx":315,"./Timestamp.jsx":328,"jwt-decode":161,"react":219}],322:[function(require,module,exports){
+},{"./Address.jsx":282,"./Comments.jsx":287,"./Item.jsx":299,"./Items.jsx":301,"./Price.jsx":316,"./Timestamp.jsx":329,"jwt-decode":161,"react":219}],323:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69631,7 +69761,7 @@ var Signup = function (_React$Component) {
 
 module.exports = Signup;
 
-},{"./Switch.jsx":324,"react":219}],323:[function(require,module,exports){
+},{"./Switch.jsx":325,"react":219}],324:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69749,7 +69879,7 @@ var Stroke = function (_React$Component) {
 
 module.exports = Stroke;
 
-},{"react":219}],324:[function(require,module,exports){
+},{"react":219}],325:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -69841,7 +69971,7 @@ var Switch = function (_React$Component) {
 
 module.exports = Switch;
 
-},{"./Stroke.jsx":323,"react":219}],325:[function(require,module,exports){
+},{"./Stroke.jsx":324,"react":219}],326:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69953,7 +70083,7 @@ var initDefaultFallback = function initDefaultFallback() {
 
 module.exports = Tabs;
 
-},{"./Switch.jsx":324,"fs":51,"react":219}],326:[function(require,module,exports){
+},{"./Switch.jsx":325,"fs":51,"react":219}],327:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -69993,7 +70123,7 @@ var TextContent = function (_React$Component) {
 
 module.exports = TextContent;
 
-},{"react":219}],327:[function(require,module,exports){
+},{"react":219}],328:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70095,7 +70225,7 @@ var ThanksPurchaseComplete = function (_React$Component) {
 
 module.exports = ThanksPurchaseComplete;
 
-},{"./Items.jsx":301,"./Signup.jsx":322,"react":219}],328:[function(require,module,exports){
+},{"./Items.jsx":301,"./Signup.jsx":323,"react":219}],329:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70140,7 +70270,7 @@ var Timestamp = function (_React$Component) {
 
 module.exports = Timestamp;
 
-},{"react":219}],329:[function(require,module,exports){
+},{"react":219}],330:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70293,7 +70423,7 @@ var UserLogin = function (_React$Component) {
 
 module.exports = UserLogin;
 
-},{"./Errors.jsx":293,"./FacebookLogin.jsx":294,"bcryptjs":18,"jwt-decode":161,"react":219}],330:[function(require,module,exports){
+},{"./Errors.jsx":293,"./FacebookLogin.jsx":294,"bcryptjs":18,"jwt-decode":161,"react":219}],331:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70396,7 +70526,7 @@ var UserPasswordReset = function (_React$Component) {
 
 module.exports = UserPasswordReset;
 
-},{"./UserLogin.jsx":329,"jwt-decode":161,"react":219}],331:[function(require,module,exports){
+},{"./UserLogin.jsx":330,"jwt-decode":161,"react":219}],332:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70447,7 +70577,7 @@ var UserProfile = function (_React$Component) {
         'name',
         null,
         this.props.user.props.name
-      ), "! Welcome Home!", React.createElement(
+      ), ", Welcome Back!", React.createElement(
         'user',
         null,
         React.createElement(
@@ -70468,7 +70598,7 @@ var UserProfile = function (_React$Component) {
 
 module.exports = UserProfile;
 
-},{"./UserLogin.jsx":329,"react":219}],332:[function(require,module,exports){
+},{"./UserLogin.jsx":330,"react":219}],333:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70827,12 +70957,12 @@ module.exports = {
     TextContent: require('./TextContent.jsx'),
     VSSAdmin: require('./VSSAdmin.jsx'),
     Shipment: require('./Shipment.jsx'),
-    FulfillmentStation: require('./FulfillmentStation.jsx')
-
+    FulfillmentStation: require('./FulfillmentStation.jsx'),
+    MandateUserLogin: require('./MandateUserLogin.jsx')
   },
   dispatcher: dispatcher,
   api: api,
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./Gallery.jsx":297,"./Items.jsx":301,"./LayoutBasic.jsx":302,"./LayoutMain.jsx":306,"./PageEdit.jsx":307,"./PageList.jsx":312,"./Placeholder.jsx":314,"./ProductList.jsx":318,"./Shipment.jsx":321,"./Signup.jsx":322,"./TextContent.jsx":326,"./UserPasswordReset.jsx":330,"./VSSAdmin.jsx":332,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);
+},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./Gallery.jsx":297,"./Items.jsx":301,"./LayoutBasic.jsx":302,"./LayoutMain.jsx":306,"./MandateUserLogin.jsx":307,"./PageEdit.jsx":308,"./PageList.jsx":313,"./Placeholder.jsx":315,"./ProductList.jsx":319,"./Shipment.jsx":322,"./Signup.jsx":323,"./TextContent.jsx":327,"./UserPasswordReset.jsx":331,"./VSSAdmin.jsx":333,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);

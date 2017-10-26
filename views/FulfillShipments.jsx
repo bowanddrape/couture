@@ -29,9 +29,25 @@ class FulfillShipments extends React.Component {
   }
 
   render() {
+    let fulfillment_stations = null;
+    if (typeof(window)!="undefined" && this.props.station_types) {
+      let station_links = [];
+      this.props.station_types.forEach((station_type) => {
+        station_links.push(
+          <a key={station_links.length} className="cta" style={{marginLeft:"10px"}} href={window.location.pathname+'/'+station_type}>{station_type}</a>
+        );
+      });
+      fulfillment_stations = (
+        <div>
+          Fullfillment Stations: <span>{station_links}</span>
+        </div>
+      )
+    }
+
     return (
       <div>
         <h1>Store "{this.props.store.props.name}"</h1>
+        {fulfillment_stations}
         <Tabs>
           <shipments>
             <h2>New</h2>

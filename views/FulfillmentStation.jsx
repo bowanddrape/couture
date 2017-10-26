@@ -1,7 +1,9 @@
 
 const React = require('react');
+
 const Item = require('./Item.jsx');
-//const Items = require('./Items.jsx');
+const UserProfile = require('./UserProfile.jsx');
+const Errors = require('./Errors.jsx');
 
 /*
 garment index garment id
@@ -34,14 +36,13 @@ class FulfillmentStation extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      search: "office-",
       station: this.props.station,
+      started: null,
       shipment: null,
-      shipExists: false,
     }
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
-    this.renderSearch = this.renderSearch.bind(this);
-    this.renderResults = this.renderResults.bind(this);
   }
 
   handleInputChange(event) {
@@ -53,74 +54,93 @@ class FulfillmentStation extends React.Component {
     });
   }
 
-  handleSearch(){
-    console.log("searching...");
+  handleSearch() {
+    Errors.clear();
     let product_tokens = this.state.search.split('-');
     if (product_tokens.length != 3)
-      return "Invalid search parameters"
+      return Errors.emitError("lookup", "Invalid search parameters");
     // TODO use product_toks[0] to determine facility_id, hardcoded for now
-    //let from_id = '78f87a89-1bcb-4048-b6e5-68cf4ffcc53a';
-    let from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1';
-    //set id to whatever facility it came from
+    let from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "office"
 
     let fulfillment_id = product_tokens[1];
     let content_index = product_tokens[2];
     BowAndDrape.api("GET", "/shipment", {from_id, fulfillment_id}, (err, results) => {
       if (err){
-        console.log("ERROR");
-        console.log(err);
-        return(err);
+        return Errors.emitError("lookup", err.toString());
       }
-      console.log("Results:");
-      console.log(results);
 
       if (results.length == 0){
-        console.log("Nothing Returned");
-        return;
+        return Errors.emitError("lookup", "No garment found, check garment id");
       }
 
+      // TODO handle invalid content index
+
       this.setState({
-        shipExists:true,
-        shipment:results[0],
-        started:new Date().getTime()/1000,
-        content_index: content_index});
+        shipment: results[0],
+        started: new Date().getTime()/1000,
+        content_index: content_index,
+      });
     });
   }
 
-  renderSearch(){
+  handleDone(add_tags, remove_tags) {
+    // TODO also log metrics
+    BowAndDrape.api("POST", "/shipment/tagcontent", {
+      id: this.state.shipment.id,
+      content_index: this.state.content_index-1,
+      add_tags: ["example_next_step"],
+      remove_tags: ["example_previous_step"],
+    }, (err, results) =>  {
+      if (err) return Errors.emitError(err);
+      this.setState({shipment:null});
+    });
+  }
+
+  renderSearch() {
     return (
       <div>
-        <label>Order #:</label>
+        <label>Garment ID#:</label>
         <input
           type="text"
           value={this.state.search}
           onChange={this.handleInputChange}
+          onKeyUp={(event)=>{if(event.which==13){this.handleSearch()}}}
           name="search"
         />
-        <button onClick={this.handleSearch}>Search</button>
+        <button onClick={this.handleSearch}>Lookup</button>
       </div>
     );
   }
 
-  renderResults(){
+  renderResults() {
+
     return (
       <div>
-        <Item fulfillment={true} {...this.state.shipment.contents[this.state.content_index-1]}/>
+        <div className="items"><div className="product_wrapper">
+          <Item fulfillment={true} garment_id={`office-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
+        </div></div>
+        <button onClick={()=>{this.setState({shipment:null})}}>Cancel</button>
+        <button onClick={this.handleDone.bind(this)}>Done</button>
       </div>
     );
   }
 
-  render(){
-    let toRender = false;
-    if (this.state.shipExists == true) {
-      toRender = this.renderResults();
+  render() {
+    let to_render = null;
+    if (this.state.shipment) {
+      to_render = this.renderResults();
     } else {
-      toRender = this.renderSearch();
+      to_render = this.renderSearch();
     }
 
-    return(
-      <div className="fulfillmentStation">
-        {toRender}
+    return (
+      <div>
+        <UserProfile user={this.props.user}/>
+        <h1>{this.props.station}</h1>
+        <Errors />
+        <div className="fulfillmentStation">
+          {to_render}
+        </div>
       </div>
     );
   }
