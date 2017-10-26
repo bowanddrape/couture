@@ -7,6 +7,8 @@ const Scrollable = require('./Scrollable.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
+const tagged_tabs = ["picking", "pressing", "qa-ing", "packing"];
+
 class FulfillShipments extends React.Component {
   constructor(props) {
     super(props);
@@ -14,6 +16,9 @@ class FulfillShipments extends React.Component {
     this.state = {
       search_query: "",
     }
+    tagged_tabs.forEach((tag) => {
+      this.state[tag.replace(/-/g, "")] = [];
+    });
     // make a global map of known facilities?
     if (typeof(BowAndDrape)!="undefined") {
       if(!BowAndDrape.facilities) {
@@ -26,6 +31,20 @@ class FulfillShipments extends React.Component {
   componentDidMount() {
     // TODO listen on a websocket for updates to shipments that are made
     // while this page is open in a browser
+
+    this.refreshTaggedShipments();
+  }
+
+  refreshTaggedShipments() {
+    if (!BowAndDrape) return;
+    // FIXME facility_id hardcoded for now
+    let from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1';
+    tagged_tabs.forEach((tag) => {
+      BowAndDrape.api("GET", "/shipment/tagged/", {tag:"needs_"+tag, from_id}, (err, shipments) => {
+        if (err) return Errors.emitError(null, err);
+        this.setState({[tag.replace(/-/g,"")]:shipments});
+      });
+    });
   }
 
   render() {
@@ -44,11 +63,29 @@ class FulfillShipments extends React.Component {
       )
     }
 
+    let tagged_tab_contents = [];
+    tagged_tabs.forEach((tag) => {
+      let tab_contents = [];
+      this.state[tag.replace(/-/g,"")].forEach((shipment, index) => {
+        // ignore dupe shipments
+        if (this.state[tag.replace(/-/g,"")].findIndex((s)=>{return s.id==shipment.id})!=index) return;
+        tab_contents.push(
+          <Shipment key={tab_contents.length} fulfillment={true} {...shipment} />
+        );
+      });
+      tagged_tab_contents.push(
+        <shipments key={tagged_tab_contents.length} name={tag+" "+this.state[tag.replace(/-/g,"")].length}>
+          <h2>{tag}</h2>
+          {tab_contents}
+        </shipments>
+      );
+    });
+
     return (
       <div>
         <h1>Store "{this.props.store.props.name}"</h1>
         {fulfillment_stations}
-        <Tabs>
+        <Tabs onChange={this.refreshTaggedShipments.bind(this)}>
           <shipments>
             <h2>New</h2>
             <Scrollable
@@ -67,36 +104,7 @@ class FulfillShipments extends React.Component {
               page = {{sort:"requested", direction:"DESC"}}
             />
           </shipments>
-          <shipments>
-            <h2>Picking</h2>
-            <Scrollable
-              component={Shipment}
-              component_props={{fulfillment:true}}
-              endpoint={`/shipment?store_id=${this.props.store.id}&approved=not_null&picked=null&packed=null&received=null`}
-              page = {{sort:"requested", direction:"ASC", limit:100}}
-            />
-          </shipments>
-          <shipments>
-            <h2>Pressing</h2>
-          </shipments>
-          <shipments>
-            <h2>Reviewing</h2>
-            <Scrollable
-              component={Shipment}
-              component_props={{fulfillment:true}}
-              endpoint={`/shipment?store_id=${this.props.store.id}&picked=not_null&inspected=null`}
-              page = {{sort:"requested", direction:"ASC"}}
-            />
-          </shipments>
-          <shipments>
-            <h2>Packing</h2>
-            <Scrollable
-              component={Shipment}
-              component_props={{fulfillment:true}}
-              endpoint={`/shipment?store_id=${this.props.store.id}&inspected=not_null&packed=null`}
-              page = {{sort:"requested", direction:"ASC"}}
-            />
-          </shipments>
+          {tagged_tab_contents}
           <shipments>
             <h2>Packed</h2>
             <Scrollable

@@ -32,9 +32,7 @@ class JSONAPI extends SQLTable {
         req.query.page.limit = 20;
       if (req.query.page.limit>100)
         req.query.page.limit = 100;
-      return this.constructor.getAll(req.query, (err, objects) => {
-        res.json(objects).end();
-      });
+      return this.onApiGet(req, res);
     }
     if (req.method=='POST') {
       // convert any parsable json field
@@ -64,6 +62,12 @@ class JSONAPI extends SQLTable {
   hasApiPermission(req, res) {
     // by default user must be a super-admin
     return (req.user && req.user.roles.indexOf("bowanddrape")!=-1);
+  }
+
+  onApiGet(req, res) {
+    return this.constructor.getAll(req.query, (err, objects) => {
+      res.json(objects).end();
+    });
   }
 
   onApiSave(req, res, object, callback) {

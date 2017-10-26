@@ -456,7 +456,7 @@ class ProductList extends React.Component {
         url += '?' + querystring.stringify(query_params);
         history.replaceState(history.state, "", url);
       });
-    }, 2000);
+    }, 500);
   }
 
 }

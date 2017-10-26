@@ -58,6 +58,25 @@ class Shipment extends JSONAPI {
   }
 
   // extends JSONAPI
+  onApiGet(req, res) {
+    // get list of shipments by tag
+    if (/\/shipment\/tagged/.test(req.path)) {
+      let from_id = req.query.from_id;
+      let tag = req.query.tag;
+      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE from_id=$1) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $2`; 
+      return SQLTable.sqlQuery(Shipment, query, [from_id, tag], (err, shipments) => {
+        // remove an extra field we made just for the db select
+        shipments.forEach((shipment) => {
+          delete shipment.content_array;
+        });
+        res.json(shipments);
+      });
+    }
+
+    super.onApiGet(req, res);
+  }
+
+  // extends JSONAPI
   onApiSave(req, res, object, callback) {
     // if this was a request for shipping rates, return that instead
     if (req.path=="/shipment/quote") {
@@ -82,6 +101,7 @@ class Shipment extends JSONAPI {
       });
     }
 
+    // edit tags on shipment contents
     if (req.path=="/shipment/tagcontent") {
       let update_tags_tasks = []
       // first get inital content
@@ -93,15 +113,26 @@ class Shipment extends JSONAPI {
           let shipment = new Shipment(result.rows[0]);
           // default inputs
           object.content_index = object.content_index || 0;
+          if (object.content_index=='*') {
+            object.content_index = Array.apply(null, {length: shipment.contents.filter((item)=>{return item.sku}).length}).map(Number.call, Number);
+            // legacy items don't have skus
+            if (shipment.props.imported=="haute") {
+              object.content_index = Array.apply(null, {length: shipment.contents.length}).map(Number.call, Number);
+            }
+          }
+          if (typeof(object.content_index)=="number" || typeof(object.content_index)=="string")
+            object.content_index = [parseInt(object.content_index)];
           object.add_tags = new Set(object.add_tags);
           object.remove_tags = new Set(object.remove_tags);
-          if (!shipment.contents || shipment.contents.length<=object.content_index)
+          if (!shipment.contents || shipment.contents.length<=object.content_index.reduce((a,b)=>{return Math.max(a,b)}))
             return callback(err)
-          let content = shipment.contents[object.content_index];
-          let tags = new Set(content.tags);
-          tags = new Set([...tags, ...object.add_tags]);
-          tags = new Set([...tags].filter(x=>!object.remove_tags.has(x)));
-          shipment.contents[object.content_index].tags = Array.from(tags);
+          object.content_index.forEach((content_index) => {
+            let content = shipment.contents[content_index];
+            let tags = new Set(content.tags);
+            tags = new Set([...tags, ...object.add_tags]);
+            tags = new Set([...tags].filter(x=>!object.remove_tags.has(x)));
+            shipment.contents[content_index].tags = Array.from(tags);
+          });
 
           callback(err, client, shipment);
         });
@@ -131,9 +162,9 @@ class Shipment extends JSONAPI {
     // If there's an api call to approve this for production, do extra steps
     // TODO in the future check if we already have a fulfillment_id
     if (object.id && object.approved){
-      let s = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 RETURNING *"
-      return SQLTable.sqlExec(s, [object.approved, object.id], (err, result) => {
-        if (err) return callback(err);
+      let query = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 RETURNING *"
+      return SQLTable.sqlExec(query, [object.approved, object.id], (err, result) => {
+        if (err) return res.json({error:err});
         let next_fulfillment_id = result.rows[0].fulfillment_id || 1;
         object.fulfillment_id = next_fulfillment_id;
         // FIXME currently hardcoding all fullments to come from office factory

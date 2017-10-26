@@ -37,7 +37,6 @@ class FulfillmentStation extends React.Component {
     super(props);
     this.state = {
       search: "office-",
-      station: this.props.station,
       started: null,
       shipment: null,
     }
@@ -88,12 +87,42 @@ class FulfillmentStation extends React.Component {
     BowAndDrape.api("POST", "/shipment/tagcontent", {
       id: this.state.shipment.id,
       content_index: this.state.content_index-1,
-      add_tags: ["example_next_step"],
-      remove_tags: ["example_previous_step"],
+      add_tags,
+      remove_tags,
     }, (err, results) =>  {
       if (err) return Errors.emitError(err);
       this.setState({shipment:null});
     });
+  }
+
+  handleNextStep(state) {
+    let remove_tags = [];
+    switch (this.props.station) {
+      case "picking":
+        remove_tags.push("needs_picking");
+        break;
+      case "pressing":
+        remove_tags.push("needs_pressing");
+        break;
+      case "qa-ing":
+        remove_tags.push("needs_qa-ing");
+        break;
+      case "packing":
+        remove_tags.push("needs_packing");
+        break;
+    };
+
+    switch (state) {
+      case "picking":
+        return this.handleDone(["needs_picking"], remove_tags);
+      case "pressing":
+        return this.handleDone(["needs_pressing"], remove_tags);
+      case "qa-ing":
+        return this.handleDone(["needs_qa-ing"], remove_tags);
+      case "packing":
+        return this.handleDone(["needs_packing"], remove_tags);
+    };
+    this.handleDont([], []);
   }
 
   renderSearch() {
@@ -113,14 +142,31 @@ class FulfillmentStation extends React.Component {
   }
 
   renderResults() {
+    let actions = [];
+    actions.push(<button key={actions.length} onClick={()=>{this.setState({shipment:null})}}>Cancel</button>);
+    switch (this.props.station) {
+      case "picking":
+        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Pressing</button>);
+        break;
+      case "pressing":
+        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "qa-ing")}>Mark for QA-ing</button>);
+        break;
+      case "qa-ing":
+        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "packing")}>Mark for Packing</button>);
+        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Re-Pressing</button>);
+        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "picking")}>Mark for Re-Picking</button>);
+        break;
+      case "packing":
+        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "shipping")}>Mark for Shipping</button>);
+        break;
+    };
 
     return (
       <div>
         <div className="items"><div className="product_wrapper">
           <Item fulfillment={true} garment_id={`office-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
         </div></div>
-        <button onClick={()=>{this.setState({shipment:null})}}>Cancel</button>
-        <button onClick={this.handleDone.bind(this)}>Done</button>
+        {actions}
       </div>
     );
   }
@@ -135,7 +181,10 @@ class FulfillmentStation extends React.Component {
 
     return (
       <div>
-        <UserProfile user={this.props.user}/>
+        <div style={{width:"200px",position:"absolute",right:0,backgroundColor:"#fff",border:"solid 1px #000", padding:"0 10px"}}>
+          <UserProfile user={this.props.user}/>
+        </div>
+        <div style={{height:"86px"}} />
         <h1>{this.props.station}</h1>
         <Errors />
         <div className="fulfillmentStation">
