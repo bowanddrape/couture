@@ -410,11 +410,11 @@ class ProductCanvas extends React.Component {
         let camera_class = camera_label + 'view cameraBtn';
         hud_controls.push(
           <button className={camera_class}  key={hud_controls.length} onClick={this.handleChangeCamera.bind(this, hud_controls.length)}>
-            {camera_label} View
+            {camera_label}<br></br>View
           </button>
         );
       });
-      hud_controls.push(<button key={hud_controls.length} className="cameraBtn centerBtn" onClick={this.autoLayout.bind(this, true)}>Center All</button>);
+      hud_controls.push(<button key={hud_controls.length} className="cameraBtn centerBtn" onClick={this.autoLayout.bind(this, true)}>Center<br></br>All</button>);
     }
 
     return (

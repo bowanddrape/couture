@@ -209,7 +209,7 @@ customize {
     font-weight: 700;
     height: auto;
     display: block;
-    padding: 20px 0;
+    padding: 10px 0;
     .zurichroman;
     &:before {
       content: "";
@@ -276,9 +276,9 @@ customize {
     flex-direction: column;
     position: absolute;
     top: 185px;
-    right: 30px;
+    right: 40px;
     &.rainbow_border {
-      padding: 0 50px 0 20px;
+      padding: 0 15px 0 15px;
       position: absolute;
       z-index: 1;
       right: -5px;
@@ -291,13 +291,22 @@ customize {
     }
   }
   @media (max-width: @desktop_min_width) {
+
     hud_controls {
       top: 0;
-      right: 0;
+      right: 10px;
     }
-    .hudBtn:before {
-      height: 20px;
-      width: 30px;
+
+    customize hud_controls.rainbow_border {
+          padding: 0 15px 0 15px;
+    }
+
+    .hudBtn {
+      padding: 10px 0;
+      &:before {
+        height: 20px;
+        width: 30px;
+      }
     }
   }
 
@@ -348,19 +357,31 @@ customize {
       justify-content: flex-end;
     }
 
+    hud_controls{
+      &.rainbow_border {
+      padding: 0 45px 0 20px;
+      z-index: 1;
+      right: 0;
+    }
+    .hudBtn {
+      padding: 20px 0;
+    }
+  }
+
     .component_container {
+      margin: 0;
       div {
-        height: 50px;
-        width: 50px;
-        margin: 15px;
+        height: 65px;
+        width: 65px;
+        margin: 10px;
       }
     }
 
     div[name=Emoji].rainbow_border {
       z-index: 100;
-      max-width: 94%;
-      margin: 0 auto;
+      max-width: 100%;
       border: none;
+      border-top: 3px solid #eee;
 
       &::before {
         background-image: none;
@@ -410,6 +431,7 @@ customize {
       flex-flow: row wrap;
       align-content: flex-start;
       overflow-y: scroll;
+      flex: 1;
     }
     .components {
       display: flex;
@@ -426,7 +448,6 @@ customize {
       flex-wrap: wrap;
       flex-flow: row wrap;
       align-content: flex-start;
-      height: 100%;
         img {
           width: 40px;
         }
@@ -438,7 +459,7 @@ customize {
       .component_container:not(.letters) {
         height: 95%;
         width: 260px;
-        padding: 10px;
+        padding: 10px 0;
         flex-direction: row;
       }
     }
@@ -447,7 +468,7 @@ customize {
     border-top: 3px solid #eee;
     border-bottom: 3px solid #eee;
     canvas {
-      height: 80vh;
+      height: 70vh;
     }
     .component_selected {
       canvas, component_hitbox {
