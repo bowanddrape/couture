@@ -44,6 +44,7 @@ class Item extends React.Component {
         ItemUtils.recurseAssembly(this.props.assembly[i], (component) => {
           // haute imported entries will have "text" set
           if (component.props && component.props.image && component.text) {
+            assembly_phrase += component.text;
             let letters = {};
             component.text.split("").forEach((letter) => {
               // Skip spaces
@@ -60,19 +61,20 @@ class Item extends React.Component {
               letter_strings.push(letters[letter].letter+"x"+letters[letter].quantity);
             });
             assembly.push(
-              <div key={assembly.length}><img src={component.props.image}/>{letter_strings.join("  ")}</div>
+              <div key={assembly.length} className="legacy"><img src={component.props.image}/>{letter_strings.join("  ")}</div>
             );
             return;
           }
 
+          let sku = component.sku || component.props.name;
+
           // ignore anything you can't see
           if (!component.props || !component.props.image) return;
-          let last_sku_tok = component.sku.split("_").pop();
+          let last_sku_tok = sku.split("_").pop();
           assembly_phrase += last_sku_tok;
           // skip skus corresponding to spaces
           if (last_sku_tok == " ") return;
 
-          let sku = component.sku || component.props.name;
           component.quantity = component.quantity || 1;
           if (!assembly_contents[sku])
             assembly_contents[sku] = JSON.parse(JSON.stringify(component));

@@ -59,6 +59,18 @@ class Shipment extends React.Component {
     let shipment = {id: this.props.id};
     Object.assign(shipment, this.state);
     shipment[state] = Math.round(new Date().getTime()/1000);
+    if (state == "approved") {
+      return BowAndDrape.api("POST", "/shipment/tagcontent", {
+        id: this.props.id,
+        content_index: "*",
+        add_tags: ["needs_picking"],
+        remove_tags: ["needs_designqa"],
+      }, (err, results) =>  {
+        BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
+          this.setState(shipment);
+        });
+      });
+    }
     BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
       this.setState(shipment);
     });
@@ -155,11 +167,11 @@ class Shipment extends React.Component {
     if (typeof(BowAndDrape)!="undefined" && BowAndDrape.facilities) {
       if (BowAndDrape.facilities[this.state.from_id]) {
         let facility = BowAndDrape.facilities[this.state.from_id];
-        from = (<div><label>From: </label>{facility.props.name} {React.createElement(Address, facility.address)}</div>);
+        from = (<div><label>From: </label>{facility.props.name}</div>);
       }
       if (BowAndDrape.facilities[this.state.to_id]) {
         let facility = BowAndDrape.facilities[this.state.to_id];
-        to = (<div><label>To: </label>{facility.props.name} {React.createElement(Address, facility.address)}</div>);
+        to = (<div><label>To: </label>{facility.props.name}</div>);
       }
     } // lookup facilities
 
@@ -196,6 +208,7 @@ class Shipment extends React.Component {
             <shipping_details>
               <div><label>Order_id: </label><a href={`/shipment/${this.props.id}`}>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</a></div>
               <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
+              {from}
               {to}
               <div><label>User: </label>{this.props.email}</div>
               {this.state.shipping_label?<div><label>Shipping: </label><a href={this.state.shipping_label} target="_blank">Label</a></div>:null}

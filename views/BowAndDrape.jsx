@@ -148,6 +148,7 @@ module.exports = {
     Shipment: require('./Shipment.jsx'),
     FulfillmentStation: require('./FulfillmentStation.jsx'),
     MandateUserLogin: require('./MandateUserLogin.jsx'),
+    WarningNotice: require('./WarningNotice.jsx'),
   },
   dispatcher,
   api,
