@@ -8,6 +8,7 @@ const Shipment = require('./Shipment');
 const Address = require('./Address');
 const Log = require('./Log');
 const TaxCloud = require('./TaxCloud');
+const Facility = require('./Facility');
 
 const payment_method = require('./PayStripe.js');
 //const payment_method = require('./PayBraintree.js');
@@ -68,8 +69,8 @@ class Order {
     return Store.get(req.body.store_id, (err, store) => {
       if (err || !store)
         return res.json({error: "Cart not properly linked to store"});
-      // set shipment source
-      shipment.from_id = store.facility_id;
+      // set shipment destination
+      shipment.to_id = Facility.special_ids.customer_ship;
 
       let handleCheckInventory = (client, callback) => {
         // TODO in the future, let SQLTable.get take in an optional pg client
