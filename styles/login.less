@@ -1,0 +1,157 @@
+//Forms - Should Prob Consolidate these //TODO Consilidate Form Styles
+
+.cartLoginWrap {
+  grid-column-start: 1;
+  grid-column-end: -1;
+  margin-top: 30px;
+}
+
+
+
+login {
+  display: block;
+  position: relative;
+  max-width: 350px;
+  margin: 30px auto 0 auto;
+
+
+  input[type="text"],input[type="password"] {
+    background-color: #f8f8f8;
+    border-color: #e1e5e6;
+    width: 100%;
+    display: block;
+  }
+
+  .loginForm {
+    min-width: 300px;
+  }
+
+
+
+  .primary {
+    max-width: 100%;
+  }
+
+
+  .loginNav {
+    border: none;
+    .bodyfont;
+    .notFancy;
+    display: block;
+    position: relative;
+    text-align: left;
+    text-transform: none;
+    max-width: 100%;
+    height: auto;
+    font-size: 12px;
+    color: @color_support_1;
+    &.forgotPassword {
+      border-bottom: 2px solid @color_support_0;
+      padding-bottom: 10px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+  }
+
+  .formHead {
+    font-weight: 600;
+    font-size: 18px;
+    display: block;
+  }
+  .formActions {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+
+    .facebookBtn {
+      max-width: 100%;
+      margin: 25px 0px;
+    }
+  }
+
+  .resetAction{
+    margin-bottom: 30px;
+  }
+
+  .topLine {
+    border-top: 2px solid @color_support_0;
+    text-align: center;
+    padding: 20px 0;
+    font-weight: 600;
+    font-size: 20px;
+
+    .loginNav {
+      text-transform: none;
+      color: @color_support_1;
+      font-size: 14px;
+      text-align: center;
+    }
+  }
+}
+
+menu login {
+  margin: 0 auto;
+}
+
+menu.expanded login {
+  margin-top: 30px;
+}
+
+  //States
+
+
+    .loginNavWrap, .registerBtn, .loginBtn, .resetBtn, .registerAction, .loginAction, .resetAction{
+    display: none;
+    }
+
+  //Default State
+  .default{
+    .loginNavWrap {
+      display: inline-block;
+    }
+    .loginForm {
+      display: none;
+    }
+  }
+
+  //Login state
+  .login {
+    .loginBtn {
+      display: inherit;
+    }
+    .registerAction {
+      display: inherit;
+    }
+  }
+
+  //Register state
+
+  .register {
+    .registerBtn {
+      display: block;
+    }
+    .loginAction {
+      display: block;
+    }
+    .forgotPassword {
+      display: none;
+    }
+
+  }
+
+  //Forgot State
+
+  .forgot {
+    .formActions {
+      display: none;
+    }
+    .resetBtn {
+      display: inherit;
+    }
+    .resetAction {
+      display: block;
+    }
+    input[type=password] {
+      display: none;
+    }
+  }

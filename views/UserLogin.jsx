@@ -11,6 +11,7 @@ class UserLogin extends React.Component {
     super(props);
     this.state = {
       user: {},
+      loginState: 'default',
     }
   }
 
@@ -79,16 +80,41 @@ class UserLogin extends React.Component {
 
     this.fields = this.fields || {};
     return (
-      <login style={this.props.style}>
-        <Errors label="login" />
-        <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text" name="email"/>
-        <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password"/>
-        <section className="btnWrap">
-          <button className="loginBtn" onClick={this.login.bind(this)}>Login</button>
-          <button className="loginBtn" onClick={this.login.bind(this)}>Register</button>
-          <button className="loginBtn" onClick={this.verify.bind(this)}>Reset Password</button>
-          <FacebookLogin user={this.state.user}/>
+      <login className={this.state.loginState} style={this.props.style}>
+        <section className="loginNavWrap">
+          <button className="loginNav" onClick={()=>{this.setState({loginState:'login'})}}>Sign In</button>
+          <button className="loginNav" onClick={()=>{this.setState({loginState:'register'})}}>Create An Account</button>
         </section>
+
+        <Errors label="login" />
+        <section className="loginForm">
+          <div className="resetAction">
+            <span className="formHead">Forgot Password</span>
+            Enter your email address and we’ll send you instructions to reset your password.
+            <button className="loginNav" onClick={()=>{this.setState({loginState:'login'})}}>Back to Sign In</button>
+          </div>
+          <form>
+            <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text" name="email"/>
+            <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password"/>
+            <button className="primary registerBtn" onClick={this.login.bind(this)}>Create Account</button>
+            <button className="primary loginBtn" onClick={this.login.bind(this)}>Sign In</button>
+            <button className="primary resetBtn" onClick={this.verify.bind(this)}>Send Reset Instructions</button>
+          </form>
+          <div className="formActions">
+            <button className="loginNav forgotPassword" onClick={()=>{this.setState({loginState:'forgot'})}}>Forgot Password?</button>
+              <FacebookLogin user={this.state.user}/>
+          </div>
+          <div className="formSubAction">
+            <div className="registerAction topLine">
+              I'm new here <button className="loginNav" onClick={()=>{this.setState({loginState:'register'})}}>Create An Account</button>
+            </div>
+            <div className="loginAction topLine">
+              Already have an account? <button className="loginNav" onClick={()=>{this.setState({loginState:'login'})}}>Sign In Now</button>
+            </div>
+          </div>
+        </section>
+
+
         {this.props.cta ? <div className="cta">{this.props.cta}</div> : null}
       </login>
     );

@@ -84,7 +84,7 @@ body {
 }
 .layout_main {
   overflow-x: hidden;
-  padding: 80px 20px 10px 20px;
+  padding: 80px 0 0 0;
 }
 a {
   text-decoration: none;
@@ -130,7 +130,6 @@ button:after,
   content: '';
   width: 100%;
   height: 56px;
-  max-width: 190px;
   position: absolute;
   z-index: -2;
   top: -5px;
@@ -147,7 +146,6 @@ button:before,
   content: '';
   width: 100%;
   height: 56px;
-  max-width: 190px;
   position: absolute;
   z-index: -2;
   top: -5px;
@@ -182,6 +180,29 @@ button.primary.busyState:after,
 .button.primary.busyState:after {
   animation-timing-function: ease;
   animation: busyState 1.5s infinite;
+}
+.notFancy:after {
+  content: '';
+  width: 0%;
+  height: 0;
+  display: none;
+}
+.notFancy:focus {
+  box-shadow: none;
+}
+.notFancy:before {
+  content: '';
+  width: 0%;
+  height: 0;
+  display: none;
+}
+.notFancy:hover:after {
+  top: 0;
+  left: 0;
+}
+.notFancy:hover:before {
+  top: 0;
+  left: 0;
 }
 .cta {
   font-family: "zurichbold_condensed", sans-serif;
@@ -560,8 +581,8 @@ comments message {
   /* .summary_items */
 }
 .items .product_wrapper {
-  border-top: 2px solid black;
-  border-bottom: 2px solid black;
+  border-top: 2px solid #eaeaea;
+  border-bottom: 2px solid #eaeaea;
   padding: 10px;
   grid-column: span 4;
   /* .item */
@@ -611,7 +632,7 @@ comments message {
 }
 .items .summary_items .summary_items_inner {
   padding: 20px;
-  border: 1px solid black;
+  border: 2px solid #eaeaea;
   display: inline-block;
 }
 .items .summary_items .summary_items_header {
@@ -1017,7 +1038,7 @@ customize .product_details .size_chart row span:first-child {
     z-index: 100;
     max-width: 100%;
     border: none;
-    border-top: 3px solid #eee;
+    border-top: 3px solid #eaeaea;
   }
   customize div[name=Emoji].rainbow_border::before {
     background-image: none;
@@ -1049,7 +1070,7 @@ customize .product_details .size_chart row span:first-child {
     top: 0px;
     left: 0px;
     bottom: 0px;
-    border-right: 3px solid #eee;
+    border-right: 3px solid #eaeaea;
     width: auto;
     height: 100%;
     background: white;
@@ -1098,8 +1119,8 @@ customize .product_details .size_chart row span:first-child {
     flex-direction: row;
   }
   customize .canvas_container {
-    border-top: 3px solid #eee;
-    border-bottom: 3px solid #eee;
+    border-top: 3px solid #eaeaea;
+    border-bottom: 3px solid #eaeaea;
   }
   customize .canvas_container canvas {
     height: 70vh;
@@ -1130,7 +1151,7 @@ switch_option img {
   border-top: 1px solid black;
   z-index: 10;
   background: white;
-  border-top: 3px solid #eee;
+  border-top: 3px solid #eaeaea;
 }
 .add_to_cart .productName {
   position: relative;
@@ -1660,7 +1681,7 @@ product_options switch.expanded {
   width: 150px;
 }
 @media (min-width: 737px) {
-  .header .img-logo {
+  .header img.logo {
     width: 260px;
   }
 }
@@ -1678,14 +1699,14 @@ product_options switch.expanded {
 .header .cartmenu cart_bug {
   position: relative;
   padding: 0px 7px;
-  border-radius: 500px;
+  border-radius: 700px;
   background-color: #ff5c5c;
   font-size: 11px;
   right: -24px;
 }
 .header menu {
   top: 0;
-  margin: 10px 0;
+  margin: 15px 0;
   padding: 0px;
   width: 100%;
   overflow: hidden;
@@ -1694,17 +1715,6 @@ product_options switch.expanded {
   transition: max-height 1s ease, border-bottom 1s ease;
   border-bottom: solid 3px rgba(0, 0, 0, 0);
 }
-.header menu login {
-  position: relative;
-  display: inline-block;
-  border-bottom: 3px solid #eee;
-}
-.header menu .loginBtn {
-  display: inline-block;
-  padding: 10px;
-  margin-right: 10px;
-  border-bottom: 1px solid black;
-}
 .header menu menu_items {
   position: relative;
   display: inline-block;
@@ -1712,8 +1722,8 @@ product_options switch.expanded {
 .header menu a:hover {
   text-decoration: none;
 }
-.header menu button,
-.header menu .button {
+.header menu a button,
+.header menu a .button {
   font-family: 'zurich_condensedregular', sans-serif;
   font-weight: normal;
   font-size: 14px;
@@ -1722,20 +1732,21 @@ product_options switch.expanded {
   border: none;
   margin: 12px auto;
 }
-.header menu button:hover,
-.header menu .button:hover {
+.header menu a button:hover,
+.header menu a .button:hover {
   color: #7f5cff;
 }
-.header menu button:before,
-.header menu .button:before {
+.header menu a button:before,
+.header menu a .button:before {
   display: none;
 }
-.header menu button:after,
-.header menu .button:after {
+.header menu a button:after,
+.header menu a .button:after {
   display: none;
 }
 .header menu.expanded {
-  max-height: 500px;
+  max-height: 100vh;
+  height: calc(100vh - 75px);
 }
 user {
   display: block;
@@ -1776,7 +1787,7 @@ user name {
   .header menu {
     max-height: initial;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
   }
   .header menu menu_items {
     display: flex;
@@ -1785,19 +1796,6 @@ user name {
   }
   .header menu menu_items button {
     margin: 0px 54px;
-  }
-  .header menu login input {
-    background-color: #fff;
-    border: 1px solid lightgrey;
-    min-width: 230px;
-    width: auto;
-    min-height: 40px;
-    margin: 10px auto;
-    padding: 5px 10px;
-    outline: none;
-    font-size: 14px;
-    display: inline-block;
-    margin-right: 10px;
   }
   .header menu login,
   .header menu user {
@@ -1814,7 +1812,7 @@ user name {
   .header menu.expanded login,
   .header menu.expanded user {
     opacity: 1;
-    max-height: 300px;
+    max-height: 100vh;
   }
 }
 .footer {
@@ -1983,4 +1981,150 @@ user name {
   .gallery .caption .price {
     font-size: 5px;
   }
+}
+.cartLoginWrap {
+  grid-column-start: 1;
+  grid-column-end: -1;
+  margin-top: 30px;
+}
+login {
+  display: block;
+  position: relative;
+  max-width: 350px;
+  margin: 30px auto 0 auto;
+}
+login input[type="text"],
+login input[type="password"] {
+  background-color: #f8f8f8;
+  border-color: #e1e5e6;
+  width: 100%;
+  display: block;
+}
+login .loginForm {
+  min-width: 300px;
+}
+login .primary {
+  max-width: 100%;
+}
+login .loginNav {
+  border: none;
+  font-family: "Open Sans", Arial, sans-serif;
+  line-height: 1.43;
+  letter-spacing: 1.3px;
+  color: #000;
+  display: block;
+  position: relative;
+  text-align: left;
+  text-transform: none;
+  max-width: 100%;
+  height: auto;
+  font-size: 12px;
+  color: #7f5cff;
+}
+login .loginNav:after {
+  content: '';
+  width: 0%;
+  height: 0;
+  display: none;
+}
+login .loginNav:focus {
+  box-shadow: none;
+}
+login .loginNav:before {
+  content: '';
+  width: 0%;
+  height: 0;
+  display: none;
+}
+login .loginNav:hover:after {
+  top: 0;
+  left: 0;
+}
+login .loginNav:hover:before {
+  top: 0;
+  left: 0;
+}
+login .loginNav.forgotPassword {
+  border-bottom: 2px solid #eaeaea;
+  padding-bottom: 10px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+login .formHead {
+  font-weight: 600;
+  font-size: 18px;
+  display: block;
+}
+login .formActions {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+}
+login .formActions .facebookBtn {
+  max-width: 100%;
+  margin: 25px 0px;
+}
+login .resetAction {
+  margin-bottom: 30px;
+}
+login .topLine {
+  border-top: 2px solid #eaeaea;
+  text-align: center;
+  padding: 20px 0;
+  font-weight: 600;
+  font-size: 20px;
+}
+login .topLine .loginNav {
+  text-transform: none;
+  color: #7f5cff;
+  font-size: 14px;
+  text-align: center;
+}
+menu login {
+  margin: 0 auto;
+}
+menu.expanded login {
+  margin-top: 30px;
+}
+.loginNavWrap,
+.registerBtn,
+.loginBtn,
+.resetBtn,
+.registerAction,
+.loginAction,
+.resetAction {
+  display: none;
+}
+.default .loginNavWrap {
+  display: inline-block;
+}
+.default .loginForm {
+  display: none;
+}
+.login .loginBtn {
+  display: inherit;
+}
+.login .registerAction {
+  display: inherit;
+}
+.register .registerBtn {
+  display: block;
+}
+.register .loginAction {
+  display: block;
+}
+.register .forgotPassword {
+  display: none;
+}
+.forgot .formActions {
+  display: none;
+}
+.forgot .resetBtn {
+  display: inherit;
+}
+.forgot .resetAction {
+  display: block;
+}
+.forgot input[type=password] {
+  display: none;
 }

@@ -63038,7 +63038,7 @@ var Cart = function (_React$Component) {
           ),
           React.createElement(
             'section',
-            { className: this.state.no_login_prompt ? "hidden" : "" },
+            { className: this.state.no_login_prompt ? "hidden" : "cartLoginWrap" },
             React.createElement(UserLogin, null)
           )
         ),
@@ -64598,8 +64598,8 @@ var FacebookLogin = function (_React$Component) {
       // otherwise show login button
       return React.createElement(
         'button',
-        { className: 'loginBtn', onClick: this.fbLogin },
-        'Login with Facebook'
+        { className: 'facebookBtn', onClick: this.fbLogin },
+        'Sign In with Facebook'
       );
     }
   }]);
@@ -66331,12 +66331,12 @@ var LayoutHeader = function (_React$Component) {
           React.createElement(
             'menu',
             { className: this.state.expanded ? "expanded" : "" },
-            React.createElement(UserProfile, this.props),
             React.createElement(
               'menu_items',
               null,
               menu_items
-            )
+            ),
+            React.createElement(UserProfile, this.props)
           )
         )
       );
@@ -70297,7 +70297,8 @@ var UserLogin = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (UserLogin.__proto__ || Object.getPrototypeOf(UserLogin)).call(this, props));
 
     _this.state = {
-      user: {}
+      user: {},
+      loginState: 'default'
     };
     return _this;
   }
@@ -70367,37 +70368,115 @@ var UserLogin = function (_React$Component) {
       this.fields = this.fields || {};
       return React.createElement(
         'login',
-        { style: this.props.style },
-        React.createElement(Errors, { label: 'login' }),
-        React.createElement('input', { ref: function ref(input) {
-            _this3.fields.email = input;
-          }, placeholder: 'email address', type: 'text', name: 'email' }),
-        React.createElement('input', { ref: function ref(input) {
-            _this3.fields.password = input;
-          }, placeholder: 'password', onKeyUp: function onKeyUp(event) {
-            if (event.which == 13) {
-              _this3.login();
-            }
-          }, type: 'password', name: 'password' }),
+        { className: this.state.loginState, style: this.props.style },
         React.createElement(
           'section',
-          { className: 'btnWrap' },
+          { className: 'loginNavWrap' },
           React.createElement(
             'button',
-            { className: 'loginBtn', onClick: this.login.bind(this) },
-            'Login'
+            { className: 'loginNav', onClick: function onClick() {
+                _this3.setState({ loginState: 'login' });
+              } },
+            'Sign In'
           ),
           React.createElement(
             'button',
-            { className: 'loginBtn', onClick: this.login.bind(this) },
-            'Register'
+            { className: 'loginNav', onClick: function onClick() {
+                _this3.setState({ loginState: 'register' });
+              } },
+            'Create An Account'
+          )
+        ),
+        React.createElement(Errors, { label: 'login' }),
+        React.createElement(
+          'section',
+          { className: 'loginForm' },
+          React.createElement(
+            'div',
+            { className: 'resetAction' },
+            React.createElement(
+              'span',
+              { className: 'formHead' },
+              'Forgot Password'
+            ),
+            'Enter your email address and we\u2019ll send you instructions to reset your password.',
+            React.createElement(
+              'button',
+              { className: 'loginNav', onClick: function onClick() {
+                  _this3.setState({ loginState: 'login' });
+                } },
+              'Back to Sign In'
+            )
           ),
           React.createElement(
-            'button',
-            { className: 'loginBtn', onClick: this.verify.bind(this) },
-            'Reset Password'
+            'form',
+            null,
+            React.createElement('input', { ref: function ref(input) {
+                _this3.fields.email = input;
+              }, placeholder: 'email address', type: 'text', name: 'email' }),
+            React.createElement('input', { ref: function ref(input) {
+                _this3.fields.password = input;
+              }, placeholder: 'password', onKeyUp: function onKeyUp(event) {
+                if (event.which == 13) {
+                  _this3.login();
+                }
+              }, type: 'password', name: 'password' }),
+            React.createElement(
+              'button',
+              { className: 'primary registerBtn', onClick: this.login.bind(this) },
+              'Create Account'
+            ),
+            React.createElement(
+              'button',
+              { className: 'primary loginBtn', onClick: this.login.bind(this) },
+              'Sign In'
+            ),
+            React.createElement(
+              'button',
+              { className: 'primary resetBtn', onClick: this.verify.bind(this) },
+              'Send Reset Instructions'
+            )
           ),
-          React.createElement(FacebookLogin, { user: this.state.user })
+          React.createElement(
+            'div',
+            { className: 'formActions' },
+            React.createElement(
+              'button',
+              { className: 'loginNav forgotPassword', onClick: function onClick() {
+                  _this3.setState({ loginState: 'forgot' });
+                } },
+              'Forgot Password?'
+            ),
+            React.createElement(FacebookLogin, { user: this.state.user })
+          ),
+          React.createElement(
+            'div',
+            { className: 'formSubAction' },
+            React.createElement(
+              'div',
+              { className: 'registerAction topLine' },
+              'I\'m new here ',
+              React.createElement(
+                'button',
+                { className: 'loginNav', onClick: function onClick() {
+                    _this3.setState({ loginState: 'register' });
+                  } },
+                'Create An Account'
+              )
+            ),
+            React.createElement(
+              'div',
+              { className: 'loginAction topLine' },
+              'Already have an account? ',
+              React.createElement(
+                'button',
+                { className: 'loginNav', onClick: function onClick() {
+                    _this3.setState({ loginState: 'login' });
+                  } },
+                'Sign In Now'
+              )
+            )
+          )
         ),
         this.props.cta ? React.createElement(
           'div',

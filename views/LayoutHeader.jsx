@@ -52,10 +52,10 @@ class LayoutHeader extends React.Component {
         <a href="/"><img className="logo" src="/logo_mini.svg" /></a>
         <CartMenu key={menu_items.length} />
         <menu className={this.state.expanded?"expanded":""}>
-          <UserProfile {...this.props}/>
           <menu_items>
             {menu_items}
           </menu_items>
+          <UserProfile {...this.props}/>
         </menu>
         </div>
       </div>

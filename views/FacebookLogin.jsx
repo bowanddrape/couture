@@ -72,8 +72,8 @@ class FacebookLogin extends React.Component {
     }
     // otherwise show login button
     return (
-      <button className="loginBtn" onClick={this.fbLogin}>
-        Login with Facebook
+      <button className="facebookBtn" onClick={this.fbLogin}>
+        Sign In with Facebook
       </button>
     )
   }

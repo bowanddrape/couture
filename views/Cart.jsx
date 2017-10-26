@@ -319,7 +319,7 @@ class Cart extends React.Component {
               <input type="radio" name="checkout" value="false" defaultChecked={true} onChange={this.handleToggleGuestCheckout.bind(this)}/> <span className="radio_label">Login</span>
               <input type="radio" name="checkout" value="true" onChange={this.handleToggleGuestCheckout.bind(this)}/><span className="radio_label">Checkout As Guest</span>
             </form></section>
-            <section className={this.state.no_login_prompt?"hidden":""} >
+          <section className={this.state.no_login_prompt?"hidden":"cartLoginWrap"} >
               <UserLogin />
             </section>
           </div>
