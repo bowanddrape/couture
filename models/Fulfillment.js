@@ -4,9 +4,12 @@ const Facility = require('./Facility');
 const Shipment = require('./Shipment');
 const Page = require('./Page');
 
+const MandateUserLogin = require('../views/MandateUserLogin.jsx');
 const FulfillShipments = require('../views/FulfillShipments.jsx');
 const GenericList = require('../views/GenericList.jsx');
 const FulfillmentStation = require('../views/FulfillmentStation.jsx');
+
+const station_types = ["picking","pressing","qa-ing","packing"];
 
 /***
 Handle requests to /fulfillment/
@@ -19,6 +22,9 @@ class Fulfillment {
       return next();
     }
 
+    if (req.method=="GET" && req.path_tokens.length == 3)
+      return Fulfillment.handleGetStation(req, res);
+
     // user must be logged in
     if (!req.user) {
       return Page.renderNotFound(req, res);
@@ -29,9 +35,6 @@ class Fulfillment {
 
     if (req.method=="GET" && req.path_tokens.length == 2)
       return Fulfillment.handleGetDetails(req, res);
-
-    if (req.method=="GET" && req.path_tokens.length == 3)
-      return Fulfillment.handleGetStation(req, res);
 
     res.json({error: "invalid endpoint"}).end();
   }
@@ -52,17 +55,25 @@ class Fulfillment {
   }
 
   static handleGetStation(req, res){
+    req.query.layout = "basic";
+
+    // user must be logged in
+    if (!req.user) {
+      return Page.render(req, res, MandateUserLogin, {});
+    }
+
+    let store_id = req.path_tokens[1];
     // Check for a valid station type
-    let stationType = req.path_tokens[2].toLowerCase();
-    let validTypes = ["pick","press","qa"];
-    let isValid = (validTypes.indexOf(stationType) > -1);
+    let station_type = req.path_tokens[2].toLowerCase();
+    let isValid = (station_types.indexOf(station_type) > -1);
 
     if (isValid){
       return Page.render(req, res, FulfillmentStation, {
-        station: stationType
-        });
+        user: req.user,
+        station: station_type,
+      });
     } else {
-        return Page.renderNotFound(req, res);
+      return Page.renderNotFound(req, res);
     }
   }
 
@@ -92,6 +103,7 @@ class Fulfillment {
         Page.render(req, res, FulfillShipments, {
           store: store,
           facilities: facilities,
+          station_types,
         });
       }); // Facility.getAll
     }); // get store

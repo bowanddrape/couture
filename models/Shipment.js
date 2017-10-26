@@ -9,6 +9,8 @@ const ShipProvider = require('./ShipProvider.js');
 const Page = require('./Page');
 const ShipmentView = require('../views/Shipment.jsx');
 const SQLTable = require('./SQLTable.js');
+const Facility = require('./Facility.js');
+
 var aws = require('aws-sdk');
 var s3 = new aws.S3({ accessKeyId: process.env.AWS_ACCESS_KEY, secretAccessKey: process.env.AWS_SECRET_KEY, region: process.env.AWS_REGION })
 
@@ -57,20 +59,6 @@ class Shipment extends JSONAPI {
 
   // extends JSONAPI
   onApiSave(req, res, object, callback) {
-    // TODO in the future check if we already have a fulfillment_id
-    if (object.id && object.approved){
-        let s = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 RETURNING *"
-        return SQLTable.sqlExec(s, [object.approved, object.id], (err, result) => {
-        if (err) {
-          console.log(err);
-          return callback(err);
-        }
-        let next_fulfillment_id = result.rows[0].fulfillment_id || 1;
-        object.fulfillment_id = next_fulfillment_id;
-        super.onApiSave(req, res, object, callback);
-        });
-    };
-
     // if this was a request for shipping rates, return that instead
     if (req.path=="/shipment/quote") {
       return this.constructor.get(object.id, (err, shipment) => {
@@ -93,6 +81,67 @@ class Shipment extends JSONAPI {
         });
       });
     }
+
+    if (req.path=="/shipment/tagcontent") {
+      let update_tags_tasks = []
+      // first get inital content
+      update_tags_tasks.push((client, callback) => {
+        let query = `SELECT * FROM shipments WHERE id=$1 LIMIT 1`;
+        client.query(query, [object.id], (err, result) => {
+          if (err) return callback(err);
+          if (!result.rows.length) return callback("no such shipment");
+          let shipment = new Shipment(result.rows[0]);
+          // default inputs
+          object.content_index = object.content_index || 0;
+          object.add_tags = new Set(object.add_tags);
+          object.remove_tags = new Set(object.remove_tags);
+          if (!shipment.contents || shipment.contents.length<=object.content_index)
+            return callback(err)
+          let content = shipment.contents[object.content_index];
+          let tags = new Set(content.tags);
+          tags = new Set([...tags, ...object.add_tags]);
+          tags = new Set([...tags].filter(x=>!object.remove_tags.has(x)));
+          shipment.contents[object.content_index].tags = Array.from(tags);
+
+          callback(err, client, shipment);
+        });
+      });
+      // update the db
+      update_tags_tasks.push((client, shipment, callback) => {
+        // FIXME why is this not working
+/*
+        let query = `UPDATE shipments SET contents=$1 WHERE id=$2`;
+        client.query(query, [JSON.stringify(shipment.contents), shipment.id], (err, result) => {
+          if (err) return callback(err);
+          res.json(shipment);
+        });
+*/
+        // defaulting to non-atomic non-transactional race-condition land
+        shipment.upsert((err) => {
+          res.json(shipment);
+        });
+      });
+
+      let onError = (err) => {
+        res.json({error: err}).end();
+      }
+      return SQLTable.sqlExecTransaction(update_tags_tasks, onError);
+    }
+
+    // If there's an api call to approve this for production, do extra steps
+    // TODO in the future check if we already have a fulfillment_id
+    if (object.id && object.approved){
+      let s = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 RETURNING *"
+      return SQLTable.sqlExec(s, [object.approved, object.id], (err, result) => {
+        if (err) return callback(err);
+        let next_fulfillment_id = result.rows[0].fulfillment_id || 1;
+        object.fulfillment_id = next_fulfillment_id;
+        // FIXME currently hardcoding all fullments to come from office factory
+        object.from_id = Facility.special_ids.office;
+        super.onApiSave(req, res, object, callback);
+      });
+    };
+
     super.onApiSave(req, res, object, callback);
   }
 

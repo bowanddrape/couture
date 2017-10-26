@@ -31,8 +31,22 @@
       }
     } /* .item */
     .item.fulfillment {
+      .garment_id {
+        font-size: 25px;
+        font-weight: bold;
+      }
       .price {
         display: none;
+      }
+      .taglist {
+        display: flex;
+        .tag {
+          color: @color_primary;
+          background-color: @color_secondary;
+          padding: 2px;
+          border-radius: 3px;
+          margin: 0 2px;
+        }
       }
     }
   } /* product_wrapper */

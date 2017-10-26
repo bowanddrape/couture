@@ -111,6 +111,17 @@ class Item extends React.Component {
         assembly = (<div className="assembly">{assembly}</div>);
     }
 
+    let tag_list = null;
+    if (this.props.fulfillment && this.props.tags) {
+      let tags = [];
+      this.props.tags.forEach((tag)=> {
+        tags.push(
+          <div key={tags.length} className="tag">{tag}</div>
+        )
+      });
+      tag_list = (<div className="taglist">{tags}</div>);
+    }
+
     return (
       <div className={className}>
         <a href={this.props.props.url}>
@@ -123,7 +134,12 @@ class Item extends React.Component {
               : null
           }
         </a>
+        {tag_list}
         <div className="deets" >
+          {this.props.fulfillment ? 
+            <div className="garment_id">GarmentID#: {this.props.garment_id}</div>
+            : null
+          }
           <a href={this.props.props.url}>
             <div className="name">{this.props.props.name}</div>
           </a>

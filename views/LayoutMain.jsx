@@ -66,7 +66,7 @@ class LayoutMain extends React.Component {
     if (typeof(document)!="undefined")
       zoom = document.body.clientWidth / window.innerWidth;
     return (
-      <div>
+      <div className="layout_main">
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
         <LayoutBorderWrap />
         <LayoutHeader user={this.state.user}/>

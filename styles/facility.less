@@ -44,23 +44,24 @@ shipment {
       }
     }
   }
-  .assembly {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    max-height: 400px;
-    margin: 10px 0;
-    .quant {
-      font-weight: bold;
-    }
-    .label {
-      font-size: 12px;
-      margin-left: 5px;
-    }
-  }
 }
 shipment:last-child {
   border-bottom: none;
+}
+
+.assembly {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-height: 400px;
+  margin: 10px 0;
+  .quant {
+    font-weight: bold;
+  }
+  .label {
+    font-size: 12px;
+    margin-left: 5px;
+  }
 }
 
 comments {
