@@ -932,7 +932,7 @@ customize hud_controls.rainbow_border {
   padding: 0 15px 0 15px;
   position: absolute;
   z-index: 1;
-  right: -5px;
+  right: 0;
 }
 customize hud_controls button:before {
   display: none;
@@ -1065,6 +1065,7 @@ customize .product_details .size_chart row span:first-child {
     align-content: flex-start;
     overflow-y: scroll;
     flex: 1;
+    padding-left: 10px;
   }
   customize .component_picker .components {
     display: flex;
