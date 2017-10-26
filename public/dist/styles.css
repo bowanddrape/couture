@@ -998,9 +998,9 @@ customize .product_details .size_chart row span:first-child {
     justify-content: flex-end;
   }
   customize hud_controls.rainbow_border {
-    padding: 0 50px 0 20px;
+    padding: 0 45px 0 20px;
     z-index: 1;
-    right: -5px;
+    right: 0;
   }
   customize hud_controls .hudBtn {
     padding: 20px 0;
