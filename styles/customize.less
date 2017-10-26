@@ -3,35 +3,45 @@
 
 @customize_emoji_key_height: 40px;
 @customize_emoji_key_width: 40px;
-@customize_emoji_key_margin: 4px;
+@customize_emoji_key_margin: 7px;
 customize {
+  position: relative;
+  display: block;
+
+  .rainbow_border {
+    max-width: 94%;
+    margin: 0 auto;
+  }
+
+  .canvasWrap {
+    width: 100%;
+    display: inline-block;
+  }
   product_options {
     position: absolute;
     left: 0;
     display: flex;
     flex-direction: column;
+
     select {
       font-size: 35px;
     }
   }
   .canvas_container {
     display: flex;
+    position: relative;
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 100%;
-    overflow: hidden;
+    justify-content: flex-end;
 
     canvas {
-      flex-grow: 1;
-      height: 300px;
+      flex-grow: 0;
+      height: 420px;
       width: 100%;
+      float: right;
       display: block;
       max-height: 100%;
-    }
-    .component_selected {
-      canvas, component_hitbox {
-        margin-left: -30px; /* FIXME this is dumb, comment this out */
-      }
     }
   }
   tabs.components {
@@ -51,9 +61,10 @@ customize {
     flex-direction: column;
     flex-wrap: wrap;
     align-content: flex-start;
-    height: (@customize_emoji_key_height + (@customize_emoji_key_margin + 2) * 2) * 4 + 15px;
+    height: (@customize_emoji_key_height + (@customize_emoji_key_margin + 2) * 2) * 4 - 5px;
     max-width: 100%;
     overflow-x: scroll;
+    margin: 0 8px;
 
     div {
       height: @customize_emoji_key_height;
@@ -80,6 +91,7 @@ customize {
       border: none;
     }
   }
+
   .component_virtual_keyboard_container {
     .component_container;
     div {
@@ -109,24 +121,167 @@ customize {
     }
   }
   .component_container.letters {
-    max-width: 400px;
+    max-width: 600px;
     margin: 0 auto 20px auto;
     padding: 15px;
-    position: relative;
-    .rainbow_border;
+    bottom: 0;
+    left: ~"calc(60vw - 330px)";
+    position: absolute;
+    display: inline-block;
+    height: auto;
+
+    .punnyInputWrap {
+      display: inline-block;
+      position: relative;
+      float: left;
+      width: 100%;
+      height: auto;
+      &:after {
+        content: '';
+        background: @gradient-rainbow;
+        height: 5px;
+        width: 100%;
+        display: block;
+        position: relative;
+      }
+    }
+    input {
+      border: none;
+      text-transform: lowercase;
+      display: inline-block;
+      width: 100%;
+    }
+    .sayIt {
+      display: inline-block;
+      top: 5px;
+      float: left;
+      margin: 0;
+    }
+
   }
+
+
+//Right Hand Btns
+  .cameraBtn {
+    .zurichroman;
+    border: 0;
+    font-weight: 700;
+    height: auto;
+    display: block;
+    padding-top: 10px;
+    &:before {
+      content: "";
+      display: block;
+      height: 25px;
+      width: 30px;
+      margin: 0 auto 10px auto;
+      position: initial;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-color: white;
+
+    }
+  }
+
+  .frontview {
+    &:before {
+      background-image: url(/frontview.svg);
+    }
+  }
+
+  .backview {
+    &:before {
+      content: "";
+        background-image: url(/backview.svg);
+    }
+  }
+
+  .centerBtn{
+    &:before {
+      content: "";
+        background-image: url(/centerview.svg);
+    }
+  }
+
+  .hudBtn {
+    border: none;
+    font-weight: 700;
+    height: auto;
+    display: block;
+    padding: 20px 0;
+    .zurichroman;
+    &:before {
+      content: "";
+      display: block;
+      height: 30px;
+      width: 40px;
+      margin: 0 auto 10px auto;
+      position: initial;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-color: white;
+    }
+  }
+
+
+
+  .hudBtn--delete {
+    &:before {
+      content: "";
+        background-image: url(/bin.svg);
+    }
+  }
+
+  .hudBtn--rotateLeft{
+    &:before {
+      content: "";
+        background-image: url(/frontview.svg);
+    }
+  }
+
+  .hudBtn--rotateRight{
+    &:before {
+      content: "";
+        background-image: url(/backview.svg);
+    }
+  }
+
+  .hudBtn--edit{
+    &:before {
+      content: "";
+        background-image: url(/edit.svg);
+    }
+  }
+
+
+  .hudBtn--done{
+    &:before {
+      content: "";
+        background-image: url(/tick.svg);
+    }
+  }
+
+  .hudBtn--center{
+    &:before {
+      content: "";
+        background-image: url(/centerview.svg);
+    }
+  }
+
 
   hud_controls {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 0px;
-    right: 0px;
-    min-width: 83px;
+    top: 185px;
+    right: 30px;
     &.rainbow_border {
-      padding: 0 10px;
+      padding: 0 50px 0 20px;
       position: absolute;
       z-index: 1;
+      right: -5px;
     }
     button:before {
       display: none;
@@ -135,83 +290,164 @@ customize {
       display: none;
     }
   }
+  @media (max-width: @desktop_min_width) {
+    hud_controls {
+      top: 0;
+      right: 0;
+    }
+    .hudBtn:before {
+      height: 20px;
+      width: 30px;
+    }
+  }
+
   .product_details {
-    display: flex;
-    flex-wrap: wrap;
     .description {
       margin: 20px auto;
-      font-family: sans-serif;
       letter-spacing: 2px;
       line-height: 23px;
       text-align: center;
-      max-width: 600px;
+      grid-column-start: 1;
+      grid-column-end: 4;
+      margin-top: 40px;
     }
     .size_chart {
       margin: 20px auto;
       display: table;
+      border-collapse: collapse;
+      font-family: 'zurich_condensedregular', sans-serif;
+      grid-column-start: 4;
+      grid-column-end: -1;
+      margin-top: 40px;
       row {
-        &:first-child {
-          background-color: @color_support_0;
+          border-bottom: 1px solid @color_support_0;
+        &:last-child {
+          border-bottom:none;
         }
         display: table-row;
         span {
-          &:first-child {
-            background-color: @color_support_0;
-          }
           display: table-cell;
-          padding: 5px;
-          border: solid 1px @color_primary;
+          padding: 5px 5px 5px 10px;
+          &:first-child {
+            border-right: 1px solid @color_support_0;
+          }
         }
       }
     }
   }
 }
 
-@media (min-width: @desktop_min_width) { customize {
+@media (min-width: @desktop_min_width) {
+  customize {
+    .component_wrapper {
+      position: relative;
+      width: 80vw;
+      height: 81vh;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+
+    .component_container {
+      div {
+        height: 50px;
+        width: 50px;
+        margin: 15px;
+      }
+    }
+
+    div[name=Emoji].rainbow_border {
+      z-index: 100;
+      max-width: 94%;
+      margin: 0 auto;
+      border: none;
+
+      &::before {
+        background-image: none;
+      }
+    }
+
+
+  .canvasWrap {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
   product_options {
     left: auto;
     right: 0;
     max-width: 750px;
+    top: 30px;
     switch {
       justify-content: flex-end;
       margin-bottom: 10px;
+      padding-right: 40px;
     }
   }
   hud_controls:not(.rainbow_border) {
-    top: 165px;
+    top: 420px;
   }
   .component_picker {
     position: absolute;
     top: 0px;
     left: 0px;
     bottom: 0px;
+    border-right: 3px solid #eee;
+    width: auto;
+    height: 100%;
+    background: white;
+
+    tab_contents {
+      max-width: 260px;
+      display: flex;
+      align-items: left;
+      justify-content: left;
+      flex-direction: row;
+      flex-wrap: wrap;
+      flex-flow: row wrap;
+      align-content: flex-start;
+      overflow-y: scroll;
+    }
     .components {
       display: flex;
-      flex-direction: row-reverse;
-      height: 100%;
+      flex-direction: column-reverse;
+      justify-content: flex-start;
+      height: 95%;
+      padding: 20px;
       switch {
-        flex-direction: column;
+      max-width: 260px;
+      display: flex;
+      align-items: left;
+      justify-content: left;
+      flex-direction: row;
+      flex-wrap: wrap;
+      flex-flow: row wrap;
+      align-content: flex-start;
+      height: 100%;
+        img {
+          width: 40px;
+        }
       }
       .component_container.letters {
-        width: 300px;
-        margin-left: 48px;
+        width: 600px;
         margin-top: 118px;
       }
       .component_container:not(.letters) {
-        height: 400px;
-        width: 119px;
+        height: 95%;
+        width: 260px;
+        padding: 10px;
         flex-direction: row;
-        overflow-x: hidden;
-        overflow-y: scroll;
-      }
-      .rainbow_border[name='Emoji'] {
-        margin-left: 50px;
       }
     }
   }
   .canvas_container {
+    border-top: 3px solid #eee;
+    border-bottom: 3px solid #eee;
     canvas {
-      height: 700px;
+      height: 80vh;
     }
     .component_selected {
       canvas, component_hitbox {
@@ -219,4 +455,100 @@ customize {
       }
     }
   }
-}}
+}
+
+}
+
+.component_wrapper {
+  position: relative;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+switch_option img {
+  font-weight: 700;
+}
+
+
+.add_to_cart {
+  position: fixed;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  border-top: 1px solid black;
+  z-index: 10;
+  background: white;
+  border-top: 3px solid #eee;
+
+  .productName {
+    position: relative;
+    display: inline-block;
+    font-size: 42px;
+    text-transform: uppercase;
+    font-weight: 800;
+    border-bottom: 5px solid #7f5cff;
+    margin: 35px 60px 0 0;
+  }
+
+  .productPrice {
+  font-weight: 600;
+  }
+
+  .addCart {
+    display: inline-block;
+  }
+}
+
+
+@media (max-width: @desktop_min_width) {
+customize {
+  .component_container.letters {
+    top: -20px;
+    left: 5%;
+    position: relative;
+    width: 90%;
+    padding: 0;
+  }
+
+
+  .cameraBtn {
+    font-size: 10px;
+  }
+   .product_details {
+    .description {
+      grid-column-start: 1;
+      grid-column-end: -1;
+    }
+    .size_chart {
+      grid-column-start: 1;
+      grid-column-end: -1;
+    }
+  }
+}
+
+  .add_to_cart {
+      height: auto;
+      position: relative;
+      border: none;
+      padding-top: 30px;
+    .productName {
+      position: relative;
+      display: inline-block;
+      font-size: 16px;
+      text-transform: uppercase;
+      font-weight: bold;
+      border-bottom: 3px solid #7f5cff;
+      margin: 5px 15px 0 15px;
+    }
+
+    .addCart {
+      font-size: 16px;
+      display: inline-block;
+      margin-top: 15px;
+    }
+  }
+}

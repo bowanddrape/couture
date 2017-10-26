@@ -8,10 +8,16 @@
   right: 0;
 
   .footer-inner {
-    border-top: 5px solid transparent;
-    border-image: @gradient-rainbow;
-    border-image-slice: 1;
     padding: 50px 0;
+    &:before {
+      content: '';
+      background: @gradient-rainbow;
+      height: 5px;
+      width: 100%;
+      display: block;
+      position: relative;
+      margin: 0 0 50px 0;
+    }
   }
 
   .footer-menu {
@@ -22,7 +28,7 @@
       text-transform: uppercase;
       margin-bottom: 10px;
       display: block;
-      font-family: "Zurich-Condensed-Bold", sans-serif;
+      font-family: "zurichbold_condensed", sans-serif;
       font-weight: normal;
       vertical-align: middle;
       transition: color .5s ease;
@@ -81,6 +87,7 @@
    }
      button {
        display: inline-block;
+           top: 5px;
      }
    }
 }
@@ -89,17 +96,12 @@
   .footer {
       .footer-menu {
         a {
-          margin-right: 60px;
           display: inline-block;
-          margin-bottom: 0;
+          margin-right: 60px;
         }
         .social {
-          &:last-of-type {
-            margin-right: 60px;
-          }
-          &:first-of-type {
-            margin-left: 0;
-          }
+          display: inline-block;
+          margin-right: 20px;
         }
       }
   }

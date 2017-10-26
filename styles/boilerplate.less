@@ -4,6 +4,7 @@
 
 @desktop_min_width: 737px;
 
+
 @keyframes busyState {
   0%    { opacity: 1;}
   50%   { opacity: 0.2;}
@@ -21,6 +22,7 @@ body {
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+  margin: 0;
 }
 
 .layout_main {
@@ -41,7 +43,6 @@ a.button {
 button, .button {
   text-align: center;
   white-space: nowrap;
-
   height: 56px;
   border: 5px solid @color_secondary;
   display: block;
@@ -53,6 +54,9 @@ button, .button {
   margin: 6px auto;
   width: 100%;
   max-width: 180px;
+  font-family: 'arvobold';
+  font-weight: normal;
+  letter-spacing: 2px;
   cursor: pointer;
   text-transform: uppercase;
     box-sizing: border-box;
@@ -116,7 +120,7 @@ button, .button {
 }
 
 .cta {
-  font-family: "Zurich-Condensed-Bold", sans-serif;
+  font-family: "zurichbold_condensed", sans-serif;
   font-size: 10px;
   font-weight: bold;
   letter-spacing: 2px;
@@ -149,10 +153,10 @@ actions {
   &:after {
     content: " ";
     position: absolute;
-    left: 2px;
-    right: 2px;
-    top: 2px;
-    bottom: 2px;
+    left: 5px;
+    right: 5px;
+    top: 5px;
+    bottom: 5px;
     background-color: @color_primary;
     z-index: -1;
   }
@@ -163,9 +167,10 @@ errors {
   background-color: @color_error;
   border-radius: 5px;
   padding: 5px;
-  margin: 3px auto;
-  border-radius: 5px;
+  margin: 15px auto;
+  border-radius: 20px;
   display: block;
+  width: 50%;
 }
 input.error {
   box-shadow: 0 0 10px @color_error;
@@ -367,7 +372,7 @@ button:focus, input[type="button"]:focus {
     right: 0;
     width:  ~"calc(100vw - 10px)";
     height: ~"calc(100vh - 10px)";
-    z-index: 99;
+    z-index: 999;
     background: transparent;
     pointer-events: none;
     border: 5px solid transparent;
@@ -378,9 +383,22 @@ button:focus, input[type="button"]:focus {
 
 @media (min-width: @desktop_min_width) {
   .layout_main {
-    padding-top: 108px;
+    padding-top: 112px;
   }
 }
+
+
+//Grid Stuff Generic Across All
+
+.grid {
+  display: grid;
+  width: 80vw;
+  max-width: 1100px;
+  margin: 0 auto;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto;
+}
+
 
 @media print {
   .header, .footer {

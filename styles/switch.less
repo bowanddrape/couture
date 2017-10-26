@@ -11,7 +11,6 @@ switch {
     z-index: 2;
     position: relative;
     margin: 0 10px;
-    background-color: @color_primary;
     border: solid 2px @color_primary;
     color: @color_secondary;
     max-width: 165px;
@@ -25,7 +24,6 @@ switch {
   &.expanded {
     .rainbow_border;
     z-index: 1;
-    background-color: @color_primary;
     switch_option:not(.selected) {
       opacity: 0.25;
       &:hover {
@@ -43,4 +41,48 @@ switch {
 product_options switch.expanded {
   justify-content: flex-begin;
   margin-bottom: 10px;
+}
+
+
+.component_picker {
+  switch {
+    justify-content: center;
+    switch_option {
+      background-color: @color_primary;
+      border: solid 1px @color_support_0;
+      color: @color_secondary;
+      border-radius: 50%;
+      padding: 8px;
+      margin:  10px;
+    }
+    switch_option.selected, &.expanded switch_option {
+      min-width: 36px;
+    }
+    &.expanded {
+      .rainbow_border;
+      z-index: 1;
+      switch_option:not(.selected) {
+        opacity: 1;
+      }
+
+      .selected {
+        border-color: @color_highlight;
+      }
+    }
+    &:not(.expanded) switch_option:not(.selected) {
+
+    }
+  }
+}
+
+@media (min-width: @desktop_min_width) {
+.component_picker {
+  switch {
+    switch_option {
+      width: 65px;
+      height: 65px;
+      padding: 10px;
+      }
+    }
+  }
 }

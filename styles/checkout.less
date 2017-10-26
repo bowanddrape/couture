@@ -5,6 +5,12 @@
   display: grid;
   width: 80vw;
   margin: 0 auto;
+}
+
+cart {
+  grid-column-start: 1;
+  grid-column-end: -1;
+  display: grid;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: auto;
 }
@@ -106,7 +112,7 @@ input_credit {
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: auto;
 
-  input_address{
+    input_address{
     grid-column-start: 1;
     grid-column-end: 6;
   }
@@ -125,7 +131,6 @@ input_credit {
   .sectionTitle {
     margin-top: 20px;
   }
-}
 
 .cart-wrapper{
   input[type="text"], input[type="password"] {
@@ -145,6 +150,44 @@ input_credit {
     }
   }
 }
+}
+
+@media (max-width: @desktop_min_width) {
+  .cart-wrapper{
+    input[type="text"], input[type="password"] {
+      font-size: 16px
+    }
+  }
+
+  .items {
+    .product_wrapper {
+        grid-column: span 6;
+    }
+
+    .summary_items {
+      grid-column: span 6;
+      padding: 0;
+    }
+  }
+}
+
+.loginToggle {
+  grid-column-start: 1;
+  grid-column-end: -1;
+
+  input[type="radio"] {
+    margin-right: 5px;
+  }
+  .radioLabel {
+      margin-right: 15px;
+  }
+}
+
+.loginHeader {
+  grid-column-start: 1;
+  grid-column-end: -1;
+}
+
 
 .paymentWrap {
   input[type="text"].cardNum {
@@ -161,6 +204,7 @@ input_credit {
 
 .checkout_btn {
   margin: 0 0 10px 0;
+  min-width: 160px;
 }
 
 .packing_slip {

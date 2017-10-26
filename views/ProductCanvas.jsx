@@ -146,7 +146,24 @@ class ProductCanvas extends React.Component {
       return {assembly, selected_component: assembly.length-1};
     });
   }
+
   handlePopComponent(cascade=false) {
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      let selected = assembly[prevState.selected_component];
+      if (selected) {
+        selected.assembly.pop();
+        if (cascade || !selected.assembly.length) {
+          assembly.splice(prevState.selected_component, 1);
+          return {assembly, selected_component: -1};
+        }
+        return {assembly};
+      }
+      return {};
+    });
+  }
+
+  handleDelComponent(cascade=false) {
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected = assembly[prevState.selected_component];
@@ -380,33 +397,35 @@ class ProductCanvas extends React.Component {
 
     let hud_controls = [];
     if (this.state.assembly[this.state.selected_component]) {
-      hud_controls.push(<button key={hud_controls.length} onClick={this.handlePopComponent.bind(this, true)}>✖</button>);
-      hud_controls.push(<div key={hud_controls.length} style={{display:"flex"}}><button onClick={this.handleComponentRotate.bind(this, -Math.PI/20)}>↶</button>
-        <button onClick={this.handleComponentRotate.bind(this, Math.PI/20)}>↷</button></div>
+      hud_controls.push(<button className="hudBtn hudBtn--delete" key={hud_controls.length} onClick={this.handlePopComponent.bind(this, true)}>Delete</button>);
+      hud_controls.push(<div key={hud_controls.length}><button className="hudBtn hudBtn--rotateLeft" onClick={this.handleComponentRotate.bind(this, -Math.PI/20)}>Rotate</button>
+    <button className="hudBtn hudBtn--rotateRight" onClick={this.handleComponentRotate.bind(this, Math.PI/20)}>Rotate</button></div>
       );
-      hud_controls.push(<button key={hud_controls.length} onClick={this.handleComponentCenter.bind(this)}>▣</button>);
-      hud_controls.push(<button key={hud_controls.length} onClick={this.handleSelectComponent.bind(this, -1)}>✔</button>);
+      hud_controls.push(<button className="hudBtn hudBtn--center" key={hud_controls.length} onClick={this.handleComponentCenter.bind(this)}>Center</button>);
+      hud_controls.push(<button className="hudBtn hudBtn--done" key={hud_controls.length} onClick={this.handleSelectComponent.bind(this, -1)}>Done</button>);
     }
     else if (this.cameras && this.cameras.length>1) {
       this.cameras.forEach((camera) => {
-        let camera_label = camera.name.toUpperCase() || `Camera ${hud_controls.length}`;
+        let camera_label = camera.name|| `Camera ${hud_controls.length}`;
+        let camera_class = camera_label + 'view cameraBtn';
         hud_controls.push(
-          <button key={hud_controls.length} onClick={this.handleChangeCamera.bind(this, hud_controls.length)}>
-            {camera_label}
+          <button className={camera_class}  key={hud_controls.length} onClick={this.handleChangeCamera.bind(this, hud_controls.length)}>
+            {camera_label} View
           </button>
         );
       });
-      hud_controls.push(<button key={hud_controls.length} onClick={this.autoLayout.bind(this, true)}>AUTO</button>);
+      hud_controls.push(<button key={hud_controls.length} className="cameraBtn centerBtn" onClick={this.autoLayout.bind(this, true)}>Center All</button>);
     }
 
     return (
-      <div style={{position:"relative",width:"100%"}} className={this.state.assembly[this.state.selected_component]?"component_selected":""}>
-        <canvas>
-        </canvas>
-        {component_hitboxes}
+      <section className="canvasWrap">
+        <div className={this.state.assembly[this.state.selected_component]?"component_selected component_wrapper":"component_wrapper"}>
+          <canvas></canvas>
+          {component_hitboxes}
+        </div>
         <hud_controls className={this.state.assembly[this.state.selected_component]?"rainbow_border":""}>{hud_controls}</hud_controls>
         <ProductComponentPicker product={this.props.product} productCanvas={this} compatible_component_map={this.props.compatible_component_map}/>
-      </div>
+      </section>
     );
   }
 }

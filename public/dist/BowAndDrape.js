@@ -23292,51 +23292,33 @@ utils.intFromLE = intFromLE;
 module.exports={
   "_args": [
     [
-      {
-        "raw": "elliptic@^6.0.0",
-        "scope": null,
-        "escapedName": "elliptic",
-        "name": "elliptic",
-        "rawSpec": "^6.0.0",
-        "spec": ">=6.0.0 <7.0.0",
-        "type": "range"
-      },
-      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
+      "elliptic@6.4.0",
+      "/Users/Sunmi/Servers/bowanddrape"
     ]
   ],
-  "_from": "elliptic@>=6.0.0 <7.0.0",
+  "_from": "elliptic@6.4.0",
   "_id": "elliptic@6.4.0",
-  "_inCache": true,
+  "_inBundle": false,
+  "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
   "_location": "/elliptic",
-  "_nodeVersion": "7.0.0",
-  "_npmOperationalInternal": {
-    "host": "packages-18-east.internal.npmjs.com",
-    "tmp": "tmp/elliptic-6.4.0.tgz_1487798866428_0.30510620190761983"
-  },
-  "_npmUser": {
-    "name": "indutny",
-    "email": "fedor@indutny.com"
-  },
-  "_npmVersion": "3.10.8",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "elliptic@^6.0.0",
-    "scope": null,
-    "escapedName": "elliptic",
+    "type": "version",
+    "registry": true,
+    "raw": "elliptic@6.4.0",
     "name": "elliptic",
-    "rawSpec": "^6.0.0",
-    "spec": ">=6.0.0 <7.0.0",
-    "type": "range"
+    "escapedName": "elliptic",
+    "rawSpec": "6.4.0",
+    "saveSpec": null,
+    "fetchSpec": "6.4.0"
   },
   "_requiredBy": [
     "/browserify-sign",
     "/create-ecdh"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-  "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-  "_shrinkwrap": null,
-  "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
+  "_spec": "6.4.0",
+  "_where": "/Users/Sunmi/Servers/bowanddrape",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -23370,15 +23352,9 @@ module.exports={
     "jshint": "^2.6.0",
     "mocha": "^2.1.0"
   },
-  "directories": {},
-  "dist": {
-    "shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-    "tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz"
-  },
   "files": [
     "lib"
   ],
-  "gitHead": "6b0d2b76caae91471649c8e21f0b1d3ba0f96090",
   "homepage": "https://github.com/indutny/elliptic",
   "keywords": [
     "EC",
@@ -23388,15 +23364,7 @@ module.exports={
   ],
   "license": "MIT",
   "main": "lib/elliptic.js",
-  "maintainers": [
-    {
-      "name": "indutny",
-      "email": "fedor@indutny.com"
-    }
-  ],
   "name": "elliptic",
-  "optionalDependencies": {},
-  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/indutny/elliptic.git"
@@ -62883,7 +62851,7 @@ var Cart = function (_React$Component) {
             React.createElement(
               'h5',
               { style: { margin: "0" } },
-              'Expiry'
+              'Expiration Date'
             ),
             React.createElement('input', { className: 'expMonth', type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.exp_month, name: 'exp_month', placeholder: 'MM' }),
             React.createElement('input', { className: 'expYear', type: 'text', onChange: this.handleFieldChange.bind(this, "card"), value: this.state.card.exp_year, name: 'exp_year', placeholder: 'YY' })
@@ -65756,7 +65724,7 @@ var Items = function (_React$Component) {
         if (_this2.state.promo.props && _this2.state.promo.props.free_ship) shipping_cost = 0;
         contents.push({
           props: {
-            name: "Shipping & Handling",
+            name: "Shipping & Handling:",
             price: shipping_cost
           }
         });
@@ -67747,6 +67715,25 @@ var ProductCanvas = function (_React$Component) {
       });
     }
   }, {
+    key: 'handleDelComponent',
+    value: function handleDelComponent() {
+      var cascade = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      this.setState(function (prevState, props) {
+        var assembly = JSON.parse(JSON.stringify(prevState.assembly));
+        var selected = assembly[prevState.selected_component];
+        if (selected) {
+          selected.assembly.pop();
+          if (cascade || !selected.assembly.length) {
+            assembly.splice(prevState.selected_component, 1);
+            return { assembly: assembly, selected_component: -1 };
+          }
+          return { assembly: assembly };
+        }
+        return {};
+      });
+    }
+  }, {
     key: 'handleComponentMove',
     value: function handleComponentMove(index, event) {
       var _this5 = this;
@@ -67977,54 +67964,60 @@ var ProductCanvas = function (_React$Component) {
       if (this.state.assembly[this.state.selected_component]) {
         hud_controls.push(React.createElement(
           'button',
-          { key: hud_controls.length, onClick: this.handlePopComponent.bind(this, true) },
-          '\u2716'
+          { className: 'hudBtn hudBtn--delete', key: hud_controls.length, onClick: this.handlePopComponent.bind(this, true) },
+          'Delete'
         ));
         hud_controls.push(React.createElement(
           'div',
-          { key: hud_controls.length, style: { display: "flex" } },
+          { key: hud_controls.length },
           React.createElement(
             'button',
-            { onClick: this.handleComponentRotate.bind(this, -Math.PI / 20) },
-            '\u21B6'
+            { className: 'hudBtn hudBtn--rotateLeft', onClick: this.handleComponentRotate.bind(this, -Math.PI / 20) },
+            'Rotate'
           ),
           React.createElement(
             'button',
-            { onClick: this.handleComponentRotate.bind(this, Math.PI / 20) },
-            '\u21B7'
+            { className: 'hudBtn hudBtn--rotateRight', onClick: this.handleComponentRotate.bind(this, Math.PI / 20) },
+            'Rotate'
           )
         ));
         hud_controls.push(React.createElement(
           'button',
-          { key: hud_controls.length, onClick: this.handleComponentCenter.bind(this) },
-          '\u25A3'
+          { className: 'hudBtn hudBtn--center', key: hud_controls.length, onClick: this.handleComponentCenter.bind(this) },
+          'Center'
         ));
         hud_controls.push(React.createElement(
           'button',
-          { key: hud_controls.length, onClick: this.handleSelectComponent.bind(this, -1) },
-          '\u2714'
+          { className: 'hudBtn hudBtn--done', key: hud_controls.length, onClick: this.handleSelectComponent.bind(this, -1) },
+          'Done'
         ));
       } else if (this.cameras && this.cameras.length > 1) {
         this.cameras.forEach(function (camera) {
-          var camera_label = camera.name.toUpperCase() || 'Camera ' + hud_controls.length;
+          var camera_label = camera.name || 'Camera ' + hud_controls.length;
+          var camera_class = camera_label + 'view cameraBtn';
           hud_controls.push(React.createElement(
             'button',
-            { key: hud_controls.length, onClick: _this10.handleChangeCamera.bind(_this10, hud_controls.length) },
-            camera_label
+            { className: camera_class, key: hud_controls.length, onClick: _this10.handleChangeCamera.bind(_this10, hud_controls.length) },
+            camera_label,
+            ' View'
           ));
         });
         hud_controls.push(React.createElement(
           'button',
-          { key: hud_controls.length, onClick: this.autoLayout.bind(this, true) },
-          'AUTO'
+          { key: hud_controls.length, className: 'cameraBtn centerBtn', onClick: this.autoLayout.bind(this, true) },
+          'Center All'
         ));
       }
 
       return React.createElement(
-        'div',
-        { style: { position: "relative", width: "100%" }, className: this.state.assembly[this.state.selected_component] ? "component_selected" : "" },
-        React.createElement('canvas', null),
-        component_hitboxes,
+        'section',
+        { className: 'canvasWrap' },
+        React.createElement(
+          'div',
+          { className: this.state.assembly[this.state.selected_component] ? "component_selected component_wrapper" : "component_wrapper" },
+          React.createElement('canvas', null),
+          component_hitboxes
+        ),
         React.createElement(
           'hud_controls',
           { className: this.state.assembly[this.state.selected_component] ? "rainbow_border" : "" },
@@ -68215,27 +68208,29 @@ var ProductComponentPicker = function (_React$Component) {
             _this3.component_letter_map[i] = _component_letters;
             components.push(React.createElement(
               'div',
-              { key: components.length, name: compatible_component.props.name || compatible_component.sku, style: { height: "auto", overflow: "hidden" }, className: 'component_container letters' },
-              React.createElement('input', { type: 'text', style: { width: "90%", margin: "auto" },
-                name: compatible_component.sku,
-                placeholder: 'Say Something',
-                onChange: function onChange(event) {
-                  _this3.handleSetComponentText(event.target.value, _component_letters);
-                },
-                onFocus: function onFocus(event) {
-                  event.persist();
-                  // TODO figure out some better scrolly what-nots?
-                  setTimeout(function () {
-                    event.target.scrollIntoView(false);
-                  }, 1);
-                },
-                onKeyUp: function onKeyUp(event) {
-                  if (event.which != 13) return;
-                  _this3.handleSetComponentText(event.target.value, _component_letters);
-                  _this3.props.productCanvas.handleSelectComponent(-1);
-                },
-                value: _this3.props.productCanvas.getComponentText()
-              })
+              { key: components.length, name: compatible_component.props.name || compatible_component.sku, className: 'component_container letters' },
+              React.createElement(
+                'div',
+                { className: 'punnyInputWrap' },
+                React.createElement('input', { type: 'text', className: 'punnyInput', placeholder: 'Say Something', name: compatible_component.sku,
+                  onChange: function onChange(event) {
+                    _this3.handleSetComponentText(event.target.value, _component_letters);
+                  },
+                  onFocus: function onFocus(event) {
+                    event.persist();
+                    // TODO figure out some better scrolly what-nots?
+                    setTimeout(function () {
+                      event.target.scrollIntoView(false);
+                    }, 1);
+                  },
+                  onKeyUp: function onKeyUp(event) {
+                    if (event.which != 13) return;
+                    _this3.handleSetComponentText(event.target.value, _component_letters);
+                    _this3.props.productCanvas.handleSelectComponent(-1);
+                  },
+                  value: _this3.props.productCanvas.getComponentText()
+                })
+              )
             ));
             return 'continue';
           } // is_native_keyboard
@@ -68466,15 +68461,26 @@ var ProductList = function (_React$Component) {
         ),
         this.props.edit ? null : React.createElement(
           'div',
-          { className: 'add_to_cart', style: { textAlign: "center" } },
+          { className: 'add_to_cart' },
+          React.createElement(
+            'div',
+            { className: 'productName bottomSwitch' },
+            product.props.name,
+            ' ',
+            React.createElement(
+              'span',
+              { className: 'productPrice' },
+              '$',
+              product.props.price
+            )
+          ),
           React.createElement(
             BADButton,
-            { className: 'primary', onClick: this.handleAddToCart.bind(this, product) },
-            'Add To Cart $',
-            product.props.price
+            { className: 'primary addCart', onClick: this.handleAddToCart.bind(this, product) },
+            'Add To Cart'
           )
         ),
-        product.props.details ? React.createElement('div', { className: 'product_details', dangerouslySetInnerHTML: {
+        product.props.details ? React.createElement('div', { className: 'product_details grid', dangerouslySetInnerHTML: {
             __html: unescape(product.props.details)
           } }) : null,
         React.createElement(ClickForMore, { href: '/pdp/' + product.sku.split('_').slice(0, 2).join('_') + '?layout=basic' })
@@ -70376,12 +70382,17 @@ var UserLogin = function (_React$Component) {
           React.createElement(
             'button',
             { className: 'loginBtn', onClick: this.login.bind(this) },
-            'Login / Register'
+            'Login'
+          ),
+          React.createElement(
+            'button',
+            { className: 'loginBtn', onClick: this.login.bind(this) },
+            'Register'
           ),
           React.createElement(
             'button',
             { className: 'loginBtn', onClick: this.verify.bind(this) },
-            'Verify / Forgot Pass'
+            'Reset Password'
           ),
           React.createElement(FacebookLogin, { user: this.state.user })
         ),
