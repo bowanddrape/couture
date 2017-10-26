@@ -866,7 +866,7 @@ customize .hudBtn {
   font-weight: 700;
   height: auto;
   display: block;
-  padding: 20px 0;
+  padding: 10px 0;
   font-family: 'zurich_condensedregular', sans-serif;
   font-weight: normal;
 }
@@ -911,10 +911,10 @@ customize hud_controls {
   flex-direction: column;
   position: absolute;
   top: 185px;
-  right: 30px;
+  right: 40px;
 }
 customize hud_controls.rainbow_border {
-  padding: 0 50px 0 20px;
+  padding: 0 15px 0 15px;
   position: absolute;
   z-index: 1;
   right: -5px;
@@ -928,7 +928,13 @@ customize hud_controls button:after {
 @media (max-width: 737px) {
   customize hud_controls {
     top: 0;
-    right: 0;
+    right: 10px;
+  }
+  customize customize hud_controls.rainbow_border {
+    padding: 0 15px 0 15px;
+  }
+  customize .hudBtn {
+    padding: 10px 0;
   }
   customize .hudBtn:before {
     height: 20px;
@@ -976,16 +982,27 @@ customize .product_details .size_chart row span:first-child {
     flex-direction: row;
     justify-content: flex-end;
   }
+  customize hud_controls.rainbow_border {
+    padding: 0 50px 0 20px;
+    z-index: 1;
+    right: -5px;
+  }
+  customize hud_controls .hudBtn {
+    padding: 20px 0;
+  }
+  customize .component_container {
+    margin: 0;
+  }
   customize .component_container div {
-    height: 50px;
-    width: 50px;
-    margin: 15px;
+    height: 65px;
+    width: 65px;
+    margin: 10px;
   }
   customize div[name=Emoji].rainbow_border {
     z-index: 100;
-    max-width: 94%;
-    margin: 0 auto;
+    max-width: 100%;
     border: none;
+    border-top: 3px solid #eee;
   }
   customize div[name=Emoji].rainbow_border::before {
     background-image: none;
@@ -1032,6 +1049,7 @@ customize .product_details .size_chart row span:first-child {
     flex-flow: row wrap;
     align-content: flex-start;
     overflow-y: scroll;
+    flex: 1;
   }
   customize .component_picker .components {
     display: flex;
@@ -1049,7 +1067,6 @@ customize .product_details .size_chart row span:first-child {
     flex-wrap: wrap;
     flex-flow: row wrap;
     align-content: flex-start;
-    height: 100%;
   }
   customize .component_picker .components switch img {
     width: 40px;
@@ -1061,7 +1078,7 @@ customize .product_details .size_chart row span:first-child {
   customize .component_picker .components .component_container:not(.letters) {
     height: 95%;
     width: 260px;
-    padding: 10px;
+    padding: 10px 0;
     flex-direction: row;
   }
   customize .canvas_container {
@@ -1069,7 +1086,7 @@ customize .product_details .size_chart row span:first-child {
     border-bottom: 3px solid #eee;
   }
   customize .canvas_container canvas {
-    height: 80vh;
+    height: 70vh;
   }
   customize .canvas_container .component_selected canvas,
   customize .canvas_container .component_selected component_hitbox {
@@ -1624,11 +1641,11 @@ product_options switch.expanded {
 .header img.logo {
   display: block;
   margin: auto;
-  width: 260px;
+  width: 150px;
 }
 @media (min-width: 737px) {
   .header .img-logo {
-    width: 200px;
+    width: 260px;
   }
 }
 .header .cartmenu {

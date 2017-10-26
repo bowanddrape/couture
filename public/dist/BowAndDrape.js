@@ -67857,13 +67857,16 @@ var ProductCanvas = function (_React$Component) {
             'button',
             { className: camera_class, key: hud_controls.length, onClick: _this10.handleChangeCamera.bind(_this10, hud_controls.length) },
             camera_label,
-            ' View'
+            React.createElement('br', null),
+            'View'
           ));
         });
         hud_controls.push(React.createElement(
           'button',
           { key: hud_controls.length, className: 'cameraBtn centerBtn', onClick: this.autoLayout.bind(this, true) },
-          'Center All'
+          'Center',
+          React.createElement('br', null),
+          'All'
         ));
       }
 
