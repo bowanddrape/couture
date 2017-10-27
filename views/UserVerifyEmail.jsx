@@ -14,7 +14,7 @@ class UserVerifyEmail extends React.Component {
       <table><tbody>
         <tr><td style={styles.fullwidth}>
           <a href={this.props.link}>
-            Click here to reset your password / verify your account
+            <img src="https://couture.bowanddrape.com/email_reset_password.gif" />
           </a>
         </td></tr>
       </tbody></table>
