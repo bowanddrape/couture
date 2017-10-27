@@ -68,6 +68,9 @@ login {
       display: flex;
       align-items: center;
       justify-content: center;
+      display: -webkit-flex;
+      -webkit-justify-content: center;
+      -webkit-align-items: center;
       img {
         width: 25px;
         height: auto;
@@ -153,3 +156,10 @@ menu.expanded login {
       display: none;
     }
   }
+
+
+  @media (min-width: @desktop_min_width) {
+    login {
+      margin: 30px 0 0 0;
+    }
+}

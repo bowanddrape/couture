@@ -23,7 +23,7 @@
   }
 
   .headerInner {
-    padding-top: 30px;
+    padding-top: 25px;
   }
 
   handle {
@@ -74,7 +74,7 @@
   }
   menu {
     top: 0;
-    margin: 15px 0;
+    margin: 10px 0;
     padding: 0px;
     width: 100%;
     overflow: hidden;
@@ -181,9 +181,14 @@ user {
       transition: max-height 1s ease, border-bottom 1s ease;
     }
     &.expanded {
-      border-bottom: 5px solid transparent;
-      border-image: @gradient-rainbow;
-      border-image-slice: 1;
+        &:after {
+          content: '';
+          background: @gradient-rainbow;
+          height: 5px;
+          width: 100%;
+          display: block;
+          position: relative;
+        }
       login, user {
         opacity: 1;
         max-height: 100vh;

@@ -63053,19 +63053,27 @@ var Cart = function (_React$Component) {
             React.createElement(
               'form',
               null,
-              React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
-              ' ',
               React.createElement(
-                'span',
-                { className: 'radio_label' },
-                'Same Billing address'
+                'div',
+                { className: 'radioWrap' },
+                React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
+                ' ',
+                React.createElement(
+                  'span',
+                  { className: 'radio_label' },
+                  'Same Billing address'
+                )
               ),
-              React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: !this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
-              ' ',
               React.createElement(
-                'span',
-                { className: 'radio_label' },
-                'Different Billing address'
+                'div',
+                { className: 'radioWrap' },
+                React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: !this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
+                ' ',
+                React.createElement(
+                  'span',
+                  { className: 'radio_label' },
+                  'Different Billing address'
+                )
               )
             ),
             this.state.same_billing ? null : React.createElement(InputAddress, _extends({ section_title: 'Billing Address', errors: React.createElement(Errors, { label: 'billing' }), handleFieldChange: this.handleFieldChange.bind(this, "billing"), handleSetSectionState: this.handleSetSectionState.bind(this, "billing") }, this.state.billing))
@@ -68533,6 +68541,13 @@ var ProductList = function (_React$Component) {
           React.createElement(
             'product_options',
             null,
+            React.createElement(
+              'span',
+              null,
+              'Product',
+              React.createElement('br', null),
+              'Options'
+            ),
             product_options
           ),
           React.createElement(ProductCanvas, { ref: 'ProductCanvas', product: product, handleUpdateProduct: this.handleUpdateProduct.bind(this), assembly: this.initial_assembly, compatible_component_map: this.props.compatible_component_map })

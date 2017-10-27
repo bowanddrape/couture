@@ -172,6 +172,7 @@ class ProductList extends React.Component {
         }
         <div className="canvas_container">
           <product_options>
+            <span>Product<br></br>Options</span>
             {product_options}
           </product_options>
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly} compatible_component_map={this.props.compatible_component_map}/>

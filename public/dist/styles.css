@@ -559,6 +559,7 @@ comments message {
 }
 .items .product_wrapper .item {
   border-bottom: 2px solid black;
+  padding-bottom: 30px;
 }
 .items .product_wrapper .item:last-of-type {
   border-bottom: none;
@@ -673,6 +674,9 @@ customize product_options {
   display: flex;
   flex-direction: column;
 }
+customize product_options span {
+  display: none;
+}
 customize product_options select {
   font-size: 35px;
 }
@@ -686,7 +690,7 @@ customize .canvas_container {
 }
 customize .canvas_container canvas {
   flex-grow: 0;
-  height: 420px;
+  height: 400px;
   width: 100%;
   float: right;
   display: block;
@@ -823,7 +827,7 @@ customize .component_container.letters {
   max-width: 600px;
   margin: 0 auto 20px auto;
   padding: 15px;
-  bottom: 0;
+  bottom: 30px;
   left: calc(60vw - 330px);
   position: absolute;
   display: inline-block;
@@ -937,7 +941,7 @@ customize hud_controls {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 185px;
+  top: 20px;
   right: 40px;
 }
 customize hud_controls.rainbow_border {
@@ -1030,6 +1034,7 @@ customize .product_details .size_chart row span:first-child {
     max-width: 100%;
     border: none;
     border-top: 3px solid #eaeaea;
+    z-index: 0;
   }
   customize div[name=Emoji].rainbow_border::before {
     background-image: none;
@@ -1048,13 +1053,22 @@ customize .product_details .size_chart row span:first-child {
     max-width: 750px;
     top: 30px;
   }
+  customize product_options span {
+    display: block;
+    font-family: 'zurich_condensedregular', sans-serif;
+    font-weight: normal;
+    text-transform: uppercase;
+    padding-right: 40px;
+    text-align: right;
+  }
   customize product_options switch {
     justify-content: flex-end;
     margin-bottom: 10px;
     padding-right: 40px;
   }
   customize hud_controls:not(.rainbow_border) {
-    top: 420px;
+    top: 240px;
+    border-top: 3px solid #eaeaea;
   }
   customize .component_picker {
     position: absolute;
@@ -1067,7 +1081,7 @@ customize .product_details .size_chart row span:first-child {
     background: white;
   }
   customize .component_picker tab_contents {
-    max-width: 260px;
+    max-width: 340px;
     display: flex;
     align-items: left;
     justify-content: left;
@@ -1087,7 +1101,7 @@ customize .product_details .size_chart row span:first-child {
     padding: 20px;
   }
   customize .component_picker .components switch {
-    max-width: 260px;
+    max-width: 340px;
     display: flex;
     align-items: left;
     justify-content: left;
@@ -1105,7 +1119,7 @@ customize .product_details .size_chart row span:first-child {
   }
   customize .component_picker .components .component_container:not(.letters) {
     height: 95%;
-    width: 260px;
+    width: 340px;
     padding: 10px 0;
     flex-direction: row;
   }
@@ -1114,7 +1128,7 @@ customize .product_details .size_chart row span:first-child {
     border-bottom: 3px solid #eaeaea;
   }
   customize .canvas_container canvas {
-    height: 70vh;
+    height: 68vh;
   }
   customize .canvas_container .component_selected canvas,
   customize .canvas_container .component_selected component_hitbox {
@@ -1138,7 +1152,7 @@ switch_option img {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120px;
+  height: 90px;
   border-top: 1px solid black;
   z-index: 10;
   background: white;
@@ -1147,11 +1161,11 @@ switch_option img {
 .add_to_cart .productName {
   position: relative;
   display: inline-block;
-  font-size: 42px;
+  font-size: 32px;
   text-transform: uppercase;
   font-weight: 800;
   border-bottom: 5px solid #7f5cff;
-  margin: 35px 60px 0 0;
+  margin: 15px 40px 0 0;
 }
 .add_to_cart .productPrice {
   font-weight: 600;
@@ -1215,6 +1229,15 @@ cart {
   grid-column-start: 1;
   grid-column-end: -1;
   margin-top: 40px;
+}
+.billing-check input[type="radio"] {
+  margin-right: 5px;
+}
+.billing-check .radioLabel {
+  margin-right: 15px;
+}
+.billing-check .radioWrap {
+  display: inline-block;
 }
 .sameCheckbox {
   margin-bottom: 20px;
@@ -1655,7 +1678,7 @@ product_options switch.expanded {
   position: relative;
 }
 .header .headerInner {
-  padding-top: 30px;
+  padding-top: 25px;
 }
 .header handle {
   background-image: url(/hamburger.svg);
@@ -1702,7 +1725,7 @@ product_options switch.expanded {
 }
 .header menu {
   top: 0;
-  margin: 15px 0;
+  margin: 10px 0;
   padding: 0px;
   width: 100%;
   overflow: hidden;
@@ -1804,10 +1827,13 @@ user name {
     max-height: 0px;
     transition: max-height 1s ease, border-bottom 1s ease;
   }
-  .header menu.expanded {
-    border-bottom: 5px solid transparent;
-    border-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
-    border-image-slice: 1;
+  .header menu.expanded:after {
+    content: '';
+    background: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
+    height: 5px;
+    width: 100%;
+    display: block;
+    position: relative;
   }
   .header menu.expanded login,
   .header menu.expanded user {
@@ -1968,7 +1994,7 @@ user name {
   padding: 0 0 0 2px;
 }
 @media (min-width: 737px) {
-  .gallery {
+  clickformore {
     zoom: 300%;
   }
   .gallery .card.linebreak {
@@ -2027,6 +2053,7 @@ input[type="password"] {
   margin: 10px auto;
   padding: 5px 22px;
   outline: none;
+  -webkit-appearance: none;
 }
 input[type="text"]:focus,
 input[type="password"]:focus {
@@ -2123,6 +2150,9 @@ login .formActions .facebookBtn {
   display: flex;
   align-items: center;
   justify-content: center;
+  display: -webkit-flex;
+  -webkit-justify-content: center;
+  -webkit-align-items: center;
 }
 login .formActions .facebookBtn img {
   width: 25px;
@@ -2185,4 +2215,9 @@ menu.expanded login {
 }
 .forgot input[type=password] {
   display: none;
+}
+@media (min-width: 737px) {
+  login {
+    margin: 30px 0 0 0;
+  }
 }
