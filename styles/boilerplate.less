@@ -75,7 +75,7 @@ button, .button {
     z-index: -2;
     top: -5px;
     left: 0px;
-    background-color: @color_support_1;
+    background-color: @color_highlight;
     transition: top .2s ease, left .2s linear;
   }
   &:focus {
@@ -184,32 +184,6 @@ actions {
     background-color: @color_primary;
     z-index: -1;
   }
-}
-
-errors {
-  color: @color_primary;
-  background-color: @color_error;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 15px auto;
-  border-radius: 20px;
-  display: block;
-  width: 50%;
-}
-input.error {
-  box-shadow: 0 0 10px @color_error;
-  color: @color_error;
-}
-input[type="text"], input[type="password"] {
-  background-color: @color_primary;
-  .bodyfont;
-  border: 1px solid @color_secondary;
-  min-width: 230px;
-  width: auto;
-  min-height: 53px;
-  margin: 10px auto;
-  padding: 5px 22px;
-  outline: none;
 }
 
 .deck {

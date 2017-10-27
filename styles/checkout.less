@@ -19,6 +19,17 @@ cart {
   grid-column-start: 1;
   grid-column-end: -1;
   margin-top: 40px;
+
+  input[type="radio"] {
+    margin-right: 5px;
+  }
+  .radioLabel {
+      margin-right: 15px;
+  }
+
+  .radioWrap {
+    display: inline-block;
+  }
 }
 
 .sameCheckbox {
@@ -68,7 +79,9 @@ cart {
 }
 
 .sum-bold, .name {
-  font-weight: 800;
+  .headerfont;
+  margin-top: 10px;
+  display: block;
 }
 
 input_address {
@@ -167,6 +180,7 @@ input_credit {
     .summary_items {
       grid-column: span 6;
       padding: 0;
+
     }
   }
 }
@@ -197,8 +211,8 @@ input_credit {
   input[type="text"].cardCvc, input[type="text"].expMonth, input[type="text"].expYear {
     display: inline-block;
     margin-right: 10px;
-    width: 60px;
-    min-width: 60px;
+    width: 90px;
+    min-width: 90px;
   }
 }
 

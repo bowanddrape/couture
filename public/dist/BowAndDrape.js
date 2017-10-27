@@ -23292,51 +23292,33 @@ utils.intFromLE = intFromLE;
 module.exports={
   "_args": [
     [
-      {
-        "raw": "elliptic@^6.0.0",
-        "scope": null,
-        "escapedName": "elliptic",
-        "name": "elliptic",
-        "rawSpec": "^6.0.0",
-        "spec": ">=6.0.0 <7.0.0",
-        "type": "range"
-      },
-      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
+      "elliptic@6.4.0",
+      "/Users/Sunmi/Servers/bowanddrape"
     ]
   ],
-  "_from": "elliptic@>=6.0.0 <7.0.0",
+  "_from": "elliptic@6.4.0",
   "_id": "elliptic@6.4.0",
-  "_inCache": true,
+  "_inBundle": false,
+  "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
   "_location": "/elliptic",
-  "_nodeVersion": "7.0.0",
-  "_npmOperationalInternal": {
-    "host": "packages-18-east.internal.npmjs.com",
-    "tmp": "tmp/elliptic-6.4.0.tgz_1487798866428_0.30510620190761983"
-  },
-  "_npmUser": {
-    "name": "indutny",
-    "email": "fedor@indutny.com"
-  },
-  "_npmVersion": "3.10.8",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "elliptic@^6.0.0",
-    "scope": null,
-    "escapedName": "elliptic",
+    "type": "version",
+    "registry": true,
+    "raw": "elliptic@6.4.0",
     "name": "elliptic",
-    "rawSpec": "^6.0.0",
-    "spec": ">=6.0.0 <7.0.0",
-    "type": "range"
+    "escapedName": "elliptic",
+    "rawSpec": "6.4.0",
+    "saveSpec": null,
+    "fetchSpec": "6.4.0"
   },
   "_requiredBy": [
     "/browserify-sign",
     "/create-ecdh"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-  "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-  "_shrinkwrap": null,
-  "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
+  "_spec": "6.4.0",
+  "_where": "/Users/Sunmi/Servers/bowanddrape",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -23370,15 +23352,9 @@ module.exports={
     "jshint": "^2.6.0",
     "mocha": "^2.1.0"
   },
-  "directories": {},
-  "dist": {
-    "shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-    "tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz"
-  },
   "files": [
     "lib"
   ],
-  "gitHead": "6b0d2b76caae91471649c8e21f0b1d3ba0f96090",
   "homepage": "https://github.com/indutny/elliptic",
   "keywords": [
     "EC",
@@ -23388,15 +23364,7 @@ module.exports={
   ],
   "license": "MIT",
   "main": "lib/elliptic.js",
-  "maintainers": [
-    {
-      "name": "indutny",
-      "email": "fedor@indutny.com"
-    }
-  ],
   "name": "elliptic",
-  "optionalDependencies": {},
-  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/indutny/elliptic.git"
@@ -63085,19 +63053,27 @@ var Cart = function (_React$Component) {
             React.createElement(
               'form',
               null,
-              React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
-              ' ',
               React.createElement(
-                'span',
-                { className: 'radio_label' },
-                'Same Billing address'
+                'div',
+                { className: 'radioWrap' },
+                React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
+                ' ',
+                React.createElement(
+                  'span',
+                  { className: 'radio_label' },
+                  'Same Billing address'
+                )
               ),
-              React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: !this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
-              ' ',
               React.createElement(
-                'span',
-                { className: 'radio_label' },
-                'Different Billing address'
+                'div',
+                { className: 'radioWrap' },
+                React.createElement('input', { type: 'radio', name: 'checkout', defaultChecked: !this.state.same_billing, onChange: this.handleToggleSameBilling.bind(this) }),
+                ' ',
+                React.createElement(
+                  'span',
+                  { className: 'radio_label' },
+                  'Different Billing address'
+                )
               )
             ),
             this.state.same_billing ? null : React.createElement(InputAddress, _extends({ section_title: 'Billing Address', errors: React.createElement(Errors, { label: 'billing' }), handleFieldChange: this.handleFieldChange.bind(this, "billing"), handleSetSectionState: this.handleSetSectionState.bind(this, "billing") }, this.state.billing))
@@ -64501,6 +64477,7 @@ var Errors = function (_React$Component) {
         errors.push(React.createElement(
           "div",
           { key: errors.length },
+          React.createElement("img", { className: "errorEmoji", src: "/error.svg" }),
           msg
         ));
       });
@@ -64631,6 +64608,7 @@ var FacebookLogin = function (_React$Component) {
       return React.createElement(
         'button',
         { className: 'facebookBtn', onClick: this.fbLogin },
+        React.createElement('img', { src: '/facebook.svg' }),
         'Sign In with Facebook'
       );
     }
@@ -66031,7 +66009,7 @@ var Items = function (_React$Component) {
             'div',
             { className: 'summary_items_inner' },
             React.createElement(
-              'h4',
+              'h3',
               { className: 'summary_items_header' },
               'Summary'
             ),
@@ -66087,7 +66065,7 @@ var Items = function (_React$Component) {
               React.createElement(
                 'div',
                 { className: 'promo_input', style: style_summary.deets },
-                React.createElement('input', { placeholder: 'Promo code', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
+                React.createElement('input', { placeholder: 'Promo code', className: 'clearInput', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
                     _this6.setState({ promo: { code: event.target.value } });
                   }, onKeyUp: function onKeyUp(event) {
                     if (event.which == 13) {
@@ -68360,7 +68338,7 @@ var ProductComponentPicker = function (_React$Component) {
               React.createElement(
                 'div',
                 { className: 'punnyInputWrap' },
-                React.createElement('input', { type: 'text', className: 'punnyInput', placeholder: 'Say Something', name: compatible_component.sku,
+                React.createElement('input', { type: 'text', className: 'clearInput', placeholder: 'Say Something', name: compatible_component.sku,
                   onChange: function onChange(event) {
                     _this3.handleSetComponentText(event.target.value, _component_letters);
                   },
@@ -68603,6 +68581,13 @@ var ProductList = function (_React$Component) {
           React.createElement(
             'product_options',
             null,
+            React.createElement(
+              'span',
+              null,
+              'Product',
+              React.createElement('br', null),
+              'Options'
+            ),
             product_options
           ),
           React.createElement(ProductCanvas, { ref: 'ProductCanvas', product: product, handleUpdateProduct: this.handleUpdateProduct.bind(this), assembly: this.initial_assembly, compatible_component_map: this.props.compatible_component_map })
@@ -70452,7 +70437,7 @@ var UserLogin = function (_React$Component) {
 
     _this.state = {
       user: {},
-      loginState: 'default'
+      loginState: 'login'
     };
     return _this;
   }
@@ -70523,24 +70508,6 @@ var UserLogin = function (_React$Component) {
       return React.createElement(
         'login',
         { className: this.state.loginState, style: this.props.style },
-        React.createElement(
-          'section',
-          { className: 'loginNavWrap' },
-          React.createElement(
-            'button',
-            { className: 'loginNav', onClick: function onClick() {
-                _this3.setState({ loginState: 'login' });
-              } },
-            'Sign In'
-          ),
-          React.createElement(
-            'button',
-            { className: 'loginNav', onClick: function onClick() {
-                _this3.setState({ loginState: 'register' });
-              } },
-            'Create An Account'
-          )
-        ),
         React.createElement(Errors, { label: 'login' }),
         React.createElement(
           'section',

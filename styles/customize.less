@@ -23,6 +23,9 @@ customize {
     display: flex;
     flex-direction: column;
 
+    span {
+      display: none;
+    }
     select {
       font-size: 35px;
     }
@@ -37,7 +40,7 @@ customize {
 
     canvas {
       flex-grow: 0;
-      height: 420px;
+      height: 400px;
       width: 100%;
       float: right;
       display: block;
@@ -124,7 +127,7 @@ customize {
     max-width: 600px;
     margin: 0 auto 20px auto;
     padding: 15px;
-    bottom: 0;
+    bottom: 30px;
     left: ~"calc(60vw - 330px)";
     position: absolute;
     display: inline-block;
@@ -275,7 +278,7 @@ customize {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 185px;
+    top: 20px;
     right: 40px;
     &.rainbow_border {
       padding: 0 15px 0 15px;
@@ -382,6 +385,7 @@ customize {
       max-width: 100%;
       border: none;
       border-top: 3px solid @color_support_0;
+      z-index: 0;
 
       &::before {
         background-image: none;
@@ -402,6 +406,13 @@ customize {
     right: 0;
     max-width: 750px;
     top: 30px;
+    span {
+      display: block;
+      .zurichroman;
+      text-transform: uppercase;
+      padding-right: 40px;
+      text-align: right;
+    }
     switch {
       justify-content: flex-end;
       margin-bottom: 10px;
@@ -409,7 +420,8 @@ customize {
     }
   }
   hud_controls:not(.rainbow_border) {
-    top: 420px;
+    top: 240px;
+    border-top: 3px solid @color_support_0;
   }
   .component_picker {
     position: absolute;
@@ -422,7 +434,7 @@ customize {
     background: white;
 
     tab_contents {
-      max-width: 260px;
+      max-width: 340px;
       display: flex;
       align-items: left;
       justify-content: left;
@@ -441,7 +453,7 @@ customize {
       height: 95%;
       padding: 20px;
       switch {
-      max-width: 260px;
+      max-width: 340px;
       display: flex;
       align-items: left;
       justify-content: left;
@@ -459,7 +471,7 @@ customize {
       }
       .component_container:not(.letters) {
         height: 95%;
-        width: 260px;
+        width: 340px;
         padding: 10px 0;
         flex-direction: row;
       }
@@ -469,7 +481,7 @@ customize {
     border-top: 3px solid @color_support_0;
     border-bottom: 3px solid @color_support_0;
     canvas {
-      height: 70vh;
+      height: 68vh;
     }
     .component_selected {
       canvas, component_hitbox {
@@ -500,7 +512,7 @@ switch_option img {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120px;
+  height: 90px;
   border-top: 1px solid black;
   z-index: 10;
   background: white;
@@ -509,11 +521,11 @@ switch_option img {
   .productName {
     position: relative;
     display: inline-block;
-    font-size: 42px;
+    font-size: 32px;
     text-transform: uppercase;
     font-weight: 800;
     border-bottom: 5px solid #7f5cff;
-    margin: 35px 60px 0 0;
+    margin: 15px 40px 0 0;
   }
 
   .productPrice {

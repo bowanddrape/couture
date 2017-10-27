@@ -40,8 +40,12 @@
   }
 }
 @media (min-width: @desktop_min_width) {
+  clickformore {
+        zoom: 300%;
+        // Hacky - but works for the time being
+  }
   .gallery {
-    zoom: 300%;
+    // zoom: 300%; This doesn't work bevause it isn't rendered
     .card.linebreak {
       display: block;
       flex-basis: 100%;
@@ -55,4 +59,3 @@
     }
   }
 }
-

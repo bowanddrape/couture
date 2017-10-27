@@ -129,7 +129,7 @@ class ProductComponentPicker extends React.Component {
           components.push(
             <div key={components.length} name={compatible_component.props.name||compatible_component.sku} className="component_container letters">
               <div className="punnyInputWrap">
-              <input type="text" className="punnyInput" placeholder="Say Something" name={compatible_component.sku}
+              <input type="text" className="clearInput" placeholder="Say Something" name={compatible_component.sku}
                 onChange={(event) => {
                   this.handleSetComponentText(event.target.value, component_letters);
                 }}

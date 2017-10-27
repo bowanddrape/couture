@@ -47,7 +47,7 @@ class ClickForMore extends React.Component {
       if (err) return;
       this.setState({has_content: true});
     });
- 
+
     if (this.props.auto_desktop)
       document.addEventListener('scroll', this.handleScroll);
   }
