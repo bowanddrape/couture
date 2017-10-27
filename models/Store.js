@@ -134,6 +134,10 @@ class Store extends SQLTable {
         return res.status(304).end();
 
       ProductList.preprocessProps({store:store}, (err, product_list) => {
+        if (err) {
+          console.log(err);
+          return res.status(500);
+        }
         product_list.c = req.query['c'];
         product_list = new ProductList(product_list);
         product_list.componentWillMount();
