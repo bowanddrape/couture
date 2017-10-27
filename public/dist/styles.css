@@ -244,35 +244,6 @@ actions {
   background-color: #fff;
   z-index: -1;
 }
-errors {
-  color: #fff;
-  background-color: #ff5c5c;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 15px auto;
-  border-radius: 20px;
-  display: block;
-  width: 50%;
-}
-input.error {
-  box-shadow: 0 0 10px #ff5c5c;
-  color: #ff5c5c;
-}
-input[type="text"],
-input[type="password"] {
-  background-color: #fff;
-  font-family: "Open Sans", Arial, sans-serif;
-  line-height: 1.43;
-  letter-spacing: 1.3px;
-  color: #000;
-  border: 1px solid #000;
-  min-width: 230px;
-  width: auto;
-  min-height: 53px;
-  margin: 10px auto;
-  padding: 5px 22px;
-  outline: none;
-}
 .deck {
   display: flex;
   flex-direction: row;
@@ -582,9 +553,8 @@ comments message {
 }
 .items .product_wrapper {
   border-top: 2px solid #eaeaea;
-  border-bottom: 2px solid #eaeaea;
   padding: 10px;
-  grid-column: span 4;
+  grid-column: span 6;
   /* .item */
 }
 .items .product_wrapper .item {
@@ -594,7 +564,7 @@ comments message {
   border-bottom: none;
 }
 .items .product_wrapper .item .preview {
-  height: 200px;
+  height: 140px;
 }
 .items .product_wrapper .item .deets {
   display: inline-block;
@@ -632,14 +602,17 @@ comments message {
   display: block;
 }
 .items .summary_items {
-  display: inline-block;
-  grid-column: span 2;
-  padding: 0 0 0 40px;
+  grid-column: span 6;
+  padding: 0;
+  margin-top: 30px;
 }
 .items .summary_items .promo_input input {
   border: none;
   border-bottom: 3px solid #000;
   text-transform: lowercase;
+}
+.items .summary_items .promo_input input:active {
+  border-bottom: 3px solid #000;
 }
 .items .summary_items .promo_input button {
   display: inline-block;
@@ -650,7 +623,7 @@ comments message {
   display: inline-block;
 }
 .items .summary_items .summary_items_header {
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid #eaeaea;
 }
 .items.fulfillment .summary_items {
   display: none;
@@ -667,15 +640,19 @@ comments message {
 .items .remove:before {
   background-color: white;
 }
-@media (max-width: 737px) {
-  .items .productWrapper {
-    grid-column: span 6;
-    border-bottom: none;
+@media (min-width: 737px) {
+  .items .product_wrapper {
+    grid-column: span 4;
+    border-bottom: 2px solid #eaeaea;
   }
-  .summary_items {
-    grid-column: span 6;
-    padding: 0;
-    margin-top: 30px;
+  .items .product_wrapper .item .preview {
+    height: 200px;
+  }
+  .items .summary_items {
+    display: inline-block;
+    grid-column: span 2;
+    padding: 0 0 0 40px;
+    margin-top: 0;
   }
 }
 customize {
@@ -1430,8 +1407,8 @@ input_credit [name="exp_year"] {
 .paymentWrap input[type="text"].expYear {
   display: inline-block;
   margin-right: 10px;
-  width: 60px;
-  min-width: 60px;
+  width: 90px;
+  min-width: 90px;
 }
 .checkout_btn {
   margin: 0 0 10px 0;
@@ -1765,7 +1742,8 @@ product_options switch.expanded {
 }
 .header menu.expanded {
   max-height: 100vh;
-  height: calc(100vh - 75px);
+  height: calc(100vh - 85px);
+  overflow-y: scroll;
 }
 user {
   display: block;
@@ -1807,6 +1785,9 @@ user name {
     max-height: initial;
     display: flex;
     flex-direction: column;
+  }
+  .header menu.expanded {
+    height: calc(100vh - 75px);
   }
   .header menu menu_items {
     display: flex;
@@ -1906,6 +1887,7 @@ user name {
 .footer signup div:last-of-type input {
   border: none;
   border-bottom: 5px solid #000;
+  background: none;
   text-transform: lowercase;
 }
 .footer signup button {
@@ -2000,6 +1982,64 @@ user name {
   .gallery .caption .price {
     font-size: 5px;
   }
+}
+errors {
+  color: #fff;
+  background-color: #ff5c5c;
+  padding: 5px;
+  margin: 15px auto;
+  display: block;
+  width: auto;
+}
+errors div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+errors img {
+  width: 40px;
+  height: auto;
+  display: inline-block;
+  margin: 0 40px 0 10px;
+}
+@media (min-width: 737px) {
+  errors img {
+    width: 70px;
+  }
+}
+input.error {
+  box-shadow: 0 0 10px #ff5c5c;
+  color: #ff5c5c;
+}
+input[type="text"],
+input[type="password"] {
+  background-color: #f8f8f8;
+  border-color: #f8f8f8;
+  font-family: "Open Sans", Arial, sans-serif;
+  line-height: 1.43;
+  letter-spacing: 1.3px;
+  color: #000;
+  border: 1px solid #f8f8f8;
+  min-width: 230px;
+  width: auto;
+  min-height: 53px;
+  margin: 10px auto;
+  padding: 5px 22px;
+  outline: none;
+}
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #7f5cff;
+}
+input[type="text"].clearInput,
+input[type="password"].clearInput {
+  background-color: transparent;
+  border-color: transparent;
+}
+input[type="text"].clearInput:focus,
+input[type="password"].clearInput:focus {
+  border: none;
 }
 .cartLoginWrap {
   grid-column-start: 1;

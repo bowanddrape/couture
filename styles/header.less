@@ -100,7 +100,7 @@
     border: none;
     margin: 12px auto;
     &:hover {
-      color: @color_support_1;
+      color: @color_highlight;
     }
     &:before { display:none; }
     &:after { display:none; }
@@ -111,7 +111,8 @@
 
   menu.expanded {
     max-height: 100vh;
-    height: ~"calc(100vh - 75px)";
+    height: ~"calc(100vh - 85px)";
+    overflow-y: scroll;
   }
 }
 
@@ -160,6 +161,10 @@ user {
     max-height: initial;
     display: flex;
     flex-direction: column;
+
+    &.expanded {
+      height: ~"calc(100vh - 75px)";
+    }
     menu_items {
       display: flex;
       justify-content: center;

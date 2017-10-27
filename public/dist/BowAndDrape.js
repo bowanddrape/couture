@@ -64469,6 +64469,7 @@ var Errors = function (_React$Component) {
         errors.push(React.createElement(
           "div",
           { key: errors.length },
+          React.createElement("img", { className: "errorEmoji", src: "/error.svg" }),
           msg
         ));
       });
@@ -64599,6 +64600,7 @@ var FacebookLogin = function (_React$Component) {
       return React.createElement(
         'button',
         { className: 'facebookBtn', onClick: this.fbLogin },
+        React.createElement('img', { src: '/facebook.svg' }),
         'Sign In with Facebook'
       );
     }
@@ -66014,7 +66016,7 @@ var Items = function (_React$Component) {
               React.createElement(
                 'div',
                 { className: 'promo_input', style: style_summary.deets },
-                React.createElement('input', { placeholder: 'Promo code', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
+                React.createElement('input', { placeholder: 'Promo code', className: 'clearInput', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
                     _this6.setState({ promo: { code: event.target.value } });
                   }, onKeyUp: function onKeyUp(event) {
                     if (event.which == 13) {
@@ -66462,7 +66464,8 @@ var LayoutMain = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (LayoutMain.__proto__ || Object.getPrototypeOf(LayoutMain)).call(this, props));
 
     _this.state = {
-      user: {}
+      user: {},
+      stopscroll: false
     };
     return _this;
   }
@@ -66508,7 +66511,7 @@ var LayoutMain = function (_React$Component) {
       if (typeof document != "undefined") zoom = document.body.clientWidth / window.innerWidth;
       return React.createElement(
         'div',
-        { className: 'layout_main' },
+        { className: this.state.stopscroll ? "stopScroll layout_main" : "layout_main" },
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         React.createElement(LayoutBorderWrap, null),
         React.createElement(LayoutHeader, { user: this.state.user }),
@@ -68287,7 +68290,7 @@ var ProductComponentPicker = function (_React$Component) {
               React.createElement(
                 'div',
                 { className: 'punnyInputWrap' },
-                React.createElement('input', { type: 'text', className: 'punnyInput', placeholder: 'Say Something', name: compatible_component.sku,
+                React.createElement('input', { type: 'text', className: 'clearInput', placeholder: 'Say Something', name: compatible_component.sku,
                   onChange: function onChange(event) {
                     _this3.handleSetComponentText(event.target.value, _component_letters);
                   },
