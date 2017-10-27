@@ -1272,7 +1272,12 @@ cart {
 }
 .sum-bold,
 .name {
-  font-weight: 800;
+  font-family: "zurichbold_condensed", sans-serif;
+  color: #000;
+  font-weight: normal;
+  letter-spacing: 0px;
+  margin-top: 10px;
+  display: block;
 }
 input_address {
   grid-column-start: 1;
@@ -2009,8 +2014,6 @@ login {
 }
 login input[type="text"],
 login input[type="password"] {
-  background-color: #f8f8f8;
-  border-color: #e1e5e6;
   width: 100%;
   display: block;
 }
@@ -2077,6 +2080,14 @@ login .formActions {
 login .formActions .facebookBtn {
   max-width: 100%;
   margin: 25px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+login .formActions .facebookBtn img {
+  width: 25px;
+  height: auto;
+  margin-right: 5px;
 }
 login .resetAction {
   margin-bottom: 30px;
@@ -2100,19 +2111,12 @@ menu login {
 menu.expanded login {
   margin-top: 30px;
 }
-.loginNavWrap,
 .registerBtn,
 .loginBtn,
 .resetBtn,
 .registerAction,
 .loginAction,
 .resetAction {
-  display: none;
-}
-.default .loginNavWrap {
-  display: inline-block;
-}
-.default .loginForm {
   display: none;
 }
 .login .loginBtn {

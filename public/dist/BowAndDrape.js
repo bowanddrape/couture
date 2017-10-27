@@ -65958,7 +65958,7 @@ var Items = function (_React$Component) {
             'div',
             { className: 'summary_items_inner' },
             React.createElement(
-              'h4',
+              'h3',
               { className: 'summary_items_header' },
               'Summary'
             ),
@@ -70379,7 +70379,7 @@ var UserLogin = function (_React$Component) {
 
     _this.state = {
       user: {},
-      loginState: 'default'
+      loginState: 'login'
     };
     return _this;
   }
@@ -70450,24 +70450,6 @@ var UserLogin = function (_React$Component) {
       return React.createElement(
         'login',
         { className: this.state.loginState, style: this.props.style },
-        React.createElement(
-          'section',
-          { className: 'loginNavWrap' },
-          React.createElement(
-            'button',
-            { className: 'loginNav', onClick: function onClick() {
-                _this3.setState({ loginState: 'login' });
-              } },
-            'Sign In'
-          ),
-          React.createElement(
-            'button',
-            { className: 'loginNav', onClick: function onClick() {
-                _this3.setState({ loginState: 'register' });
-              } },
-            'Create An Account'
-          )
-        ),
         React.createElement(Errors, { label: 'login' }),
         React.createElement(
           'section',

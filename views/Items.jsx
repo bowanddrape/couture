@@ -211,7 +211,7 @@ class Items extends React.Component {
         </div>
         <div className="summary_items">
           <div className="summary_items_inner">
-            <h4 className="summary_items_header">Summary</h4>
+            <h3 className="summary_items_header">Summary</h3>
             {/* item subtotal */}
             <div className="item" style={style_summary.item}>
               <div style={style_summary.img_preview_container} />
@@ -247,7 +247,7 @@ class Items extends React.Component {
             }
           </div> {/* .summary_items_inner */}
         </div> {/* .summary_items_outer */}
-        
+
         </div>
     );
   }
