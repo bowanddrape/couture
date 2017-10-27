@@ -1,12 +1,29 @@
 errors {
   color: @color_primary;
   background-color: @color_error;
-  border-radius: 5px;
   padding: 5px;
   margin: 15px auto;
-  border-radius: 20px;
   display: block;
-  width: 50%;
+  width: auto;
+
+div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+  img {
+    width: 40px;
+    height: auto;
+    display: inline-block;
+    margin: 0 40px 0 10px
+  }
+
+  @media (min-width: @desktop_min_width) {
+    img {
+      width: 70px;
+    }
+  }
 }
 
 input.error {

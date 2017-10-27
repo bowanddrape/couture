@@ -64469,6 +64469,7 @@ var Errors = function (_React$Component) {
         errors.push(React.createElement(
           "div",
           { key: errors.length },
+          React.createElement("img", { className: "errorEmoji", src: "/error.svg" }),
           msg
         ));
       });
@@ -66465,7 +66466,8 @@ var LayoutMain = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (LayoutMain.__proto__ || Object.getPrototypeOf(LayoutMain)).call(this, props));
 
     _this.state = {
-      user: {}
+      user: {},
+      stopscroll: false
     };
     return _this;
   }
@@ -66511,7 +66513,7 @@ var LayoutMain = function (_React$Component) {
       if (typeof document != "undefined") zoom = document.body.clientWidth / window.innerWidth;
       return React.createElement(
         'div',
-        { className: 'layout_main' },
+        { className: this.state.stopscroll ? "stopScroll layout_main" : "layout_main" },
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         React.createElement(LayoutBorderWrap, null),
         React.createElement(LayoutHeader, { user: this.state.user }),

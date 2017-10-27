@@ -59,7 +59,7 @@ class Errors extends React.Component {
     let errors = [];
     this.state.errors.forEach((msg) => {
       errors.push(
-        <div key={errors.length}>{msg}</div>
+        <div key={errors.length}><img className="errorEmoji" src="/error.svg"/>{msg}</div>
       );
     });
     return (

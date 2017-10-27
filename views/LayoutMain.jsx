@@ -23,6 +23,7 @@ class LayoutMain extends React.Component {
     super(props);
     this.state = {
       user: {},
+      stopscroll: false,
     };
   }
 
@@ -66,7 +67,7 @@ class LayoutMain extends React.Component {
     if (typeof(document)!="undefined")
       zoom = document.body.clientWidth / window.innerWidth;
     return (
-      <div className="layout_main">
+      <div className={this.state.stopscroll?"stopScroll layout_main":"layout_main"}>
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
         <LayoutBorderWrap />
         <LayoutHeader user={this.state.user}/>
