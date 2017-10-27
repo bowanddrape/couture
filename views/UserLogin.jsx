@@ -11,7 +11,7 @@ class UserLogin extends React.Component {
     super(props);
     this.state = {
       user: {},
-      loginState: 'default',
+      loginState: 'login',
     }
   }
 
@@ -81,11 +81,6 @@ class UserLogin extends React.Component {
     this.fields = this.fields || {};
     return (
       <login className={this.state.loginState} style={this.props.style}>
-        <section className="loginNavWrap">
-          <button className="loginNav" onClick={()=>{this.setState({loginState:'login'})}}>Sign In</button>
-          <button className="loginNav" onClick={()=>{this.setState({loginState:'register'})}}>Create An Account</button>
-        </section>
-
         <Errors label="login" />
         <section className="loginForm">
           <div className="resetAction">
