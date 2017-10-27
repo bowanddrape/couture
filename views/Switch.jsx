@@ -50,7 +50,7 @@ class Switch extends React.Component {
         <switch_option className={child.props.value==this.props.value?"selected":""} ref={index} key={index} {...child.props} onClick={this.handleClick.bind(this, child.props.value)}
         >
           <div style={{textAlign:"center"}}>
-            <img src={"/"+child.props.children.toString().replace(/ /g,"_").toLowerCase()+".svg"} alt={child.props.children} />
+            <img src={"/"+child.props.children.toString().replace(/ /g,"_").toLowerCase()+".svg"} alt={child.props.children} title={child.props.children.toString()}/>
           </div>
         </switch_option>
       );

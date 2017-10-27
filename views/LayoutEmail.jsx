@@ -51,9 +51,9 @@ class LayoutEmail extends React.Component {
               <tr><td style={{width: "100%", maxWidth: "600px", backgroundColor: "#F5C9CA"}}>
                 <table style={{width:"100%", align:"center"}}><tbody><tr>
                   <td style={{textAlign:"right"}}>Follow & Share:</td>
-                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="https://couture.bowanddrape.com/instagram.png" alt="instagram" /></a></td>
-                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img src="https://couture.bowanddrape.com/facebook.png" alt="facebook" /></a></td>
-                  <td style={{textAlign:"center"}}><a href="https://twitter.com/bowanddrape"><img src="https://couture.bowanddrape.com/twitter.png" alt="twitter" /></a></td>
+                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img style={{maxHeight:"23px"}} src="https://couture.bowanddrape.com/instagram.png" alt="instagram" /></a></td>
+                  <td style={{textAlign:"center"}}><a href="https://www.instagram.com/bowanddrape/"><img style={{maxHeight:"23px"}} src="https://couture.bowanddrape.com/facebook.png" alt="facebook" /></a></td>
+                  <td style={{textAlign:"center"}}><a href="https://twitter.com/bowanddrape"><img style={{maxHeight:"23px"}} src="https://couture.bowanddrape.com/twitter.png" alt="twitter" /></a></td>
                 </tr></tbody></table>
               </td></tr>
             </tbody></table>

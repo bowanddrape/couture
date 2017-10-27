@@ -3,11 +3,12 @@ const React = require('react');
 const Shipment = require('./Shipment.jsx');
 const Tabs = require('./Tabs.jsx');
 const Scrollable = require('./Scrollable.jsx');
+const FulfillmentStickers = require('./FulfillmentStickers.jsx');
 
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-const tagged_tabs = ["picking", "pressing", "qa-ing", "packing"];
+const tagged_tabs = ["stickering","picking", "pressing", "qa-ing", "packing"];
 
 class FulfillShipments extends React.Component {
   constructor(props) {
@@ -65,6 +66,9 @@ class FulfillShipments extends React.Component {
 
     let tagged_tab_contents = [];
     tagged_tabs.forEach((tag) => {
+      // seperate handling for some states
+      if (["stickering"].indexOf(tag)>=0) return;
+
       let tab_contents = [];
       this.state[tag.replace(/-/g,"")].forEach((shipment, index) => {
         // ignore dupe shipments
@@ -104,6 +108,12 @@ class FulfillShipments extends React.Component {
               page = {{sort:"requested", direction:"DESC"}}
             />
           </shipments>
+{/* TODO do this
+          <shipments name={"Needs Stickers"+this.state.stickering.length}>
+            <h2>Needs Stickers</h2>
+            <FulfillmentStickers shipments={this.state.stickering} />
+          </shipments>
+*/}
           {tagged_tab_contents}
           <shipments>
             <h2>Packed</h2>
