@@ -620,6 +620,17 @@ comments message {
 .items .product_wrapper .item.fulfillment .assembly .legacy img {
   height: 28px;
 }
+.items .product_wrapper .item.fulfillment .assembly_image {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: solid 4px #ccc;
+  background-color: #ccc;
+}
+.items .product_wrapper .item.fulfillment .assembly_image img {
+  margin: auto;
+  display: block;
+}
 .items .summary_items {
   display: inline-block;
   grid-column: span 2;

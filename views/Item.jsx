@@ -85,25 +85,19 @@ class Item extends React.Component {
       } // this.props.assembly.forEach
       Object.keys(assembly_contents).sort().forEach((sku) => {
         let label = assembly_contents[sku].props.name || sku;
-        let backgroundImage = `url(${assembly_contents[sku].props.image})`;
-        let backgroundSize = `contain`;
-        if (assembly_contents[sku].props.imagewidth<assembly_contents[sku].props.imageheight)
-          backgroundSize = `${assembly_contents[sku].props.imagewidth/assembly_contents[sku].props.imageheight*100}% 100%`;
-        if (assembly_contents[sku].props.imagewidth>assembly_contents[sku].props.imageheight)
-          backgroundSize = `100% ${assembly_contents[sku].props.imageheight/assembly_contents[sku].props.imagewidth*100}%`;
+        let image_width = 20;
+        let image_height = 20;
+        if (assembly_contents[sku].props.imagewidth<assembly_contents[sku].props.imageheight) {
+          image_width *= assembly_contents[sku].props.imagewidth/assembly_contents[sku].props.imageheight;
+        }
+        if (assembly_contents[sku].props.imagewidth>assembly_contents[sku].props.imageheight) {
+          image_height *= assembly_contents[sku].props.imageheight/assembly_contents[sku].props.imagewidth;
+        }
         assembly.push(
           <span key={assembly.length} style={{marginRight:"8px"}}>
-            <span style={{
-              display: "inline-block",
-              width: "20px",
-              height: "20px",
-              border: "solid 4px #ccc",
-              backgroundColor: "#ccc",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              backgroundImage,
-              backgroundSize}}
-            />
+            <span className="assembly_image">
+              <img src={assembly_contents[sku].props.image} style={{width:image_width, height:image_height}} />
+            </span>
             {assembly_contents[sku].quantity>1?<span className="quant">{"x"+assembly_contents[sku].quantity}</span>:null}
             <span className="label">{label}</span>
           </span>
