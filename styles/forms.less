@@ -1,0 +1,40 @@
+errors {
+  color: @color_primary;
+  background-color: @color_error;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 15px auto;
+  border-radius: 20px;
+  display: block;
+  width: 50%;
+}
+
+input.error {
+  box-shadow: 0 0 10px @color_error;
+  color: @color_error;
+}
+input[type="text"], input[type="password"] {
+  background-color: @color_input;
+  border-color: @color_input;
+  .bodyfont;
+  border: 1px solid @color_input;
+  min-width: 230px;
+  width: auto;
+  min-height: 53px;
+  margin: 10px auto;
+  padding: 5px 22px;
+  outline: none;
+
+  &:focus {
+    border-color: @color_highlight;
+  }
+
+  &.clearInput{
+    background-color: transparent;
+    border-color: transparent;
+
+    &:focus {
+      border: none;
+    }
+  }
+}

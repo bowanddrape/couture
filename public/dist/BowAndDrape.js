@@ -64599,6 +64599,7 @@ var FacebookLogin = function (_React$Component) {
       return React.createElement(
         'button',
         { className: 'facebookBtn', onClick: this.fbLogin },
+        React.createElement('img', { src: '/facebook.svg' }),
         'Sign In with Facebook'
       );
     }
@@ -66016,7 +66017,7 @@ var Items = function (_React$Component) {
               React.createElement(
                 'div',
                 { className: 'promo_input', style: style_summary.deets },
-                React.createElement('input', { placeholder: 'Promo code', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
+                React.createElement('input', { placeholder: 'Promo code', className: 'clearInput', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
                     _this6.setState({ promo: { code: event.target.value } });
                   }, onKeyUp: function onKeyUp(event) {
                     if (event.which == 13) {
@@ -68289,7 +68290,7 @@ var ProductComponentPicker = function (_React$Component) {
               React.createElement(
                 'div',
                 { className: 'punnyInputWrap' },
-                React.createElement('input', { type: 'text', className: 'punnyInput', placeholder: 'Say Something', name: compatible_component.sku,
+                React.createElement('input', { type: 'text', className: 'clearInput', placeholder: 'Say Something', name: compatible_component.sku,
                   onChange: function onChange(event) {
                     _this3.handleSetComponentText(event.target.value, _component_letters);
                   },

@@ -240,14 +240,14 @@ class Items extends React.Component {
               <div className="item promo" style={Object.assign({},style_summary.item,{padding:"none"})}>
                 <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
                 <div className="promo_input" style={style_summary.deets}>
-                  <input placeholder="Promo code" type="text" value={this.state.promo.code} onChange={(event)=>{this.setState({promo:{code:event.target.value}})}} onKeyUp={(event)=>{if(event.which==13){this.handleApplyDiscountCode()}}}/>
+                  <input placeholder="Promo code" className="clearInput" type="text" value={this.state.promo.code} onChange={(event)=>{this.setState({promo:{code:event.target.value}})}} onKeyUp={(event)=>{if(event.which==13){this.handleApplyDiscountCode()}}}/>
                   <button onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
                 </div>
               </div>
             }
           </div> {/* .summary_items_inner */}
         </div> {/* .summary_items_outer */}
-        
+
         </div>
     );
   }

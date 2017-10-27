@@ -64,6 +64,10 @@
         border: none;
         border-bottom: 3px solid #000;
         text-transform: lowercase;
+
+        &:active {
+            border-bottom: 3px solid #000;
+        }
       }
 
       button {
@@ -78,7 +82,7 @@
     }
 
     .summary_items_header {
-      border-bottom: 2px solid black;
+      border-bottom: 2px solid @color_support_0;
     }
   } /* .summary_items */
   &.fulfillment .summary_items {
