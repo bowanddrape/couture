@@ -65487,24 +65487,22 @@ var Item = function (_React$Component) {
         } // this.props.assembly.forEach
         Object.keys(assembly_contents).sort().forEach(function (sku) {
           var label = assembly_contents[sku].props.name || sku;
-          var backgroundImage = 'url(' + assembly_contents[sku].props.image + ')';
-          var backgroundSize = 'contain';
-          if (assembly_contents[sku].props.imagewidth < assembly_contents[sku].props.imageheight) backgroundSize = assembly_contents[sku].props.imagewidth / assembly_contents[sku].props.imageheight * 100 + '% 100%';
-          if (assembly_contents[sku].props.imagewidth > assembly_contents[sku].props.imageheight) backgroundSize = '100% ' + assembly_contents[sku].props.imageheight / assembly_contents[sku].props.imagewidth * 100 + '%';
+          var image_width = 20;
+          var image_height = 20;
+          if (assembly_contents[sku].props.imagewidth < assembly_contents[sku].props.imageheight) {
+            image_width *= assembly_contents[sku].props.imagewidth / assembly_contents[sku].props.imageheight;
+          }
+          if (assembly_contents[sku].props.imagewidth > assembly_contents[sku].props.imageheight) {
+            image_height *= assembly_contents[sku].props.imageheight / assembly_contents[sku].props.imagewidth;
+          }
           assembly.push(React.createElement(
             'span',
             { key: assembly.length, style: { marginRight: "8px" } },
-            React.createElement('span', { style: {
-                display: "inline-block",
-                width: "20px",
-                height: "20px",
-                border: "solid 4px #ccc",
-                backgroundColor: "#ccc",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundImage: backgroundImage,
-                backgroundSize: backgroundSize }
-            }),
+            React.createElement(
+              'span',
+              { className: 'assembly_image' },
+              React.createElement('img', { src: assembly_contents[sku].props.image, style: { width: image_width, height: image_height } })
+            ),
             assembly_contents[sku].quantity > 1 ? React.createElement(
               'span',
               { className: 'quant' },
