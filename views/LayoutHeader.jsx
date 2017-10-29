@@ -21,10 +21,10 @@ class LayoutHeader extends React.Component {
   render() {
     let menu_items = [];
 
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own"><button className="primary">Customize Your Own</button></a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own"><button className="primary">Shop</button></a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own"><button className="primary">Inspo</button></a>);
-    menu_items.push(<a key={menu_items.length} href="/customize-your-own"><button className="primary">Lookbook</button></a>);
+    menu_items.push(<a key={menu_items.length} href="/customize_your_own"><button className="primary">Customize Your Own</button></a>);
+    menu_items.push(<a key={menu_items.length} href="/customize_your_own"><button className="primary">Shop</button></a>);
+    menu_items.push(<a key={menu_items.length} href="/customize_your_own"><button className="primary">Inspo</button></a>);
+    menu_items.push(<a key={menu_items.length} href="/customize_your_own"><button className="primary">Lookbook</button></a>);
     // links to admin pages
     if (this.props.user&&this.props.user.roles&&this.props.user.roles.length) {
       menu_items.push(<a href="/store" key={menu_items.length}><button className="primary">Admin Store</button></a>);
