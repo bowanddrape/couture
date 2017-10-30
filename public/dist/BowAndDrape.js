@@ -70515,10 +70515,10 @@ var UserLogin = function (_React$Component) {
       return React.createElement(
         'login',
         { className: this.state.loginState, style: this.props.style },
-        React.createElement(Errors, { label: 'login' }),
         React.createElement(
           'section',
           { className: 'loginForm' },
+          React.createElement(Errors, { label: 'login' }),
           React.createElement(
             'div',
             { className: 'resetAction' },
