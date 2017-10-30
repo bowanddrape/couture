@@ -90,9 +90,6 @@ a {
   text-decoration: none;
   color: #000;
 }
-a:not(.button):hover {
-  text-decoration: underline;
-}
 a.button {
   padding: 16px 0 0 0;
 }
@@ -217,7 +214,8 @@ button.primary.busyState:after,
 .cta:hover {
   text-decoration: none;
 }
-actions {
+actions,
+.actions {
   display: flex;
 }
 .rainbow_border {
@@ -1443,43 +1441,49 @@ input_credit [name="exp_year"] {
 .packing_slip div.summary_items {
   display: none;
 }
-page_edit {
+.page_edit {
   display: block;
   border: solid 3px #f5c9ca;
   padding: 5px;
   margin-top: 5px;
 }
-page_edit element {
+.page_edit element {
   position: relative;
   display: block;
   background-color: #f5c9ca;
   padding: 3px;
   border-bottom: solid 3px #76d300;
 }
-page_edit element:last-of-type {
+.page_edit element:last-of-type {
   border-bottom: none;
 }
-page_edit element card {
+.page_edit element card {
   margin-top: 30px;
 }
-page_edit element card .preview {
+.page_edit element card .preview {
   width: 150px;
   height: 150px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
-page_edit element card fields {
+.page_edit element card fields {
   width: 300px;
   margin-left: 75px;
 }
-page_edit element card fields div {
+.page_edit element card fields div {
   position: relative;
 }
-page_edit element card fields label {
+.page_edit element card fields label {
   position: absolute;
   right: 305px;
   top: 28px;
+}
+.page_edit .actions {
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  background-color: #fff;
 }
 component_edit {
   display: flex;

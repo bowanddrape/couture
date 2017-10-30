@@ -147,19 +147,19 @@ class PageEdit extends React.Component {
     }
 
     return (
-      <page_edit>
+      <div className="page_edit">
         <label>path:</label><input type="text" onChange={(e)=>{this.setState({path:e.target.value});}} value={this.state.path} name="path"/>
         <a href={this.state.path} target="_blank" className="cta" style={{marginLeft:"30px"}}>preview</a>
         {elements}
         <element onClick={this.handleNewElement.bind(this)}>Add Element</element>
-        <actions>
+        <div className="actions">
           <button onClick={this.handleSave.bind(this)}>{this.props.path?"Save":"Add New Page"}</button>
           {(this.props.path) ?
             <button onClick={this.handleRemove.bind(this)}>Delete</button>
             : null
           }
-        </actions>
-      </page_edit>
+        </div>
+      </div>
     )
   }
 }

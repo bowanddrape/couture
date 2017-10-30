@@ -66844,8 +66844,8 @@ var PageEdit = function (_React$Component) {
       }
 
       return React.createElement(
-        "page_edit",
-        null,
+        "div",
+        { className: "page_edit" },
         React.createElement(
           "label",
           null,
@@ -66866,8 +66866,8 @@ var PageEdit = function (_React$Component) {
           "Add Element"
         ),
         React.createElement(
-          "actions",
-          null,
+          "div",
+          { className: "actions" },
           React.createElement(
             "button",
             { onClick: this.handleSave.bind(this) },
