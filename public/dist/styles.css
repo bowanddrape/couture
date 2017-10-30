@@ -609,8 +609,13 @@ comments message {
   border: none;
   border-bottom: 3px solid #000;
   text-transform: lowercase;
+  font-size: 14px;
+  padding-left: 0;
 }
 .items .summary_items .promo_input input:active {
+  border-bottom: 3px solid #000;
+}
+.items .summary_items .promo_input input:focus {
   border-bottom: 3px solid #000;
 }
 .items .summary_items .promo_input button {
@@ -724,7 +729,7 @@ customize .component_container div {
   cursor: pointer;
 }
 customize .component_container div.backspace {
-  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
   background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -736,7 +741,7 @@ customize .component_container div.backspace {
   border: none;
 }
 customize .component_container div.enter {
-  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
   background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -769,7 +774,7 @@ customize .component_virtual_keyboard_container div {
   cursor: pointer;
 }
 customize .component_virtual_keyboard_container div.backspace {
-  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
   background-position: 0px -118px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -781,7 +786,7 @@ customize .component_virtual_keyboard_container div.backspace {
   border: none;
 }
 customize .component_virtual_keyboard_container div.enter {
-  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
   background-position: 0px -166px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -804,7 +809,7 @@ customize .component_virtual_keyboard_container row div {
   flex: 0 1 auto;
 }
 customize .component_virtual_keyboard_container div.spacebar {
-  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
   background-position: 0px -214px;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -1159,7 +1164,7 @@ switch_option img {
 .add_to_cart .productName {
   position: relative;
   display: inline-block;
-  font-size: 32px;
+  font-size: 26px;
   text-transform: uppercase;
   font-weight: 800;
   border-bottom: 5px solid #7f5cff;
@@ -1276,6 +1281,7 @@ cart {
   letter-spacing: 0px;
   margin-top: 10px;
   display: block;
+  font-size: 16px;
 }
 input_address {
   grid-column-start: 1;
@@ -1935,7 +1941,7 @@ user name {
   }
 }
 .icon {
-  background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
+  background-image: url('/sprite.PNG?bcaaf908817a0377e2eab221f3811581231d39dd');
 }
 .purchase_complete > div {
   width: 600px;
