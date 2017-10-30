@@ -16,10 +16,15 @@ class Gallery extends React.Component {
     let border = this.props.border || "5px";
 
     items.forEach((item, index) => {
+      item.width = item.width || "90px";
+      let max_width = null;
+      if (/px/.test(item.width))
+        max_width = (parseInt(item.width)*4)+"px";
       gallery_cards.push(
         <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={{
-          width: item.width || "90px",
+          width: item.width,
           flexGrow: "1",
+          maxWidth: max_width,
           margin: `${border}`,
         }} >
           <img src={item.image} style={{

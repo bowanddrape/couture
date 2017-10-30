@@ -65263,11 +65263,15 @@ var Gallery = function (_React$Component) {
       var border = this.props.border || "5px";
 
       items.forEach(function (item, index) {
+        item.width = item.width || "90px";
+        var max_width = null;
+        if (/px/.test(item.width)) max_width = parseInt(item.width) * 4 + "px";
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
-              width: item.width || "90px",
+              width: item.width,
               flexGrow: "1",
+              maxWidth: max_width,
               margin: "" + border
             } },
           React.createElement("img", { src: item.image, style: {

@@ -53,8 +53,9 @@ class SQLTable {
       client.query(query, values, function(err, result) {
         done(); // release connection back to pool
         if(err) {
-          // TODO escalate?
-          console.error(JSON.stringify(err)+" at "+query);
+          let error_msg = JSON.stringify(err);
+          if (error_msg!='{}')
+            console.error(JSON.stringify(err)+" at "+query);
           return callback(err);
         }
 
