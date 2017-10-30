@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowndrape/couture/node_modules/browserify-sign"
+      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -65267,10 +65267,11 @@ var Gallery = function (_React$Component) {
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
               width: item.width || "90px",
+              flexGrow: "1",
               margin: "" + border
             } },
           React.createElement("img", { src: item.image, style: {
-              width: item.width || "90px"
+              width: "100%"
             } }),
           item.caption ? React.createElement(
             "div",
@@ -70562,7 +70563,7 @@ var UserLogin = function (_React$Component) {
             )
           ),
           React.createElement(
-            'form',
+            'div',
             null,
             React.createElement('input', { ref: function ref(input) {
                 _this3.fields.email = input;

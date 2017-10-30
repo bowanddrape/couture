@@ -19,10 +19,11 @@ class Gallery extends React.Component {
       gallery_cards.push(
         <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={{
           width: item.width || "90px",
+          flexGrow: "1",
           margin: `${border}`,
         }} >
           <img src={item.image} style={{
-            width: item.width || "90px",
+            width: "100%",
           }} />
           {item.caption ?
             <div className="caption" >

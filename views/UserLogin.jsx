@@ -88,13 +88,13 @@ class UserLogin extends React.Component {
             Enter your email address and we’ll send you instructions to reset your password.
             <button className="loginNav" onClick={()=>{this.setState({loginState:'login'})}}>Back to Sign In</button>
           </div>
-          <form>
+          <div>
             <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text" name="email"/>
             <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password"/>
             <button className="primary registerBtn" onClick={this.login.bind(this)}>Create Account</button>
             <button className="primary loginBtn" onClick={this.login.bind(this)}>Sign In</button>
             <button className="primary resetBtn" onClick={this.verify.bind(this)}>Send Reset Instructions</button>
-          </form>
+          </div>
           <div className="formActions">
             <button className="loginNav forgotPassword" onClick={()=>{this.setState({loginState:'forgot'})}}>Forgot Password?</button>
               <FacebookLogin user={this.state.user}/>
