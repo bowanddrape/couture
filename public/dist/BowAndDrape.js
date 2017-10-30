@@ -66730,7 +66730,7 @@ var PageEdit = function (_React$Component) {
     value: function handleMoveElementDown(index) {
       var elements = this.state.elements;
       var moved = elements.splice(index, 1);
-      elements.splice(index, 0, moved[0]);
+      elements.splice(index + 1, 0, moved[0]);
       this.setState({ elements: elements });
     }
   }, {
