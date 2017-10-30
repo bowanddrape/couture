@@ -47,7 +47,7 @@ class PageEdit extends React.Component {
   handleMoveElementDown(index) {
     let elements = this.state.elements;
     let moved = elements.splice(index, 1);
-    elements.splice(index, 0, moved[0]);
+    elements.splice(index+1, 0, moved[0]);
     this.setState({elements});
   }
 
