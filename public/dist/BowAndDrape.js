@@ -67476,9 +67476,11 @@ var PageListElement = function (_React$Component) {
   _createClass(PageListElement, [{
     key: 'render',
     value: function render() {
+      var path = this.props.path;
+      if (path == "/") path = "/%20";
       return React.createElement(
         'a',
-        { href: "/page" + this.props.path, className: 'cta' },
+        { href: "/page" + path, className: 'cta' },
         this.props.path
       );
     }
@@ -67532,7 +67534,7 @@ var PageList = function (_React$Component2) {
           endpoint: this.state.filter ? '/page?search=' + this.state.filter : "/page",
           component_props: { whitelisted_components: this.props.whitelisted_components },
           page: { sort: "path", direction: "ASC" },
-          style: { display: "flex", flexDirection: "column" }
+          style: { display: "flex", flexDirection: "column", margin: "12px" }
         })
       );
     }

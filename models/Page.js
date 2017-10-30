@@ -67,6 +67,8 @@ class Page extends JSONAPI {
     // if path is specified
     if (req.path_tokens.length > 1) {
       let path = `/${req.path_tokens.slice(1).join('/')}`;
+      // special handling for homepage link
+      if (path=="/%20") path = "/";
       return Page.get(path, (err, page) => {
         // Check for error and missing page
         if (err) return res.status(500).json(err);
