@@ -256,7 +256,7 @@ class Shipment extends React.Component {
         </h1>
         <contents>
           {line_items}
-          <Items contents={this.props.contents} fulfillment={this.props.fulfillment} fulfillment_id={this.props.fulfillment_id?("office-"+this.props.fulfillment_id):null} packing_slip={this.props.packing_slip}/>
+          <Items contents={this.props.contents} fulfillment={this.props.fulfillment} fulfillment_id={this.props.fulfillment_id?("216-"+this.props.fulfillment_id):null} packing_slip={this.props.packing_slip}/>
         </contents>
         {payment_info}
       </shipment>

@@ -172,7 +172,7 @@ class Page extends JSONAPI {
       if (data.length)
         head_props = data[0].props;
       let head = Page.getHTMLHead(req, res, head_props);
-      let body = Page.renderString(data, Page.getLayout(req));
+      let body = Page.renderString(data, Page.getLayout(req, res));
       return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
     });
   }
@@ -263,7 +263,7 @@ class Page extends JSONAPI {
     `;
   }
 
-  static getLayout(req) {
+  static getLayout(req, res) {
     let layout = LayoutMain;
 
     // allow query to override layout
@@ -281,6 +281,7 @@ class Page extends JSONAPI {
           // I thought req.protocol would work, but we need to specify https
           HTMLConvert(`${process.env.ENV=='dev'?'http':'https'}://${req.headers.host}${req.path}?layout=basic&token=${req.query.token}`).pipe(sharp().trim()).pipe(res);
         } catch(err) {
+          console.log(`error rendering image ${req.headers.host}${req.path}?layout=basic&token=${req.query.token} ${err.toString()}`);
           return Page.renderError(req, res);
         }
         return;
@@ -298,7 +299,7 @@ class Page extends JSONAPI {
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.json(props).end();
     let head = Page.getHTMLHead(req, res, props);
-    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], Page.getLayout(req));
+    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], Page.getLayout(req, res));
     return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
   }
 

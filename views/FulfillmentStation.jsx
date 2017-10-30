@@ -36,7 +36,7 @@ class FulfillmentStation extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      search: "office-",
+      search: "216-",
       started: null,
       shipment: null,
     }
@@ -59,7 +59,7 @@ class FulfillmentStation extends React.Component {
     if (product_tokens.length != 3)
       return Errors.emitError("lookup", "Invalid search parameters");
     // TODO use product_toks[0] to determine facility_id, hardcoded for now
-    let from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "office"
+    let from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "216"
 
     let fulfillment_id = product_tokens[1];
     let content_index = product_tokens[2];
@@ -164,7 +164,7 @@ class FulfillmentStation extends React.Component {
     return (
       <div>
         <div className="items"><div className="product_wrapper">
-          <Item fulfillment={true} garment_id={`office-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
+          <Item fulfillment={true} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
         </div></div>
         {actions}
       </div>

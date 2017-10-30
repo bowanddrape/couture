@@ -118,6 +118,16 @@ class Item extends React.Component {
       tag_list = (<div className="taglist">{tags}</div>);
     }
 
+    // pad fulfillment_id
+    let garment_id = this.props.garment_id;
+    if (garment_id) {
+      let garment_id_toks = garment_id.split("-");
+      if (garment_id_toks.length>2) {
+        garment_id_toks[1] = garment_id_toks[1].padStart(7,"0");
+        garment_id = garment_id_toks.join("-");
+      }
+    }
+
     return (
       <div className={className}>
         <a href={this.props.props.url}>
@@ -133,7 +143,7 @@ class Item extends React.Component {
         {tag_list}
         <div className="deets" >
           {this.props.fulfillment ? 
-            <div className="garment_id">GarmentID#: {this.props.garment_id}</div>
+            <div className="garment_id">GarmentID#: {garment_id}</div>
             : null
           }
           <a href={this.props.props.url}>

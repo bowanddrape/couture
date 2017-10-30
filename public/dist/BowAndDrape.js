@@ -64952,7 +64952,7 @@ var FulfillmentStation = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (FulfillmentStation.__proto__ || Object.getPrototypeOf(FulfillmentStation)).call(this, props));
 
     _this.state = {
-      search: "office-",
+      search: "216-",
       started: null,
       shipment: null
     };
@@ -64978,7 +64978,7 @@ var FulfillmentStation = function (_React$Component) {
       var product_tokens = this.state.search.split('-');
       if (product_tokens.length != 3) return Errors.emitError("lookup", "Invalid search parameters");
       // TODO use product_toks[0] to determine facility_id, hardcoded for now
-      var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "office"
+      var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "216"
 
       var fulfillment_id = product_tokens[1];
       var content_index = product_tokens[2];
@@ -65141,7 +65141,7 @@ var FulfillmentStation = function (_React$Component) {
           React.createElement(
             'div',
             { className: 'product_wrapper' },
-            React.createElement(Item, _extends({ fulfillment: true, garment_id: 'office-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
+            React.createElement(Item, _extends({ fulfillment: true, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
           )
         ),
         actions
@@ -65625,6 +65625,16 @@ var Item = function (_React$Component) {
         );
       }
 
+      // pad fulfillment_id
+      var garment_id = this.props.garment_id;
+      if (garment_id) {
+        var garment_id_toks = garment_id.split("-");
+        if (garment_id_toks.length > 2) {
+          garment_id_toks[1] = garment_id_toks[1].padStart(7, "0");
+          garment_id = garment_id_toks.join("-");
+        }
+      }
+
       return React.createElement(
         'div',
         { className: className },
@@ -65649,7 +65659,7 @@ var Item = function (_React$Component) {
             'div',
             { className: 'garment_id' },
             'GarmentID#: ',
-            this.props.garment_id
+            garment_id
           ) : null,
           React.createElement(
             'a',
@@ -69755,7 +69765,7 @@ var Shipment = function (_React$Component) {
           'contents',
           null,
           line_items,
-          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment, fulfillment_id: this.props.fulfillment_id ? "office-" + this.props.fulfillment_id : null, packing_slip: this.props.packing_slip })
+          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment, fulfillment_id: this.props.fulfillment_id ? "216-" + this.props.fulfillment_id : null, packing_slip: this.props.packing_slip })
         ),
         payment_info
       );
