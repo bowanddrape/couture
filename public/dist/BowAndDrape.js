@@ -66297,18 +66297,8 @@ var LayoutFooter = function (_React$Component) {
       menu_items.push(React.createElement('a', { className: 'social facebook', key: menu_items.length, href: '//facebook.com/BowAndDrape/', target: '_blank' }));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/about' },
-        'About Us'
-      ));
-      menu_items.push(React.createElement(
-        'a',
         { key: menu_items.length, href: '/contact' },
         'Customer Service'
-      ));
-      menu_items.push(React.createElement(
-        'a',
-        { key: menu_items.length, href: '/press' },
-        'Press'
       ));
       menu_items.push(React.createElement(
         'a',
@@ -66412,7 +66402,7 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize_your_own' },
+        { key: menu_items.length, href: '/shop' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -66421,20 +66411,11 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize_your_own' },
+        { key: menu_items.length, href: '/inspo' },
         React.createElement(
           'button',
           { className: 'primary' },
           'Inspo'
-        )
-      ));
-      menu_items.push(React.createElement(
-        'a',
-        { key: menu_items.length, href: '/customize_your_own' },
-        React.createElement(
-          'button',
-          { className: 'primary' },
-          'Lookbook'
         )
       ));
       // links to admin pages
