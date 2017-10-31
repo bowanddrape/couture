@@ -65873,7 +65873,7 @@ var Items = function (_React$Component) {
         var shipping_quote = prevState.shipping_quote;
         // remove any previous shipping line
         contents.forEach(function (item, index) {
-          if (item.props.name == "Shipping & Handling") return contents.splice(index, 1);
+          if (item.props.name == "Shipping & Handling:") return contents.splice(index, 1);
         });
         // doesn't cost anything to ship nothing
         if (!contents.length) {

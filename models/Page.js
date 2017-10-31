@@ -172,7 +172,9 @@ class Page extends JSONAPI {
       if (data.length)
         head_props = data[0].props;
       let head = Page.getHTMLHead(req, res, head_props);
-      let body = Page.renderString(data, Page.getLayout(req, res));
+      let layout = Page.getLayout(req, res);
+      if (!layout) return;
+      let body = Page.renderString(data, layout);
       return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
     });
   }
@@ -299,7 +301,9 @@ class Page extends JSONAPI {
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.json(props).end();
     let head = Page.getHTMLHead(req, res, props);
-    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], Page.getLayout(req, res));
+    let layout = Page.getLayout(req, res);
+    if (!layout) return;
+    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], layout);
     return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
   }
 

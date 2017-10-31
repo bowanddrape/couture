@@ -39,7 +39,7 @@ class Items extends React.Component {
       let shipping_quote = prevState.shipping_quote;
       // remove any previous shipping line
       contents.forEach((item, index) => {
-        if (item.props.name == "Shipping & Handling")
+        if (item.props.name == "Shipping & Handling:")
           return contents.splice(index, 1);
       });
       // doesn't cost anything to ship nothing
