@@ -60,7 +60,7 @@ class Mail {
           contents: shipment.contents,
         }
         let body = Page.renderString([{component:OrderShippedEmail, props}], LayoutEmail);
-        Mail.send(null, `RE: Bow & Drape order ${props.order_id}`, body, (err) => {
+        Mail.send(shipment.email, `RE: Bow & Drape order ${props.order_id}`, body, (err) => {
           if (err) return callback(err);
           callback();
         });
@@ -82,7 +82,7 @@ class Mail {
           contents: shipment.contents,
         }
         let body = Page.renderString([{component:OrderPlacedEmail, props}], LayoutEmail);
-        Mail.send(null, `Bow & Drape order ${props.order_id}`, body, (err) => {
+        Mail.send(shipment.email, `Bow & Drape order ${props.order_id}`, body, (err) => {
           if (err) return callback(err);
           callback();
         });
@@ -96,7 +96,7 @@ class Mail {
       username: shipment.address.name,
     }
     let body = Page.renderString([{component:OrderSurveyEmail, props}], LayoutEmail);
-    Mail.send(null, `Bow & Drape order ${props.order_id}`, body, (err) => {
+    Mail.send(null, `RE: Bow & Drape order ${props.order_id}`, body, (err) => {
       if (err) console.log(err);
       callback();
     });

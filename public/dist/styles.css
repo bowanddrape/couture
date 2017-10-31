@@ -115,7 +115,7 @@ button,
   text-transform: uppercase;
   box-sizing: border-box;
   align-items: flex-start;
-  -webkit-appearance: button;
+  -webkit-appearance: none;
   text-rendering: auto;
   word-spacing: normal;
   text-indent: 0px;
@@ -344,23 +344,6 @@ input[type="radio"] {
 }
 .radio_label {
   margin-right: 15px;
-}
-address {
-  display: block;
-  font-family: Arvo;
-  font-size: 13px;
-  font-style: normal;
-}
-address name,
-address street,
-address apt,
-address country {
-  display: block;
-}
-address locality,
-address region,
-address postal {
-  display: inline;
 }
 .payment_info address {
   margin-top: 6px;

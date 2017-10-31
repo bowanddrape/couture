@@ -6,7 +6,6 @@ const styles = require('./EmailStyles.js');
 const reasons_to_contact_us = [
   'Do it even if you just want to say "Heyyyy!" Srsly tho. We get lonely sometimes...',
   'Even if the question is "Would you rather have a free wifi forever or a lifetime supply of pizza?" Srsly. Ask us anything!',
-  "Do it just to be sure we're still alive and haven't yet died gloriously in battle against the patriarchy",
 ];
 
 /***

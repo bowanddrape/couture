@@ -50,7 +50,6 @@ class LayoutBasic extends React.Component {
       zoom = document.body.clientWidth / window.innerWidth;
     return (
       <div>
-        <link rel="stylesheet" href="/styles.css" type="text/css"></link>
         {content}
 
         <script src="/BowAndDrape.js"></script>

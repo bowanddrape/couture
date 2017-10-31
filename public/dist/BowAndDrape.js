@@ -62558,42 +62558,47 @@ var Address = function (_React$Component) {
     value: function render() {
       return React.createElement(
         "address",
-        null,
+        { style: {
+            display: "block",
+            fontFamily: "Arvo",
+            fontSize: "13px",
+            fontStyle: "normal"
+          } },
         React.createElement(
           "name",
-          null,
+          { style: { display: "block" } },
           this.props.name
         ),
         React.createElement(
           "street",
-          null,
+          { style: { display: "block" } },
           this.props.street
         ),
         React.createElement(
           "apt",
-          null,
+          { style: { display: "block" } },
           this.props.apt
         ),
         React.createElement(
           "locality",
-          null,
+          { style: { display: "inline" } },
           this.props.locality,
           this.props.locality ? "," : ""
         ),
         React.createElement(
           "region",
-          null,
+          { style: { display: "inline" } },
           this.props.region,
           " "
         ),
         React.createElement(
           "postal",
-          null,
+          { style: { display: "inline" } },
           this.props.postal
         ),
         React.createElement(
           "country",
-          null,
+          { style: { display: "block" } },
           this.props.country
         )
       );
@@ -65483,12 +65488,15 @@ var Price = require('./Price.jsx');
 /* I moved the styles to inline for email compatibility, but currently the item
 design is still relying on unsupported styles and thus doesn't work */
 var style = {};
-var style_summary = {};
-/***
-Draw an Item. Used in views/Items.jsx
-props: will mirror a Component model
-***/
-
+var style_summary = {
+  item: {
+    clear: "both"
+  }
+  /***
+  Draw an Item. Used in views/Items.jsx
+  props: will mirror a Component model
+  ***/
+};
 var Item = function (_React$Component) {
   _inherits(Item, _React$Component);
 
@@ -65513,7 +65521,6 @@ var Item = function (_React$Component) {
       if (this.props.fulfillment) {
         className += " fulfillment";
       }
-      var inline_style = this.props.style ? this.props.style : style;
 
       var quantity = this.props.quantity || 1;
 
@@ -65635,16 +65642,20 @@ var Item = function (_React$Component) {
         }
       }
 
+      var style = this.props.style || Item.style;
+      var preview_img = this.props.props.image;
+      if (preview_img && this.props.is_email) preview_img = "https://couture.bowanddrape.com" + preview_img;
+
       return React.createElement(
         'div',
-        { className: className },
+        { className: className, style: this.props.style.item },
         React.createElement(
           'a',
           { href: this.props.props.url },
-          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image : "", onError: function onError(event) {
+          React.createElement('img', { className: 'preview', src: preview_img, onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
-          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image + "&camera=1" : "", onError: function onError(event) {
+          React.createElement('img', { className: 'preview', src: preview_img ? preview_img + "&camera=1" : "", onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
           /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
@@ -65654,7 +65665,9 @@ var Item = function (_React$Component) {
         tag_list,
         React.createElement(
           'div',
-          { className: 'deets' },
+          { className: 'deets', style: this.props.is_email ? {
+              float: "left"
+            } : {} },
           this.props.fulfillment ? React.createElement(
             'div',
             { className: 'garment_id' },
@@ -66029,9 +66042,9 @@ var Items = function (_React$Component) {
         }
         // if has a base sku or is a legacy imported item
         if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
-          line_items.push(React.createElement(Item, _extends({ style: style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment, garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null })));
+          line_items.push(React.createElement(Item, _extends({ style: style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment, garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null, is_email: this.props.is_email })));
         } else {
-          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove })));
+          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove, is_email: this.props.is_email })));
         }
       }
 
@@ -66205,7 +66218,6 @@ var LayoutBasic = function (_React$Component) {
       return React.createElement(
         'div',
         null,
-        React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         content,
         React.createElement('script', { src: '/BowAndDrape.js' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutBasic, {\n              content_string: `' + (typeof document != "undefined" ? this.props.content_string : escape(this.props.content_string)) + '`,\n              content,\n            });\n            ReactDOM.hydrate(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
@@ -67778,7 +67790,7 @@ var ProductCanvas = function (_React$Component) {
             position[1] = prev_line.props.position[1];
             position[2] = prev_line.props.position[2];
             if (prev_line.assembly.length && prev_line.assembly[prev_line.assembly.length - 1].props) {
-              position[1] -= parseFloat(prev_line.assembly[prev_line.assembly.length - 1].props.imageheight);
+              position[1] -= parseFloat(prev_line.assembly[prev_line.assembly.length - 1].props.imageheight) * 1.3;
             }
           }
           // facing the camera for now TODO get normal of intersected tri
@@ -70789,9 +70801,23 @@ var UserProfile = function (_React$Component) {
   _createClass(UserProfile, [{
     key: 'logout',
     value: function logout() {
-      // FIXME we also need to unauth or logout facebook
-      BowAndDrape.dispatcher.handleAuth({});
-      location.reload();
+      // logout facebook
+      try {
+        return FB.getLoginStatus(function (response) {
+          if (response.status !== 'connected') {
+            BowAndDrape.dispatcher.handleAuth({});
+            location.reload();
+          }
+          return FB.logout(function () {
+            BowAndDrape.dispatcher.handleAuth({});
+            location.reload();
+          });
+        });
+      } catch (err) {
+        console.log(err);
+        BowAndDrape.dispatcher.handleAuth({});
+        location.reload();
+      }
     }
   }, {
     key: 'render',
@@ -71243,11 +71269,12 @@ module.exports = {
     Shipment: require('./Shipment.jsx'),
     FulfillmentStation: require('./FulfillmentStation.jsx'),
     MandateUserLogin: require('./MandateUserLogin.jsx'),
-    WarningNotice: require('./WarningNotice.jsx')
+    WarningNotice: require('./WarningNotice.jsx'),
+    FacebookLogin: require('./FacebookLogin.jsx')
   },
   dispatcher: dispatcher,
   api: api,
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./Gallery.jsx":298,"./Items.jsx":302,"./LayoutBasic.jsx":303,"./LayoutMain.jsx":307,"./MandateUserLogin.jsx":308,"./PageEdit.jsx":309,"./PageList.jsx":314,"./Placeholder.jsx":316,"./ProductList.jsx":320,"./Shipment.jsx":323,"./Signup.jsx":324,"./TextContent.jsx":328,"./UserPasswordReset.jsx":332,"./VSSAdmin.jsx":334,"./WarningNotice.jsx":335,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);
+},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FacebookLogin.jsx":294,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./Gallery.jsx":298,"./Items.jsx":302,"./LayoutBasic.jsx":303,"./LayoutMain.jsx":307,"./MandateUserLogin.jsx":308,"./PageEdit.jsx":309,"./PageList.jsx":314,"./Placeholder.jsx":316,"./ProductList.jsx":320,"./Shipment.jsx":323,"./Signup.jsx":324,"./TextContent.jsx":328,"./UserPasswordReset.jsx":332,"./VSSAdmin.jsx":334,"./WarningNotice.jsx":335,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);

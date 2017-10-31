@@ -73,7 +73,7 @@ class ProductCanvas extends React.Component {
           position[1] = prev_line.props.position[1];
           position[2] = prev_line.props.position[2];
           if (prev_line.assembly.length && prev_line.assembly[prev_line.assembly.length-1].props) {
-            position[1] -= parseFloat(prev_line.assembly[prev_line.assembly.length-1].props.imageheight);
+            position[1] -= parseFloat(prev_line.assembly[prev_line.assembly.length-1].props.imageheight)*1.3;
           }
         }
         // facing the camera for now TODO get normal of intersected tri
