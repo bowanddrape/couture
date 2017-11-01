@@ -78,7 +78,7 @@ class Component {
       const getPixels = require("get-pixels")
       getPixels(state.props.image, (err, loaded_image) => {
         if (err) {
-          console.log("error loading image "+err);
+          console.log(`error loading image ${state.props.image} ${err}`);
           if (callback) callback(err);
           return;
         }

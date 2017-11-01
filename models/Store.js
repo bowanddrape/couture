@@ -147,7 +147,7 @@ class Store extends SQLTable {
         let height = parseInt(req.query['h']) || 200;
         let camera_index = parseInt(req.query['camera']) || 0;
         let resolution = 2;
-        let customizer = new Customizer({width:width*resolution, height:height*resolution});
+        let customizer = new Customizer({width:width*resolution, height:height*resolution, resolution});
         customizer.init();
         // set our camera, 404 if invalid
         if (camera_index && !product_list.initial_product.props.cameras)

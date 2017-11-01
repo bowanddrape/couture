@@ -63575,7 +63575,7 @@ var Component = function () {
         var getPixels = require("get-pixels");
         getPixels(state.props.image, function (err, loaded_image) {
           if (err) {
-            console.log("error loading image " + err);
+            console.log('error loading image ' + state.props.image + ' ' + err);
             if (callback) callback(err);
             return;
           }
@@ -64109,7 +64109,7 @@ var Customizer = function () {
 
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
-    this.options.resolution = 2;
+    this.options.resolution = this.options.resolution || 4;
 
     this.camera = {
       position: [0, 0, -1],
