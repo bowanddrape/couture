@@ -22,13 +22,11 @@ class Gallery extends React.Component {
         max_width = (parseInt(item.width)*4)+"px";
 
       let media = (
-        <img src={item.image} style={{
-          width: "100%",
-        }} />
+        <img src={item.image} style={{width: "100%"}} />
       );
       if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
         media = (
-          <video src={item.image} autoPlay loop controls={false}/>
+          <video src={item.image} style={{width: "100%"}} autoPlay loop controls={false}/>
         );
       }
       gallery_cards.push(

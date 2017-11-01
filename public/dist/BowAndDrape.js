@@ -65272,11 +65272,9 @@ var Gallery = function (_React$Component) {
         var max_width = null;
         if (/px/.test(item.width)) max_width = parseInt(item.width) * 4 + "px";
 
-        var media = React.createElement("img", { src: item.image, style: {
-            width: "100%"
-          } });
+        var media = React.createElement("img", { src: item.image, style: { width: "100%" } });
         if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
-          media = React.createElement("video", { src: item.image, autoPlay: true, loop: true, controls: false });
+          media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false });
         }
         gallery_cards.push(React.createElement(
           "a",
