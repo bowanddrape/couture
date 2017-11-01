@@ -20,6 +20,17 @@ class Gallery extends React.Component {
       let max_width = null;
       if (/px/.test(item.width))
         max_width = (parseInt(item.width)*4)+"px";
+
+      let media = (
+        <img src={item.image} style={{
+          width: "100%",
+        }} />
+      );
+      if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
+        media = (
+          <video src={item.image} autoPlay loop controls={false}/>
+        );
+      }
       gallery_cards.push(
         <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={{
           width: item.width,
@@ -27,9 +38,7 @@ class Gallery extends React.Component {
           maxWidth: max_width,
           margin: `${border}`,
         }} >
-          <img src={item.image} style={{
-            width: "100%",
-          }} />
+          {media}
           {item.caption ?
             <div className="caption" >
               {item.caption.split(" ").filter((tok)=>{return (tok[0]!='$')}).join(" ")}

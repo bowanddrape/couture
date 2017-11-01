@@ -65271,6 +65271,13 @@ var Gallery = function (_React$Component) {
         item.width = item.width || "90px";
         var max_width = null;
         if (/px/.test(item.width)) max_width = parseInt(item.width) * 4 + "px";
+
+        var media = React.createElement("img", { src: item.image, style: {
+            width: "100%"
+          } });
+        if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
+          media = React.createElement("video", { src: item.image, autoPlay: true, loop: true, controls: false });
+        }
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
@@ -65279,9 +65286,7 @@ var Gallery = function (_React$Component) {
               maxWidth: max_width,
               margin: "" + border
             } },
-          React.createElement("img", { src: item.image, style: {
-              width: "100%"
-            } }),
+          media,
           item.caption ? React.createElement(
             "div",
             { className: "caption" },
