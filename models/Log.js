@@ -54,7 +54,7 @@ class Log {
 
   static message(msg, callback) {
     callback = callback || function(err){
-      if (err) console.info(err);
+      if (err) console.info("Log::message "+err);
     };
     slack.chat.postMessage({
       token,
@@ -75,7 +75,7 @@ class Log {
         path: `/services/T0928RSGP/B2TUE537X/mko0Fs5coag6qzjCtc0T28VW`
       }, (result) => {}
     );
-    slack_notify.on('error', function(err) {console.info(err);});
+    slack_notify.on('error', function(err) {console.info("Log::slackWebhoockMessage "+err);});
     slack_notify.end(JSON.stringify({
       as_user: false,
       username,
@@ -137,7 +137,7 @@ class Log {
     influx.query(query).then((rows) => {
       res.json(rows);
     }).catch((reason) => {
-      console.log(reason);
+      console.log("Log::handleHTTP "+reason.toString());
       return res.status(500).end(reason);
     });
   }

@@ -37,7 +37,6 @@ class Component extends JSONAPI {
       try {
         this.props = JSON.parse(this.props);
       } catch(err) {
-        console.log(err);
       }
     }
     // options apply to product families only, virtual groups of components

@@ -223,7 +223,7 @@ class Shipment extends JSONAPI {
           });
         }
       );
-      request.on('error', function(err) {console.log(err);});
+      request.on('error', function(err) {console.log("Shipment::lookupTracking "+err);});
       request.end();
   }
 

@@ -155,7 +155,7 @@ class Page extends JSONAPI {
           if (component.preprocessProps) {
             return component.preprocessProps(props, function(err, result) {
               if (err) {
-                console.log(err); //TODO elevate this
+                console.log("Page::render preprocessProps "+err); //TODO elevate this
                 return callback(err);
               }
               return callback(null, {component, props:result});
