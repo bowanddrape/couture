@@ -309,7 +309,7 @@ class Cart extends React.Component {
           onUpdate={(items)=>{this.setState({items:items.contents})}}
           is_cart="true"
         />
-
+      
         { this.state.user.email ? null :
           <div className="checkout_section">
             <section className="loginHeader">
