@@ -38,6 +38,19 @@ class Shipment extends JSONAPI {
     };
   }
 
+  // estends SQLTable
+  upsert(callback) {
+    super.upsert((err, result) => {
+      if (callback) {
+        callback(err, result);
+      }
+      SQLTable.sqlExec("REFRESH MATERIALIZED VIEW inventory", [], (err) => {
+        if (err)
+          console.log("error updating inventory view "+err);
+      });
+    });
+  }
+
   // extends JSONAPI
   hasApiPermission(req, res) {
     // allow user to ask for own shipments

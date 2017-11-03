@@ -1833,6 +1833,7 @@ user name {
   position: absolute;
   left: 0;
   right: 0;
+  z-index: -1;
 }
 .footer .footer-inner {
   padding: 50px 0;
@@ -1982,6 +1983,9 @@ user name {
   padding: 0 0 0 2px;
 }
 @media (min-width: 737px) {
+  .gallery .card {
+    flex-grow: 1;
+  }
   .gallery .card.linebreak {
     display: block;
     flex-basis: 100%;

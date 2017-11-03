@@ -65279,7 +65279,6 @@ var Gallery = function (_React$Component) {
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
               width: item.width,
-              flexGrow: "1",
               maxWidth: max_width,
               margin: "" + border
             } },
