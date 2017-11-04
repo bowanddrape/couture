@@ -65268,6 +65268,11 @@ var Gallery = function (_React$Component) {
 
       items.forEach(function (item, index) {
         item.width = item.width || "90px";
+        if (item.href) {
+          // if link to this site, make it relative
+          item.href = item.href.replace(/^https:\/\/couture\.bowanddrape\.com/, "");
+          item.href = item.href.replace(/^https:\/\/www\.bowanddrape\.com/, "");
+        }
         var max_width = null;
         if (/px/.test(item.width)) max_width = parseInt(item.width) * 4 + "px";
 
