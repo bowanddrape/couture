@@ -385,7 +385,7 @@ input[type="button"]:focus {
   width: 100%;
   overflow-x: auto;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .carousel_container .slide {
     margin: 18px 20px;
   }
@@ -397,7 +397,7 @@ input[type="button"]:focus {
     width: 1204px;
   }
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .border-wrap {
     position: fixed;
     top: 0;
@@ -412,7 +412,7 @@ input[type="button"]:focus {
     border-image-slice: 1;
   }
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .layout_main {
     padding-top: 112px;
   }
@@ -622,7 +622,7 @@ comments message {
 .items .remove:before {
   background-color: white;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .items .product_wrapper {
     grid-column: span 4;
     border-bottom: 2px solid #eaeaea;
@@ -805,14 +805,14 @@ customize .component_virtual_keyboard_container div.halfgap {
   border: none;
 }
 customize .component_container.letters {
-  max-width: 600px;
   margin: 0 auto 20px auto;
   padding: 15px;
   bottom: 30px;
-  left: calc(60vw - 330px);
+  left: calc(72vw - 330px);
   position: absolute;
   display: inline-block;
   height: auto;
+  overflow: hidden;
 }
 customize .component_container.letters .punnyInputWrap {
   display: inline-block;
@@ -937,7 +937,7 @@ customize hud_controls button:before {
 customize hud_controls button:after {
   display: none;
 }
-@media (max-width: 737px) {
+@media (max-width: 1000px) {
   customize hud_controls {
     top: 0;
     right: 10px;
@@ -985,10 +985,10 @@ customize .product_details .size_chart row span {
 customize .product_details .size_chart row span:first-child {
   border-right: 1px solid #eaeaea;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   customize .component_wrapper {
     position: relative;
-    width: 80vw;
+    width: 62vw;
     height: 81vh;
     display: flex;
     flex-direction: row;
@@ -1154,7 +1154,7 @@ switch_option img {
 .add_to_cart .addCart {
   display: inline-block;
 }
-@media (max-width: 737px) {
+@media (max-width: 1000px) {
   customize .component_container.letters {
     top: -20px;
     left: 5%;
@@ -1375,7 +1375,7 @@ input_credit [name="exp_year"] {
 .billing-check .cart-wrapper login input[type="password"] {
   margin-right: 20px;
 }
-@media (max-width: 737px) {
+@media (max-width: 1000px) {
   .cart-wrapper input[type="text"],
   .cart-wrapper input[type="password"] {
     font-size: 16px;
@@ -1641,7 +1641,7 @@ product_options switch.expanded {
 .component_picker switch.expanded .selected {
   border-color: #7f5cff;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .component_picker switch switch_option {
     width: 65px;
     height: 65px;
@@ -1686,7 +1686,7 @@ product_options switch.expanded {
   margin: auto;
   width: 150px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .header img.logo {
     width: 260px;
   }
@@ -1771,7 +1771,7 @@ user img {
 user name {
   margin-top: 25px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .header:after {
     background: none;
     height: 0;
@@ -1908,7 +1908,7 @@ user name {
   display: inline-block;
   top: 5px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .footer .footer-menu a {
     display: inline-block;
     margin-right: 60px;
@@ -1982,7 +1982,7 @@ user name {
   color: #000;
   padding: 0 0 0 2px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .gallery .card {
     flex-grow: 1;
   }
@@ -2018,7 +2018,7 @@ errors img {
   display: inline-block;
   margin: 0 40px 0 10px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   errors img {
     width: 70px;
   }
@@ -2205,7 +2205,7 @@ menu.expanded login {
 .forgot input[type=password] {
   display: none;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   login {
     margin: 30px 0 0 0;
   }
