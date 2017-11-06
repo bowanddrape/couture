@@ -13,6 +13,77 @@ props: will mirror a Component model
 ***/
 class Item extends React.Component {
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      props: this.props,
+      currentTags: this.props.tags,
+    };
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleAddTag = this.handleAddTag.bind(this);
+    this.handleButtonTag = this.handleButtonTag.bind(this);
+  }
+
+  handleButtonTag(event) {
+    const target = event.target;
+    const tagID = target.getAttribute("tag_id");
+    // TODO also log metrics
+    let remove_tags = [tagID];
+    let payload = {
+      id: this.props.shipment_id,
+      content_index: this.props.content_index,
+      remove_tags,
+    }
+
+    BowAndDrape.api("POST", "/shipment/tagcontent", payload, (err, results) =>  {
+      if (err) {
+        console.log(err);
+        return Errors.emitError(err);
+      }
+      let tagsCopy = this.state.currentTags.slice();
+      let index = tagsCopy.indexOf(tagID);
+      if (index > -1) {
+         tagsCopy.splice(index, 1);
+      }
+      this.setState({
+        currentTags: tagsCopy
+      });
+    });
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    this.setState({
+      [name]: value
+    });
+  }
+
+  handleAddTag() {
+    // TODO also log metrics
+    let add_tags = [this.state.tags];
+    let payload = {
+      id: this.props.shipment_id,
+      content_index: this.props.content_index,
+      add_tags,
+    }
+    BowAndDrape.api("POST", "/shipment/tagcontent", payload, (err, results) =>  {
+      if (err) {
+        console.log(err);
+        return Errors.emitError(err);
+      }
+      // add tag to existing currentTags
+      let newTags = add_tags.concat(this.state.currentTags);
+      this.setState({
+        currentTags: newTags,
+        shipment:null,
+      });
+    //TODO Fix error that's preventing react from updating on tag state changes
+    location.reload();
+    });
+  }
+
   render() {
     if (!this.props.props) {
       return (
@@ -110,9 +181,11 @@ class Item extends React.Component {
     let tag_list = null;
     if (this.props.fulfillment && this.props.tags) {
       let tags = [];
-      this.props.tags.forEach((tag)=> {
+      this.state.currentTags.forEach((tag)=> {
         tags.push(
-          <div key={tags.length} className="tag">{tag}</div>
+          <div key={tags.length} className="tag">
+            <button className="tag_button" tag_id={tag} onClick={this.handleButtonTag}>{tag}</button>
+          </div>
         )
       });
       tag_list = (<div className="taglist">{tags}</div>);
@@ -130,9 +203,12 @@ class Item extends React.Component {
               : null
           }
         </a>
+        <label>Enter Tags:</label>
+        <input type="text" onChange={this.handleInputChange} value={this.state.tags} name="tags"/>
+        <button onClick={this.handleAddTag}>Add Tag</button>
         {tag_list}
         <div className="deets" >
-          {this.props.fulfillment ? 
+          {this.props.fulfillment ?
             <div className="garment_id">GarmentID#: {this.props.garment_id}</div>
             : null
           }
