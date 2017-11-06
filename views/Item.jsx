@@ -126,7 +126,6 @@ class Item extends React.Component {
     if (garment_id) {
       let garment_id_toks = garment_id.split("-");
       if (garment_id_toks.length>2) {
-        garment_id_toks[1] = garment_id_toks[1].padStart(7,"0");
         garment_id = garment_id_toks.join("-");
       }
     }
