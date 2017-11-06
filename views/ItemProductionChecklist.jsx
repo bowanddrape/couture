@@ -70,8 +70,8 @@ class ItemProductionChecklist extends React.Component {
             <div></div>
             <picklist>{picklist}</picklist>
             <images>
-              <img src={item.image}></img>
-              <img src={item.image.replace("_front","_back").replace("_f.jpg","_b.jpg")}></img>
+              <img src={item.image.replace("www", "haute")}></img>
+              <img src={item.image.replace("www", "haute").replace("_front","_back").replace("_f.jpg","_b.jpg")}></img>
             </images>
           </order_item>
         );
