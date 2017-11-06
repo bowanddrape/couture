@@ -6,7 +6,11 @@ const Price = require('./Price.jsx');
 /* I moved the styles to inline for email compatibility, but currently the item
 design is still relying on unsupported styles and thus doesn't work */
 const style = {};
-const style_summary = {}
+const style_summary = {
+  item: {
+    clear: "both",
+  }
+}
 /***
 Draw an Item. Used in views/Items.jsx
 props: will mirror a Component model
@@ -96,7 +100,6 @@ class Item extends React.Component {
     if (this.props.fulfillment) {
       className += " fulfillment";
     }
-    let inline_style = this.props.style?this.props.style:style;
 
     let quantity = this.props.quantity || 1;
 
@@ -191,11 +194,16 @@ class Item extends React.Component {
       tag_list = (<div className="taglist">{tags}</div>);
     }
 
+    let style = this.props.style || Item.style;
+    let preview_img = this.props.props.image;
+    if (preview_img && this.props.is_email)
+      preview_img = "https://couture.bowanddrape.com"+preview_img;
+
     return (
-      <div className={className}>
+      <div className={className} style={style.item}>
         <a href={this.props.props.url}>
-          <img className="preview" src={this.props.props.image?this.props.props.image:""} onError={(event)=>{event.target.style.display='none'}}/>
-          <img className="preview" src={this.props.props.image?this.props.props.image+"&camera=1":""} onError={(event)=>{event.target.style.display='none'}}/>
+          <img className="preview" src={preview_img} onError={(event)=>{event.target.style.display='none'}}/>
+          <img className="preview" src={preview_img?preview_img+"&camera=1":""} onError={(event)=>{event.target.style.display='none'}}/>
           {/*for legacy haute orders, draw the back*/}
           {
             /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ?

@@ -230,7 +230,7 @@ class User extends SQLTable {
     user.iat = Math.floor(Date.now() / 1000);
     user.exp = Math.floor(Date.now() / 1000) + 60*60*24*7;
     jsonwebtoken.sign(user, jwt_secret, {}, function(err, token) {
-      if (err) console.log(err); // TODO: escalate this
+      if (err) console.log("User::generateJwtToken "+err.toString());
       callback(err, token);
     });
   }

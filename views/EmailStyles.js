@@ -44,5 +44,23 @@ module.exports = {
     width: "100%",
     margin: "0 auto",
   },
+  button: {
+    textAlign: "center",
+    whiteSpace: "nowrap",
+    height: "36px",
+    border: "5px solid #000",
+    display: "block",
+    position: "relative",
+    color: "#000",
+    textDecoration: "none",
+    padding: "14px 0 0 0",
+    margin: "20px auto",
+    width: "300px",
+    fontFamily: "arvobold",
+    fontWeight: "bold",
+    fontSize: "18px",
+    letterSpacing: "2px",
+    cursor: "pointer",
+  },
 }
 

@@ -149,6 +149,7 @@ module.exports = {
     FulfillmentStation: require('./FulfillmentStation.jsx'),
     MandateUserLogin: require('./MandateUserLogin.jsx'),
     WarningNotice: require('./WarningNotice.jsx'),
+    FacebookLogin: require('./FacebookLogin.jsx'),
   },
   dispatcher,
   api,

@@ -28,7 +28,7 @@ Shipment.getAll({address:"not_null"}, (err, shipments) => {
     }
 
     // send shipping confirmation email if not shipped yet
-    if (!shipment.props.email_shipment && shipment.received>(new Date().getTime()/1000) && shipment.tracking_code) {
+    if (!shipment.props.email_shipment && !shipment.received && shipment.tracking_code) {
       return Mail.sendShippedEmail(shipment, () => {
         shipment.props.email_shipment = true;
         shipment.upsert();

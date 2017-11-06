@@ -258,7 +258,7 @@ class Shipment extends React.Component {
           {line_items}
           <Items contents={this.props.contents}
             fulfillment={this.props.fulfillment}
-            fulfillment_id={this.props.fulfillment_id?("office-"+this.props.fulfillment_id):null}
+            fulfillment_id={this.props.fulfillment_id?("216-"+this.props.fulfillment_id):null}
             packing_slip={this.props.packing_slip}
             shipment_id={this.props.id}
             content_index={line_items.length}

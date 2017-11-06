@@ -69,7 +69,7 @@ function getLegacyItems(mysql_connection, order_id, callback) {
     async.series(assembly_queries, function(err, assembly) {
       for (let i=0; i<rows.length; i++) {
         rows[i].assembly = assembly[i];
-        rows[i].image = "http://www.bowanddrape.com/"+rows[i].directory_local.split('/').slice(4).join('/')+rows[i].canvas_file_name;
+        rows[i].image = "http://haute.bowanddrape.com/"+rows[i].directory_local.split('/').slice(4).join('/')+rows[i].canvas_file_name;
       }
       // return an array with a number of rows corresponding to the quantity
       var ret = [];

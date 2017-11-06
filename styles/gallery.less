@@ -2,6 +2,7 @@
 @import "./boilerplate.less";
 
 .gallery {
+  image-rendering: auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -41,6 +42,9 @@
 }
 @media (min-width: @desktop_min_width) {
   .gallery {
+    .card {
+      flex-grow: 1;
+    }
     .card.linebreak {
       display: block;
       flex-basis: 100%;

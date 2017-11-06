@@ -38,7 +38,7 @@ class Items extends React.Component {
       let shipping_quote = prevState.shipping_quote;
       // remove any previous shipping line
       contents.forEach((item, index) => {
-        if (item.props.name == "Shipping & Handling")
+        if (/^Shipping /.test(item.props.name))
           return contents.splice(index, 1);
       });
       // doesn't cost anything to ship nothing
@@ -107,7 +107,7 @@ class Items extends React.Component {
       // FIXME
       // embroidery and airbrush will take longer, too lazy to update the db
       if (/letter_embroidery/.test(component.sku))
-        default_manufacture_time.parallel = 10
+        default_manufacture_time.parallel = 10;
       if (/letter_airbrush/.test(component.sku))
         default_manufacture_time.parallel = 15;
       // extract the manufacture_time for this component
@@ -190,7 +190,7 @@ class Items extends React.Component {
       if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
         line_items.push(<Item style={style} key={line_items.length} {...this.state.contents[i]} onRemove={remove} fulfillment={this.props.fulfillment} garment_id={this.props.fulfillment_id?(this.props.fulfillment_id+"-"+(line_items.length+1)):null} shipment_id={this.props.shipment_id} content_index={this.props.content_index}/>);
       } else {
-        summary_items.push(<Item style={style_summary} key={summary_items.length} {...this.state.contents[i]} onRemove={remove}/>);
+        summary_items.push(<Item style={style_summary} key={summary_items.length} {...this.state.contents[i]} onRemove={remove} is_email={this.props.is_email}/>);
       }
     }
 

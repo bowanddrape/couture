@@ -38,6 +38,19 @@ class Shipment extends JSONAPI {
     };
   }
 
+  // estends SQLTable
+  upsert(callback) {
+    super.upsert((err, result) => {
+      if (callback) {
+        callback(err, result);
+      }
+      SQLTable.sqlExec("REFRESH MATERIALIZED VIEW inventory", [], (err) => {
+        if (err)
+          console.log("error updating inventory view "+err);
+      });
+    });
+  }
+
   // extends JSONAPI
   hasApiPermission(req, res) {
     // allow user to ask for own shipments
@@ -116,7 +129,7 @@ class Shipment extends JSONAPI {
           if (object.content_index=='*') {
             object.content_index = Array.apply(null, {length: shipment.contents.filter((item)=>{return item.sku}).length}).map(Number.call, Number);
             // legacy items don't have skus
-            if (shipment.props.imported=="haute") {
+            if (shipment.props && shipment.props.imported=="haute") {
               object.content_index = Array.apply(null, {length: shipment.contents.length}).map(Number.call, Number);
             }
           }
@@ -167,8 +180,8 @@ class Shipment extends JSONAPI {
         if (err) return res.json({error:err});
         let next_fulfillment_id = result.rows[0].fulfillment_id || 1;
         object.fulfillment_id = next_fulfillment_id;
-        // FIXME currently hardcoding all fullments to come from office factory
-        object.from_id = Facility.special_ids.office;
+        // FIXME currently hardcoding all fullments to come from 216 factory
+        object.from_id = Facility.special_ids["216"];
         super.onApiSave(req, res, object, callback);
       });
     };
@@ -223,7 +236,7 @@ class Shipment extends JSONAPI {
           });
         }
       );
-      request.on('error', function(err) {console.log(err);});
+      request.on('error', function(err) {console.log("Shipment::lookupTracking "+err);});
       request.end();
   }
 

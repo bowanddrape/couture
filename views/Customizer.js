@@ -15,7 +15,7 @@ class Customizer {
   constructor(options) {
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
-    this.options.resolution = 2;
+    this.options.resolution = this.options.resolution || 4;
 
     this.camera = {
       position: [0, 0, -1],

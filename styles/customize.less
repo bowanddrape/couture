@@ -124,14 +124,14 @@ customize {
     }
   }
   .component_container.letters {
-    max-width: 600px;
     margin: 0 auto 20px auto;
     padding: 15px;
     bottom: 30px;
-    left: ~"calc(60vw - 330px)";
+    left: ~"calc(72vw - 330px)";
     position: absolute;
     display: inline-block;
     height: auto;
+    overflow: hidden;
 
     .punnyInputWrap {
       display: inline-block;
@@ -353,7 +353,7 @@ customize {
   customize {
     .component_wrapper {
       position: relative;
-      width: 80vw;
+      width: 62vw;
       height: 81vh;
       display: flex;
       flex-direction: row;
@@ -430,11 +430,12 @@ customize {
     bottom: 0px;
     border-right: 3px solid @color_support_0;
     width: auto;
+    min-width: 484px;
     height: 100%;
     background: white;
 
     tab_contents {
-      max-width: 340px;
+      max-width: 425px;
       display: flex;
       align-items: left;
       justify-content: left;
@@ -453,7 +454,7 @@ customize {
       height: 95%;
       padding: 20px;
       switch {
-      max-width: 340px;
+      max-width: 425px;
       display: flex;
       align-items: left;
       justify-content: left;

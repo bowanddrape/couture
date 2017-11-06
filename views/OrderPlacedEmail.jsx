@@ -26,11 +26,9 @@ class OrderPlacedEmail extends React.Component {
             <div style={styles.text}>frame it above your bed, or take a screenshot</div>
             <div style={styles.text}>and make it your phone background</div>
           </div>
-          {/* this should work, but doesn't with our styles:
-            <Items contents={this.props.contents}/>
-            so let's just use an image instead
-          */}
-          <img src={`${this.props.order_link}?layout=image&token=${this.props.token}`} style={{width:"600px",margin:"20px auto"}}/>
+          <div style={{textAlign:"center"}}>
+            <a href={`${this.props.order_link}?token=${this.props.token}`} style={styles.button}>VIEW ORDER DEETS</a>
+          </div>
         </td></tr>
       </tbody></table>
     );

@@ -67,6 +67,8 @@ class Page extends JSONAPI {
     // if path is specified
     if (req.path_tokens.length > 1) {
       let path = `/${req.path_tokens.slice(1).join('/')}`;
+      // special handling for homepage link
+      if (path=="/%20") path = "/";
       return Page.get(path, (err, page) => {
         // Check for error and missing page
         if (err) return res.status(500).json(err);
@@ -153,7 +155,7 @@ class Page extends JSONAPI {
           if (component.preprocessProps) {
             return component.preprocessProps(props, function(err, result) {
               if (err) {
-                console.log(err); //TODO elevate this
+                console.log("Page::render preprocessProps "+err); //TODO elevate this
                 return callback(err);
               }
               return callback(null, {component, props:result});
@@ -170,7 +172,9 @@ class Page extends JSONAPI {
       if (data.length)
         head_props = data[0].props;
       let head = Page.getHTMLHead(req, res, head_props);
-      let body = Page.renderString(data, Page.getLayout(req));
+      let layout = Page.getLayout(req, res);
+      if (!layout) return;
+      let body = Page.renderString(data, layout);
       return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
     });
   }
@@ -261,7 +265,7 @@ class Page extends JSONAPI {
     `;
   }
 
-  static getLayout(req) {
+  static getLayout(req, res) {
     let layout = LayoutMain;
 
     // allow query to override layout
@@ -279,6 +283,7 @@ class Page extends JSONAPI {
           // I thought req.protocol would work, but we need to specify https
           HTMLConvert(`${process.env.ENV=='dev'?'http':'https'}://${req.headers.host}${req.path}?layout=basic&token=${req.query.token}`).pipe(sharp().trim()).pipe(res);
         } catch(err) {
+          console.log(`error rendering image ${req.headers.host}${req.path}?layout=basic&token=${req.query.token} ${err.toString()}`);
           return Page.renderError(req, res);
         }
         return;
@@ -296,7 +301,9 @@ class Page extends JSONAPI {
     if (!req.accepts('*/*') && req.accepts('application/json'))
       return res.json(props).end();
     let head = Page.getHTMLHead(req, res, props);
-    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], Page.getLayout(req));
+    let layout = Page.getLayout(req, res);
+    if (!layout) return;
+    let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], layout);
     return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
   }
 

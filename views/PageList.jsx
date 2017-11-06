@@ -6,8 +6,10 @@ const Errors = require('./Errors.jsx');
 
 class PageListElement extends React.Component {
   render() {
+    let path = this.props.path;
+    if (path=="/") path = "/%20";
     return (
-      <a href={"/page"+this.props.path} className="cta">
+      <a href={"/page"+path} className="cta">
         {this.props.path}
       </a>
     )
@@ -45,7 +47,7 @@ class PageList extends React.Component {
         endpoint={this.state.filter?`/page?search=${this.state.filter}`:"/page"}
         component_props={{whitelisted_components:this.props.whitelisted_components}}
         page = {{sort:"path", direction:"ASC"}}
-        style={{display:"flex",flexDirection:"column"}}
+        style={{display:"flex",flexDirection:"column",margin:"12px"}}
       />
       </div>
     )

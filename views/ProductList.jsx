@@ -324,6 +324,7 @@ class ProductList extends React.Component {
         value: parseFloat(product.props.price),
         currency: "USD",
         content_ids: product.sku,
+        content_type: "product",
       });
     } catch(err) {console.log(err)}
 

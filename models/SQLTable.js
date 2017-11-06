@@ -307,7 +307,7 @@ class SQLTable {
     });
     async.parallel(db_tasks, (err, ret) => {
       if (err) {
-        console.log(err);
+        console.log("SQLTable::initMandatory "+err);
         return callback(err);
       }
       let ids = {};

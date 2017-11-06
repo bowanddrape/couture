@@ -15,9 +15,23 @@ class UserProfile extends React.Component {
   }
 
   logout() {
-    // FIXME we also need to unauth or logout facebook
-    BowAndDrape.dispatcher.handleAuth({});
-    location.reload();
+    // logout facebook
+    try {
+      return FB.getLoginStatus((response) => {
+        if (response.status !== 'connected') {
+          BowAndDrape.dispatcher.handleAuth({});
+          location.reload();
+        }
+        return FB.logout(() => {
+          BowAndDrape.dispatcher.handleAuth({});
+          location.reload();
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      BowAndDrape.dispatcher.handleAuth({});
+      location.reload();
+    }
   }
 
   render() {

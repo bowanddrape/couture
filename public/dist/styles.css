@@ -90,9 +90,6 @@ a {
   text-decoration: none;
   color: #000;
 }
-a:not(.button):hover {
-  text-decoration: underline;
-}
 a.button {
   padding: 16px 0 0 0;
 }
@@ -118,7 +115,7 @@ button,
   text-transform: uppercase;
   box-sizing: border-box;
   align-items: flex-start;
-  -webkit-appearance: button;
+  -webkit-appearance: none;
   text-rendering: auto;
   word-spacing: normal;
   text-indent: 0px;
@@ -217,7 +214,8 @@ button.primary.busyState:after,
 .cta:hover {
   text-decoration: none;
 }
-actions {
+actions,
+.actions {
   display: flex;
 }
 .rainbow_border {
@@ -347,23 +345,6 @@ input[type="radio"] {
 .radio_label {
   margin-right: 15px;
 }
-address {
-  display: block;
-  font-family: Arvo;
-  font-size: 13px;
-  font-style: normal;
-}
-address name,
-address street,
-address apt,
-address country {
-  display: block;
-}
-address locality,
-address region,
-address postal {
-  display: inline;
-}
 .payment_info address {
   margin-top: 6px;
 }
@@ -404,7 +385,7 @@ input[type="button"]:focus {
   width: 100%;
   overflow-x: auto;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .carousel_container .slide {
     margin: 18px 20px;
   }
@@ -416,7 +397,7 @@ input[type="button"]:focus {
     width: 1204px;
   }
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .border-wrap {
     position: fixed;
     top: 0;
@@ -431,7 +412,7 @@ input[type="button"]:focus {
     border-image-slice: 1;
   }
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .layout_main {
     padding-top: 112px;
   }
@@ -641,7 +622,7 @@ comments message {
 .items .remove:before {
   background-color: white;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .items .product_wrapper {
     grid-column: span 4;
     border-bottom: 2px solid #eaeaea;
@@ -824,14 +805,14 @@ customize .component_virtual_keyboard_container div.halfgap {
   border: none;
 }
 customize .component_container.letters {
-  max-width: 600px;
   margin: 0 auto 20px auto;
   padding: 15px;
   bottom: 30px;
-  left: calc(60vw - 330px);
+  left: calc(72vw - 330px);
   position: absolute;
   display: inline-block;
   height: auto;
+  overflow: hidden;
 }
 customize .component_container.letters .punnyInputWrap {
   display: inline-block;
@@ -956,7 +937,7 @@ customize hud_controls button:before {
 customize hud_controls button:after {
   display: none;
 }
-@media (max-width: 737px) {
+@media (max-width: 1000px) {
   customize hud_controls {
     top: 0;
     right: 10px;
@@ -1004,10 +985,10 @@ customize .product_details .size_chart row span {
 customize .product_details .size_chart row span:first-child {
   border-right: 1px solid #eaeaea;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   customize .component_wrapper {
     position: relative;
-    width: 80vw;
+    width: 62vw;
     height: 81vh;
     display: flex;
     flex-direction: row;
@@ -1077,11 +1058,12 @@ customize .product_details .size_chart row span:first-child {
     bottom: 0px;
     border-right: 3px solid #eaeaea;
     width: auto;
+    min-width: 484px;
     height: 100%;
     background: white;
   }
   customize .component_picker tab_contents {
-    max-width: 340px;
+    max-width: 425px;
     display: flex;
     align-items: left;
     justify-content: left;
@@ -1101,7 +1083,7 @@ customize .product_details .size_chart row span:first-child {
     padding: 20px;
   }
   customize .component_picker .components switch {
-    max-width: 340px;
+    max-width: 425px;
     display: flex;
     align-items: left;
     justify-content: left;
@@ -1173,7 +1155,7 @@ switch_option img {
 .add_to_cart .addCart {
   display: inline-block;
 }
-@media (max-width: 737px) {
+@media (max-width: 1000px) {
   customize .component_container.letters {
     top: -20px;
     left: 5%;
@@ -1394,7 +1376,7 @@ input_credit [name="exp_year"] {
 .billing-check .cart-wrapper login input[type="password"] {
   margin-right: 20px;
 }
-@media (max-width: 737px) {
+@media (max-width: 1000px) {
   .cart-wrapper input[type="text"],
   .cart-wrapper input[type="password"] {
     font-size: 16px;
@@ -1443,43 +1425,49 @@ input_credit [name="exp_year"] {
 .packing_slip div.summary_items {
   display: none;
 }
-page_edit {
+.page_edit {
   display: block;
   border: solid 3px #f5c9ca;
   padding: 5px;
   margin-top: 5px;
 }
-page_edit element {
+.page_edit element {
   position: relative;
   display: block;
   background-color: #f5c9ca;
   padding: 3px;
   border-bottom: solid 3px #76d300;
 }
-page_edit element:last-of-type {
+.page_edit element:last-of-type {
   border-bottom: none;
 }
-page_edit element card {
+.page_edit element card {
   margin-top: 30px;
 }
-page_edit element card .preview {
+.page_edit element card .preview {
   width: 150px;
   height: 150px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
-page_edit element card fields {
+.page_edit element card fields {
   width: 300px;
   margin-left: 75px;
 }
-page_edit element card fields div {
+.page_edit element card fields div {
   position: relative;
 }
-page_edit element card fields label {
+.page_edit element card fields label {
   position: absolute;
   right: 305px;
   top: 28px;
+}
+.page_edit .actions {
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  background-color: #fff;
 }
 component_edit {
   display: flex;
@@ -1654,7 +1642,7 @@ product_options switch.expanded {
 .component_picker switch.expanded .selected {
   border-color: #7f5cff;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .component_picker switch switch_option {
     width: 65px;
     height: 65px;
@@ -1699,7 +1687,7 @@ product_options switch.expanded {
   margin: auto;
   width: 150px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .header img.logo {
     width: 260px;
   }
@@ -1784,7 +1772,7 @@ user img {
 user name {
   margin-top: 25px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .header:after {
     background: none;
     height: 0;
@@ -1846,6 +1834,7 @@ user name {
   position: absolute;
   left: 0;
   right: 0;
+  z-index: -1;
 }
 .footer .footer-inner {
   padding: 50px 0;
@@ -1920,7 +1909,7 @@ user name {
   display: inline-block;
   top: 5px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   .footer .footer-menu a {
     display: inline-block;
     margin-right: 60px;
@@ -1953,6 +1942,7 @@ user name {
   text-align: center;
 }
 .gallery {
+  image-rendering: auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1993,7 +1983,10 @@ user name {
   color: #000;
   padding: 0 0 0 2px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
+  .gallery .card {
+    flex-grow: 1;
+  }
   .gallery .card.linebreak {
     display: block;
     flex-basis: 100%;
@@ -2026,7 +2019,7 @@ errors img {
   display: inline-block;
   margin: 0 40px 0 10px;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   errors img {
     width: 70px;
   }
@@ -2213,7 +2206,7 @@ menu.expanded login {
 .forgot input[type=password] {
   display: none;
 }
-@media (min-width: 737px) {
+@media (min-width: 1000px) {
   login {
     margin: 30px 0 0 0;
   }

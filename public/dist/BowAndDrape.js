@@ -62558,42 +62558,47 @@ var Address = function (_React$Component) {
     value: function render() {
       return React.createElement(
         "address",
-        null,
+        { style: {
+            display: "block",
+            fontFamily: "Arvo",
+            fontSize: "13px",
+            fontStyle: "normal"
+          } },
         React.createElement(
           "name",
-          null,
+          { style: { display: "block" } },
           this.props.name
         ),
         React.createElement(
           "street",
-          null,
+          { style: { display: "block" } },
           this.props.street
         ),
         React.createElement(
           "apt",
-          null,
+          { style: { display: "block" } },
           this.props.apt
         ),
         React.createElement(
           "locality",
-          null,
+          { style: { display: "inline" } },
           this.props.locality,
           this.props.locality ? "," : ""
         ),
         React.createElement(
           "region",
-          null,
+          { style: { display: "inline" } },
           this.props.region,
           " "
         ),
         React.createElement(
           "postal",
-          null,
+          { style: { display: "inline" } },
           this.props.postal
         ),
         React.createElement(
           "country",
-          null,
+          { style: { display: "block" } },
           this.props.country
         )
       );
@@ -62958,7 +62963,17 @@ var Cart = function (_React$Component) {
           // facebook track event
           try {
             var _total_price = ItemUtils.getPrice(_this3.order_payload.contents);
-            fbq('track', 'Purchase', { value: _total_price, currency: 'USD' });
+            var facebook_content_ids = resp.shipment.contents.map(function (item) {
+              return item.sku;
+            }).filter(function (sku) {
+              return sku;
+            });
+            fbq('track', 'Purchase', {
+              value: _total_price,
+              content_ids: facebook_content_ids,
+              content_type: "product",
+              currency: 'USD'
+            });
           } catch (err) {
             console.log(err);
           }
@@ -63517,8 +63532,7 @@ var Component = function () {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         // mipmapping the sequins looks bad?
         //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.generateMipmap(gl.TEXTURE_2D);
@@ -63571,7 +63585,7 @@ var Component = function () {
         var getPixels = require("get-pixels");
         getPixels(state.props.image, function (err, loaded_image) {
           if (err) {
-            console.log("error loading image " + err);
+            console.log('error loading image ' + state.props.image + ' ' + err);
             if (callback) callback(err);
             return;
           }
@@ -64105,7 +64119,7 @@ var Customizer = function () {
 
     this.options = options;
     this.options.vfov = this.options.vfov || 45; // vfov in degrees
-    this.options.resolution = 2;
+    this.options.resolution = this.options.resolution || 4;
 
     this.camera = {
       position: [0, 0, -1],
@@ -64952,7 +64966,7 @@ var FulfillmentStation = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (FulfillmentStation.__proto__ || Object.getPrototypeOf(FulfillmentStation)).call(this, props));
 
     _this.state = {
-      search: "office-",
+      search: "216-",
       started: null,
       shipment: null
     };
@@ -64978,7 +64992,7 @@ var FulfillmentStation = function (_React$Component) {
       var product_tokens = this.state.search.split('-');
       if (product_tokens.length != 3) return Errors.emitError("lookup", "Invalid search parameters");
       // TODO use product_toks[0] to determine facility_id, hardcoded for now
-      var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "office"
+      var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "216"
 
       var fulfillment_id = product_tokens[1];
       var content_index = product_tokens[2];
@@ -65141,7 +65155,7 @@ var FulfillmentStation = function (_React$Component) {
           React.createElement(
             'div',
             { className: 'product_wrapper' },
-            React.createElement(Item, _extends({ fulfillment: true, garment_id: 'office-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
+            React.createElement(Item, _extends({ fulfillment: true, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
           )
         ),
         actions
@@ -65264,19 +65278,26 @@ var Gallery = function (_React$Component) {
 
       items.forEach(function (item, index) {
         item.width = item.width || "90px";
+        if (item.href) {
+          // if link to this site, make it relative
+          item.href = item.href.replace(/^https:\/\/couture\.bowanddrape\.com/, "");
+          item.href = item.href.replace(/^https:\/\/www\.bowanddrape\.com/, "");
+        }
         var max_width = null;
         if (/px/.test(item.width)) max_width = parseInt(item.width) * 4 + "px";
+
+        var media = React.createElement("img", { src: item.image, style: { width: "100%" } });
+        if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
+          media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false });
+        }
         gallery_cards.push(React.createElement(
           "a",
           { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
               width: item.width,
-              flexGrow: "1",
               maxWidth: max_width,
               margin: "" + border
             } },
-          React.createElement("img", { src: item.image, style: {
-              width: "100%"
-            } }),
+          media,
           item.caption ? React.createElement(
             "div",
             { className: "caption" },
@@ -65483,12 +65504,15 @@ var Price = require('./Price.jsx');
 /* I moved the styles to inline for email compatibility, but currently the item
 design is still relying on unsupported styles and thus doesn't work */
 var style = {};
-var style_summary = {};
-/***
-Draw an Item. Used in views/Items.jsx
-props: will mirror a Component model
-***/
-
+var style_summary = {
+  item: {
+    clear: "both"
+  }
+  /***
+  Draw an Item. Used in views/Items.jsx
+  props: will mirror a Component model
+  ***/
+};
 var Item = function (_React$Component) {
   _inherits(Item, _React$Component);
 
@@ -65513,7 +65537,6 @@ var Item = function (_React$Component) {
       if (this.props.fulfillment) {
         className += " fulfillment";
       }
-      var inline_style = this.props.style ? this.props.style : style;
 
       var quantity = this.props.quantity || 1;
 
@@ -65625,16 +65648,29 @@ var Item = function (_React$Component) {
         );
       }
 
+      // pad fulfillment_id
+      var garment_id = this.props.garment_id;
+      if (garment_id) {
+        var garment_id_toks = garment_id.split("-");
+        if (garment_id_toks.length > 2) {
+          garment_id = garment_id_toks.join("-");
+        }
+      }
+
+      var style = this.props.style || Item.style;
+      var preview_img = this.props.props.image;
+      if (preview_img && this.props.is_email) preview_img = "https://couture.bowanddrape.com" + preview_img;
+
       return React.createElement(
         'div',
-        { className: className },
+        { className: className, style: style.item },
         React.createElement(
           'a',
           { href: this.props.props.url },
-          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image : "", onError: function onError(event) {
+          React.createElement('img', { className: 'preview', src: preview_img, onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
-          React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image + "&camera=1" : "", onError: function onError(event) {
+          React.createElement('img', { className: 'preview', src: preview_img ? preview_img + "&camera=1" : "", onError: function onError(event) {
               event.target.style.display = 'none';
             } }),
           /_front/.test(this.props.props.image) || /_f\.jpg/.test(this.props.props.image) ? React.createElement('img', { className: 'preview', src: this.props.props.image ? this.props.props.image.replace("_front", "_back").replace("_f.jpg", "_b.jpg") : undefined, onError: function onError(event) {
@@ -65644,12 +65680,14 @@ var Item = function (_React$Component) {
         tag_list,
         React.createElement(
           'div',
-          { className: 'deets' },
+          { className: 'deets', style: this.props.is_email ? {
+              float: "left"
+            } : {} },
           this.props.fulfillment ? React.createElement(
             'div',
             { className: 'garment_id' },
             'GarmentID#: ',
-            this.props.garment_id
+            garment_id
           ) : null,
           React.createElement(
             'a',
@@ -65863,7 +65901,7 @@ var Items = function (_React$Component) {
         var shipping_quote = prevState.shipping_quote;
         // remove any previous shipping line
         contents.forEach(function (item, index) {
-          if (item.props.name == "Shipping & Handling") return contents.splice(index, 1);
+          if (/^Shipping /.test(item.props.name)) return contents.splice(index, 1);
         });
         // doesn't cost anything to ship nothing
         if (!contents.length) {
@@ -66019,9 +66057,9 @@ var Items = function (_React$Component) {
         }
         // if has a base sku or is a legacy imported item
         if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
-          line_items.push(React.createElement(Item, _extends({ style: style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment, garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null })));
+          line_items.push(React.createElement(Item, _extends({ style: style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment, garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null, is_email: this.props.is_email })));
         } else {
-          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove })));
+          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove, is_email: this.props.is_email })));
         }
       }
 
@@ -66287,18 +66325,8 @@ var LayoutFooter = function (_React$Component) {
       menu_items.push(React.createElement('a', { className: 'social facebook', key: menu_items.length, href: '//facebook.com/BowAndDrape/', target: '_blank' }));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/about' },
-        'About Us'
-      ));
-      menu_items.push(React.createElement(
-        'a',
         { key: menu_items.length, href: '/contact' },
         'Customer Service'
-      ));
-      menu_items.push(React.createElement(
-        'a',
-        { key: menu_items.length, href: '/press' },
-        'Press'
       ));
       menu_items.push(React.createElement(
         'a',
@@ -66402,7 +66430,7 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize_your_own' },
+        { key: menu_items.length, href: '/shop' },
         React.createElement(
           'button',
           { className: 'primary' },
@@ -66411,20 +66439,11 @@ var LayoutHeader = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
-        { key: menu_items.length, href: '/customize_your_own' },
+        { key: menu_items.length, href: '/inspo' },
         React.createElement(
           'button',
           { className: 'primary' },
           'Inspo'
-        )
-      ));
-      menu_items.push(React.createElement(
-        'a',
-        { key: menu_items.length, href: '/customize_your_own' },
-        React.createElement(
-          'button',
-          { className: 'primary' },
-          'Lookbook'
         )
       ));
       // links to admin pages
@@ -66730,7 +66749,7 @@ var PageEdit = function (_React$Component) {
     value: function handleMoveElementDown(index) {
       var elements = this.state.elements;
       var moved = elements.splice(index, 1);
-      elements.splice(index, 0, moved[0]);
+      elements.splice(index + 1, 0, moved[0]);
       this.setState({ elements: elements });
     }
   }, {
@@ -66844,8 +66863,8 @@ var PageEdit = function (_React$Component) {
       }
 
       return React.createElement(
-        "page_edit",
-        null,
+        "div",
+        { className: "page_edit" },
         React.createElement(
           "label",
           null,
@@ -66866,8 +66885,8 @@ var PageEdit = function (_React$Component) {
           "Add Element"
         ),
         React.createElement(
-          "actions",
-          null,
+          "div",
+          { className: "actions" },
           React.createElement(
             "button",
             { onClick: this.handleSave.bind(this) },
@@ -67476,9 +67495,11 @@ var PageListElement = function (_React$Component) {
   _createClass(PageListElement, [{
     key: 'render',
     value: function render() {
+      var path = this.props.path;
+      if (path == "/") path = "/%20";
       return React.createElement(
         'a',
-        { href: "/page" + this.props.path, className: 'cta' },
+        { href: "/page" + path, className: 'cta' },
         this.props.path
       );
     }
@@ -67532,7 +67553,7 @@ var PageList = function (_React$Component2) {
           endpoint: this.state.filter ? '/page?search=' + this.state.filter : "/page",
           component_props: { whitelisted_components: this.props.whitelisted_components },
           page: { sort: "path", direction: "ASC" },
-          style: { display: "flex", flexDirection: "column" }
+          style: { display: "flex", flexDirection: "column", margin: "12px" }
         })
       );
     }
@@ -67785,7 +67806,7 @@ var ProductCanvas = function (_React$Component) {
             position[1] = prev_line.props.position[1];
             position[2] = prev_line.props.position[2];
             if (prev_line.assembly.length && prev_line.assembly[prev_line.assembly.length - 1].props) {
-              position[1] -= parseFloat(prev_line.assembly[prev_line.assembly.length - 1].props.imageheight);
+              position[1] -= parseFloat(prev_line.assembly[prev_line.assembly.length - 1].props.imageheight) * 1.3;
             }
           }
           // facing the camera for now TODO get normal of intersected tri
@@ -68800,7 +68821,8 @@ var ProductList = function (_React$Component) {
         fbq('track', 'AddToCart', {
           value: parseFloat(product.props.price),
           currency: "USD",
-          content_ids: product.sku
+          content_ids: product.sku,
+          content_type: "product"
         });
       } catch (err) {
         console.log(err);
@@ -69753,7 +69775,7 @@ var Shipment = function (_React$Component) {
           'contents',
           null,
           line_items,
-          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment, fulfillment_id: this.props.fulfillment_id ? "office-" + this.props.fulfillment_id : null, packing_slip: this.props.packing_slip })
+          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment, fulfillment_id: this.props.fulfillment_id ? "216-" + this.props.fulfillment_id : null, packing_slip: this.props.packing_slip })
         ),
         payment_info
       );
@@ -70796,9 +70818,23 @@ var UserProfile = function (_React$Component) {
   _createClass(UserProfile, [{
     key: 'logout',
     value: function logout() {
-      // FIXME we also need to unauth or logout facebook
-      BowAndDrape.dispatcher.handleAuth({});
-      location.reload();
+      // logout facebook
+      try {
+        return FB.getLoginStatus(function (response) {
+          if (response.status !== 'connected') {
+            BowAndDrape.dispatcher.handleAuth({});
+            location.reload();
+          }
+          return FB.logout(function () {
+            BowAndDrape.dispatcher.handleAuth({});
+            location.reload();
+          });
+        });
+      } catch (err) {
+        console.log(err);
+        BowAndDrape.dispatcher.handleAuth({});
+        location.reload();
+      }
     }
   }, {
     key: 'render',
@@ -71250,11 +71286,12 @@ module.exports = {
     Shipment: require('./Shipment.jsx'),
     FulfillmentStation: require('./FulfillmentStation.jsx'),
     MandateUserLogin: require('./MandateUserLogin.jsx'),
-    WarningNotice: require('./WarningNotice.jsx')
+    WarningNotice: require('./WarningNotice.jsx'),
+    FacebookLogin: require('./FacebookLogin.jsx')
   },
   dispatcher: dispatcher,
   api: api,
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./Gallery.jsx":298,"./Items.jsx":302,"./LayoutBasic.jsx":303,"./LayoutMain.jsx":307,"./MandateUserLogin.jsx":308,"./PageEdit.jsx":309,"./PageList.jsx":314,"./Placeholder.jsx":316,"./ProductList.jsx":320,"./Shipment.jsx":323,"./Signup.jsx":324,"./TextContent.jsx":328,"./UserPasswordReset.jsx":332,"./VSSAdmin.jsx":334,"./WarningNotice.jsx":335,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);
+},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FacebookLogin.jsx":294,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./Gallery.jsx":298,"./Items.jsx":302,"./LayoutBasic.jsx":303,"./LayoutMain.jsx":307,"./MandateUserLogin.jsx":308,"./PageEdit.jsx":309,"./PageList.jsx":314,"./Placeholder.jsx":316,"./ProductList.jsx":320,"./Shipment.jsx":323,"./Signup.jsx":324,"./TextContent.jsx":328,"./UserPasswordReset.jsx":332,"./VSSAdmin.jsx":334,"./WarningNotice.jsx":335,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);
