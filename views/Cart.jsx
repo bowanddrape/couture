@@ -244,7 +244,15 @@ class Cart extends React.Component {
         // facebook track event
         try {
           let total_price = ItemUtils.getPrice(this.order_payload.contents)
-          fbq('track', 'Purchase', {value: total_price, currency: 'USD'});
+          let facebook_content_ids = resp.shipment.contents.map((item) => {
+            return item.sku;
+          }).filter((sku)=>{return sku;});
+          fbq('track', 'Purchase', {
+            value: total_price,
+            content_ids: facebook_content_ids,
+            content_type: "product",
+            currency: 'USD',
+          });
         } catch(err) {console.log(err)}
 
         BowAndDrape.cart_menu.update([]);

@@ -136,7 +136,7 @@ class Item extends React.Component {
       preview_img = "https://couture.bowanddrape.com"+preview_img;
 
     return (
-      <div className={className} style={this.props.style.item}>
+      <div className={className} style={style.item}>
         <a href={this.props.props.url}>
           <img className="preview" src={preview_img} onError={(event)=>{event.target.style.display='none'}}/>
           <img className="preview" src={preview_img?preview_img+"&camera=1":""} onError={(event)=>{event.target.style.display='none'}}/>

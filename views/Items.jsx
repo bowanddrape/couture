@@ -108,7 +108,7 @@ class Items extends React.Component {
       // FIXME
       // embroidery and airbrush will take longer, too lazy to update the db
       if (/letter_embroidery/.test(component.sku))
-        default_manufacture_time.parallel = 10
+        default_manufacture_time.parallel = 10;
       if (/letter_airbrush/.test(component.sku))
         default_manufacture_time.parallel = 15;
       // extract the manufacture_time for this component

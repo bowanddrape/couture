@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowndrape/couture/node_modules/browserify-sign"
+      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -62963,7 +62963,17 @@ var Cart = function (_React$Component) {
           // facebook track event
           try {
             var _total_price = ItemUtils.getPrice(_this3.order_payload.contents);
-            fbq('track', 'Purchase', { value: _total_price, currency: 'USD' });
+            var facebook_content_ids = resp.shipment.contents.map(function (item) {
+              return item.sku;
+            }).filter(function (sku) {
+              return sku;
+            });
+            fbq('track', 'Purchase', {
+              value: _total_price,
+              content_ids: facebook_content_ids,
+              content_type: "product",
+              currency: 'USD'
+            });
           } catch (err) {
             console.log(err);
           }
@@ -65643,7 +65653,6 @@ var Item = function (_React$Component) {
       if (garment_id) {
         var garment_id_toks = garment_id.split("-");
         if (garment_id_toks.length > 2) {
-          garment_id_toks[1] = garment_id_toks[1].padStart(7, "0");
           garment_id = garment_id_toks.join("-");
         }
       }
@@ -65654,7 +65663,7 @@ var Item = function (_React$Component) {
 
       return React.createElement(
         'div',
-        { className: className, style: this.props.style.item },
+        { className: className, style: style.item },
         React.createElement(
           'a',
           { href: this.props.props.url },
@@ -66224,6 +66233,7 @@ var LayoutBasic = function (_React$Component) {
       return React.createElement(
         'div',
         null,
+        React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         content,
         React.createElement('script', { src: '/BowAndDrape.js' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutBasic, {\n              content_string: `' + (typeof document != "undefined" ? this.props.content_string : escape(this.props.content_string)) + '`,\n              content,\n            });\n            ReactDOM.hydrate(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } })
@@ -68811,7 +68821,8 @@ var ProductList = function (_React$Component) {
         fbq('track', 'AddToCart', {
           value: parseFloat(product.props.price),
           currency: "USD",
-          content_ids: product.sku
+          content_ids: product.sku,
+          content_type: "product"
         });
       } catch (err) {
         console.log(err);
