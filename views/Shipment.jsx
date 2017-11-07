@@ -262,6 +262,7 @@ class Shipment extends React.Component {
             packing_slip={this.props.packing_slip}
             shipment_id={this.props.id}
             content_index={line_items.length}
+            edit_tags={this.props.edit_tags}
         />
         </contents>
         {payment_info}
