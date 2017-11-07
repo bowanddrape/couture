@@ -65574,6 +65574,8 @@ var Item = function (_React$Component) {
     value: function handleAddTag() {
       var _this3 = this;
 
+      // ignore if we don't have a new tag to add
+      if (!this.state.new_tag.trim()) return;
       // TODO also log metrics
       var add_tags = [this.state.new_tag];
       var payload = {
@@ -65706,20 +65708,22 @@ var Item = function (_React$Component) {
       }
 
       var tag_list = null;
-      if (this.props.fulfillment && this.props.tags) {
+      if (this.props.fulfillment) {
         var tags = [];
-        this.state.current_tags.forEach(function (tag) {
-          tags.push(React.createElement(
-            'div',
-            { key: tags.length, className: 'tag' },
-            tag,
-            _this4.props.edit_tags ? React.createElement(
-              'span',
-              { style: { cursor: "pointer" }, onClick: _this4.handleRemoveTag.bind(_this4, tag) },
-              '\u2718'
-            ) : null
-          ));
-        });
+        if (this.state.current_tags) {
+          this.state.current_tags.forEach(function (tag) {
+            tags.push(React.createElement(
+              'div',
+              { key: tags.length, className: 'tag' },
+              tag,
+              _this4.props.edit_tags ? React.createElement(
+                'span',
+                { style: { cursor: "pointer" }, onClick: _this4.handleRemoveTag.bind(_this4, tag) },
+                '\u2718'
+              ) : null
+            ));
+          });
+        }
         tag_list = React.createElement(
           'div',
           null,

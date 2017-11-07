@@ -63,6 +63,8 @@ class Item extends React.Component {
   }
 
   handleAddTag() {
+    // ignore if we don't have a new tag to add
+    if (!this.state.new_tag.trim()) return;
     // TODO also log metrics
     let add_tags = [this.state.new_tag];
     let payload = {
@@ -178,18 +180,20 @@ class Item extends React.Component {
     }
 
     let tag_list = null;
-    if (this.props.fulfillment && this.props.tags) {
+    if (this.props.fulfillment) {
       let tags = [];
-      this.state.current_tags.forEach((tag)=> {
-        tags.push(
-          <div key={tags.length} className="tag">
-            {tag}
-            {this.props.edit_tags?
-              <span style={{cursor:"pointer"}} onClick={this.handleRemoveTag.bind(this, tag)}>✘</span> : null
-            }
-          </div>
-        )
-      });
+      if (this.state.current_tags) {
+        this.state.current_tags.forEach((tag)=> {
+          tags.push(
+            <div key={tags.length} className="tag">
+              {tag}
+              {this.props.edit_tags?
+                <span style={{cursor:"pointer"}} onClick={this.handleRemoveTag.bind(this, tag)}>✘</span> : null
+              }
+            </div>
+          )
+        });
+      }
       tag_list = (
         <div>
           <div className="taglist">
