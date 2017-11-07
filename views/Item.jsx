@@ -17,6 +17,73 @@ props: will mirror a Component model
 ***/
 class Item extends React.Component {
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      props: this.props,
+      new_tag: "",
+      current_tags: this.props.tags,
+    };
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleAddTag = this.handleAddTag.bind(this);
+  }
+
+  handleRemoveTag(tag) {
+    // TODO also log metrics
+    let remove_tags = [tag];
+    let payload = {
+      id: this.props.shipment_id,
+      content_index: this.props.content_index,
+      remove_tags,
+    }
+
+    BowAndDrape.api("POST", "/shipment/tagcontent", payload, (err, results) =>  {
+      if (err) {
+        console.log(err);
+        return Errors.emitError(err);
+      }
+      // now that we removed the tag, also redraw the tag section on this view
+      this.setState((prev_state) => {
+        let current_tags = prev_state.current_tags.slice();
+        current_tags = current_tags.filter((prev_tag) => {
+          return prev_tag != tag;
+        });
+        return {current_tags};
+      });
+    });
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    this.setState({
+      [name]: value
+    });
+  }
+
+  handleAddTag() {
+    // TODO also log metrics
+    let add_tags = [this.state.new_tag];
+    let payload = {
+      id: this.props.shipment_id,
+      content_index: this.props.content_index,
+      add_tags,
+    }
+    BowAndDrape.api("POST", "/shipment/tagcontent", payload, (err, results) =>  {
+      if (err) {
+        console.log(err);
+        return Errors.emitError(err);
+      }
+      // add tag to existing current_tags
+      let newTags = add_tags.concat(this.state.current_tags);
+      this.setState({
+        current_tags: newTags,
+        new_tag: "",
+      });
+    });
+  }
+
   render() {
     if (!this.props.props) {
       return (
@@ -113,21 +180,35 @@ class Item extends React.Component {
     let tag_list = null;
     if (this.props.fulfillment && this.props.tags) {
       let tags = [];
-      this.props.tags.forEach((tag)=> {
+      this.state.current_tags.forEach((tag)=> {
         tags.push(
-          <div key={tags.length} className="tag">{tag}</div>
+          <div key={tags.length} className="tag">
+            {tag}
+            {this.props.edit_tags?
+              <span style={{cursor:"pointer"}} onClick={this.handleRemoveTag.bind(this, tag)}>✘</span> : null
+            }
+          </div>
         )
       });
-      tag_list = (<div className="taglist">{tags}</div>);
-    }
-
-    // pad fulfillment_id
-    let garment_id = this.props.garment_id;
-    if (garment_id) {
-      let garment_id_toks = garment_id.split("-");
-      if (garment_id_toks.length>2) {
-        garment_id = garment_id_toks.join("-");
-      }
+      tag_list = (
+        <div>
+          <div className="taglist">
+            {tags}
+          </div>
+          {this.props.edit_tags?
+            <div className="add_tag">
+              <input type="text"
+                onChange={this.handleInputChange}
+                onKeyUp={(event)=>{if(event.which==13){this.handleAddTag()}}}
+                value={this.state.new_tag}
+                placeholder="enter new tag"
+                name="new_tag"
+              />
+              <button onClick={this.handleAddTag}>Add Tag</button>
+            </div> :null
+          }
+        </div>
+      );
     }
 
     let style = this.props.style || Item.style;
@@ -148,11 +229,9 @@ class Item extends React.Component {
           }
         </a>
         {tag_list}
-        <div className="deets" style={this.props.is_email?{
-          float:"left"
-        }:{}}>
-          {this.props.fulfillment ? 
-            <div className="garment_id">GarmentID#: {garment_id}</div>
+        <div className="deets">
+          {this.props.fulfillment ?
+            <div className="garment_id">GarmentID#: {this.props.garment_id}</div>
             : null
           }
           <a href={this.props.props.url}>

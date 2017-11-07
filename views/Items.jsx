@@ -15,8 +15,7 @@ props:
 class Items extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      expanded: false,
+    this.state = {      expanded: false,
       contents: this.props.contents || [],
       shipping_quote: {
         days: 5,
@@ -189,7 +188,19 @@ class Items extends React.Component {
       }
       // if has a base sku or is a legacy imported item
       if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
-        line_items.push(<Item style={style} key={line_items.length} {...this.state.contents[i]} onRemove={remove} fulfillment={this.props.fulfillment} garment_id={this.props.fulfillment_id?(this.props.fulfillment_id+"-"+(line_items.length+1)):null} is_email={this.props.is_email}/>);
+        line_items.push(
+          <Item
+            style={style}
+            key={line_items.length}
+            onRemove={remove}
+            fulfillment={this.props.fulfillment}
+            garment_id={this.props.fulfillment_id?(this.props.fulfillment_id+"-"+(line_items.length+1)):null}
+            shipment_id={this.props.shipment_id}
+            content_index={this.props.content_index}
+            edit_tags={this.props.edit_tags}
+            {...this.state.contents[i]}
+          />
+        );
       } else {
         summary_items.push(<Item style={style_summary} key={summary_items.length} {...this.state.contents[i]} onRemove={remove} is_email={this.props.is_email}/>);
       }

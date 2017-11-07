@@ -164,7 +164,7 @@ class FulfillmentStation extends React.Component {
     return (
       <div>
         <div className="items"><div className="product_wrapper">
-          <Item fulfillment={true} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
+          <Item fulfillment={true} content_index={this.state.content_index} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
         </div></div>
         {actions}
       </div>

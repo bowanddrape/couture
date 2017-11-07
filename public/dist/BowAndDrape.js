@@ -64776,7 +64776,7 @@ var FulfillShipments = function (_React$Component) {
           if (_this3.state[tag.replace(/-/g, "")].findIndex(function (s) {
             return s.id == shipment.id;
           }) != index) return;
-          tab_contents.push(React.createElement(Shipment, _extends({ key: tab_contents.length, fulfillment: true }, shipment)));
+          tab_contents.push(React.createElement(Shipment, _extends({ key: tab_contents.length, fulfillment: true, edit_tags: true }, shipment)));
         });
         tagged_tab_contents.push(React.createElement(
           'shipments',
@@ -64814,7 +64814,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { fulfillment: true },
+              component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&approved=null&on_hold=null&packed=null&received=null',
               page: { sort: "requested", direction: "ASC" }
             })
@@ -64829,7 +64829,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { fulfillment: true },
+              component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&approved=null&on_hold=not_null',
               page: { sort: "requested", direction: "DESC" }
             })
@@ -64845,7 +64845,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { fulfillment: true },
+              component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&packed=not_null&ship_description=null',
               page: { sort: "requested", direction: "DESC" }
             })
@@ -64860,7 +64860,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { fulfillment: true },
+              component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&ship_description=not_null&received=null',
               page: { sort: "requested", direction: "ASC" }
             })
@@ -64875,7 +64875,7 @@ var FulfillShipments = function (_React$Component) {
             ),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { fulfillment: true },
+              component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&received=not_null',
               page: { sort: "received", direction: "DESC" }
             })
@@ -64893,7 +64893,7 @@ var FulfillShipments = function (_React$Component) {
               } }),
             React.createElement(Scrollable, {
               component: Shipment,
-              component_props: { fulfillment: true },
+              component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?search=' + this.state.search_query,
               page: { sort: "requested", direction: "DESC" }
             })
@@ -65155,7 +65155,7 @@ var FulfillmentStation = function (_React$Component) {
           React.createElement(
             'div',
             { className: 'product_wrapper' },
-            React.createElement(Item, _extends({ fulfillment: true, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
+            React.createElement(Item, _extends({ fulfillment: true, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
           )
         ),
         actions
@@ -65491,6 +65491,8 @@ module.exports = InputAddress;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -65516,15 +65518,87 @@ var style_summary = {
 var Item = function (_React$Component) {
   _inherits(Item, _React$Component);
 
-  function Item() {
+  function Item(props) {
     _classCallCheck(this, Item);
 
-    return _possibleConstructorReturn(this, (Item.__proto__ || Object.getPrototypeOf(Item)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (Item.__proto__ || Object.getPrototypeOf(Item)).call(this, props));
+
+    _this.state = {
+      props: _this.props,
+      new_tag: "",
+      current_tags: _this.props.tags
+    };
+    _this.handleInputChange = _this.handleInputChange.bind(_this);
+    _this.handleAddTag = _this.handleAddTag.bind(_this);
+    return _this;
   }
 
   _createClass(Item, [{
+    key: 'handleRemoveTag',
+    value: function handleRemoveTag(tag) {
+      var _this2 = this;
+
+      // TODO also log metrics
+      var remove_tags = [tag];
+      var payload = {
+        id: this.props.shipment_id,
+        content_index: this.props.content_index,
+        remove_tags: remove_tags
+      };
+
+      BowAndDrape.api("POST", "/shipment/tagcontent", payload, function (err, results) {
+        if (err) {
+          console.log(err);
+          return Errors.emitError(err);
+        }
+        // now that we removed the tag, also redraw the tag section on this view
+        _this2.setState(function (prev_state) {
+          var current_tags = prev_state.current_tags.slice();
+          current_tags = current_tags.filter(function (prev_tag) {
+            return prev_tag != tag;
+          });
+          return { current_tags: current_tags };
+        });
+      });
+    }
+  }, {
+    key: 'handleInputChange',
+    value: function handleInputChange(event) {
+      var target = event.target;
+      var value = target.type === 'checkbox' ? target.checked : target.value;
+      var name = target.name;
+      this.setState(_defineProperty({}, name, value));
+    }
+  }, {
+    key: 'handleAddTag',
+    value: function handleAddTag() {
+      var _this3 = this;
+
+      // TODO also log metrics
+      var add_tags = [this.state.new_tag];
+      var payload = {
+        id: this.props.shipment_id,
+        content_index: this.props.content_index,
+        add_tags: add_tags
+      };
+      BowAndDrape.api("POST", "/shipment/tagcontent", payload, function (err, results) {
+        if (err) {
+          console.log(err);
+          return Errors.emitError(err);
+        }
+        // add tag to existing current_tags
+        var newTags = add_tags.concat(_this3.state.current_tags);
+        _this3.setState({
+          current_tags: newTags,
+          new_tag: ""
+        });
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
+      var _this4 = this;
+
       if (!this.props.props) {
         return React.createElement(
           'div',
@@ -65634,27 +65708,47 @@ var Item = function (_React$Component) {
       var tag_list = null;
       if (this.props.fulfillment && this.props.tags) {
         var tags = [];
-        this.props.tags.forEach(function (tag) {
+        this.state.current_tags.forEach(function (tag) {
           tags.push(React.createElement(
             'div',
             { key: tags.length, className: 'tag' },
-            tag
+            tag,
+            _this4.props.edit_tags ? React.createElement(
+              'span',
+              { style: { cursor: "pointer" }, onClick: _this4.handleRemoveTag.bind(_this4, tag) },
+              '\u2718'
+            ) : null
           ));
         });
         tag_list = React.createElement(
           'div',
-          { className: 'taglist' },
-          tags
+          null,
+          React.createElement(
+            'div',
+            { className: 'taglist' },
+            tags
+          ),
+          this.props.edit_tags ? React.createElement(
+            'div',
+            { className: 'add_tag' },
+            React.createElement('input', { type: 'text',
+              onChange: this.handleInputChange,
+              onKeyUp: function onKeyUp(event) {
+                if (event.which == 13) {
+                  _this4.handleAddTag();
+                }
+              },
+              value: this.state.new_tag,
+              placeholder: 'enter new tag',
+              name: 'new_tag'
+            }),
+            React.createElement(
+              'button',
+              { onClick: this.handleAddTag },
+              'Add Tag'
+            )
+          ) : null
         );
-      }
-
-      // pad fulfillment_id
-      var garment_id = this.props.garment_id;
-      if (garment_id) {
-        var garment_id_toks = garment_id.split("-");
-        if (garment_id_toks.length > 2) {
-          garment_id = garment_id_toks.join("-");
-        }
       }
 
       var style = this.props.style || Item.style;
@@ -65680,14 +65774,12 @@ var Item = function (_React$Component) {
         tag_list,
         React.createElement(
           'div',
-          { className: 'deets', style: this.props.is_email ? {
-              float: "left"
-            } : {} },
+          { className: 'deets' },
           this.props.fulfillment ? React.createElement(
             'div',
             { className: 'garment_id' },
             'GarmentID#: ',
-            garment_id
+            this.props.garment_id
           ) : null,
           React.createElement(
             'a',
@@ -65870,8 +65962,7 @@ var Items = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Items.__proto__ || Object.getPrototypeOf(Items)).call(this, props));
 
-    _this.state = {
-      expanded: false,
+    _this.state = { expanded: false,
       contents: _this.props.contents || [],
       shipping_quote: {
         days: 5,
@@ -66057,7 +66148,16 @@ var Items = function (_React$Component) {
         }
         // if has a base sku or is a legacy imported item
         if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
-          line_items.push(React.createElement(Item, _extends({ style: style, key: line_items.length }, this.state.contents[i], { onRemove: remove, fulfillment: this.props.fulfillment, garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null, is_email: this.props.is_email })));
+          line_items.push(React.createElement(Item, _extends({
+            style: style,
+            key: line_items.length,
+            onRemove: remove,
+            fulfillment: this.props.fulfillment,
+            garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null,
+            shipment_id: this.props.shipment_id,
+            content_index: this.props.content_index,
+            edit_tags: this.props.edit_tags
+          }, this.state.contents[i])));
         } else {
           summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove, is_email: this.props.is_email })));
         }
@@ -69775,7 +69875,14 @@ var Shipment = function (_React$Component) {
           'contents',
           null,
           line_items,
-          React.createElement(Items, { contents: this.props.contents, fulfillment: this.props.fulfillment, fulfillment_id: this.props.fulfillment_id ? "216-" + this.props.fulfillment_id : null, packing_slip: this.props.packing_slip })
+          React.createElement(Items, { contents: this.props.contents,
+            fulfillment: this.props.fulfillment,
+            fulfillment_id: this.props.fulfillment_id ? "216-" + this.props.fulfillment_id : null,
+            packing_slip: this.props.packing_slip,
+            shipment_id: this.props.id,
+            content_index: line_items.length,
+            edit_tags: this.props.edit_tags
+          })
         ),
         payment_info
       );
