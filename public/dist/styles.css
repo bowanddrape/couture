@@ -569,6 +569,12 @@ comments message {
   border-radius: 3px;
   margin: 0 2px;
 }
+.items .product_wrapper .item.fulfillment .add_tag {
+  display: flex;
+}
+.items .product_wrapper .item.fulfillment .add_tag > * {
+  margin: 0;
+}
 .items .product_wrapper .item.fulfillment .assembly .legacy img {
   height: 28px;
 }

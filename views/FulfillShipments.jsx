@@ -74,7 +74,7 @@ class FulfillShipments extends React.Component {
         // ignore dupe shipments
         if (this.state[tag.replace(/-/g,"")].findIndex((s)=>{return s.id==shipment.id})!=index) return;
         tab_contents.push(
-          <Shipment key={tab_contents.length} fulfillment={true} {...shipment} />
+          <Shipment key={tab_contents.length} fulfillment={true} edit_tags={true} {...shipment} />
         );
       });
       tagged_tab_contents.push(
@@ -94,7 +94,7 @@ class FulfillShipments extends React.Component {
             <h2>New</h2>
             <Scrollable
               component={Shipment}
-              component_props={{fulfillment:true}}
+              component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&approved=null&on_hold=null&packed=null&received=null`}
               page = {{sort:"requested", direction:"ASC"}}
             />
@@ -103,7 +103,7 @@ class FulfillShipments extends React.Component {
             <h2>Hold</h2>
             <Scrollable
               component={Shipment}
-              component_props={{fulfillment:true}}
+              component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&approved=null&on_hold=not_null`}
               page = {{sort:"requested", direction:"DESC"}}
             />
@@ -119,7 +119,7 @@ class FulfillShipments extends React.Component {
             <h2>Packed</h2>
             <Scrollable
               component={Shipment}
-              component_props={{fulfillment:true}}
+              component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&packed=not_null&ship_description=null`}
               page = {{sort:"requested", direction:"DESC"}}
             />
@@ -128,7 +128,7 @@ class FulfillShipments extends React.Component {
             <h2>Shipped</h2>
             <Scrollable
               component={Shipment}
-              component_props={{fulfillment:true}}
+              component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&ship_description=not_null&received=null`}
               page = {{sort:"requested", direction:"ASC"}}
             />
@@ -137,7 +137,7 @@ class FulfillShipments extends React.Component {
             <h2>Completed</h2>
             <Scrollable
               component={Shipment}
-              component_props={{fulfillment:true}}
+              component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&received=not_null`}
               page = {{sort:"received", direction:"DESC"}}
             />
@@ -147,7 +147,7 @@ class FulfillShipments extends React.Component {
             <input type="text" placeholder="search by id" value={this.state.search_query} onChange={(event)=>{this.setState({search_query:event.target.value})}}/>
             <Scrollable
               component={Shipment}
-              component_props={{fulfillment:true}}
+              component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?search=${this.state.search_query}`}
               page = {{sort:"requested", direction:"DESC"}}
             />

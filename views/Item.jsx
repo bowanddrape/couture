@@ -21,18 +21,16 @@ class Item extends React.Component {
     super(props)
     this.state = {
       props: this.props,
-      currentTags: this.props.tags,
+      new_tag: "",
+      current_tags: this.props.tags,
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleAddTag = this.handleAddTag.bind(this);
-    this.handleButtonTag = this.handleButtonTag.bind(this);
   }
 
-  handleButtonTag(event) {
-    const target = event.target;
-    const tagID = target.getAttribute("tag_id");
+  handleRemoveTag(tag) {
     // TODO also log metrics
-    let remove_tags = [tagID];
+    let remove_tags = [tag];
     let payload = {
       id: this.props.shipment_id,
       content_index: this.props.content_index,
@@ -44,13 +42,13 @@ class Item extends React.Component {
         console.log(err);
         return Errors.emitError(err);
       }
-      let tagsCopy = this.state.currentTags.slice();
-      let index = tagsCopy.indexOf(tagID);
-      if (index > -1) {
-         tagsCopy.splice(index, 1);
-      }
-      this.setState({
-        currentTags: tagsCopy
+      // now that we removed the tag, also redraw the tag section on this view
+      this.setState((prev_state) => {
+        let current_tags = prev_state.current_tags.slice();
+        current_tags = current_tags.filter((prev_tag) => {
+          return prev_tag != tag;
+        });
+        return {current_tags};
       });
     });
   }
@@ -66,7 +64,7 @@ class Item extends React.Component {
 
   handleAddTag() {
     // TODO also log metrics
-    let add_tags = [this.state.tags];
+    let add_tags = [this.state.new_tag];
     let payload = {
       id: this.props.shipment_id,
       content_index: this.props.content_index,
@@ -77,14 +75,12 @@ class Item extends React.Component {
         console.log(err);
         return Errors.emitError(err);
       }
-      // add tag to existing currentTags
-      let newTags = add_tags.concat(this.state.currentTags);
+      // add tag to existing current_tags
+      let newTags = add_tags.concat(this.state.current_tags);
       this.setState({
-        currentTags: newTags,
-        shipment:null,
+        current_tags: newTags,
+        new_tag: "",
       });
-    //TODO Fix error that's preventing react from updating on tag state changes
-    location.reload();
     });
   }
 
@@ -184,14 +180,35 @@ class Item extends React.Component {
     let tag_list = null;
     if (this.props.fulfillment && this.props.tags) {
       let tags = [];
-      this.state.currentTags.forEach((tag)=> {
+      this.state.current_tags.forEach((tag)=> {
         tags.push(
           <div key={tags.length} className="tag">
-            <button className="tag_button" tag_id={tag} onClick={this.handleButtonTag}>{tag}</button>
+            {tag}
+            {this.props.edit_tags?
+              <span style={{cursor:"pointer"}} onClick={this.handleRemoveTag.bind(this, tag)}>✘</span> : null
+            }
           </div>
         )
       });
-      tag_list = (<div className="taglist">{tags}</div>);
+      tag_list = (
+        <div>
+          <div className="taglist">
+            {tags}
+          </div>
+          {this.props.edit_tags?
+            <div className="add_tag">
+              <input type="text"
+                onChange={this.handleInputChange}
+                onKeyUp={(event)=>{if(event.which==13){this.handleAddTag()}}}
+                value={this.state.new_tag}
+                placeholder="enter new tag"
+                name="new_tag"
+              />
+              <button onClick={this.handleAddTag}>Add Tag</button>
+            </div> :null
+          }
+        </div>
+      );
     }
 
     let style = this.props.style || Item.style;
@@ -211,11 +228,8 @@ class Item extends React.Component {
               : null
           }
         </a>
-        <label>Enter Tags:</label>
-        <input type="text" onChange={this.handleInputChange} value={this.state.tags} name="tags"/>
-        <button onClick={this.handleAddTag}>Add Tag</button>
         {tag_list}
-        <div className="deets" >
+        <div className="deets">
           {this.props.fulfillment ?
             <div className="garment_id">GarmentID#: {this.props.garment_id}</div>
             : null
