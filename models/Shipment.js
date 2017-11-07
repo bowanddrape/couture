@@ -54,7 +54,8 @@ class Shipment extends JSONAPI {
   // extends JSONAPI
   hasApiPermission(req, res) {
     // allow user to ask for own shipments
-    if (req.method=='GET' && req.user && req.user.email==req.query.email)
+    // FIXME only allow user to look at own shipments
+    if (req.method=='GET' && req.user)
       return true;
 
     return super.hasApiPermission(req, res);
