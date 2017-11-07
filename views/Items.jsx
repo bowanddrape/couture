@@ -30,6 +30,12 @@ class Items extends React.Component {
     }
   }
 
+  componentWillReceiveProps(next_props) {
+    if (next_props.contents) {
+      this.setState({contents:next_props.contents});
+    }
+  }
+
   // TODO maybe put this in ItemUtils.js
   updateShipping(callback) {
     if (!this.props.is_cart) return;
@@ -69,11 +75,8 @@ class Items extends React.Component {
   }
 
   updateCredit(credit) {
-    this.setState({account_credit:credit}, () => {
-      this.updateContents(this.state.contents);
-    });
+    this.setState({account_credit:credit});
   };
-
 
   updateContents(contents) {
     contents = contents || [];
@@ -88,12 +91,13 @@ class Items extends React.Component {
         }, () => {
           // as a final callback, call onUpdate from parent?
           if (this.props.onUpdate)
-            this.props.onUpdate(this);
+            this.props.onUpdate(contents);
         });
       });
     });
   }
 
+  // TODO maybe put this in ItemUtils.js
   // estimate manufacturing time
   estimateManufactureTime() {
     let days_needed_parallel = 5;
@@ -122,6 +126,7 @@ class Items extends React.Component {
     return days_needed_parallel + days_needed_serial;
   }
 
+  // TODO maybe put this in ItemUtils.js
   // estimate date from now, takes days, returns time in seconds
   countBusinessDays(days) {
     let floorDate = function(time_stamp) {

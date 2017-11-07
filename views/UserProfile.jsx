@@ -16,22 +16,21 @@ class UserProfile extends React.Component {
 
   logout() {
     // logout facebook
-    try {
-      return FB.getLoginStatus((response) => {
-        if (response.status !== 'connected') {
-          BowAndDrape.dispatcher.handleAuth({});
-          location.reload();
-        }
-        return FB.logout(() => {
-          BowAndDrape.dispatcher.handleAuth({});
-          location.reload();
-        });
-      });
-    } catch (err) {
-      console.log(err);
+    // sometimes facebook doesn't respond
+    let timeoutHandler = setTimeout(()=> {
       BowAndDrape.dispatcher.handleAuth({});
       location.reload();
-    }
+    }, 1000);
+    return FB.getLoginStatus((response) => {
+      if (response.status !== 'connected') {
+        BowAndDrape.dispatcher.handleAuth({});
+        location.reload();
+      }
+      return FB.logout(() => {
+        BowAndDrape.dispatcher.handleAuth({});
+        location.reload();
+      });
+    });
   }
 
   render() {
