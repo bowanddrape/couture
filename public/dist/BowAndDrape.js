@@ -62808,7 +62808,7 @@ var Cart = function (_React$Component) {
       Errors.clear();
       items = items || [];
 
-      if (this.refs.Items) this.refs.Items.updateContents(items);
+      this.setState({ items: items });
 
       if (!items.length) Errors.emitError(null, "Cart is empty");
     }
@@ -63046,7 +63046,7 @@ var Cart = function (_React$Component) {
           ref: 'Items',
           contents: this.state.items,
           onUpdate: function onUpdate(items) {
-            _this4.setState({ items: items.contents });
+            _this4.setState({ items: items });
           },
           is_cart: 'true'
         }),
@@ -65981,10 +65981,17 @@ var Items = function (_React$Component) {
     return _this;
   }
 
-  // TODO maybe put this in ItemUtils.js
-
-
   _createClass(Items, [{
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(next_props) {
+      if (next_props.contents) {
+        this.setState({ contents: next_props.contents });
+      }
+    }
+
+    // TODO maybe put this in ItemUtils.js
+
+  }, {
     key: 'updateShipping',
     value: function updateShipping(callback) {
       var _this2 = this;
@@ -66023,34 +66030,31 @@ var Items = function (_React$Component) {
   }, {
     key: 'updateCredit',
     value: function updateCredit(credit) {
-      var _this3 = this;
-
-      this.setState({ account_credit: credit }, function () {
-        _this3.updateContents(_this3.state.contents);
-      });
+      this.setState({ account_credit: credit });
     }
   }, {
     key: 'updateContents',
     value: function updateContents(contents) {
-      var _this4 = this;
+      var _this3 = this;
 
       contents = contents || [];
       this.setState({ contents: contents }, function () {
         // update shipping line
-        _this4.updateShipping(function () {
+        _this3.updateShipping(function () {
           // update account credit line
-          _this4.setState(function (prevState) {
+          _this3.setState(function (prevState) {
             var contents = JSON.parse(JSON.stringify(prevState.contents));
             ItemUtils.applyCredits(prevState.account_credit, contents);
             return { contents: contents };
           }, function () {
             // as a final callback, call onUpdate from parent?
-            if (_this4.props.onUpdate) _this4.props.onUpdate(_this4);
+            if (_this3.props.onUpdate) _this3.props.onUpdate(contents);
           });
         });
       });
     }
 
+    // TODO maybe put this in ItemUtils.js
     // estimate manufacturing time
 
   }, {
@@ -66079,6 +66083,7 @@ var Items = function (_React$Component) {
       return days_needed_parallel + days_needed_serial;
     }
 
+    // TODO maybe put this in ItemUtils.js
     // estimate date from now, takes days, returns time in seconds
 
   }, {
@@ -66101,27 +66106,27 @@ var Items = function (_React$Component) {
   }, {
     key: 'handleApplyDiscountCode',
     value: function handleApplyDiscountCode() {
-      var _this5 = this;
+      var _this4 = this;
 
       if (!BowAndDrape) return;
       BowAndDrape.api("GET", "/promocode", { code: this.state.promo.code.toLowerCase() }, function (err, result) {
         if (err) return Errors.emitError("promo", err.toString());
         if (!result.length) return Errors.emitError("promo", "no such promo code");
         var promo = result[0];
-        _this5.setState({ promo: promo });
+        _this4.setState({ promo: promo });
         // FIXME this is a race as contents could be modified between
         // clone and set, but I can't figure out how to wrap this properly
-        var contents = JSON.parse(JSON.stringify(_this5.state.contents));
+        var contents = JSON.parse(JSON.stringify(_this4.state.contents));
         ItemUtils.applyPromoCode(contents, promo, function (err, items) {
           if (err) return Errors.emitError("promo", err.toString());
-          _this5.updateContents(items);
+          _this4.updateContents(items);
         });
       });
     }
   }, {
     key: 'render',
     value: function render() {
-      var _this6 = this;
+      var _this5 = this;
 
       var line_items = [];
       var summary_items = [];
@@ -66245,16 +66250,16 @@ var Items = function (_React$Component) {
                 'div',
                 { className: 'promo_input', style: style_summary.deets },
                 React.createElement('input', { placeholder: 'Promo code', className: 'clearInput', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
-                    _this6.setState({ promo: { code: event.target.value } });
+                    _this5.setState({ promo: { code: event.target.value } });
                   }, onKeyUp: function onKeyUp(event) {
                     if (event.which == 13) {
-                      _this6.handleApplyDiscountCode();
+                      _this5.handleApplyDiscountCode();
                     }
                   } }),
                 React.createElement(
                   'button',
                   { onClick: function onClick() {
-                      _this6.handleApplyDiscountCode();
+                      _this5.handleApplyDiscountCode();
                     } },
                   'Apply'
                 )
@@ -70930,22 +70935,21 @@ var UserProfile = function (_React$Component) {
     key: 'logout',
     value: function logout() {
       // logout facebook
-      try {
-        return FB.getLoginStatus(function (response) {
-          if (response.status !== 'connected') {
-            BowAndDrape.dispatcher.handleAuth({});
-            location.reload();
-          }
-          return FB.logout(function () {
-            BowAndDrape.dispatcher.handleAuth({});
-            location.reload();
-          });
-        });
-      } catch (err) {
-        console.log(err);
+      // sometimes facebook doesn't respond
+      var timeoutHandler = setTimeout(function () {
         BowAndDrape.dispatcher.handleAuth({});
         location.reload();
-      }
+      }, 1000);
+      return FB.getLoginStatus(function (response) {
+        if (response.status !== 'connected') {
+          BowAndDrape.dispatcher.handleAuth({});
+          location.reload();
+        }
+        return FB.logout(function () {
+          BowAndDrape.dispatcher.handleAuth({});
+          location.reload();
+        });
+      });
     }
   }, {
     key: 'render',

@@ -116,8 +116,7 @@ class Cart extends React.Component {
     Errors.clear();
     items = items || [];
 
-    if (this.refs.Items)
-          this.refs.Items.updateContents(items);
+    this.setState({items});
 
     if (!items.length)
       Errors.emitError(null, "Cart is empty");
@@ -134,8 +133,6 @@ class Cart extends React.Component {
       return {no_login_prompt:!prevState.no_login_prompt};
     });
   }
-
-
 
   handleFieldChange(section, event) {
     let update = {};
@@ -314,7 +311,9 @@ class Cart extends React.Component {
         <Items
           ref="Items"
           contents={this.state.items}
-          onUpdate={(items)=>{this.setState({items:items.contents})}}
+          onUpdate={(items)=>{
+            this.setState({items})
+          }}
           is_cart="true"
         />
 
