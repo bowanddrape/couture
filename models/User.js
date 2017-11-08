@@ -27,6 +27,7 @@ class User extends SQLTable {
     Object.assign(this, user);
     if (user.email)
       this.email = user.email.toLowerCase(); // remember lowercase while selecting
+    this.props = this.props || {};
   }
 
   // needed by SQLTable
@@ -36,6 +37,21 @@ class User extends SQLTable {
       pkey: "email",
       fields: ["passhash", "verified", "props", "credits"]
     };
+  }
+
+  // extends SQLTable
+  static get(primary_key_value, callback) {
+    super.get(primary_key_value, (err, user) => {
+      if (!err && !user) {
+        let user = new User({email: primary_key_value});
+        return user.upsert((err, user) => {
+          User.get(primary_key_value, (err, user) => {
+            callback(err, user);
+          });
+        });
+      }
+      callback(err, user);
+    });
   }
 
   static handleHTTP(req, res, next) {
@@ -199,13 +215,12 @@ class User extends SQLTable {
         }
 
         // if user did not exist, create one
-        if (!user)
+        if (!user || !user.passhash)
           return User.handleRegister(req, res);
-
-        if (!user.passhash)
-          return res.json({error:"Select 'Forgot Password' to set a password"}).end();
+        // verify correct password
         if (user.passhash!=req.body.passhash)
           return res.json({error:"Incorrect password"}).end();
+
         User.sendJwtToken(res, user);
       });
     } else if (req.user) {
@@ -238,7 +253,7 @@ class User extends SQLTable {
   // create a new user
   static handleRegister(req, res) {
     User.get(req.body.email, function(err, user) {
-      if (user) return res.json({error:"user exists"}).end();
+      if (user && user.passhash) return res.json({error:"user exists"}).end();
 
       let new_user = new User({
         email: req.body.email,
