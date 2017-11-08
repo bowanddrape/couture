@@ -159,9 +159,11 @@ class SQLTable {
       if (column == "search") {
         values.push(`.*${constraints[column]}.*`);
         // if we have props, search that too
-        let sql_constraint = (sql.fields.indexOf("props") >= 0) ?
-          `(props->>'name' ~* $${values.length} OR props->>'legacy_id' ~* $${values.length} OR ${sql.pkey}::text ~* $${values.length})` :
-          `${sql.pkey}::text ~* $${values.length}`;
+        let sql_constraint = `${sql.pkey}::text ~* $${values.length}`;
+        if (sql.fields.indexOf("props") >= 0)
+          sql_constraint = `(props->>'name' ~* $${values.length} OR props->>'legacy_id' ~* $${values.length} OR ${sql_constraint})`;
+        if (sql.fields.indexOf("email") >= 0)
+          sql_constraint = `(email ~* $${values.length} OR ${sql_constraint})`;
 
         where = where ?
           where + ` AND ${sql_constraint}`:
