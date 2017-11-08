@@ -64,10 +64,21 @@ class Shipment extends React.Component {
         id: this.props.id,
         content_index: "*",
         add_tags: ["needs_picking"],
-        remove_tags: ["needs_designqa"],
+        remove_tags: ["new"],
       }, (err, results) =>  {
         BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
-          this.setState(shipment);
+          window.location.href = `/shipment/${shipment.id}/?fulfillment=1&edit_tags=1`;
+        });
+      });
+    } else if (state == "on_hold") {
+      return BowAndDrape.api("POST", "/shipment/tagcontent", {
+        id: this.props.id,
+        content_index: "*",
+        add_tags: ["on_hold"],
+        remove_tags: [],
+      }, (err, results) =>  {
+        BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
+          window.location.href = `/shipment/${shipment.id}/?fulfillment=1&edit_tags=1`;
         });
       });
     }
@@ -92,14 +103,6 @@ class Shipment extends React.Component {
     shipment.props.comments.push(comment);
     BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
       this.setState({comments: shipment.props.comments});
-    });
-  }
-
-  handleRemoveHold() {
-    let shipment = {id: this.props.id};
-    shipment.on_hold = "";
-    BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
-      this.setState(shipment);
     });
   }
 
@@ -184,19 +187,6 @@ class Shipment extends React.Component {
       actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "approved")}>Ready to Make</button>);
     if (!this.state.approved && !this.state.packed && !this.state.on_hold)
       actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "on_hold")}>Hold</button>);
-    if (this.state.on_hold)
-      actions.push(<button key={actions.length} onClick={this.handleRemoveHold.bind(this)}>Remove Hold</button>);
-
-    if (this.state.approved && !this.state.picked && !this.state.packed && !this.state.received)
-      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "picked")}>Picked</button>);
-    if (this.state.approved && this.state.picked && !this.state.inspected && !this.state.received)
-      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "inspected")}>QA passed</button>);
-    if (this.state.inspected && !this.state.packed && !this.state.received)
-      actions.push(<button key={actions.length} onClick={this.handleMarkState.bind(this, "packed")}>Packed</button>);
-    // TODO for kiosk mode
-    if (false) {
-      actions.push(<button key={actions.length} onClick={this.setSink.bind(this, "customer_pickup")}>Marked as Pickedup</button>);
-    }
 
     actions.push(<button key={actions.length} onClick={this.setSink.bind(this, "canceled")}>Cancel</button>);
 

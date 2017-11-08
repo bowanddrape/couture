@@ -185,7 +185,7 @@ class Item extends React.Component {
       if (this.state.current_tags) {
         this.state.current_tags.forEach((tag)=> {
           tags.push(
-            <div key={tags.length} className="tag">
+            <div key={tags.length} className={"tag "+tag}>
               {tag}
               {this.props.edit_tags?
                 <span style={{cursor:"pointer"}} onClick={this.handleRemoveTag.bind(this, tag)}>✘</span> : null

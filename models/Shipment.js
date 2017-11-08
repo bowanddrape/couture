@@ -75,10 +75,9 @@ class Shipment extends JSONAPI {
   onApiGet(req, res) {
     // get list of shipments by tag
     if (/\/shipment\/tagged/.test(req.path)) {
-      let from_id = req.query.from_id;
       let tag = req.query.tag;
-      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE from_id=$1) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $2`; 
-      return SQLTable.sqlQuery(Shipment, query, [from_id, tag], (err, shipments) => {
+      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE props#>>'{imported}' IS NULL) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $1`; 
+      return SQLTable.sqlQuery(Shipment, query, [tag], (err, shipments) => {
         // remove an extra field we made just for the db select
         shipments.forEach((shipment) => {
           delete shipment.content_array;

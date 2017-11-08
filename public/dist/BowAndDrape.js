@@ -64689,7 +64689,13 @@ var FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-var tagged_tabs = ["stickering", "picking", "pressing", "qa-ing", "packing"];
+var tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
+var tag_names = {
+  picking: "needs_picking",
+  pressing: "needs_pressing",
+  qaing: "needs_qaing",
+  packing: "needs_packing"
+};
 
 var FulfillShipments = function (_React$Component) {
   _inherits(FulfillShipments, _React$Component);
@@ -64729,10 +64735,10 @@ var FulfillShipments = function (_React$Component) {
       var _this2 = this;
 
       if (!BowAndDrape) return;
-      // FIXME facility_id hardcoded for now
-      var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1';
       tagged_tabs.forEach(function (tag) {
-        BowAndDrape.api("GET", "/shipment/tagged/", { tag: "needs_" + tag, from_id: from_id }, function (err, shipments) {
+        var tag_name = tag;
+        if (tag_names[tag]) tag_name = tag_names[tag];
+        BowAndDrape.api("GET", "/shipment/tagged/", { tag: tag_name }, function (err, shipments) {
           if (err) return Errors.emitError(null, err);
           _this2.setState(_defineProperty({}, tag.replace(/-/g, ""), shipments));
         });
@@ -65041,8 +65047,8 @@ var FulfillmentStation = function (_React$Component) {
         case "pressing":
           remove_tags.push("needs_pressing");
           break;
-        case "qa-ing":
-          remove_tags.push("needs_qa-ing");
+        case "qaing":
+          remove_tags.push("needs_qaing");
           break;
         case "packing":
           remove_tags.push("needs_packing");
@@ -65714,7 +65720,7 @@ var Item = function (_React$Component) {
           this.state.current_tags.forEach(function (tag) {
             tags.push(React.createElement(
               'div',
-              { key: tags.length, className: 'tag' },
+              { key: tags.length, className: "tag " + tag },
               tag,
               _this4.props.edit_tags ? React.createElement(
                 'span',
@@ -69493,10 +69499,21 @@ var Shipment = function (_React$Component) {
           id: this.props.id,
           content_index: "*",
           add_tags: ["needs_picking"],
-          remove_tags: ["needs_designqa"]
+          remove_tags: ["new"]
         }, function (err, results) {
           BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
-            _this3.setState(shipment);
+            window.location.href = '/shipment/' + shipment.id + '/?fulfillment=1&edit_tags=1';
+          });
+        });
+      } else if (state == "on_hold") {
+        return BowAndDrape.api("POST", "/shipment/tagcontent", {
+          id: this.props.id,
+          content_index: "*",
+          add_tags: ["on_hold"],
+          remove_tags: []
+        }, function (err, results) {
+          BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
+            window.location.href = '/shipment/' + shipment.id + '/?fulfillment=1&edit_tags=1';
           });
         });
       }
@@ -69527,20 +69544,9 @@ var Shipment = function (_React$Component) {
       });
     }
   }, {
-    key: 'handleRemoveHold',
-    value: function handleRemoveHold() {
-      var _this5 = this;
-
-      var shipment = { id: this.props.id };
-      shipment.on_hold = "";
-      BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
-        _this5.setState(shipment);
-      });
-    }
-  }, {
     key: 'handleQueryRates',
     value: function handleQueryRates() {
-      var _this6 = this;
+      var _this5 = this;
 
       var shipment = { id: this.props.id };
       BowAndDrape.api("POST", "/shipment/quote", shipment, function (err, ret) {
@@ -69555,7 +69561,7 @@ var Shipment = function (_React$Component) {
             price: rate.amount
           });
         });
-        _this6.setState({
+        _this5.setState({
           rates: rates,
           tracking_code: "quoting..."
         });
@@ -69564,12 +69570,12 @@ var Shipment = function (_React$Component) {
   }, {
     key: 'handleBuyLabel',
     value: function handleBuyLabel(rate_id) {
-      var _this7 = this;
+      var _this6 = this;
 
       var shipment = { id: this.props.id, rate_id: rate_id };
       BowAndDrape.api("POST", "/shipment/buylabel", shipment, function (err, shipment) {
         if (err) return alert(err);
-        _this7.setState({
+        _this6.setState({
           rates: undefined,
           tracking_code: shipment.tracking_code,
           shipping_label: shipment.shipping_label
@@ -69579,7 +69585,7 @@ var Shipment = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this8 = this;
+      var _this7 = this;
 
       var line_items = [];
       if (this.state.rates) {
@@ -69589,7 +69595,7 @@ var Shipment = function (_React$Component) {
             { key: line_items.length, style: Item.style.item },
             React.createElement(
               'button',
-              { onClick: _this8.handleBuyLabel.bind(_this8, rate.rate_id), style: { maxWidth: "190px" } },
+              { onClick: _this7.handleBuyLabel.bind(_this7, rate.rate_id), style: { maxWidth: "190px" } },
               'Buy Label'
             ),
             React.createElement(
@@ -69691,35 +69697,6 @@ var Shipment = function (_React$Component) {
         { key: actions.length, onClick: this.handleMarkState.bind(this, "on_hold") },
         'Hold'
       ));
-      if (this.state.on_hold) actions.push(React.createElement(
-        'button',
-        { key: actions.length, onClick: this.handleRemoveHold.bind(this) },
-        'Remove Hold'
-      ));
-
-      if (this.state.approved && !this.state.picked && !this.state.packed && !this.state.received) actions.push(React.createElement(
-        'button',
-        { key: actions.length, onClick: this.handleMarkState.bind(this, "picked") },
-        'Picked'
-      ));
-      if (this.state.approved && this.state.picked && !this.state.inspected && !this.state.received) actions.push(React.createElement(
-        'button',
-        { key: actions.length, onClick: this.handleMarkState.bind(this, "inspected") },
-        'QA passed'
-      ));
-      if (this.state.inspected && !this.state.packed && !this.state.received) actions.push(React.createElement(
-        'button',
-        { key: actions.length, onClick: this.handleMarkState.bind(this, "packed") },
-        'Packed'
-      ));
-      // TODO for kiosk mode
-      if (false) {
-        actions.push(React.createElement(
-          'button',
-          { key: actions.length, onClick: this.setSink.bind(this, "customer_pickup") },
-          'Marked as Pickedup'
-        ));
-      }
 
       actions.push(React.createElement(
         'button',

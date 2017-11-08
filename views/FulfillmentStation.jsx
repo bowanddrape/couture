@@ -104,8 +104,8 @@ class FulfillmentStation extends React.Component {
       case "pressing":
         remove_tags.push("needs_pressing");
         break;
-      case "qa-ing":
-        remove_tags.push("needs_qa-ing");
+      case "qaing":
+        remove_tags.push("needs_qaing");
         break;
       case "packing":
         remove_tags.push("needs_packing");

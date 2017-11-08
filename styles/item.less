@@ -44,9 +44,16 @@
         .tag {
           color: @color_primary;
           background-color: @color_secondary;
+          border: solid 1px @color_secondary;
           padding: 2px;
           border-radius: 3px;
           margin: 0 2px;
+        }
+        .tab.on_hold {
+          border: solid 1px @color_support_2;
+        }
+        .tab.vip {
+          border: solid 1px @color_support_3;
         }
       }
       .add_tag {

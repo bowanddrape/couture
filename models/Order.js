@@ -155,6 +155,26 @@ class Order {
       } // define handlePayments()
 
       let handleCreateShipment = (client, callback) => {
+        // go through each order item and add default tags
+        // TODO organize this somewhere
+        shipment.contents.forEach((item) => {
+          if (!item.sku) return;
+          let needs_embroidery = false;
+          let needs_airbrush = false;
+          // see if we have any embroidery
+          // TODO flag each component with manufacturing reqirements
+          item.recurseAssembly((component) => {
+            if (/letter_embroidery/.test(component.sku)) needs_embroidery = true;
+            if (/letter_airbrush/.test(component.sku)) needs_airbrush = true;
+          });
+          item.tags = item.tags || [];
+          if (needs_embroidery)
+            item.tags.push("needs_embroidery");
+          if (needs_airbrush)
+            item.tags.push("needs_airbrush");
+          item.tags.push("new");
+        });
+
         let upsert = shipment.buildUpsertQuery();
         client.query(upsert.query, upsert.values, (err, result) => {
           if (err) return callback("Could not save shipment info");

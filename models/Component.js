@@ -141,7 +141,7 @@ class Component extends JSONAPI {
     foreach(this, ancestor);
     if (!this.assembly) return;
     this.assembly.forEach((component) => {
-      component.recurseProductFamily(foreach, this);
+      component.recurseAssembly(foreach, this);
     });
   }
 

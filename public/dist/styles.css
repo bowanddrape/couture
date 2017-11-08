@@ -565,9 +565,16 @@ comments message {
 .items .product_wrapper .item.fulfillment .taglist .tag {
   color: #fff;
   background-color: #000;
+  border: solid 1px #000;
   padding: 2px;
   border-radius: 3px;
   margin: 0 2px;
+}
+.items .product_wrapper .item.fulfillment .taglist .tab.on_hold {
+  border: solid 1px #ff5c5c;
+}
+.items .product_wrapper .item.fulfillment .taglist .tab.vip {
+  border: solid 1px #f5c9ca;
 }
 .items .product_wrapper .item.fulfillment .add_tag {
   display: flex;

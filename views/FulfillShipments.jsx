@@ -8,7 +8,13 @@ const FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-const tagged_tabs = ["stickering","picking", "pressing", "qa-ing", "packing"];
+const tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
+const tag_names = {
+  picking: "needs_picking",
+  pressing: "needs_pressing",
+  qaing: "needs_qaing",
+  packing: "needs_packing",
+}
 
 class FulfillShipments extends React.Component {
   constructor(props) {
@@ -38,10 +44,10 @@ class FulfillShipments extends React.Component {
 
   refreshTaggedShipments() {
     if (!BowAndDrape) return;
-    // FIXME facility_id hardcoded for now
-    let from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1';
     tagged_tabs.forEach((tag) => {
-      BowAndDrape.api("GET", "/shipment/tagged/", {tag:"needs_"+tag, from_id}, (err, shipments) => {
+      let tag_name = tag;
+      if (tag_names[tag]) tag_name = tag_names[tag];
+      BowAndDrape.api("GET", "/shipment/tagged/", {tag:tag_name}, (err, shipments) => {
         if (err) return Errors.emitError(null, err);
         this.setState({[tag.replace(/-/g,"")]:shipments});
       });
