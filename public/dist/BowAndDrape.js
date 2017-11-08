@@ -69735,6 +69735,16 @@ var Shipment = function (_React$Component) {
                 React.createElement(
                   'label',
                   null,
+                  'Order_placed: '
+                ),
+                React.createElement(Timestamp, { time: this.props.requested })
+              ),
+              React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
                   'Deliver_by: '
                 ),
                 React.createElement(Timestamp, { time: this.props.delivery_promised })
