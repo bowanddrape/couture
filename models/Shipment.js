@@ -152,17 +152,11 @@ class Shipment extends JSONAPI {
       });
       // update the db
       update_tags_tasks.push((client, shipment, callback) => {
-        // FIXME why is this not working
-/*
         let query = `UPDATE shipments SET contents=$1 WHERE id=$2`;
         client.query(query, [JSON.stringify(shipment.contents), shipment.id], (err, result) => {
           if (err) return callback(err);
           res.json(shipment);
-        });
-*/
-        // defaulting to non-atomic non-transactional race-condition land
-        shipment.upsert((err) => {
-          res.json(shipment);
+          callback(null);
         });
       });
 
