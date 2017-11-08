@@ -66170,7 +66170,7 @@ var Items = function (_React$Component) {
             fulfillment: this.props.fulfillment,
             garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null,
             shipment_id: this.props.shipment_id,
-            content_index: this.props.content_index,
+            content_index: i,
             edit_tags: this.props.edit_tags
           }, this.state.contents[i])));
         } else {

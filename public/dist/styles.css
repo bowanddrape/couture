@@ -570,11 +570,13 @@ comments message {
   border-radius: 3px;
   margin: 0 2px;
 }
-.items .product_wrapper .item.fulfillment .taglist .tab.on_hold {
+.items .product_wrapper .item.fulfillment .taglist .tag.on_hold {
   border: solid 1px #ff5c5c;
+  box-shadow: 2px 2px 1px #ff5c5c;
 }
-.items .product_wrapper .item.fulfillment .taglist .tab.vip {
+.items .product_wrapper .item.fulfillment .taglist .tag.vip {
   border: solid 1px #f5c9ca;
+  box-shadow: 2px 2px 1px #f5c9ca;
 }
 .items .product_wrapper .item.fulfillment .add_tag {
   display: flex;
