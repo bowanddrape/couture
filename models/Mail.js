@@ -49,6 +49,9 @@ class Mail {
   static sendShippedEmail(shipment, callback) {
     User.get(shipment.email, (err, user) => {
       if (err) return callback(err);
+      if (!user) {
+        user = new User({email: shipment.email});
+      }
       User.generateJwtToken(user, (err, token) => {
         if (err) return callback(err);
 
@@ -71,6 +74,9 @@ class Mail {
   static sendPlacedEmail(shipment, callback) {
     User.get(shipment.email, (err, user) => {
       if (err) return callback(err);
+      if (!user) {
+        user = new User({email: shipment.email});
+      }
       User.generateJwtToken(user, (err, token) => {
         if (err) return callback(err);
 
