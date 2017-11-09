@@ -9,7 +9,7 @@ const FulfillShipments = require('../views/FulfillShipments.jsx');
 const GenericList = require('../views/GenericList.jsx');
 const FulfillmentStation = require('../views/FulfillmentStation.jsx');
 
-const station_types = ["picking","pressing","qa-ing","packing"];
+const station_types = ["picking","pressing","qaing","packing"];
 
 /***
 Handle requests to /fulfillment/

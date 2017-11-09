@@ -71,13 +71,20 @@ class FulfillmentStation extends React.Component {
       if (results.length == 0){
         return Errors.emitError("lookup", "No garment found, check garment id");
       }
+      // Handle wrong station events
+      let correctStation = true;
+      let tag= results[0].contents[0].tags[0];
+      let tagIndex = tag.indexOf(this.props.station);
+      if (tagIndex == -1){
+        correctStation = false;
+      }
 
       // TODO handle invalid content index
-
       this.setState({
         shipment: results[0],
         started: new Date().getTime()/1000,
         content_index: content_index,
+        correctStation: correctStation,
       });
     });
   }
@@ -117,7 +124,7 @@ class FulfillmentStation extends React.Component {
         return this.handleDone(["needs_picking"], remove_tags);
       case "pressing":
         return this.handleDone(["needs_pressing"], remove_tags);
-      case "qa-ing":
+      case "qaing":
         return this.handleDone(["needs_qaing"], remove_tags);
       case "packing":
         return this.handleDone(["needs_packing"], remove_tags);
@@ -143,15 +150,30 @@ class FulfillmentStation extends React.Component {
 
   renderResults() {
     let actions = [];
-    actions.push(<button key={actions.length} onClick={()=>{this.setState({shipment:null})}}>Cancel</button>);
+    actions.push(<button key={actions.length} onClick={()=>{this.setState({shipment:null})}}>Back</button>);
+    if (!this.state.correctStation){
+      return (
+        <div>
+          <div className="warning404">
+            <h2>ERROR: Incorrect Station</h2>
+          </div>
+            <div className="items">
+              <div className="product_wrapper">
+                <Item fulfillment={true} content_index={this.state.content_index} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
+          </div></div>
+          {actions}
+        </div>
+      );
+    }
+
     switch (this.props.station) {
       case "picking":
         actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Pressing</button>);
         break;
       case "pressing":
-        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "qa-ing")}>Mark for QA-ing</button>);
+        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "qaing")}>Mark for QAing</button>);
         break;
-      case "qa-ing":
+      case "qaing":
         actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "packing")}>Mark for Packing</button>);
         actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Re-Pressing</button>);
         actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "picking")}>Mark for Re-Picking</button>);
