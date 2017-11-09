@@ -125,25 +125,6 @@ class Items extends React.Component {
     return days_needed_parallel + days_needed_serial;
   }
 
-  // TODO maybe put this in ItemUtils.js
-  // estimate date from now, takes days, returns time in seconds
-  countBusinessDays(days) {
-    let floorDate = function(time_stamp) {
-      time_stamp -= time_stamp % (24 * 60 * 60 * 1000); // subtract amount of time since midnight
-      time_stamp += new Date().getTimezoneOffset() * 60 * 1000; // add on the timezone offset
-      return time_stamp;
-    }
-    // start counting from midnight tonight
-    let ms_per_day = (24 * 60 * 60 * 1000);
-    let time = floorDate(new Date().getTime()) + ms_per_day;
-    for (let i=0; i<days; ) {
-      time += ms_per_day;
-      if (new Date(time).getDay()%6!=0)
-        i += 1;
-    }
-    return time/1000;
-  }
-
   handleApplyDiscountCode() {
     if (!BowAndDrape) return;
     BowAndDrape.api("GET", "/promocode", {code:this.state.promo.code.toLowerCase()}, (err, result) => {
@@ -232,7 +213,7 @@ class Items extends React.Component {
             <div className="item" style={style_summary.item}>
               <div style={style_summary.img_preview_container} />
                 {this.props.is_cart ?
-                    <div className="item shippingDate" style={style.item}><span className="sum-bold" style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={this.countBusinessDays(this.estimateManufactureTime())} /></div>
+                    <div className="item shippingDate" style={style.item}><span className="sum-bold" style={{marginRight:"5px"}}>Shipping on or before:</span><Timestamp time={ItemUtils.countBusinessDays(this.estimateManufactureTime())} /></div>
                   : null
                 }
               <div className="deets" style={style_summary.deets}>

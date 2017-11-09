@@ -434,6 +434,28 @@ input[type="button"]:focus {
     padding-top: 0px;
   }
 }
+.fulfillment_admin > h1 {
+  position: fixed;
+  top: 90px;
+  background-color: #fff;
+  width: 100%;
+  z-index: 1;
+}
+.fulfillment_admin .station_links {
+  position: fixed;
+  top: 140px;
+  background-color: #fff;
+  width: 100%;
+  z-index: 1;
+}
+.fulfillment_admin switch.expanded {
+  position: fixed;
+  top: 159px;
+}
+.fulfillment_admin tab_contents {
+  display: block;
+  margin-top: 130px;
+}
 shipments {
   display: block;
   padding: 10px;

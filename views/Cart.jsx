@@ -207,7 +207,7 @@ class Cart extends React.Component {
       contents: this.refs.Items.state.contents,
       address: this.state.shipping,
       billing_address: this.state.same_billing ? this.state.shipping : this.state.billing,
-      delivery_promised: this.refs.Items.countBusinessDays(this.refs.Items.state.shipping_quote.days + this.refs.Items.estimateManufactureTime(this.refs.Items.state.contents)),
+      delivery_promised: ItemUtils.countBusinessDays(this.refs.Items.state.shipping_quote.days + this.refs.Items.estimateManufactureTime(this.refs.Items.state.contents)),
     }
 
     let placeOrder = (payload) => {

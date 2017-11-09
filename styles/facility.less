@@ -1,6 +1,31 @@
 
 @import "./colors.less";
 
+.fulfillment_admin {
+  & > h1 {
+    position: fixed;
+    top: 90px;
+    background-color: @color_primary;
+    width: 100%;
+    z-index: 1;
+  }
+  .station_links {
+    position: fixed;
+    top: 140px;
+    background-color: @color_primary;
+    width: 100%;
+    z-index: 1;
+  }
+  switch.expanded {
+    position: fixed;
+    top: 159px;
+  }
+  tab_contents {
+    display: block;
+    margin-top: 130px;
+  }
+}
+
 shipments {
   display: block;
   padding: 10px;

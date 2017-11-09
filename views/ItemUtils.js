@@ -83,10 +83,29 @@ let applyCredits = (credits, items) => {
   });
 }
 
+// estimate date from now, takes days, returns time in seconds
+let countBusinessDays = (days) => {
+  let floorDate = function(time_stamp) {
+    time_stamp -= time_stamp % (24 * 60 * 60 * 1000); // subtract amount of time since midnight
+    time_stamp += new Date().getTimezoneOffset() * 60 * 1000; // add on the timezone offset
+    return time_stamp;
+  }
+  // start counting from midnight tonight
+  let ms_per_day = (24 * 60 * 60 * 1000);
+  let time = floorDate(new Date().getTime()) + ms_per_day;
+  for (let i=0; i<days; ) {
+    time += ms_per_day;
+    if (new Date(time).getDay()%6!=0)
+      i += 1;
+  }
+  return time/1000;
+}
+
 module.exports = {
   recurseAssembly,
   recurseOptions,
   getPrice,
   applyPromoCode,
   applyCredits,
+  countBusinessDays,
 };

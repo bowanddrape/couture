@@ -118,7 +118,7 @@ class FulfillmentStation extends React.Component {
       case "pressing":
         return this.handleDone(["needs_pressing"], remove_tags);
       case "qa-ing":
-        return this.handleDone(["needs_qa-ing"], remove_tags);
+        return this.handleDone(["needs_qaing"], remove_tags);
       case "packing":
         return this.handleDone(["needs_packing"], remove_tags);
     };

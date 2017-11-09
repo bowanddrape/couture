@@ -64,8 +64,8 @@ class FulfillShipments extends React.Component {
         );
       });
       fulfillment_stations = (
-        <div>
-          Fullfillment Stations: <span>{station_links}</span>
+        <div className="station_links">
+          Fulfillment Stations: <span>{station_links}</span>
         </div>
       )
     }
@@ -92,28 +92,10 @@ class FulfillShipments extends React.Component {
     });
 
     return (
-      <div>
+      <div className="fulfillment_admin">
         <h1>Store "{this.props.store.props.name}"</h1>
         {fulfillment_stations}
         <Tabs onChange={this.refreshTaggedShipments.bind(this)}>
-          <shipments>
-            <h2>New</h2>
-            <Scrollable
-              component={Shipment}
-              component_props={{fulfillment:true,edit_tags:true}}
-              endpoint={`/shipment?store_id=${this.props.store.id}&approved=null&on_hold=null&packed=null&received=null`}
-              page = {{sort:"requested", direction:"ASC"}}
-            />
-          </shipments>
-          <shipments>
-            <h2>Hold</h2>
-            <Scrollable
-              component={Shipment}
-              component_props={{fulfillment:true,edit_tags:true}}
-              endpoint={`/shipment?store_id=${this.props.store.id}&approved=null&on_hold=not_null`}
-              page = {{sort:"requested", direction:"DESC"}}
-            />
-          </shipments>
 {/* TODO do this
           <shipments name={"Needs Stickers"+this.state.stickering.length}>
             <h2>Needs Stickers</h2>
@@ -127,7 +109,7 @@ class FulfillShipments extends React.Component {
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&packed=not_null&ship_description=null`}
-              page = {{sort:"requested", direction:"DESC"}}
+              page = {{sort:"delivery_promised", direction:"DESC"}}
             />
           </shipments>
           <shipments>
@@ -136,7 +118,7 @@ class FulfillShipments extends React.Component {
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&ship_description=not_null&received=null`}
-              page = {{sort:"requested", direction:"ASC"}}
+              page = {{sort:"delivery_promised", direction:"ASC"}}
             />
           </shipments>
           <shipments>
@@ -149,13 +131,22 @@ class FulfillShipments extends React.Component {
             />
           </shipments>
           <shipments>
+            <h2>All</h2>
+            <Scrollable
+              component={Shipment}
+              component_props={{fulfillment:true,edit_tags:true}}
+              endpoint={`/shipment?store_id=${this.props.store.id}`}
+              page = {{sort:"delivery_promised", direction:"DESC"}}
+            />
+          </shipments>
+          <shipments>
             <h2>Search</h2>
             <input type="text" placeholder="search by id" value={this.state.search_query} onChange={(event)=>{this.setState({search_query:event.target.value})}}/>
             <Scrollable
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?search=${this.state.search_query}`}
-              page = {{sort:"requested", direction:"DESC"}}
+              page = {{sort:"delivery_promised", direction:"DESC"}}
             />
           </shipments>
         </Tabs>

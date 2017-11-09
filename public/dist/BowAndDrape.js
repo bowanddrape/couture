@@ -62927,7 +62927,7 @@ var Cart = function (_React$Component) {
         contents: this.refs.Items.state.contents,
         address: this.state.shipping,
         billing_address: this.state.same_billing ? this.state.shipping : this.state.billing,
-        delivery_promised: this.refs.Items.countBusinessDays(this.refs.Items.state.shipping_quote.days + this.refs.Items.estimateManufactureTime(this.refs.Items.state.contents))
+        delivery_promised: ItemUtils.countBusinessDays(this.refs.Items.state.shipping_quote.days + this.refs.Items.estimateManufactureTime(this.refs.Items.state.contents))
       };
 
       var placeOrder = function placeOrder(payload) {
@@ -64761,8 +64761,8 @@ var FulfillShipments = function (_React$Component) {
         });
         fulfillment_stations = React.createElement(
           'div',
-          null,
-          'Fullfillment Stations: ',
+          { className: 'station_links' },
+          'Fulfillment Stations: ',
           React.createElement(
             'span',
             null,
@@ -64798,7 +64798,7 @@ var FulfillShipments = function (_React$Component) {
 
       return React.createElement(
         'div',
-        null,
+        { className: 'fulfillment_admin' },
         React.createElement(
           'h1',
           null,
@@ -64810,36 +64810,6 @@ var FulfillShipments = function (_React$Component) {
         React.createElement(
           Tabs,
           { onChange: this.refreshTaggedShipments.bind(this) },
-          React.createElement(
-            'shipments',
-            null,
-            React.createElement(
-              'h2',
-              null,
-              'New'
-            ),
-            React.createElement(Scrollable, {
-              component: Shipment,
-              component_props: { fulfillment: true, edit_tags: true },
-              endpoint: '/shipment?store_id=' + this.props.store.id + '&approved=null&on_hold=null&packed=null&received=null',
-              page: { sort: "requested", direction: "ASC" }
-            })
-          ),
-          React.createElement(
-            'shipments',
-            null,
-            React.createElement(
-              'h2',
-              null,
-              'Hold'
-            ),
-            React.createElement(Scrollable, {
-              component: Shipment,
-              component_props: { fulfillment: true, edit_tags: true },
-              endpoint: '/shipment?store_id=' + this.props.store.id + '&approved=null&on_hold=not_null',
-              page: { sort: "requested", direction: "DESC" }
-            })
-          ),
           tagged_tab_contents,
           React.createElement(
             'shipments',
@@ -64853,7 +64823,7 @@ var FulfillShipments = function (_React$Component) {
               component: Shipment,
               component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&packed=not_null&ship_description=null',
-              page: { sort: "requested", direction: "DESC" }
+              page: { sort: "delivery_promised", direction: "DESC" }
             })
           ),
           React.createElement(
@@ -64868,7 +64838,7 @@ var FulfillShipments = function (_React$Component) {
               component: Shipment,
               component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?store_id=' + this.props.store.id + '&ship_description=not_null&received=null',
-              page: { sort: "requested", direction: "ASC" }
+              page: { sort: "delivery_promised", direction: "ASC" }
             })
           ),
           React.createElement(
@@ -64892,6 +64862,21 @@ var FulfillShipments = function (_React$Component) {
             React.createElement(
               'h2',
               null,
+              'All'
+            ),
+            React.createElement(Scrollable, {
+              component: Shipment,
+              component_props: { fulfillment: true, edit_tags: true },
+              endpoint: '/shipment?store_id=' + this.props.store.id,
+              page: { sort: "delivery_promised", direction: "DESC" }
+            })
+          ),
+          React.createElement(
+            'shipments',
+            null,
+            React.createElement(
+              'h2',
+              null,
               'Search'
             ),
             React.createElement('input', { type: 'text', placeholder: 'search by id', value: this.state.search_query, onChange: function onChange(event) {
@@ -64901,7 +64886,7 @@ var FulfillShipments = function (_React$Component) {
               component: Shipment,
               component_props: { fulfillment: true, edit_tags: true },
               endpoint: '/shipment?search=' + this.state.search_query,
-              page: { sort: "requested", direction: "DESC" }
+              page: { sort: "delivery_promised", direction: "DESC" }
             })
           )
         )
@@ -65061,7 +65046,7 @@ var FulfillmentStation = function (_React$Component) {
         case "pressing":
           return this.handleDone(["needs_pressing"], remove_tags);
         case "qa-ing":
-          return this.handleDone(["needs_qa-ing"], remove_tags);
+          return this.handleDone(["needs_qaing"], remove_tags);
         case "packing":
           return this.handleDone(["needs_packing"], remove_tags);
       };
@@ -65930,12 +65915,30 @@ var applyCredits = function applyCredits(credits, items) {
   });
 };
 
+// estimate date from now, takes days, returns time in seconds
+var countBusinessDays = function countBusinessDays(days) {
+  var floorDate = function floorDate(time_stamp) {
+    time_stamp -= time_stamp % (24 * 60 * 60 * 1000); // subtract amount of time since midnight
+    time_stamp += new Date().getTimezoneOffset() * 60 * 1000; // add on the timezone offset
+    return time_stamp;
+  };
+  // start counting from midnight tonight
+  var ms_per_day = 24 * 60 * 60 * 1000;
+  var time = floorDate(new Date().getTime()) + ms_per_day;
+  for (var i = 0; i < days;) {
+    time += ms_per_day;
+    if (new Date(time).getDay() % 6 != 0) i += 1;
+  }
+  return time / 1000;
+};
+
 module.exports = {
   recurseAssembly: recurseAssembly,
   recurseOptions: recurseOptions,
   getPrice: getPrice,
   applyPromoCode: applyPromoCode,
-  applyCredits: applyCredits
+  applyCredits: applyCredits,
+  countBusinessDays: countBusinessDays
 };
 
 },{}],302:[function(require,module,exports){
@@ -66088,27 +66091,6 @@ var Items = function (_React$Component) {
       });
       return days_needed_parallel + days_needed_serial;
     }
-
-    // TODO maybe put this in ItemUtils.js
-    // estimate date from now, takes days, returns time in seconds
-
-  }, {
-    key: 'countBusinessDays',
-    value: function countBusinessDays(days) {
-      var floorDate = function floorDate(time_stamp) {
-        time_stamp -= time_stamp % (24 * 60 * 60 * 1000); // subtract amount of time since midnight
-        time_stamp += new Date().getTimezoneOffset() * 60 * 1000; // add on the timezone offset
-        return time_stamp;
-      };
-      // start counting from midnight tonight
-      var ms_per_day = 24 * 60 * 60 * 1000;
-      var time = floorDate(new Date().getTime()) + ms_per_day;
-      for (var i = 0; i < days;) {
-        time += ms_per_day;
-        if (new Date(time).getDay() % 6 != 0) i += 1;
-      }
-      return time / 1000;
-    }
   }, {
     key: 'handleApplyDiscountCode',
     value: function handleApplyDiscountCode() {
@@ -66215,7 +66197,7 @@ var Items = function (_React$Component) {
                   { className: 'sum-bold', style: { marginRight: "5px" } },
                   'Shipping on or before:'
                 ),
-                React.createElement(Timestamp, { time: this.countBusinessDays(this.estimateManufactureTime()) })
+                React.createElement(Timestamp, { time: ItemUtils.countBusinessDays(this.estimateManufactureTime()) })
               ) : null,
               React.createElement(
                 'div',
@@ -69454,7 +69436,8 @@ var Shipment = function (_React$Component) {
       received: _this.props.received,
       tracking_code: _this.props.tracking_code,
       shipping_label: _this.props.shipping_label,
-      comments: (_this.props.props ? _this.props.props.comments : undefined) || []
+      comments: (_this.props.props ? _this.props.props.comments : undefined) || [],
+      hidden: false
     };
     _this.handleQueryRates = _this.handleQueryRates.bind(_this);
     return _this;
@@ -69502,7 +69485,7 @@ var Shipment = function (_React$Component) {
           remove_tags: ["new"]
         }, function (err, results) {
           BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
-            window.location.href = '/shipment/' + shipment.id + '/?fulfillment=1&edit_tags=1';
+            _this3.setState({ hidden: true });
           });
         });
       } else if (state == "on_hold") {
@@ -69513,7 +69496,7 @@ var Shipment = function (_React$Component) {
           remove_tags: []
         }, function (err, results) {
           BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
-            window.location.href = '/shipment/' + shipment.id + '/?fulfillment=1&edit_tags=1';
+            _this3.setState({ hidden: true });
           });
         });
       }
@@ -69586,6 +69569,8 @@ var Shipment = function (_React$Component) {
     key: 'render',
     value: function render() {
       var _this7 = this;
+
+      if (this.state.hidden) return null;
 
       var line_items = [];
       if (this.state.rates) {

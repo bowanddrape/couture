@@ -29,6 +29,7 @@ class Shipment extends React.Component {
       tracking_code: this.props.tracking_code,
       shipping_label: this.props.shipping_label,
       comments: (this.props.props?this.props.props.comments:undefined) || [],
+      hidden: false,
     }
     this.handleQueryRates = this.handleQueryRates.bind(this);
   }
@@ -67,7 +68,7 @@ class Shipment extends React.Component {
         remove_tags: ["new"],
       }, (err, results) =>  {
         BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
-          window.location.href = `/shipment/${shipment.id}/?fulfillment=1&edit_tags=1`;
+          this.setState({hidden:true});
         });
       });
     } else if (state == "on_hold") {
@@ -78,7 +79,7 @@ class Shipment extends React.Component {
         remove_tags: [],
       }, (err, results) =>  {
         BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
-          window.location.href = `/shipment/${shipment.id}/?fulfillment=1&edit_tags=1`;
+          this.setState({hidden:true});
         });
       });
     }
@@ -140,6 +141,8 @@ class Shipment extends React.Component {
   }
 
   render() {
+    if (this.state.hidden) return null;
+
     let line_items = [];
     if (this.state.rates) {
       this.state.rates.slice(0).reverse().forEach((rate) => {
