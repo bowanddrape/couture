@@ -64995,13 +64995,20 @@ var FulfillmentStation = function (_React$Component) {
         if (results.length == 0) {
           return Errors.emitError("lookup", "No garment found, check garment id");
         }
+        // Handle wrong station events
+        var correctStation = true;
+        var tag = results[0].contents[0].tags[0];
+        var tagIndex = tag.indexOf(_this2.props.station);
+        if (tagIndex == -1) {
+          correctStation = false;
+        }
 
         // TODO handle invalid content index
-
         _this2.setState({
           shipment: results[0],
           started: new Date().getTime() / 1000,
-          content_index: content_index
+          content_index: content_index,
+          correctStation: correctStation
         });
       });
     }
@@ -65045,7 +65052,7 @@ var FulfillmentStation = function (_React$Component) {
           return this.handleDone(["needs_picking"], remove_tags);
         case "pressing":
           return this.handleDone(["needs_pressing"], remove_tags);
-        case "qa-ing":
+        case "qaing":
           return this.handleDone(["needs_qaing"], remove_tags);
         case "packing":
           return this.handleDone(["needs_packing"], remove_tags);
@@ -65094,8 +65101,34 @@ var FulfillmentStation = function (_React$Component) {
         { key: actions.length, onClick: function onClick() {
             _this5.setState({ shipment: null });
           } },
-        'Cancel'
+        'Back'
       ));
+      if (!this.state.correctStation) {
+        return React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'div',
+            { className: 'warning404' },
+            React.createElement(
+              'h2',
+              null,
+              'ERROR: Incorrect Station'
+            )
+          ),
+          React.createElement(
+            'div',
+            { className: 'items' },
+            React.createElement(
+              'div',
+              { className: 'product_wrapper' },
+              React.createElement(Item, _extends({ fulfillment: true, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
+            )
+          ),
+          actions
+        );
+      }
+
       switch (this.props.station) {
         case "picking":
           actions.push(React.createElement(
@@ -65107,11 +65140,11 @@ var FulfillmentStation = function (_React$Component) {
         case "pressing":
           actions.push(React.createElement(
             'button',
-            { key: actions.length, onClick: this.handleNextStep.bind(this, "qa-ing") },
-            'Mark for QA-ing'
+            { key: actions.length, onClick: this.handleNextStep.bind(this, "qaing") },
+            'Mark for QAing'
           ));
           break;
-        case "qa-ing":
+        case "qaing":
           actions.push(React.createElement(
             'button',
             { key: actions.length, onClick: this.handleNextStep.bind(this, "packing") },
@@ -65192,7 +65225,7 @@ var FulfillmentStation = function (_React$Component) {
 module.exports = FulfillmentStation;
 
 },{"./Errors.jsx":293,"./Item.jsx":300,"./UserProfile.jsx":333,"react":219}],297:[function(require,module,exports){
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -65214,12 +65247,30 @@ var FulfillmentStickers = function (_React$Component) {
   }
 
   _createClass(FulfillmentStickers, [{
-    key: 'handleDone',
-    value: function handleDone() {}
-  }, {
-    key: 'render',
+    key: "render",
     value: function render() {
-      return null;
+      if (!this.props.shipments) return null;
+
+      var garment_ids = [];
+      this.props.shipments.forEach(function (shipment) {
+        if (!shipment.fulfillment_id) return;
+        shipment.contents.forEach(function (item, index) {
+          garment_ids.push(React.createElement(
+            "div",
+            { key: garment_ids.length, className: "garment_id_sticker" },
+            "216-",
+            shipment.fulfillment_id,
+            "-",
+            index
+          ));
+        });
+      });
+
+      return React.createElement(
+        "div",
+        null,
+        garment_ids
+      );
     }
   }]);
 
@@ -69746,6 +69797,20 @@ var Shipment = function (_React$Component) {
                 ),
                 this.props.email
               ),
+              this.state.fulfillment_id ? React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
+                  'Stickers? '
+                ),
+                React.createElement(
+                  'a',
+                  { href: '/shipment/' + this.props.id + '/stickers?layout=basic', target: '_blank' },
+                  'link'
+                )
+              ) : null,
               this.state.shipping_label ? React.createElement(
                 'div',
                 null,
@@ -71373,6 +71438,7 @@ module.exports = {
     VSSAdmin: require('./VSSAdmin.jsx'),
     Shipment: require('./Shipment.jsx'),
     FulfillmentStation: require('./FulfillmentStation.jsx'),
+    FulfillmentStickers: require('./FulfillmentStickers.jsx'),
     MandateUserLogin: require('./MandateUserLogin.jsx'),
     WarningNotice: require('./WarningNotice.jsx'),
     FacebookLogin: require('./FacebookLogin.jsx')
@@ -71382,4 +71448,4 @@ module.exports = {
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FacebookLogin.jsx":294,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./Gallery.jsx":298,"./Items.jsx":302,"./LayoutBasic.jsx":303,"./LayoutMain.jsx":307,"./MandateUserLogin.jsx":308,"./PageEdit.jsx":309,"./PageList.jsx":314,"./Placeholder.jsx":316,"./ProductList.jsx":320,"./Shipment.jsx":323,"./Signup.jsx":324,"./TextContent.jsx":328,"./UserPasswordReset.jsx":332,"./VSSAdmin.jsx":334,"./WarningNotice.jsx":335,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);
+},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FacebookLogin.jsx":294,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./FulfillmentStickers.jsx":297,"./Gallery.jsx":298,"./Items.jsx":302,"./LayoutBasic.jsx":303,"./LayoutMain.jsx":307,"./MandateUserLogin.jsx":308,"./PageEdit.jsx":309,"./PageList.jsx":314,"./Placeholder.jsx":316,"./ProductList.jsx":320,"./Shipment.jsx":323,"./Signup.jsx":324,"./TextContent.jsx":328,"./UserPasswordReset.jsx":332,"./VSSAdmin.jsx":334,"./WarningNotice.jsx":335,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);
