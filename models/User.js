@@ -39,21 +39,6 @@ class User extends SQLTable {
     };
   }
 
-  // extends SQLTable
-  static get(primary_key_value, callback) {
-    super.get(primary_key_value, (err, user) => {
-      if (!err && !user) {
-        let user = new User({email: primary_key_value});
-        return user.upsert((err, user) => {
-          User.get(primary_key_value, (err, user) => {
-            callback(err, user);
-          });
-        });
-      }
-      callback(err, user);
-    });
-  }
-
   static handleHTTP(req, res, next) {
     if (req.path_tokens[0]!='user') {
       return next();
