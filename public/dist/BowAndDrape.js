@@ -64689,12 +64689,13 @@ var FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-var tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
+var tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "needs_shipping"];
 var tag_names = {
   picking: "needs_picking",
   pressing: "needs_pressing",
   qaing: "needs_qaing",
-  packing: "needs_packing"
+  packing: "needs_packing",
+  shipping: "needs_shipping"
 };
 
 var FulfillShipments = function (_React$Component) {
@@ -64917,36 +64918,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 
 var Item = require('./Item.jsx');
+var Shipment = require('./Shipment.jsx');
 var UserProfile = require('./UserProfile.jsx');
 var Errors = require('./Errors.jsx');
-
-/*
-garment index garment id
-left pad w/ zero's
-shipment holds fulfillment_id, from_id, contents jsonb array
-
-picking, pressing, QA, packing?
----
-Then we need to set up the station views for each fulfillment station.
-We probably want to add a bunch of links in the admin view (above the tabs)
-that links to things like
-href="/fulfillment/78f87a89-1bcb-4048-b6e5-68cf4ffcc53a/pick" and so on...
-(and these will draw some FulfillmentStation view with a prop that's like
-station="pick")
-
-And then in the render function, draw the search box if you don't have a
-shipment, draw the <Item fulfillment={true} {...this.state.shipment}/> as
-well as a "done" button that when clicked grabs started and stopped time
-and updates the shipment, appending it to a property in the corresponding
-content_index (the payload you append should have the start, stop,
-station_type, and user). You'll probably end up using jsonb_set() in
-order to update the shipment, we haven't used it yet in our codebase so
-there isn't an example I have to copy-paste you, so you'll need to use
-google or read the docs.
-
-need to add buttons and relevant information such as what station
-
-*/
 
 var FulfillmentStation = function (_React$Component) {
   _inherits(FulfillmentStation, _React$Component);
@@ -64981,12 +64955,15 @@ var FulfillmentStation = function (_React$Component) {
 
       Errors.clear();
       var product_tokens = this.state.search.split('-');
-      if (product_tokens.length != 3) return Errors.emitError("lookup", "Invalid search parameters");
+      if (product_tokens.length != 3 && this.props.station != "packing") return Errors.emitError("lookup", "Invalid search parameters");
       // TODO use product_toks[0] to determine facility_id, hardcoded for now
       var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "216"
 
       var fulfillment_id = product_tokens[1];
-      var content_index = product_tokens[2];
+      var content_index = 1;
+      if (this.props.station != "packing") {
+        content_index = product_tokens[2];
+      }
       BowAndDrape.api("GET", "/shipment", { from_id: from_id, fulfillment_id: fulfillment_id }, function (err, results) {
         if (err) {
           return Errors.emitError("lookup", err.toString());
@@ -64996,11 +64973,21 @@ var FulfillmentStation = function (_React$Component) {
           return Errors.emitError("lookup", "No garment found, check garment id");
         }
         // Handle wrong station events
-        var correctStation = true;
-        var tag = results[0].contents[0].tags[0];
-        var tagIndex = tag.indexOf(_this2.props.station);
-        if (tagIndex == -1) {
-          correctStation = false;
+        var tagValues = results[0].contents.map(function (garment) {
+          var tag = garment.tags[0];
+          var tagIndex = tag.indexOf(_this2.props.station);
+          if (tagIndex == -1) {
+            return false;
+          } else {
+            return true;
+          }
+        });
+
+        var correctStation = tagValues[content_index - 1];
+        if (_this2.props.station == "packing") {
+          var _correctStation = tagValues.reduce(function (accumulator, currentValue) {
+            return accumulator && currentValue;
+          });
         }
 
         // TODO handle invalid content index
@@ -65014,13 +65001,13 @@ var FulfillmentStation = function (_React$Component) {
     }
   }, {
     key: 'handleDone',
-    value: function handleDone(add_tags, remove_tags) {
+    value: function handleDone(add_tags, remove_tags, ci) {
       var _this3 = this;
 
       // TODO also log metrics
       BowAndDrape.api("POST", "/shipment/tagcontent", {
         id: this.state.shipment.id,
-        content_index: this.state.content_index - 1,
+        content_index: ci,
         add_tags: add_tags,
         remove_tags: remove_tags
       }, function (err, results) {
@@ -65032,6 +65019,7 @@ var FulfillmentStation = function (_React$Component) {
     key: 'handleNextStep',
     value: function handleNextStep(state) {
       var remove_tags = [];
+      var index = this.state.content_index - 1;
       switch (this.props.station) {
         case "picking":
           remove_tags.push("needs_picking");
@@ -65049,13 +65037,15 @@ var FulfillmentStation = function (_React$Component) {
 
       switch (state) {
         case "picking":
-          return this.handleDone(["needs_picking"], remove_tags);
+          return this.handleDone(["needs_picking"], remove_tags, index);
         case "pressing":
-          return this.handleDone(["needs_pressing"], remove_tags);
+          return this.handleDone(["needs_pressing"], remove_tags, index);
         case "qaing":
-          return this.handleDone(["needs_qaing"], remove_tags);
+          return this.handleDone(["needs_qaing"], remove_tags, index);
         case "packing":
-          return this.handleDone(["needs_packing"], remove_tags);
+          return this.handleDone(["needs_packing"], remove_tags, index);
+        case "shipping":
+          return this.handleDone(["needs_shipping"], remove_tags, "*");
       };
       this.handleDont([], []);
     }
@@ -65104,6 +65094,12 @@ var FulfillmentStation = function (_React$Component) {
         'Back'
       ));
       if (!this.state.correctStation) {
+        var _view = [];
+        if (this.props.station != "packing") {
+          _view.push(React.createElement(Item, _extends({ fulfillment: true, key: _view.length, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1])));
+        } else {
+          _view.push(React.createElement(Shipment, _extends({ key: _view.length, fulfillment: true }, this.state.shipment)));
+        }
         return React.createElement(
           'div',
           null,
@@ -65122,7 +65118,7 @@ var FulfillmentStation = function (_React$Component) {
             React.createElement(
               'div',
               { className: 'product_wrapper' },
-              React.createElement(Item, _extends({ fulfillment: true, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
+              _view
             )
           ),
           actions
@@ -65169,7 +65165,13 @@ var FulfillmentStation = function (_React$Component) {
           ));
           break;
       };
-
+      // Handle packing station view requirements
+      var view = [];
+      if (this.props.station == "packing") {
+        view.push(React.createElement(Shipment, _extends({ key: view.length, fulfillment: true }, this.state.shipment)));
+      } else {
+        view.push(React.createElement(Item, _extends({ fulfillment: true, key: view.length, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1])));
+      }
       return React.createElement(
         'div',
         null,
@@ -65179,7 +65181,7 @@ var FulfillmentStation = function (_React$Component) {
           React.createElement(
             'div',
             { className: 'product_wrapper' },
-            React.createElement(Item, _extends({ fulfillment: true, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
+            view
           )
         ),
         actions
@@ -65224,7 +65226,7 @@ var FulfillmentStation = function (_React$Component) {
 
 module.exports = FulfillmentStation;
 
-},{"./Errors.jsx":293,"./Item.jsx":300,"./UserProfile.jsx":333,"react":219}],297:[function(require,module,exports){
+},{"./Errors.jsx":293,"./Item.jsx":300,"./Shipment.jsx":323,"./UserProfile.jsx":333,"react":219}],297:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
