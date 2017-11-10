@@ -9,6 +9,7 @@ class FulfillmentStickers extends React.Component {
     this.props.shipments.forEach((shipment) => {
       if (!shipment.fulfillment_id) return;
       shipment.contents.forEach((item, index) => {
+        if (!item.sku) return;
         garment_ids.push(
           <div key={garment_ids.length} className="garment_id_sticker">
             216-{shipment.fulfillment_id}-{index+1}

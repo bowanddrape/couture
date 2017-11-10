@@ -8,7 +8,7 @@ const FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-const tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
+const tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
 const tag_names = {
   picking: "needs_picking",
   pressing: "needs_pressing",

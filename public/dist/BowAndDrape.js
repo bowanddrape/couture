@@ -64689,7 +64689,7 @@ var FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-var tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
+var tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
 var tag_names = {
   picking: "needs_picking",
   pressing: "needs_pressing",
@@ -65255,6 +65255,7 @@ var FulfillmentStickers = function (_React$Component) {
       this.props.shipments.forEach(function (shipment) {
         if (!shipment.fulfillment_id) return;
         shipment.contents.forEach(function (item, index) {
+          if (!item.sku) return;
           garment_ids.push(React.createElement(
             "div",
             { key: garment_ids.length, className: "garment_id_sticker" },
