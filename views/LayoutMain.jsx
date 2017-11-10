@@ -65,6 +65,7 @@ class LayoutMain extends React.Component {
     let zoom = 1;
     if (typeof(document)!="undefined")
       zoom = document.body.clientWidth / window.innerWidth;
+    let content_string = `${(typeof(document)!="undefined")?this.props.content_string:escape(this.props.content_string)}`;
     return (
       <div className="layout_main">
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
@@ -82,7 +83,7 @@ class LayoutMain extends React.Component {
           var content = ${JSON.stringify(this.props.content)};
           if (content != "undefined") {
             var layout = React.createElement(BowAndDrape.views.LayoutMain, {
-              content_string: \`${(typeof(document)!="undefined")?this.props.content_string:escape(this.props.content_string)}\`,
+              content_string: "${content_string}",
               content,
             });
             ReactDOM.hydrate(
