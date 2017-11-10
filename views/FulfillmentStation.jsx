@@ -2,36 +2,11 @@
 const React = require('react');
 
 const Item = require('./Item.jsx');
+const Shipment = require('./Shipment.jsx');
 const UserProfile = require('./UserProfile.jsx');
 const Errors = require('./Errors.jsx');
 
-/*
-garment index garment id
-left pad w/ zero's
-shipment holds fulfillment_id, from_id, contents jsonb array
 
-picking, pressing, QA, packing?
----
-Then we need to set up the station views for each fulfillment station.
-We probably want to add a bunch of links in the admin view (above the tabs)
-that links to things like
-href="/fulfillment/78f87a89-1bcb-4048-b6e5-68cf4ffcc53a/pick" and so on...
-(and these will draw some FulfillmentStation view with a prop that's like
-station="pick")
-
-And then in the render function, draw the search box if you don't have a
-shipment, draw the <Item fulfillment={true} {...this.state.shipment}/> as
-well as a "done" button that when clicked grabs started and stopped time
-and updates the shipment, appending it to a property in the corresponding
-content_index (the payload you append should have the start, stop,
-station_type, and user). You'll probably end up using jsonb_set() in
-order to update the shipment, we haven't used it yet in our codebase so
-there isn't an example I have to copy-paste you, so you'll need to use
-google or read the docs.
-
-need to add buttons and relevant information such as what station
-
-*/
 class FulfillmentStation extends React.Component {
   constructor(props) {
     super(props);
@@ -56,13 +31,16 @@ class FulfillmentStation extends React.Component {
   handleSearch() {
     Errors.clear();
     let product_tokens = this.state.search.split('-');
-    if (product_tokens.length != 3)
+    if (product_tokens.length != 3 && this.props.station != "packing")
       return Errors.emitError("lookup", "Invalid search parameters");
     // TODO use product_toks[0] to determine facility_id, hardcoded for now
     let from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "216"
 
     let fulfillment_id = product_tokens[1];
-    let content_index = product_tokens[2];
+    let content_index = 1;
+    if (this.props.station != "packing"){
+      content_index = product_tokens[2];
+    }
     BowAndDrape.api("GET", "/shipment", {from_id, fulfillment_id}, (err, results) => {
       if (err){
         return Errors.emitError("lookup", err.toString());
@@ -72,11 +50,22 @@ class FulfillmentStation extends React.Component {
         return Errors.emitError("lookup", "No garment found, check garment id");
       }
       // Handle wrong station events
-      let correctStation = true;
-      let tag= results[0].contents[0].tags[0];
-      let tagIndex = tag.indexOf(this.props.station);
-      if (tagIndex == -1){
-        correctStation = false;
+      let tagValues = results[0].contents.map((garment) => {
+        let tag = garment.tags[0];
+        let tagIndex = tag.indexOf(this.props.station);
+        if (tagIndex == -1){
+          return false;
+        }
+        else {
+          return true;
+        }
+      });
+
+      let correctStation = tagValues[content_index-1];
+      if (this.props.station == "packing"){
+        let correctStation = tagValues.reduce(function(accumulator, currentValue) {
+          return accumulator && currentValue;
+        });
       }
 
       // TODO handle invalid content index
@@ -89,11 +78,11 @@ class FulfillmentStation extends React.Component {
     });
   }
 
-  handleDone(add_tags, remove_tags) {
+  handleDone(add_tags, remove_tags, ci) {
     // TODO also log metrics
     BowAndDrape.api("POST", "/shipment/tagcontent", {
       id: this.state.shipment.id,
-      content_index: this.state.content_index-1,
+      content_index: ci,
       add_tags,
       remove_tags,
     }, (err, results) =>  {
@@ -104,6 +93,7 @@ class FulfillmentStation extends React.Component {
 
   handleNextStep(state) {
     let remove_tags = [];
+    let index = this.state.content_index-1
     switch (this.props.station) {
       case "picking":
         remove_tags.push("needs_picking");
@@ -121,13 +111,15 @@ class FulfillmentStation extends React.Component {
 
     switch (state) {
       case "picking":
-        return this.handleDone(["needs_picking"], remove_tags);
+        return this.handleDone(["needs_picking"], remove_tags, index);
       case "pressing":
-        return this.handleDone(["needs_pressing"], remove_tags);
+        return this.handleDone(["needs_pressing"], remove_tags, index);
       case "qaing":
-        return this.handleDone(["needs_qaing"], remove_tags);
+        return this.handleDone(["needs_qaing"], remove_tags, index);
       case "packing":
-        return this.handleDone(["needs_packing"], remove_tags);
+        return this.handleDone(["needs_packing"], remove_tags, index);
+      case "shipping":
+        return this.handleDone(["needs_shipping"], remove_tags, "*");
     };
     this.handleDont([], []);
   }
@@ -152,6 +144,13 @@ class FulfillmentStation extends React.Component {
     let actions = [];
     actions.push(<button key={actions.length} onClick={()=>{this.setState({shipment:null})}}>Back</button>);
     if (!this.state.correctStation){
+      let view = [];
+      if (this.props.station != "packing"){
+        view.push(<Item fulfillment={true} key={view.length} content_index={this.state.content_index} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>)
+      }
+      else {
+        view.push(<Shipment key={view.length} fulfillment={true} {...this.state.shipment} />);
+      }
       return (
         <div>
           <div className="warning404">
@@ -159,7 +158,7 @@ class FulfillmentStation extends React.Component {
           </div>
             <div className="items">
               <div className="product_wrapper">
-                <Item fulfillment={true} content_index={this.state.content_index} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
+                {view}
           </div></div>
           {actions}
         </div>
@@ -182,11 +181,18 @@ class FulfillmentStation extends React.Component {
         actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "shipping")}>Mark for Shipping</button>);
         break;
     };
-
+    // Handle packing station view requirements
+    let view = [];
+    if (this.props.station == "packing") {
+      view.push(<Shipment key={view.length} fulfillment={true} {...this.state.shipment} />);
+    }
+    else {
+      view.push(<Item fulfillment={true} key={view.length} content_index={this.state.content_index} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>);
+    }
     return (
       <div>
         <div className="items"><div className="product_wrapper">
-          <Item fulfillment={true} content_index={this.state.content_index} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>
+          {view}
         </div></div>
         {actions}
       </div>
