@@ -51,14 +51,11 @@ class FulfillmentStation extends React.Component {
       }
       // Handle wrong station events
       let tagValues = results[0].contents.map((garment) => {
-        let tag = garment.tags[0];
-        let tagIndex = tag.indexOf(this.props.station);
-        if (tagIndex == -1){
+        if (!garment.tags || !garment.tags.length)
           return false;
-        }
-        else {
+        if (garment.tags.indexOf("needs_"+this.props.station) >= 0)
           return true;
-        }
+        return false;
       });
 
       let correctStation = tagValues[content_index-1];

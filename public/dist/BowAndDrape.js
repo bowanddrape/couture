@@ -64689,14 +64689,7 @@ var FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-var tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "needs_shipping"];
-var tag_names = {
-  picking: "needs_picking",
-  pressing: "needs_pressing",
-  qaing: "needs_qaing",
-  packing: "needs_packing",
-  shipping: "needs_shipping"
-};
+var tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "needs_shipping"];
 
 var FulfillShipments = function (_React$Component) {
   _inherits(FulfillShipments, _React$Component);
@@ -64738,7 +64731,6 @@ var FulfillShipments = function (_React$Component) {
       if (!BowAndDrape) return;
       tagged_tabs.forEach(function (tag) {
         var tag_name = tag;
-        if (tag_names[tag]) tag_name = tag_names[tag];
         BowAndDrape.api("GET", "/shipment/tagged/", { tag: tag_name }, function (err, shipments) {
           if (err) return Errors.emitError(null, err);
           _this2.setState(_defineProperty({}, tag.replace(/-/g, ""), shipments));
@@ -64974,13 +64966,9 @@ var FulfillmentStation = function (_React$Component) {
         }
         // Handle wrong station events
         var tagValues = results[0].contents.map(function (garment) {
-          var tag = garment.tags[0];
-          var tagIndex = tag.indexOf(_this2.props.station);
-          if (tagIndex == -1) {
-            return false;
-          } else {
-            return true;
-          }
+          if (!garment.tags || !garment.tags.length) return false;
+          if (garment.tags.indexOf("needs_" + _this2.props.station) >= 0) return true;
+          return false;
         });
 
         var correctStation = tagValues[content_index - 1];
