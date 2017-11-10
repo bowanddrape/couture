@@ -91,10 +91,9 @@ class Page extends JSONAPI {
 
   // if we have a matching path in our pages table, serve that page
   static handleRenderPage(req, res, next) {
-
     let pages = Page.getAll(null, function(err, pages) {
       for (let i=0; i<pages.length; i++) {
-        let matches = req.path.match(new RegExp("^"+pages[i].path+"$", "i"));
+        let matches = req.path.match(new RegExp("^"+pages[i].path.replace(/\+/g,'\\+')+"$", "i"));
         if (!matches) continue;
         // Check for redirect
         if (pages[i].redirect)
