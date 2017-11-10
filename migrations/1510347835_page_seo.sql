@@ -1,0 +1,3 @@
+ALTER TABLE pages ADD COLUMN title TEXT;
+ALTER TABLE pages ADD COLUMN description TEXT;
+ALTER TABLE pages ADD COLUMN redirect TEXT;

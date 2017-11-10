@@ -14,6 +14,9 @@ class PageEdit extends React.Component {
     super(props);
     this.state = {
       path: this.props.path,
+      title: this.props.title || "",
+      description: this.props.description || "",
+      redirect: this.props.redirect || "",
       elements: this.props.elements,
     };
   }
@@ -149,6 +152,9 @@ class PageEdit extends React.Component {
     return (
       <div className="page_edit">
         <label>path:</label><input type="text" onChange={(e)=>{this.setState({path:e.target.value});}} value={this.state.path} name="path"/>
+        <label>title:</label><input type="text" onChange={(e)=>{this.setState({title:e.target.value});}} value={this.state.title} name="title"/>
+        <label>description:</label><input type="text" onChange={(e)=>{this.setState({description:e.target.value});}} value={this.state.description} name="description"/>
+        <label>redirect:</label><input type="text" onChange={(e)=>{this.setState({redirect:e.target.value});}} value={this.state.redirect} name="redirect"/>
         <a href={this.state.path} target="_blank" className="cta" style={{marginLeft:"30px"}}>preview</a>
         {elements}
         <element onClick={this.handleNewElement.bind(this)}>Add Element</element>

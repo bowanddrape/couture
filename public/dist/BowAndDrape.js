@@ -66840,6 +66840,9 @@ var PageEdit = function (_React$Component) {
 
     _this.state = {
       path: _this.props.path,
+      title: _this.props.title || "",
+      description: _this.props.description || "",
+      redirect: _this.props.redirect || "",
       elements: _this.props.elements
     };
     return _this;
@@ -67004,6 +67007,30 @@ var PageEdit = function (_React$Component) {
         React.createElement("input", { type: "text", onChange: function onChange(e) {
             _this2.setState({ path: e.target.value });
           }, value: this.state.path, name: "path" }),
+        React.createElement(
+          "label",
+          null,
+          "title:"
+        ),
+        React.createElement("input", { type: "text", onChange: function onChange(e) {
+            _this2.setState({ title: e.target.value });
+          }, value: this.state.title, name: "title" }),
+        React.createElement(
+          "label",
+          null,
+          "description:"
+        ),
+        React.createElement("input", { type: "text", onChange: function onChange(e) {
+            _this2.setState({ description: e.target.value });
+          }, value: this.state.description, name: "description" }),
+        React.createElement(
+          "label",
+          null,
+          "redirect:"
+        ),
+        React.createElement("input", { type: "text", onChange: function onChange(e) {
+            _this2.setState({ redirect: e.target.value });
+          }, value: this.state.redirect, name: "redirect" }),
         React.createElement(
           "a",
           { href: this.state.path, target: "_blank", className: "cta", style: { marginLeft: "30px" } },
