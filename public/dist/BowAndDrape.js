@@ -66643,8 +66643,8 @@ var LayoutHeader = function (_React$Component) {
             } }),
           React.createElement(
             'a',
-            { href: '/' },
-            React.createElement('img', { className: 'logo', src: '/logo_mini.svg' })
+            { className: 'logo', href: '/' },
+            React.createElement('img', { src: '/logo_mini.svg' })
           ),
           React.createElement(CartMenu, { key: menu_items.length }),
           React.createElement(

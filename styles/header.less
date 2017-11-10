@@ -42,14 +42,17 @@
       background-image: url(/hamburger_close.svg);
     }
 
-  img.logo {
+  .logo {
     display: block;
     margin: auto;
     width: 150px;
+    img {
+      width: 100%;
+    }
   }
 
   @media (min-width: @desktop_min_width) {
-    img.logo {
+    .logo {
       width: 260px;
     }
   }

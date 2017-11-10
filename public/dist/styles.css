@@ -1723,13 +1723,16 @@ product_options switch.expanded {
 .header handle.expanded {
   background-image: url(/hamburger_close.svg);
 }
-.header img.logo {
+.header .logo {
   display: block;
   margin: auto;
   width: 150px;
 }
+.header .logo img {
+  width: 100%;
+}
 @media (min-width: 1000px) {
-  .header img.logo {
+  .header .logo {
     width: 260px;
   }
 }
