@@ -24,7 +24,6 @@ class Item extends React.Component {
       new_tag: "",
       current_tags: this.props.tags,
     };
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleAddTag = this.handleAddTag.bind(this);
   }
 
@@ -50,15 +49,6 @@ class Item extends React.Component {
         });
         return {current_tags};
       });
-    });
-  }
-
-  handleInputChange(event) {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-    this.setState({
-      [name]: value
     });
   }
 
@@ -202,7 +192,7 @@ class Item extends React.Component {
           {this.props.edit_tags?
             <div className="add_tag">
               <input type="text"
-                onChange={this.handleInputChange}
+                onChange={(event)=>{this.setState({new_tag:event.target.value})}}
                 onKeyUp={(event)=>{if(event.which==13){this.handleAddTag()}}}
                 value={this.state.new_tag}
                 placeholder="enter new tag"

@@ -65261,7 +65261,7 @@ var FulfillmentStickers = function (_React$Component) {
             "216-",
             shipment.fulfillment_id,
             "-",
-            index
+            index + 1
           ));
         });
       });
@@ -65533,8 +65533,6 @@ module.exports = InputAddress;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -65570,7 +65568,6 @@ var Item = function (_React$Component) {
       new_tag: "",
       current_tags: _this.props.tags
     };
-    _this.handleInputChange = _this.handleInputChange.bind(_this);
     _this.handleAddTag = _this.handleAddTag.bind(_this);
     return _this;
   }
@@ -65602,14 +65599,6 @@ var Item = function (_React$Component) {
           return { current_tags: current_tags };
         });
       });
-    }
-  }, {
-    key: 'handleInputChange',
-    value: function handleInputChange(event) {
-      var target = event.target;
-      var value = target.type === 'checkbox' ? target.checked : target.value;
-      var name = target.name;
-      this.setState(_defineProperty({}, name, value));
     }
   }, {
     key: 'handleAddTag',
@@ -65778,7 +65767,9 @@ var Item = function (_React$Component) {
             'div',
             { className: 'add_tag' },
             React.createElement('input', { type: 'text',
-              onChange: this.handleInputChange,
+              onChange: function onChange(event) {
+                _this4.setState({ new_tag: event.target.value });
+              },
               onKeyUp: function onKeyUp(event) {
                 if (event.which == 13) {
                   _this4.handleAddTag();
