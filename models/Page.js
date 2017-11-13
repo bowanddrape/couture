@@ -237,7 +237,7 @@ class Page extends JSONAPI {
     }
 
     let title = props.title || "Bow&Drape"+req.path.replace(/\//g, " ");
-    let description_header = null;
+    let description_header = "";
     if (props.description)
       description_header = `<meta name="description" content="${props.description}"/>`;
 
