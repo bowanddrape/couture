@@ -220,7 +220,6 @@ class ProductCanvas extends React.Component {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected = assembly[prevState.selected_component];
       if (selected) {
-        let position = [0,0,0];
         let rotation = Matrix.I(4);
         if (this.customizer.camera.rotation.angle) {
           rotation = Matrix.Rotation(
@@ -229,7 +228,7 @@ class ProductCanvas extends React.Component {
           ).ensure4x4();
         }
         selected.props.rotation = rotation;
-        selected.props.position = position;
+        selected.props.position[0] = 0;
       }
       return {assembly};
     });
@@ -274,7 +273,7 @@ class ProductCanvas extends React.Component {
       // TODO reorder component map to match current positions
 
       // TODO go through and break up phrases that are too long
-      if (reflow) {
+      if (false && reflow) {
         components.forEach((component, index) => {
           let total_width = 0;
           component.assembly.forEach((assembly_component) => {
@@ -327,8 +326,11 @@ class ProductCanvas extends React.Component {
         component.props.position = component.props.position || [0,0,0];
         // center
         component.props.position[0] = 0;
-        component.props.position[1] = line_position - component.max_height/2;
-        line_position -= component.max_height + line_spacing;
+        // for now, only center horizontally
+        if (false) {
+          component.props.position[1] = line_position - component.max_height/2;
+          line_position -= component.max_height + line_spacing;
+        }
       });
       return {assembly, selected_component};
     });

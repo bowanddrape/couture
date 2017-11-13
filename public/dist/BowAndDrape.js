@@ -68121,13 +68121,12 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[prevState.selected_component];
         if (selected) {
-          var position = [0, 0, 0];
           var rotation = Matrix.I(4);
           if (_this7.customizer.camera.rotation.angle) {
             rotation = Matrix.Rotation(-_this7.customizer.camera.rotation.angle, new Vector(_this7.customizer.camera.rotation.axis)).ensure4x4();
           }
           selected.props.rotation = rotation;
-          selected.props.position = position;
+          selected.props.position[0] = 0;
         }
         return { assembly: assembly };
       });
@@ -68179,7 +68178,7 @@ var ProductCanvas = function (_React$Component) {
         // TODO reorder component map to match current positions
 
         // TODO go through and break up phrases that are too long
-        if (reflow) {
+        if (false && reflow) {
           components.forEach(function (component, index) {
             var total_width = 0;
             component.assembly.forEach(function (assembly_component) {
@@ -68227,8 +68226,11 @@ var ProductCanvas = function (_React$Component) {
           component.props.position = component.props.position || [0, 0, 0];
           // center
           component.props.position[0] = 0;
-          component.props.position[1] = line_position - component.max_height / 2;
-          line_position -= component.max_height + line_spacing;
+          // for now, only center horizontally
+          if (false) {
+            component.props.position[1] = line_position - component.max_height / 2;
+            line_position -= component.max_height + line_spacing;
+          }
         });
         return { assembly: assembly, selected_component: selected_component };
       });
