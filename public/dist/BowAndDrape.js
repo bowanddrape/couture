@@ -64689,7 +64689,7 @@ var FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-var tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "needs_shipping"];
+var tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
 
 var FulfillShipments = function (_React$Component) {
   _inherits(FulfillShipments, _React$Component);
@@ -64810,22 +64810,7 @@ var FulfillShipments = function (_React$Component) {
             React.createElement(
               'h2',
               null,
-              'Packed'
-            ),
-            React.createElement(Scrollable, {
-              component: Shipment,
-              component_props: { fulfillment: true, edit_tags: true },
-              endpoint: '/shipment?store_id=' + this.props.store.id + '&packed=not_null&ship_description=null',
-              page: { sort: "delivery_promised", direction: "DESC" }
-            })
-          ),
-          React.createElement(
-            'shipments',
-            null,
-            React.createElement(
-              'h2',
-              null,
-              'Shipped'
+              'In Transit'
             ),
             React.createElement(Scrollable, {
               component: Shipment,
@@ -65033,7 +65018,7 @@ var FulfillmentStation = function (_React$Component) {
         case "packing":
           return this.handleDone(["needs_packing"], remove_tags, index);
         case "shipping":
-          return this.handleDone(["needs_shipping"], remove_tags, "*");
+          return this.handleDone(["shipped"], remove_tags, "*");
       };
       this.handleDont([], []);
     }

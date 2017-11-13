@@ -116,7 +116,7 @@ class FulfillmentStation extends React.Component {
       case "packing":
         return this.handleDone(["needs_packing"], remove_tags, index);
       case "shipping":
-        return this.handleDone(["needs_shipping"], remove_tags, "*");
+        return this.handleDone(["shipped"], remove_tags, "*");
     };
     this.handleDont([], []);
   }
