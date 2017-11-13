@@ -28,6 +28,35 @@ class Item extends React.Component {
     this.handleAddTag = this.handleAddTag.bind(this);
   }
 
+  handleTagging(add_tags, remove_tags){
+    let payload = {
+      id: this.props.shipment_id,
+      content_index: this.props.content_index,
+      add_tags,
+      remove_tags,
+    }
+    BowAndDrape.api("POST", "/shipment/tagcontent", payload, (err, results) => {
+      if (err) {
+        console.log(err);
+        return Errors.emitError(err);
+      }
+      // now that we removed the tag, also redraw the tag section on this view
+      let current_tags = (prev_state) => {
+        let current_tags = prev_state.current_tags.slice();
+        current_tags = current_tags.filter((prev_tag) => {
+          return prev_tag != remove_tags;
+        });
+        return {current_tags};
+      }
+      // add tag to existing current_tags
+      let newTags = add_tags.concat(current_tags);
+      this.setState({
+        current_tags: newTags,
+        new_tag: "",
+      });
+    }); //BowAndDrape.api
+  }
+
   handleRemoveTag(tag) {
     // TODO also log metrics
     let remove_tags = [tag];
@@ -37,7 +66,7 @@ class Item extends React.Component {
       remove_tags,
     }
 
-    BowAndDrape.api("POST", "/shipment/tagcontent", payload, (err, results) =>  {
+    BowAndDrape.api("POST", "/shipment/tagcontent", payload, (err, results) => {
       if (err) {
         console.log(err);
         return Errors.emitError(err);
@@ -194,25 +223,87 @@ class Item extends React.Component {
           )
         });
       }
+
+      switch (this.props.station) {
+        case "picking":
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Pressing</button>);
+          break;
+        case "pressing":
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "qaing")}>Mark for QAing</button>);
+          break;
+        case "qaing":
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "packing")}>Mark for Packing</button>);
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Re-Pressing</button>);
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "picking")}>Mark for Re-Picking</button>);
+          break;
+        case "packing":
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "shipping")}>Mark for Shipping</button>);
+          break;
+      };
+
+      // Handle airbrush and embroidery
+      let tag = null;
+      let emIndex = this.state.current_tags.indexOf("needs_embroidery");
+      let aiIndex = this.state.current_tags.indexOf("needs_airbrush");
+      let emPackIndex = this.state.current_tags.indexOf("at_embroidery")
+      let aiPackIndex = this.state.current_tags.indexOf("at_airbrush")
+
+      if (aiIndex != -1){
+        tag = this.state.current_tags[aiIndex];
+      }
+      if (emIndex != -1){
+        tag = this.state.current_tags[emIndex];
+      }
+      if (aiPackIndex != -1){
+        tag = this.state.current_tags[aiPackIndex];
+      }
+      if (emPackIndex != -1){
+        tag = this.state.current_tags[emPackIndex];
+      }
+
+      let handleButtons = [];
+
+      switch (tag){
+        case("needs_embroidery"):
+          handleButtons.push(<button onClick={this.handleTagging.bind(this, ["at_embroidery"],["needs_embroidery", "new"])}>to embroidery</button>);
+          break;
+        case("needs_airbrush"):
+          handleButtons.push(<button onClick={this.handleTagging.bind(this, ["at_airbrush"],["needs_airbrush", "new"])}>to airbrush</button>);
+          break;
+        case("at_embroidery"):
+          handleButtons.push(<button onClick={this.handleTagging.bind(this, ["needs_packing"],["at_embroidery"])}>needs packing</button>);
+          break;
+        case("at_airbrush"):
+          handleButtons.push(<button onClick={this.handleTagging.bind(this, ["needs_packing"],["at_airbrush"])}>needs packing</button>);
+          break;
+      };
+
       tag_list = (
         <div>
           <div className="taglist">
             {tags}
           </div>
           {this.props.edit_tags?
-            <div className="add_tag">
-              <input type="text"
-                onChange={this.handleInputChange}
-                onKeyUp={(event)=>{if(event.which==13){this.handleAddTag()}}}
-                value={this.state.new_tag}
-                placeholder="enter new tag"
-                name="new_tag"
-              />
-              <button onClick={this.handleAddTag}>Add Tag</button>
-            </div> :null
+            <div>
+              <div className="add_tag">
+                <input type="text"
+                  onChange={this.handleInputChange}
+                  onKeyUp={(event)=>{if(event.which==13){this.handleAddTag()}}}
+                  value={this.state.new_tag}
+                  placeholder="enter new tag"
+                  name="new_tag"
+                />
+                <button onClick={this.handleAddTag}>Add Tag</button>
+              </div>
+              <div>
+                {handleButtons}
+              </div>
+            </div>
+            :null
           }
         </div>
       );
+
     }
 
     let style = this.props.style || Item.style;
