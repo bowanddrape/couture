@@ -147,6 +147,7 @@ module.exports = {
     VSSAdmin: require('./VSSAdmin.jsx'),
     Shipment: require('./Shipment.jsx'),
     FulfillmentStation: require('./FulfillmentStation.jsx'),
+    FulfillmentStickers: require('./FulfillmentStickers.jsx'),
     MandateUserLogin: require('./MandateUserLogin.jsx'),
     WarningNotice: require('./WarningNotice.jsx'),
     FacebookLogin: require('./FacebookLogin.jsx'),

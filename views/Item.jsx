@@ -24,7 +24,6 @@ class Item extends React.Component {
       new_tag: "",
       current_tags: this.props.tags,
     };
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleAddTag = this.handleAddTag.bind(this);
   }
 
@@ -79,15 +78,6 @@ class Item extends React.Component {
         });
         return {current_tags};
       });
-    });
-  }
-
-  handleInputChange(event) {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-    this.setState({
-      [name]: value
     });
   }
 
@@ -299,11 +289,9 @@ class Item extends React.Component {
                 {handleButtons}
               </div>
             </div>
-            :null
-          }
+          :null}
         </div>
       );
-
     }
 
     let style = this.props.style || Item.style;

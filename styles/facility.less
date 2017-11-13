@@ -97,6 +97,7 @@ comments {
     font-size: 7px;
   }
   message {
+    max-width: 200px;
     display: block;
   }
 }
@@ -115,10 +116,27 @@ comments {
   .action_bar {
     display: none;
   }
-  shipment {
+  .fulfillment_admin > h1 {
+    display: none;
+  }
+  .station_links {
+    display: none;
+  }
+  switch.expanded {
+    display: none;
+  }
+  .items, .item {
+    page-break-before: always;
     page-break-after: always;
   }
-  .item {
+  .items .product_wrapper .item .preview {
+    height: 300px !important;
+  }
+  .add_tag {
+    display: none !important;
+  }
+  .garment_id_sticker {
+    font-weight: bold;
     page-break-after: always;
   }
 }

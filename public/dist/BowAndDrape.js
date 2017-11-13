@@ -64689,13 +64689,7 @@ var FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-var tagged_tabs = ["stickering", "new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
-var tag_names = {
-  picking: "needs_picking",
-  pressing: "needs_pressing",
-  qaing: "needs_qaing",
-  packing: "needs_packing"
-};
+var tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "needs_shipping"];
 
 var FulfillShipments = function (_React$Component) {
   _inherits(FulfillShipments, _React$Component);
@@ -64737,7 +64731,6 @@ var FulfillShipments = function (_React$Component) {
       if (!BowAndDrape) return;
       tagged_tabs.forEach(function (tag) {
         var tag_name = tag;
-        if (tag_names[tag]) tag_name = tag_names[tag];
         BowAndDrape.api("GET", "/shipment/tagged/", { tag: tag_name }, function (err, shipments) {
           if (err) return Errors.emitError(null, err);
           _this2.setState(_defineProperty({}, tag.replace(/-/g, ""), shipments));
@@ -64917,36 +64910,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 
 var Item = require('./Item.jsx');
+var Shipment = require('./Shipment.jsx');
 var UserProfile = require('./UserProfile.jsx');
 var Errors = require('./Errors.jsx');
-
-/*
-garment index garment id
-left pad w/ zero's
-shipment holds fulfillment_id, from_id, contents jsonb array
-
-picking, pressing, QA, packing?
----
-Then we need to set up the station views for each fulfillment station.
-We probably want to add a bunch of links in the admin view (above the tabs)
-that links to things like
-href="/fulfillment/78f87a89-1bcb-4048-b6e5-68cf4ffcc53a/pick" and so on...
-(and these will draw some FulfillmentStation view with a prop that's like
-station="pick")
-
-And then in the render function, draw the search box if you don't have a
-shipment, draw the <Item fulfillment={true} {...this.state.shipment}/> as
-well as a "done" button that when clicked grabs started and stopped time
-and updates the shipment, appending it to a property in the corresponding
-content_index (the payload you append should have the start, stop,
-station_type, and user). You'll probably end up using jsonb_set() in
-order to update the shipment, we haven't used it yet in our codebase so
-there isn't an example I have to copy-paste you, so you'll need to use
-google or read the docs.
-
-need to add buttons and relevant information such as what station
-
-*/
 
 var FulfillmentStation = function (_React$Component) {
   _inherits(FulfillmentStation, _React$Component);
@@ -64981,12 +64947,15 @@ var FulfillmentStation = function (_React$Component) {
 
       Errors.clear();
       var product_tokens = this.state.search.split('-');
-      if (product_tokens.length != 3) return Errors.emitError("lookup", "Invalid search parameters");
+      if (product_tokens.length != 3 && this.props.station != "packing") return Errors.emitError("lookup", "Invalid search parameters");
       // TODO use product_toks[0] to determine facility_id, hardcoded for now
       var from_id = '988e00d0-4b27-4ab4-ac00-59fcba6847d1'; // hardcoded "216"
 
       var fulfillment_id = product_tokens[1];
-      var content_index = product_tokens[2];
+      var content_index = 1;
+      if (this.props.station != "packing") {
+        content_index = product_tokens[2];
+      }
       BowAndDrape.api("GET", "/shipment", { from_id: from_id, fulfillment_id: fulfillment_id }, function (err, results) {
         if (err) {
           return Errors.emitError("lookup", err.toString());
@@ -64995,25 +64964,38 @@ var FulfillmentStation = function (_React$Component) {
         if (results.length == 0) {
           return Errors.emitError("lookup", "No garment found, check garment id");
         }
+        // Handle wrong station events
+        var tagValues = results[0].contents.map(function (garment) {
+          if (!garment.tags || !garment.tags.length) return false;
+          if (garment.tags.indexOf("needs_" + _this2.props.station) >= 0) return true;
+          return false;
+        });
+
+        var correctStation = tagValues[content_index - 1];
+        if (_this2.props.station == "packing") {
+          var _correctStation = tagValues.reduce(function (accumulator, currentValue) {
+            return accumulator && currentValue;
+          });
+        }
 
         // TODO handle invalid content index
-
         _this2.setState({
           shipment: results[0],
           started: new Date().getTime() / 1000,
-          content_index: content_index
+          content_index: content_index,
+          correctStation: correctStation
         });
       });
     }
   }, {
     key: 'handleDone',
-    value: function handleDone(add_tags, remove_tags) {
+    value: function handleDone(add_tags, remove_tags, ci) {
       var _this3 = this;
 
       // TODO also log metrics
       BowAndDrape.api("POST", "/shipment/tagcontent", {
         id: this.state.shipment.id,
-        content_index: this.state.content_index - 1,
+        content_index: ci,
         add_tags: add_tags,
         remove_tags: remove_tags
       }, function (err, results) {
@@ -65025,6 +65007,7 @@ var FulfillmentStation = function (_React$Component) {
     key: 'handleNextStep',
     value: function handleNextStep(state) {
       var remove_tags = [];
+      var index = this.state.content_index - 1;
       switch (this.props.station) {
         case "picking":
           remove_tags.push("needs_picking");
@@ -65042,13 +65025,15 @@ var FulfillmentStation = function (_React$Component) {
 
       switch (state) {
         case "picking":
-          return this.handleDone(["needs_picking"], remove_tags);
+          return this.handleDone(["needs_picking"], remove_tags, index);
         case "pressing":
-          return this.handleDone(["needs_pressing"], remove_tags);
-        case "qa-ing":
-          return this.handleDone(["needs_qaing"], remove_tags);
+          return this.handleDone(["needs_pressing"], remove_tags, index);
+        case "qaing":
+          return this.handleDone(["needs_qaing"], remove_tags, index);
         case "packing":
-          return this.handleDone(["needs_packing"], remove_tags);
+          return this.handleDone(["needs_packing"], remove_tags, index);
+        case "shipping":
+          return this.handleDone(["needs_shipping"], remove_tags, "*");
       };
       this.handleDont([], []);
     }
@@ -65094,8 +65079,40 @@ var FulfillmentStation = function (_React$Component) {
         { key: actions.length, onClick: function onClick() {
             _this5.setState({ shipment: null });
           } },
-        'Cancel'
+        'Back'
       ));
+      if (!this.state.correctStation) {
+        var _view = [];
+        if (this.props.station != "packing") {
+          _view.push(React.createElement(Item, _extends({ fulfillment: true, key: _view.length, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1])));
+        } else {
+          _view.push(React.createElement(Shipment, _extends({ key: _view.length, fulfillment: true }, this.state.shipment)));
+        }
+        return React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'div',
+            { className: 'warning404' },
+            React.createElement(
+              'h2',
+              null,
+              'ERROR: Incorrect Station'
+            )
+          ),
+          React.createElement(
+            'div',
+            { className: 'items' },
+            React.createElement(
+              'div',
+              { className: 'product_wrapper' },
+              _view
+            )
+          ),
+          actions
+        );
+      }
+
       switch (this.props.station) {
         case "picking":
           actions.push(React.createElement(
@@ -65107,11 +65124,11 @@ var FulfillmentStation = function (_React$Component) {
         case "pressing":
           actions.push(React.createElement(
             'button',
-            { key: actions.length, onClick: this.handleNextStep.bind(this, "qa-ing") },
-            'Mark for QA-ing'
+            { key: actions.length, onClick: this.handleNextStep.bind(this, "qaing") },
+            'Mark for QAing'
           ));
           break;
-        case "qa-ing":
+        case "qaing":
           actions.push(React.createElement(
             'button',
             { key: actions.length, onClick: this.handleNextStep.bind(this, "packing") },
@@ -65136,7 +65153,13 @@ var FulfillmentStation = function (_React$Component) {
           ));
           break;
       };
-
+      // Handle packing station view requirements
+      var view = [];
+      if (this.props.station == "packing") {
+        view.push(React.createElement(Shipment, _extends({ key: view.length, fulfillment: true }, this.state.shipment)));
+      } else {
+        view.push(React.createElement(Item, _extends({ fulfillment: true, key: view.length, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1])));
+      }
       return React.createElement(
         'div',
         null,
@@ -65146,7 +65169,7 @@ var FulfillmentStation = function (_React$Component) {
           React.createElement(
             'div',
             { className: 'product_wrapper' },
-            React.createElement(Item, _extends({ fulfillment: true, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1]))
+            view
           )
         ),
         actions
@@ -65191,8 +65214,8 @@ var FulfillmentStation = function (_React$Component) {
 
 module.exports = FulfillmentStation;
 
-},{"./Errors.jsx":293,"./Item.jsx":300,"./UserProfile.jsx":333,"react":219}],297:[function(require,module,exports){
-'use strict';
+},{"./Errors.jsx":293,"./Item.jsx":300,"./Shipment.jsx":323,"./UserProfile.jsx":333,"react":219}],297:[function(require,module,exports){
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -65214,12 +65237,31 @@ var FulfillmentStickers = function (_React$Component) {
   }
 
   _createClass(FulfillmentStickers, [{
-    key: 'handleDone',
-    value: function handleDone() {}
-  }, {
-    key: 'render',
+    key: "render",
     value: function render() {
-      return null;
+      if (!this.props.shipments) return null;
+
+      var garment_ids = [];
+      this.props.shipments.forEach(function (shipment) {
+        if (!shipment.fulfillment_id) return;
+        shipment.contents.forEach(function (item, index) {
+          if (!item.sku) return;
+          garment_ids.push(React.createElement(
+            "div",
+            { key: garment_ids.length, className: "garment_id_sticker" },
+            "216-",
+            shipment.fulfillment_id,
+            "-",
+            index + 1
+          ));
+        });
+      });
+
+      return React.createElement(
+        "div",
+        null,
+        garment_ids
+      );
     }
   }]);
 
@@ -65482,8 +65524,6 @@ module.exports = InputAddress;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -65519,7 +65559,6 @@ var Item = function (_React$Component) {
       new_tag: "",
       current_tags: _this.props.tags
     };
-    _this.handleInputChange = _this.handleInputChange.bind(_this);
     _this.handleAddTag = _this.handleAddTag.bind(_this);
     return _this;
   }
@@ -65551,14 +65590,6 @@ var Item = function (_React$Component) {
           return { current_tags: current_tags };
         });
       });
-    }
-  }, {
-    key: 'handleInputChange',
-    value: function handleInputChange(event) {
-      var target = event.target;
-      var value = target.type === 'checkbox' ? target.checked : target.value;
-      var name = target.name;
-      this.setState(_defineProperty({}, name, value));
     }
   }, {
     key: 'handleAddTag',
@@ -65727,7 +65758,9 @@ var Item = function (_React$Component) {
             'div',
             { className: 'add_tag' },
             React.createElement('input', { type: 'text',
-              onChange: this.handleInputChange,
+              onChange: function onChange(event) {
+                _this4.setState({ new_tag: event.target.value });
+              },
               onKeyUp: function onKeyUp(event) {
                 if (event.which == 13) {
                   _this4.handleAddTag();
@@ -66600,8 +66633,8 @@ var LayoutHeader = function (_React$Component) {
             } }),
           React.createElement(
             'a',
-            { href: '/' },
-            React.createElement('img', { className: 'logo', src: '/logo_mini.svg' })
+            { className: 'logo', href: '/' },
+            React.createElement('img', { src: '/logo_mini.svg' })
           ),
           React.createElement(CartMenu, { key: menu_items.length }),
           React.createElement(
@@ -66807,6 +66840,9 @@ var PageEdit = function (_React$Component) {
 
     _this.state = {
       path: _this.props.path,
+      title: _this.props.title || "",
+      description: _this.props.description || "",
+      redirect: _this.props.redirect || "",
       elements: _this.props.elements
     };
     return _this;
@@ -66971,6 +67007,30 @@ var PageEdit = function (_React$Component) {
         React.createElement("input", { type: "text", onChange: function onChange(e) {
             _this2.setState({ path: e.target.value });
           }, value: this.state.path, name: "path" }),
+        React.createElement(
+          "label",
+          null,
+          "title:"
+        ),
+        React.createElement("input", { type: "text", onChange: function onChange(e) {
+            _this2.setState({ title: e.target.value });
+          }, value: this.state.title, name: "title" }),
+        React.createElement(
+          "label",
+          null,
+          "description:"
+        ),
+        React.createElement("input", { type: "text", onChange: function onChange(e) {
+            _this2.setState({ description: e.target.value });
+          }, value: this.state.description, name: "description" }),
+        React.createElement(
+          "label",
+          null,
+          "redirect:"
+        ),
+        React.createElement("input", { type: "text", onChange: function onChange(e) {
+            _this2.setState({ redirect: e.target.value });
+          }, value: this.state.redirect, name: "redirect" }),
         React.createElement(
           "a",
           { href: this.state.path, target: "_blank", className: "cta", style: { marginLeft: "30px" } },
@@ -68061,13 +68121,12 @@ var ProductCanvas = function (_React$Component) {
         var assembly = JSON.parse(JSON.stringify(prevState.assembly));
         var selected = assembly[prevState.selected_component];
         if (selected) {
-          var position = [0, 0, 0];
           var rotation = Matrix.I(4);
           if (_this7.customizer.camera.rotation.angle) {
             rotation = Matrix.Rotation(-_this7.customizer.camera.rotation.angle, new Vector(_this7.customizer.camera.rotation.axis)).ensure4x4();
           }
           selected.props.rotation = rotation;
-          selected.props.position = position;
+          selected.props.position[0] = 0;
         }
         return { assembly: assembly };
       });
@@ -68119,7 +68178,7 @@ var ProductCanvas = function (_React$Component) {
         // TODO reorder component map to match current positions
 
         // TODO go through and break up phrases that are too long
-        if (reflow) {
+        if (false && reflow) {
           components.forEach(function (component, index) {
             var total_width = 0;
             component.assembly.forEach(function (assembly_component) {
@@ -68167,8 +68226,11 @@ var ProductCanvas = function (_React$Component) {
           component.props.position = component.props.position || [0, 0, 0];
           // center
           component.props.position[0] = 0;
-          component.props.position[1] = line_position - component.max_height / 2;
-          line_position -= component.max_height + line_spacing;
+          // for now, only center horizontally
+          if (false) {
+            component.props.position[1] = line_position - component.max_height / 2;
+            line_position -= component.max_height + line_spacing;
+          }
         });
         return { assembly: assembly, selected_component: selected_component };
       });
@@ -69746,6 +69808,20 @@ var Shipment = function (_React$Component) {
                 ),
                 this.props.email
               ),
+              this.state.fulfillment_id ? React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'label',
+                  null,
+                  'Stickers? '
+                ),
+                React.createElement(
+                  'a',
+                  { href: '/shipment/' + this.props.id + '/stickers?layout=basic', target: '_blank' },
+                  'link'
+                )
+              ) : null,
               this.state.shipping_label ? React.createElement(
                 'div',
                 null,
@@ -71373,6 +71449,7 @@ module.exports = {
     VSSAdmin: require('./VSSAdmin.jsx'),
     Shipment: require('./Shipment.jsx'),
     FulfillmentStation: require('./FulfillmentStation.jsx'),
+    FulfillmentStickers: require('./FulfillmentStickers.jsx'),
     MandateUserLogin: require('./MandateUserLogin.jsx'),
     WarningNotice: require('./WarningNotice.jsx'),
     FacebookLogin: require('./FacebookLogin.jsx')
@@ -71382,4 +71459,4 @@ module.exports = {
   Customizer: Customizer
 };
 
-},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FacebookLogin.jsx":294,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./Gallery.jsx":298,"./Items.jsx":302,"./LayoutBasic.jsx":303,"./LayoutMain.jsx":307,"./MandateUserLogin.jsx":308,"./PageEdit.jsx":309,"./PageList.jsx":314,"./Placeholder.jsx":316,"./ProductList.jsx":320,"./Shipment.jsx":323,"./Signup.jsx":324,"./TextContent.jsx":328,"./UserPasswordReset.jsx":332,"./VSSAdmin.jsx":334,"./WarningNotice.jsx":335,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);
+},{"./Cart.jsx":284,"./ComponentsEdit.jsx":291,"./Customizer.js":292,"./Errors.jsx":293,"./FacebookLogin.jsx":294,"./FulfillShipments.jsx":295,"./FulfillmentStation.jsx":296,"./FulfillmentStickers.jsx":297,"./Gallery.jsx":298,"./Items.jsx":302,"./LayoutBasic.jsx":303,"./LayoutMain.jsx":307,"./MandateUserLogin.jsx":308,"./PageEdit.jsx":309,"./PageList.jsx":314,"./Placeholder.jsx":316,"./ProductList.jsx":320,"./Shipment.jsx":323,"./Signup.jsx":324,"./TextContent.jsx":328,"./UserPasswordReset.jsx":332,"./VSSAdmin.jsx":334,"./WarningNotice.jsx":335,"events":113,"jwt-decode":161,"querystring":210,"react":219,"react-dom":216}]},{},[]);

@@ -8,6 +8,7 @@ const Address = require('./Address');
 const ShipProvider = require('./ShipProvider.js');
 const Page = require('./Page');
 const ShipmentView = require('../views/Shipment.jsx');
+const FulfillmentStickers = require('../views/FulfillmentStickers.jsx');
 const SQLTable = require('./SQLTable.js');
 const Facility = require('./Facility.js');
 
@@ -65,8 +66,11 @@ class Shipment extends JSONAPI {
   handleHTTPPage(req, res, next) {
     if (req.path_tokens.length < 2)
       return Page.renderNotFound(req, res);
+
     return Shipment.get(req.path_tokens[1], (err, shipment) => {
       if (err || !shipment) return Page.renderNotFound(req, res);
+      if (req.path_tokens[2]=="stickers")
+        return Page.render(req, res, FulfillmentStickers, {shipments:[shipment]});
       Page.render(req, res, ShipmentView, shipment);
     });
   }

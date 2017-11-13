@@ -55,7 +55,7 @@ class Page extends JSONAPI {
     return {
       tablename: "pages",
       pkey: "path",
-      fields: ["elements"]
+      fields: ["elements", "title", "description", "redirect"],
     };
   }
 
@@ -78,6 +78,9 @@ class Page extends JSONAPI {
           whitelisted_models,
           whitelisted_components,
           path: page.path,
+          title: page.title,
+          description: page.description,
+          redirect: page.redirect,
           elements: page.elements,
         });
       });
@@ -88,11 +91,13 @@ class Page extends JSONAPI {
 
   // if we have a matching path in our pages table, serve that page
   static handleRenderPage(req, res, next) {
-
     let pages = Page.getAll(null, function(err, pages) {
       for (let i=0; i<pages.length; i++) {
-        let matches = req.path.match(new RegExp("^"+pages[i].path+"$", "i"));
+        let matches = req.path.match(new RegExp("^"+pages[i].path.replace(/\+/g,'\\+')+"$", "i"));
         if (!matches) continue;
+        // Check for redirect
+        if (pages[i].redirect)
+          return res.redirect(pages[i].redirect);
         return pages[i].render(req, res);
       } // for pages
       next();
@@ -166,11 +171,15 @@ class Page extends JSONAPI {
       }); // setup render_elements
 
     }); //go through all elements on page
-    return async.parallel(render_elements, function(err, data) {
+    return async.parallel(render_elements, (err, data) => {
       if(err) return res.status(500).end(JSON.stringify(err));
       let head_props = {};
       if (data.length)
         head_props = data[0].props;
+      if (this.title)
+        head_props.title = this.title;
+      if (this.description)
+        head_props.description = this.description;
       let head = Page.getHTMLHead(req, res, head_props);
       let layout = Page.getLayout(req, res);
       if (!layout) return;
@@ -226,10 +235,18 @@ class Page extends JSONAPI {
       let height = 256;
       image_header = `<meta property="og:image:width" content="${width}"/><meta property="og:image:height" content="${height}"/><meta property="og:image" content="https://${req.headers.host}/store/${props.store.id}/preview?w=${width}&h=${height}&c=${encodeURIComponent(props.c)}"/>`
     }
+
+    let title = props.title || "Bow&Drape"+req.path.replace(/\//g, " ");
+    let description_header = null;
+    if (props.description)
+      description_header = `<meta name="description" content="${props.description}"/>`;
+
     return `
       <meta httpEquiv="content-type" content="text/html; charset=utf-8"/>
       <meta name="viewport" content="width=device-width, initial-scale=1"/>
-      <meta property="og:title" content="Bow & Drape"/>
+      <title>${title}</title>
+      ${description_header}
+      <meta property="og:title" content="${title}"/>
       <meta property="og:type" content="website"/>
       ${image_header}
 

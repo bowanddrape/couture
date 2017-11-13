@@ -523,6 +523,7 @@ comments metadata {
   font-size: 7px;
 }
 comments message {
+  max-width: 200px;
   display: block;
 }
 .timestamp {
@@ -538,10 +539,28 @@ comments message {
   .action_bar {
     display: none;
   }
-  shipment {
+  .fulfillment_admin > h1 {
+    display: none;
+  }
+  .station_links {
+    display: none;
+  }
+  switch.expanded {
+    display: none;
+  }
+  .items,
+  .item {
+    page-break-before: always;
     page-break-after: always;
   }
-  .item {
+  .items .product_wrapper .item .preview {
+    height: 300px !important;
+  }
+  .add_tag {
+    display: none !important;
+  }
+  .garment_id_sticker {
+    font-weight: bold;
     page-break-after: always;
   }
 }
@@ -1719,13 +1738,16 @@ product_options switch.expanded {
 .header handle.expanded {
   background-image: url(/hamburger_close.svg);
 }
-.header img.logo {
+.header .logo {
   display: block;
   margin: auto;
   width: 150px;
 }
+.header .logo img {
+  width: 100%;
+}
 @media (min-width: 1000px) {
-  .header img.logo {
+  .header .logo {
     width: 260px;
   }
 }
