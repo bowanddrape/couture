@@ -238,7 +238,7 @@ class Item extends React.Component {
           remove: ["needs_qaing"],
         },
         "needs_packing":{
-          add: [["needs_shipping"]],
+          add: [["shipped"]],
           remove: ["needs_packing"],
         },
         "needs_airbrush": {
@@ -250,8 +250,8 @@ class Item extends React.Component {
           remove: ["needs_embroidery", "new"],
         },
         "at_embroidery": {
-          add: [["needs_packing"]],
-          remove: ["at_airbrush"],
+          add: [["needs_packing"],["needs_pressing"]],
+          remove: ["at_embroidery"],
         },
         "at_airbrush":{
           add: [["needs_packing"]],

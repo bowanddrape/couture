@@ -65560,13 +65560,55 @@ var Item = function (_React$Component) {
       current_tags: _this.props.tags
     };
     _this.handleAddTag = _this.handleAddTag.bind(_this);
+    _this.handleInputChange = _this.handleInputChange.bind(_this);
     return _this;
   }
 
   _createClass(Item, [{
+    key: 'handleInputChange',
+    value: function handleInputChange(event) {
+      var target = event.target;
+      var value = target.type === 'checkbox' ? target.checked : target.value;
+      var name = target.name;
+      this.setState({
+        new_tag: value
+      });
+    }
+  }, {
+    key: 'handleTagging',
+    value: function handleTagging(add_tags, remove_tags) {
+      var _this2 = this;
+
+      var payload = {
+        id: this.props.shipment_id,
+        content_index: this.props.content_index,
+        add_tags: add_tags,
+        remove_tags: remove_tags
+      };
+
+      BowAndDrape.api("POST", "/shipment/tagcontent", payload, function (err, results) {
+        if (err) {
+          console.log(err);
+          return Errors.emitError(err);
+        }
+        // now that we removed the tag, also redraw the tag section on this view
+        _this2.setState(function (prev_state) {
+          var current_tags = prev_state.current_tags.slice();
+          current_tags = current_tags.filter(function (prev_tag) {
+            if (remove_tags.indexOf(prev_tag) != -1) {
+              return false;
+            }
+            return true;
+          });
+          var new_tags = current_tags.concat(add_tags);
+          return { current_tags: new_tags };
+        });
+      }); //BowAndDrape.api
+    }
+  }, {
     key: 'handleRemoveTag',
     value: function handleRemoveTag(tag) {
-      var _this2 = this;
+      var _this3 = this;
 
       // TODO also log metrics
       var remove_tags = [tag];
@@ -65582,7 +65624,7 @@ var Item = function (_React$Component) {
           return Errors.emitError(err);
         }
         // now that we removed the tag, also redraw the tag section on this view
-        _this2.setState(function (prev_state) {
+        _this3.setState(function (prev_state) {
           var current_tags = prev_state.current_tags.slice();
           current_tags = current_tags.filter(function (prev_tag) {
             return prev_tag != tag;
@@ -65594,7 +65636,7 @@ var Item = function (_React$Component) {
   }, {
     key: 'handleAddTag',
     value: function handleAddTag() {
-      var _this3 = this;
+      var _this4 = this;
 
       // ignore if we don't have a new tag to add
       if (!this.state.new_tag.trim()) return;
@@ -65611,8 +65653,8 @@ var Item = function (_React$Component) {
           return Errors.emitError(err);
         }
         // add tag to existing current_tags
-        var newTags = add_tags.concat(_this3.state.current_tags);
-        _this3.setState({
+        var newTags = add_tags.concat(_this4.state.current_tags);
+        _this4.setState({
           current_tags: newTags,
           new_tag: ""
         });
@@ -65621,7 +65663,7 @@ var Item = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       if (!this.props.props) {
         return React.createElement(
@@ -65732,20 +65774,74 @@ var Item = function (_React$Component) {
       var tag_list = null;
       if (this.props.fulfillment) {
         var tags = [];
-        if (this.state.current_tags) {
+        if (typeof this.state.current_tags != "undefined") {
           this.state.current_tags.forEach(function (tag) {
             tags.push(React.createElement(
               'div',
               { key: tags.length, className: "tag " + tag },
               tag,
-              _this4.props.edit_tags ? React.createElement(
+              _this5.props.edit_tags ? React.createElement(
                 'span',
-                { style: { cursor: "pointer" }, onClick: _this4.handleRemoveTag.bind(_this4, tag) },
+                { style: { cursor: "pointer" }, onClick: _this5.handleRemoveTag.bind(_this5, tag) },
                 '\u2718'
               ) : null
             ));
           });
         }
+
+        // Manage garment level tagging buttons
+        var tagLogic = {
+          "needs_picking": {
+            add: [["needs_pressing"]],
+            remove: ["new", "needs_picking"]
+          },
+          "needs_pressing": {
+            add: [["needs_qaing"]],
+            remove: ["needs_pressing"]
+          },
+          "needs_qaing": {
+            add: [["needs_packing"], ["needs_pressing"], ["needs_picking"]],
+            remove: ["needs_qaing"]
+          },
+          "needs_packing": {
+            add: [["shipped"]],
+            remove: ["needs_packing"]
+          },
+          "needs_airbrush": {
+            add: [["at_airbrush"]],
+            remove: ["needs_airbrush", "new"]
+          },
+          "needs_embroidery": {
+            add: [["at_embroidery"]],
+            remove: ["needs_embroidery", "new"]
+          },
+          "at_embroidery": {
+            add: [["needs_packing"], ["needs_pressing"]],
+            remove: ["at_embroidery"]
+          },
+          "at_airbrush": {
+            add: [["needs_packing"]],
+            remove: ["at_airbrush"]
+          }
+        };
+
+        var adminButtons = [];
+        if (typeof this.state.current_tags != "undefined") {
+          this.state.current_tags.forEach(function (tagKey, index) {
+            if (tagLogic.hasOwnProperty(tagKey)) {
+              var addTags = tagLogic[tagKey]["add"];
+              var removeTags = tagLogic[tagKey]["remove"];
+              addTags.forEach(function (aTag) {
+                adminButtons.push(React.createElement(
+                  'button',
+                  { key: aTag, onClick: _this5.handleTagging.bind(_this5, aTag, removeTags) },
+                  aTag
+                ));
+              });
+            }
+          });
+        }
+
         tag_list = React.createElement(
           'div',
           null,
@@ -65756,24 +65852,31 @@ var Item = function (_React$Component) {
           ),
           this.props.edit_tags ? React.createElement(
             'div',
-            { className: 'add_tag' },
-            React.createElement('input', { type: 'text',
-              onChange: function onChange(event) {
-                _this4.setState({ new_tag: event.target.value });
-              },
-              onKeyUp: function onKeyUp(event) {
-                if (event.which == 13) {
-                  _this4.handleAddTag();
-                }
-              },
-              value: this.state.new_tag,
-              placeholder: 'enter new tag',
-              name: 'new_tag'
-            }),
+            null,
             React.createElement(
-              'button',
-              { onClick: this.handleAddTag },
-              'Add Tag'
+              'div',
+              { className: 'add_tag' },
+              React.createElement('input', { type: 'text',
+                onChange: this.handleInputChange,
+                onKeyUp: function onKeyUp(event) {
+                  if (event.which == 13) {
+                    _this5.handleAddTag();
+                  }
+                },
+                value: this.state.new_tag,
+                placeholder: 'enter new tag',
+                name: 'new_tag'
+              }),
+              React.createElement(
+                'button',
+                { onClick: this.handleAddTag },
+                'Add Tag'
+              )
+            ),
+            React.createElement(
+              'div',
+              null,
+              adminButtons
             )
           ) : null
         );
