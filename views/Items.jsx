@@ -146,8 +146,9 @@ class Items extends React.Component {
     let line_items = [];
     let summary_items = [];
     let has_promo = false;
+    let total_num_products = 0;
     let subtotal = 0;
-    let total = 0;
+    let total_price = 0;
 
     let style = Item.style;
     let style_summary = Item.style_summary;
@@ -156,12 +157,18 @@ class Items extends React.Component {
       style_summary.item = Object.assign({}, style_summary.item, {display:"none"});
     }
 
+    // get list totals
+    for (let i=0; i<this.state.contents.length; i++) {
+      let quantity = this.state.contents[i].quantity || 1;
+      total_price += quantity * this.state.contents[i].props.price;
+      if (this.state.contents[i].sku) {
+        subtotal += quantity * this.state.contents[i].props.price;
+        total_num_products += quantity;
+      }
+    }
+
     for (let i=0; i<this.state.contents.length; i++) {
       let remove = null;
-      let quantity = this.state.contents[i].quantity || 1;
-      total += quantity * this.state.contents[i].props.price;
-      if (this.state.contents[i].sku)
-        subtotal += quantity * this.state.contents[i].props.price;
       // attach quantity edit buttons
       if (this.props.is_cart && typeof(BowAndDrape)!="undefined" && BowAndDrape.cart_menu) {
         // remove button
@@ -183,6 +190,7 @@ class Items extends React.Component {
             garment_id={this.props.fulfillment_id?(this.props.fulfillment_id+"-"+(line_items.length+1)):null}
             shipment_id={this.props.shipment_id}
             content_index={i}
+            total_num_products={total_num_products}
             edit_tags={this.props.edit_tags}
             {...this.state.contents[i]}
           />
@@ -229,7 +237,7 @@ class Items extends React.Component {
               <div style={style_summary.img_preview_container} />
               <div className="deets" style={Object.assign({}, style_summary.deets, {paddingTop: "28px"})}>
                 <span className="sum-bold">Total:</span>
-                <Price  style={style_summary.price_total} price={total}/>
+                <Price  style={style_summary.price_total} price={total_price}/>
               </div>
             </div>
 
