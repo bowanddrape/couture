@@ -170,9 +170,10 @@ class Order {
           item.tags = item.tags || [];
           if (needs_embroidery)
             item.tags.push("needs_embroidery");
-          if (needs_airbrush)
+          else if (needs_airbrush)
             item.tags.push("needs_airbrush");
-          item.tags.push("new");
+          else
+            item.tags.push("new");
         });
 
         let upsert = shipment.buildUpsertQuery();

@@ -27,7 +27,7 @@ class OrderPlacedEmail extends React.Component {
             <div style={styles.text}>and make it your phone background</div>
           </div>
           <div style={{textAlign:"center"}}>
-            <a href={`${this.props.order_link}?token=${this.props.token}`} style={styles.button}>VIEW ORDER DEETS</a>
+            <a href={this.props.order_link} style={styles.button}>VIEW ORDER DEETS</a>
           </div>
         </td></tr>
       </tbody></table>

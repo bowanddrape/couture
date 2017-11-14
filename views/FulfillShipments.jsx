@@ -8,7 +8,7 @@ const FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-const tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "needs_shipping"];
+const tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
 
 class FulfillShipments extends React.Component {
   constructor(props) {
@@ -97,16 +97,7 @@ class FulfillShipments extends React.Component {
 */}
           {tagged_tab_contents}
           <shipments>
-            <h2>Packed</h2>
-            <Scrollable
-              component={Shipment}
-              component_props={{fulfillment:true,edit_tags:true}}
-              endpoint={`/shipment?store_id=${this.props.store.id}&packed=not_null&ship_description=null`}
-              page = {{sort:"delivery_promised", direction:"DESC"}}
-            />
-          </shipments>
-          <shipments>
-            <h2>Shipped</h2>
+            <h2>In Transit</h2>
             <Scrollable
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
