@@ -65066,88 +65066,85 @@ var FulfillmentStation = function (_React$Component) {
           } },
         'Back'
       ));
+      var wrong_station_message = null;
       if (!this.state.correctStation) {
-        var _view = [];
-        if (this.props.station != "packing") {
-          _view.push(React.createElement(Item, _extends({ fulfillment: true, key: _view.length, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1])));
-        } else {
-          _view.push(React.createElement(Shipment, _extends({ key: _view.length, fulfillment: true }, this.state.shipment)));
-        }
-        return React.createElement(
+        wrong_station_message = React.createElement(
           'div',
-          null,
+          { className: 'warning404' },
           React.createElement(
-            'div',
-            { className: 'warning404' },
-            React.createElement(
-              'h2',
-              null,
-              'ERROR: Incorrect Station'
-            )
-          ),
-          React.createElement(
-            'div',
-            { className: 'items' },
-            React.createElement(
-              'div',
-              { className: 'product_wrapper' },
-              _view
-            )
-          ),
-          actions
+            'h2',
+            null,
+            'ERROR: Incorrect Station'
+          )
         );
       }
 
-      switch (this.props.station) {
-        case "picking":
-          actions.push(React.createElement(
-            'button',
-            { key: actions.length, onClick: this.handleNextStep.bind(this, "pressing") },
-            'Mark for Pressing'
-          ));
-          break;
-        case "pressing":
-          actions.push(React.createElement(
-            'button',
-            { key: actions.length, onClick: this.handleNextStep.bind(this, "qaing") },
-            'Mark for QAing'
-          ));
-          break;
-        case "qaing":
-          actions.push(React.createElement(
-            'button',
-            { key: actions.length, onClick: this.handleNextStep.bind(this, "packing") },
-            'Mark for Packing'
-          ));
-          actions.push(React.createElement(
-            'button',
-            { key: actions.length, onClick: this.handleNextStep.bind(this, "pressing") },
-            'Mark for Re-Pressing'
-          ));
-          actions.push(React.createElement(
-            'button',
-            { key: actions.length, onClick: this.handleNextStep.bind(this, "picking") },
-            'Mark for Re-Picking'
-          ));
-          break;
-        case "packing":
-          actions.push(React.createElement(
-            'button',
-            { key: actions.length, onClick: this.handleNextStep.bind(this, "shipping") },
-            'Mark for Shipping'
-          ));
-          break;
-      };
+      if (this.state.correctStation) {
+        switch (this.props.station) {
+          case "picking":
+            actions.push(React.createElement(
+              'button',
+              { key: actions.length, onClick: this.handleNextStep.bind(this, "pressing") },
+              'Mark for Pressing'
+            ));
+            break;
+          case "pressing":
+            actions.push(React.createElement(
+              'button',
+              { key: actions.length, onClick: this.handleNextStep.bind(this, "qaing") },
+              'Mark for QAing'
+            ));
+            break;
+          case "qaing":
+            actions.push(React.createElement(
+              'button',
+              { key: actions.length, onClick: this.handleNextStep.bind(this, "packing") },
+              'Mark for Packing'
+            ));
+            actions.push(React.createElement(
+              'button',
+              { key: actions.length, onClick: this.handleNextStep.bind(this, "pressing") },
+              'Mark for Re-Pressing'
+            ));
+            actions.push(React.createElement(
+              'button',
+              { key: actions.length, onClick: this.handleNextStep.bind(this, "picking") },
+              'Mark for Re-Picking'
+            ));
+            break;
+          case "packing":
+            actions.push(React.createElement(
+              'button',
+              { key: actions.length, onClick: this.handleNextStep.bind(this, "shipping") },
+              'Mark as Shipped'
+            ));
+            break;
+        };
+      }
       // Handle packing station view requirements
       var view = [];
       if (this.props.station == "packing") {
         view.push(React.createElement(Shipment, _extends({ key: view.length, fulfillment: true }, this.state.shipment)));
       } else {
-        view.push(React.createElement(Item, _extends({ fulfillment: true, key: view.length, content_index: this.state.content_index, garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index }, this.state.shipment.contents[this.state.content_index - 1])));
+        var total_num_products = 0;
+        this.state.shipment.contents.forEach(function (item) {
+          if (!item.sku) return;
+          var quantity = item.quantity || 1;
+          total_num_products += quantity;
+        });
+        view.push(React.createElement(Item, _extends({
+          fulfillment: true,
+          key: view.length,
+          shipment_id: this.state.shipment.id,
+          content_index: this.state.content_index,
+          total_num_products: total_num_products,
+          garment_id: '216-' + this.state.shipment.fulfillment_id + '-' + this.state.content_index
+        }, this.state.shipment.contents[this.state.content_index - 1])));
       }
       return React.createElement(
         'div',
         null,
+        wrong_station_message,
         React.createElement(
           'div',
           { className: 'items' },
@@ -65792,7 +65789,19 @@ var Item = function (_React$Component) {
             'div',
             { className: 'garment_id' },
             'GarmentID#: ',
-            this.props.garment_id
+            this.props.garment_id,
+            ',',
+            React.createElement(
+              'span',
+              { className: 'garment_caption' },
+              '(',
+              this.props.shipment_id.substr(this.props.shipment_id.length - 4),
+              ' ',
+              this.props.content_index + 1,
+              ' of ',
+              this.props.total_num_products,
+              ')'
+            )
           ) : null,
           React.createElement(
             'a',
@@ -66137,8 +66146,9 @@ var Items = function (_React$Component) {
       var line_items = [];
       var summary_items = [];
       var has_promo = false;
+      var total_num_products = 0;
       var subtotal = 0;
-      var total = 0;
+      var total_price = 0;
 
       var style = Item.style;
       var style_summary = Item.style_summary;
@@ -66147,22 +66157,29 @@ var Items = function (_React$Component) {
         style_summary.item = Object.assign({}, style_summary.item, { display: "none" });
       }
 
+      // get list totals
       for (var i = 0; i < this.state.contents.length; i++) {
-        var remove = null;
         var quantity = this.state.contents[i].quantity || 1;
-        total += quantity * this.state.contents[i].props.price;
-        if (this.state.contents[i].sku) subtotal += quantity * this.state.contents[i].props.price;
+        total_price += quantity * this.state.contents[i].props.price;
+        if (this.state.contents[i].sku) {
+          subtotal += quantity * this.state.contents[i].props.price;
+          total_num_products += quantity;
+        }
+      }
+
+      for (var _i = 0; _i < this.state.contents.length; _i++) {
+        var remove = null;
         // attach quantity edit buttons
         if (this.props.is_cart && typeof BowAndDrape != "undefined" && BowAndDrape.cart_menu) {
           // remove button
-          if (this.state.contents[i].sku) remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, i);
-          if (this.state.contents[i].props && new RegExp("^promo:", "i").test(this.state.contents[i].props.name)) {
+          if (this.state.contents[_i].sku) remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, _i);
+          if (this.state.contents[_i].props && new RegExp("^promo:", "i").test(this.state.contents[_i].props.name)) {
             has_promo = true;
-            remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, i);
+            remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, _i);
           }
         }
         // if has a base sku or is a legacy imported item
-        if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
+        if (this.state.contents[_i].sku || this.state.contents[_i].prerender_key) {
           line_items.push(React.createElement(Item, _extends({
             style: style,
             key: line_items.length,
@@ -66170,11 +66187,12 @@ var Items = function (_React$Component) {
             fulfillment: this.props.fulfillment,
             garment_id: this.props.fulfillment_id ? this.props.fulfillment_id + "-" + (line_items.length + 1) : null,
             shipment_id: this.props.shipment_id,
-            content_index: i,
+            content_index: _i,
+            total_num_products: total_num_products,
             edit_tags: this.props.edit_tags
-          }, this.state.contents[i])));
+          }, this.state.contents[_i])));
         } else {
-          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[i], { onRemove: remove, is_email: this.props.is_email })));
+          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[_i], { onRemove: remove, is_email: this.props.is_email })));
         }
       }
 
@@ -66241,7 +66259,7 @@ var Items = function (_React$Component) {
                   { className: 'sum-bold' },
                   'Total:'
                 ),
-                React.createElement(Price, { style: style_summary.price_total, price: total })
+                React.createElement(Price, { style: style_summary.price_total, price: total_price })
               )
             ),
             has_promo || !this.props.is_cart ? null : React.createElement(

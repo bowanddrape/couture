@@ -140,54 +140,58 @@ class FulfillmentStation extends React.Component {
   renderResults() {
     let actions = [];
     actions.push(<button key={actions.length} onClick={()=>{this.setState({shipment:null})}}>Back</button>);
-    if (!this.state.correctStation){
-      let view = [];
-      if (this.props.station != "packing"){
-        view.push(<Item fulfillment={true} key={view.length} content_index={this.state.content_index} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>)
-      }
-      else {
-        view.push(<Shipment key={view.length} fulfillment={true} {...this.state.shipment} />);
-      }
-      return (
-        <div>
-          <div className="warning404">
-            <h2>ERROR: Incorrect Station</h2>
-          </div>
-            <div className="items">
-              <div className="product_wrapper">
-                {view}
-          </div></div>
-          {actions}
+    let wrong_station_message = null;
+    if (!this.state.correctStation) {
+      wrong_station_message = (
+        <div className="warning404">
+          <h2>ERROR: Incorrect Station</h2>
         </div>
       );
     }
 
-    switch (this.props.station) {
-      case "picking":
-        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Pressing</button>);
-        break;
-      case "pressing":
-        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "qaing")}>Mark for QAing</button>);
-        break;
-      case "qaing":
-        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "packing")}>Mark for Packing</button>);
-        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Re-Pressing</button>);
-        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "picking")}>Mark for Re-Picking</button>);
-        break;
-      case "packing":
-        actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "shipping")}>Mark for Shipping</button>);
-        break;
-    };
+    if (this.state.correctStation) {
+      switch (this.props.station) {
+        case "picking":
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Pressing</button>);
+          break;
+        case "pressing":
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "qaing")}>Mark for QAing</button>);
+          break;
+        case "qaing":
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "packing")}>Mark for Packing</button>);
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "pressing")}>Mark for Re-Pressing</button>);
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "picking")}>Mark for Re-Picking</button>);
+          break;
+        case "packing":
+          actions.push(<button key={actions.length} onClick={this.handleNextStep.bind(this, "shipping")}>Mark as Shipped</button>);
+          break;
+      };
+    }
     // Handle packing station view requirements
     let view = [];
     if (this.props.station == "packing") {
       view.push(<Shipment key={view.length} fulfillment={true} {...this.state.shipment} />);
     }
     else {
-      view.push(<Item fulfillment={true} key={view.length} content_index={this.state.content_index} garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`} {...this.state.shipment.contents[this.state.content_index-1]}/>);
+      let total_num_products = 0;
+      this.state.shipment.contents.forEach((item) => {
+        if (!item.sku) return;
+        let quantity = item.quantity || 1;
+        total_num_products += quantity;
+      });
+      view.push(<Item
+        fulfillment={true}
+        key={view.length}
+        shipment_id={this.state.shipment.id}
+        content_index={this.state.content_index}
+        total_num_products={total_num_products}
+        garment_id={`216-${this.state.shipment.fulfillment_id}-${this.state.content_index}`}
+        {...this.state.shipment.contents[this.state.content_index-1]}
+      />);
     }
     return (
       <div>
+        {wrong_station_message}
         <div className="items"><div className="product_wrapper">
           {view}
         </div></div>
