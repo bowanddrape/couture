@@ -58,7 +58,7 @@ class Mail {
         let props = {
           order_id: shipment.id,
           token: token,
-          order_link: "https://couture.bowanddrape.com/shipment/"+shipment.id,
+          order_link: "https://www.bowanddrape.com/shipment/"+shipment.id+"?token="+token,
           tracking_link: "https://tools.usps.com/go/TrackConfirmAction.action?tLabels="+shipment.tracking_code,
           contents: shipment.contents,
         }
@@ -84,7 +84,7 @@ class Mail {
         let props = {
           order_id: shipment.id,
           token: token,
-          order_link: "https://couture.bowanddrape.com/shipment/"+shipment.id,
+          order_link: "https://www.bowanddrape.com/shipment/"+shipment.id+"?token="+token,
           contents: shipment.contents,
         }
         let body = Page.renderString([{component:OrderPlacedEmail, props}], LayoutEmail);
