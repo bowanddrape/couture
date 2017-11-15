@@ -1986,11 +1986,12 @@ user name {
   background-image: url('/sprite.PNG?ade2c445a60d36a50949c6bff4e7e1ce7d319e86');
 }
 .purchase_complete > div {
-  width: 600px;
+  width: 100%;
   margin: auto;
 }
 .purchase_complete img.hero_gif {
-  width: 400px;
+  max-width: 500px;
+  width: 100%;
   display: block;
   margin: auto;
 }
