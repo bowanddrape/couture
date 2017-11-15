@@ -61,7 +61,7 @@ class ShipProvider {
       quantity: 1,
       net_weight: (weight*0.00220462).toFixed(3).toString(),
       mass_unit: "lb",
-      value_amount: "20",
+      value_amount: "1",
       value_currency: "USD",
       origin_country: "US",
     }
