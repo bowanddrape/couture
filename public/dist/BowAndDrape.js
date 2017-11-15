@@ -69840,7 +69840,7 @@ var Shipment = function (_React$Component) {
         'Ship'
       ));
 
-      if (!this.state.approved && !this.state.packed && !this.state.on_hold) actions.push(React.createElement(
+      if (!this.state.approved) actions.push(React.createElement(
         'button',
         { key: actions.length, onClick: this.handleMarkState.bind(this, "approved") },
         'Ready to Make'
