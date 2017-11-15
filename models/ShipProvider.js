@@ -69,7 +69,7 @@ class ShipProvider {
     // Creating the CustomsDeclaration
     // (CustomsDeclaration are NOT required for domestic shipments)
     shippo.customsdeclaration.create({
-      "contents_type": "MERCHANDISE",
+      "contents_type": "SAMPLE",
       "non_delivery_option": "RETURN",
       "certify": true,
       "certify_signer": shipment.address.name,
