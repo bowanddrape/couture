@@ -70364,7 +70364,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var Stroke = require('./Stroke.jsx');
 
-var override_option_order = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "The Boyfriend Sweatshirt", "The Oversized Hoodie", "The Short Sleeve Sweatshirt", "The Vintage Tee", "The Grandpa Cardigan", "The Denim Jacket", "The Bomber Jacket", "The Utility Jacket", "The Bonnie Slip Dress", "The Cami", "The Tank Top", "The Tote", "The Backpack", "The Crossbody Bag", "The Flat Pouch", "The Mini Pouch", "The Dad Hat", "The Confetti Beanie", "The Pom Pillow", "The Pet Sweatshirt", "The Airbrush Hoodie", "The Airbrush Denim Jacket", "The Airbrush Utility Jacket", "The Airbrush Oversized Tee", "The Airbrush Flat Pouch"];
+var override_option_order = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "The Boyfriend Sweatshirt", "The Oversized Hoodie", "The Short Sleeve Sweatshirt", "The Vintage Tee", "The Grandpa Cardigan", "The Denim Jacket", "The Bomber Jacket", "The Utility Jacket", "The Bonnie Slip Dress", "The Cami", "The Tank Top", "The Tote", "The Backpack", "The Crossbody Bag", "The Flat Pouch", "The Mini Pouch", "The Dad Hat", "The Confetti Beanie", "The Pom Pillow", "The Pet Sweatshirt", "The Velvet Pillow", "The Airbrush Hoodie", "The Airbrush Denim Jacket", "The Airbrush Utility Jacket", "The Airbrush Oversized Tee", "The Airbrush Flat Pouch"];
 
 /***
 This attempts to emulate a select drop-down, but displays options side-by-side
