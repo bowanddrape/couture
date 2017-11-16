@@ -228,7 +228,7 @@ class User extends SQLTable {
     delete user.passhash; // strip off the password part
     user.props.name = user.props.name ? user.props.name : user.email; // default name to email
     user.iat = Math.floor(Date.now() / 1000);
-    user.exp = Math.floor(Date.now() / 1000) + 60*60*24*7;
+    user.exp = Math.floor(Date.now() / 1000) + 60*60*24*90;
     jsonwebtoken.sign(user, jwt_secret, {}, function(err, token) {
       if (err) console.log("User::generateJwtToken "+err.toString());
       callback(err, token);
