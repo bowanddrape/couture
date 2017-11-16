@@ -68907,6 +68907,7 @@ var ProductList = function (_React$Component) {
       return React.createElement(
         'customize',
         null,
+        React.createElement('style', { dangerouslySetInnerHTML: { __html: '\n          .header + .gallery {\n            display: none;\n          }\n        ' } }),
         this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : null,
         React.createElement(
           'div',
