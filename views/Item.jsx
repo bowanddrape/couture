@@ -129,10 +129,15 @@ class Item extends React.Component {
 
     let quantity = this.props.quantity || 1;
 
-    let product_options = [];
+    let info = [];
+    if (this.props.props && this.props.props.info) {
+      info.push(
+        <div key={info.length}>{this.props.props.info}</div>
+      )
+    }
     for (let i=1; typeof(this.props.props.options)!="undefined" && i<this.props.props.options.length; i++) {
-      product_options.push(
-        <div key={product_options.length}>{this.props.props.options[i]}</div>
+      info.push(
+        <div key={info.length}>{this.props.props.options[i]}</div>
       )
     }
 
@@ -327,7 +332,7 @@ class Item extends React.Component {
           <a href={this.props.props.url}>
             <div className="name">{this.props.props.name}</div>
           </a>
-          {product_options}
+          {info}
           {this.props.onRemove?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
 
           {assembly_phrase?<div className="assembly_phrase">{assembly_phrase}</div>:null}

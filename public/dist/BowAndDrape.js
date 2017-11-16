@@ -65662,11 +65662,18 @@ var Item = function (_React$Component) {
 
       var quantity = this.props.quantity || 1;
 
-      var product_options = [];
-      for (var i = 1; typeof this.props.props.options != "undefined" && i < this.props.props.options.length; i++) {
-        product_options.push(React.createElement(
+      var info = [];
+      if (this.props.props && this.props.props.info) {
+        info.push(React.createElement(
           'div',
-          { key: product_options.length },
+          { key: info.length },
+          this.props.props.info
+        ));
+      }
+      for (var i = 1; typeof this.props.props.options != "undefined" && i < this.props.props.options.length; i++) {
+        info.push(React.createElement(
+          'div',
+          { key: info.length },
           this.props.props.options[i]
         ));
       }
@@ -65915,7 +65922,7 @@ var Item = function (_React$Component) {
               this.props.props.name
             )
           ),
-          product_options,
+          info,
           this.props.onRemove ? React.createElement(
             'button',
             { className: 'remove', onClick: this.handleRemovePromptConfirm.bind(this), onBlur: this.handleRemoveBlur },
@@ -66013,6 +66020,8 @@ var applyPromoCode = function applyPromoCode(items, promo, callback) {
     return item.sku;
   });
   // TODO see if the promo is applicable
+  var reason = "Not Applicable";
+  if (promo.props.info) reason += ": \"" + promo.props.info + "\"";
   // TODO if the promo is a percent, maybe decrease the cost of cart items (for tax)
   // figure out value of our promo
   promo.props.price = -1 * Math.max(Math.round(total_price * promo.props.percent) / 100 || 0, promo.props.absolute || 0);
