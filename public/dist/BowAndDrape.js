@@ -65662,11 +65662,18 @@ var Item = function (_React$Component) {
 
       var quantity = this.props.quantity || 1;
 
-      var product_options = [];
-      for (var i = 1; typeof this.props.props.options != "undefined" && i < this.props.props.options.length; i++) {
-        product_options.push(React.createElement(
+      var info = [];
+      if (this.props.props && this.props.props.info) {
+        info.push(React.createElement(
           'div',
-          { key: product_options.length },
+          { key: info.length },
+          this.props.props.info
+        ));
+      }
+      for (var i = 1; typeof this.props.props.options != "undefined" && i < this.props.props.options.length; i++) {
+        info.push(React.createElement(
+          'div',
+          { key: info.length },
           this.props.props.options[i]
         ));
       }
@@ -65915,7 +65922,7 @@ var Item = function (_React$Component) {
               this.props.props.name
             )
           ),
-          product_options,
+          info,
           this.props.onRemove ? React.createElement(
             'button',
             { className: 'remove', onClick: this.handleRemovePromptConfirm.bind(this), onBlur: this.handleRemoveBlur },
@@ -66013,6 +66020,8 @@ var applyPromoCode = function applyPromoCode(items, promo, callback) {
     return item.sku;
   });
   // TODO see if the promo is applicable
+  var reason = "Not Applicable";
+  if (promo.props.info) reason += ": \"" + promo.props.info + "\"";
   // TODO if the promo is a percent, maybe decrease the cost of cart items (for tax)
   // figure out value of our promo
   promo.props.price = -1 * Math.max(Math.round(total_price * promo.props.percent) / 100 || 0, promo.props.absolute || 0);
@@ -68898,6 +68907,7 @@ var ProductList = function (_React$Component) {
       return React.createElement(
         'customize',
         null,
+        React.createElement('style', { dangerouslySetInnerHTML: { __html: '\n          .header + .gallery {\n            display: none;\n          }\n        ' } }),
         this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : null,
         React.createElement(
           'div',
@@ -69840,7 +69850,7 @@ var Shipment = function (_React$Component) {
         'Ship'
       ));
 
-      if (!this.state.approved && !this.state.packed && !this.state.on_hold) actions.push(React.createElement(
+      if (!this.state.approved) actions.push(React.createElement(
         'button',
         { key: actions.length, onClick: this.handleMarkState.bind(this, "approved") },
         'Ready to Make'
@@ -70364,7 +70374,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var Stroke = require('./Stroke.jsx');
 
-var override_option_order = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "The Boyfriend Sweatshirt", "The Oversized Hoodie", "The Short Sleeve Sweatshirt", "The Vintage Tee", "The Grandpa Cardigan", "The Denim Jacket", "The Bomber Jacket", "The Utility Jacket", "The Bonnie Slip Dress", "The Cami", "The Tank Top", "The Tote", "The Backpack", "The Crossbody Bag", "The Flat Pouch", "The Mini Pouch", "The Dad Hat", "The Confetti Beanie", "The Pom Pillow", "The Pet Sweatshirt", "The Airbrush Hoodie", "The Airbrush Denim Jacket", "The Airbrush Utility Jacket", "The Airbrush Oversized Tee", "The Airbrush Flat Pouch"];
+var override_option_order = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "The Boyfriend Sweatshirt", "The Oversized Hoodie", "The Short Sleeve Sweatshirt", "The Vintage Tee", "The Grandpa Cardigan", "The Denim Jacket", "The Bomber Jacket", "The Utility Jacket", "The Bonnie Slip Dress", "The Cami", "The Tank Top", "The Tote", "The Backpack", "The Crossbody Bag", "The Flat Pouch", "The Mini Pouch", "The Dad Hat", "The Confetti Beanie", "The Pom Pillow", "The Pet Sweatshirt", "The Velvet Pillow", "The Airbrush Hoodie", "The Airbrush Denim Jacket", "The Airbrush Utility Jacket", "The Airbrush Oversized Tee", "The Airbrush Flat Pouch"];
 
 /***
 This attempts to emulate a select drop-down, but displays options side-by-side

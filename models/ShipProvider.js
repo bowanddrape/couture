@@ -61,7 +61,7 @@ class ShipProvider {
       quantity: 1,
       net_weight: (weight*0.00220462).toFixed(3).toString(),
       mass_unit: "lb",
-      value_amount: "20",
+      value_amount: "1",
       value_currency: "USD",
       origin_country: "US",
     }
@@ -69,7 +69,7 @@ class ShipProvider {
     // Creating the CustomsDeclaration
     // (CustomsDeclaration are NOT required for domestic shipments)
     shippo.customsdeclaration.create({
-      "contents_type": "MERCHANDISE",
+      "contents_type": "SAMPLE",
       "non_delivery_option": "RETURN",
       "certify": true,
       "certify_signer": shipment.address.name,

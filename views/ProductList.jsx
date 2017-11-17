@@ -167,6 +167,11 @@ class ProductList extends React.Component {
 
     return (
       <customize>
+        <style dangerouslySetInnerHTML={{__html:`
+          .header + .gallery {
+            display: none;
+          }
+        `}} />
         {this.props.edit ?
           <ComponentEdit {...product_raw} inherits={product} /> : null
         }
