@@ -17,7 +17,12 @@
 
     .item {
       border-bottom: 2px solid black;
-      padding-bottom: 30px;
+      padding-bottom: 20px;
+      margin-top: 10px;
+
+      &:first-of-type {
+        margin-top: 0px;
+      }
 
       &:last-of-type {
         border-bottom: none;
@@ -138,8 +143,11 @@
 @media (min-width: @desktop_min_width) {
   .items{
     .product_wrapper {
-      .item .preview {
-        height: 200px;
+      .item {
+        padding-bottom: 10px;
+        .preview {
+          height: 200px;
+        }
       }
       grid-column: span 4;
       border-bottom: 2px solid @color_support_0;

@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowndrape/couture/node_modules/browserify-sign"
+      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -65226,15 +65226,38 @@ var FulfillmentStickers = function (_React$Component) {
       var garment_ids = [];
       this.props.shipments.forEach(function (shipment) {
         if (!shipment.fulfillment_id) return;
+        var total_num_products = 0;
+        shipment.contents.forEach(function (item, index) {
+          var quantity = item.quantity || 1;
+          if (item.sku) {
+            total_num_products += quantity;
+          }
+        });
+
         shipment.contents.forEach(function (item, index) {
           if (!item.sku) return;
           garment_ids.push(React.createElement(
             "div",
             { key: garment_ids.length, className: "garment_id_sticker" },
-            "216-",
-            shipment.fulfillment_id,
-            "-",
-            index + 1
+            React.createElement(
+              "div",
+              null,
+              "216-",
+              shipment.fulfillment_id,
+              "-",
+              index + 1
+            ),
+            React.createElement(
+              "div",
+              { style: { fontSize: "7px" } },
+              "(",
+              shipment.id.substr(shipment.id.length - 6),
+              " ",
+              index + 1,
+              " of ",
+              total_num_products,
+              ")"
+            )
           ));
         });
       });
@@ -65352,7 +65375,7 @@ var Gallery = function (_React$Component) {
 module.exports = Gallery;
 
 },{"react":219}],299:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -65363,6 +65386,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+var Switch = require('./Switch.jsx');
+var BADButton = require('./BADButton.jsx');
 
 /***
 Display a single product
@@ -65371,21 +65396,143 @@ Display a single product
 var HeroProduct = function (_React$Component) {
   _inherits(HeroProduct, _React$Component);
 
-  function HeroProduct() {
+  function HeroProduct(props) {
     _classCallCheck(this, HeroProduct);
 
-    return _possibleConstructorReturn(this, (HeroProduct.__proto__ || Object.getPrototypeOf(HeroProduct)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (HeroProduct.__proto__ || Object.getPrototypeOf(HeroProduct)).call(this, props));
+
+    _this.state = {
+      selected_option: 0
+    };
+    return _this;
   }
 
   _createClass(HeroProduct, [{
-    key: "render",
+    key: 'handleAddToCart',
+    value: function handleAddToCart(event) {
+      var sku = this.props.base_sku;
+      var options = [this.props.base_sku];
+      if (typeof this.props.options[this.state.selected_option] != "undefined") {
+        var option_name = this.props.options[this.state.selected_option].name;
+        sku += '_' + option_name;
+        options.push(option_name);
+      }
+
+      // build cart item
+      var item = {
+        sku: sku,
+        quantity: 1,
+        props: {
+          name: this.props.name || this.props.base_sku,
+          price: this.props.price,
+          options: options
+        }
+      };
+      // fill in human-readable options
+      if (typeof this.props.options[this.state.selected_option] != "undefined")
+
+        // set item url
+        item.props.url = location.href;
+      // get image preview url
+      item.props.image = this.props.image;
+
+      // add to cart
+      BowAndDrape.cart_menu.add(item);
+
+      // google track event
+      try {
+        var ga_item = {
+          id: item.sku,
+          name: item.props.name || item.sku,
+          brand: "Bow & Drape",
+          price: item.props.price,
+          quantity: 1
+        };
+        gtag('event', 'add_to_cart', { value: item.props.price, currency: 'usd', items: [ga_item] });
+      } catch (err) {
+        console.log(err);
+      }
+      // facebook track event
+      try {
+        fbq('track', 'AddToCart', {
+          value: parseFloat(item.props.price),
+          currency: "USD",
+          content_ids: item.sku,
+          content_type: "product"
+        });
+      } catch (err) {
+        console.log(err);
+      }
+
+      location.href = "/cart";
+    }
+  }, {
+    key: 'render',
     value: function render() {
-      return "hiyo";
+      var _this2 = this;
+
+      var option_wrapper = null;
+      if (this.props.options) {
+        var options = [];
+        this.props.options.forEach(function (option, index) {
+          var className = "option";
+          if (index == _this2.state.selected_option) className += " selected";
+          options.push(React.createElement(
+            'div',
+            {
+              className: className,
+              key: option.name,
+              value: index,
+              onClick: function onClick() {
+                _this2.setState({ selected_option: index });
+              }
+            },
+            React.createElement('img', { src: option.selector_image, alt: option.name })
+          ));
+        });
+        option_wrapper = React.createElement(
+          'div',
+          { className: 'options', value: this.state.selected_option },
+          options
+        );
+      }
+
+      return React.createElement(
+        'div',
+        { className: 'hero_product' },
+        React.createElement(
+          'div',
+          { className: 'media' },
+          React.createElement('img', { src: this.props.image })
+        ),
+        React.createElement(
+          'div',
+          { className: 'add_to_cart ' + (this.props.options.length ? "haz_options" : "") },
+          option_wrapper,
+          React.createElement(
+            'div',
+            { className: 'productName' },
+            this.props.name,
+            ' ',
+            React.createElement(
+              'span',
+              { className: 'productPrice' },
+              '$',
+              this.props.price
+            )
+          ),
+          React.createElement(
+            BADButton,
+            { className: 'primary addCart', onClick: this.handleAddToCart.bind(this) },
+            'Add To Cart'
+          )
+        ),
+        React.createElement('div', { className: 'copy product_details', dangerouslySetInnerHTML: { __html: this.props.copy } })
+      );
     }
   }], [{
-    key: "preprocessProps",
+    key: 'preprocessProps',
     value: function preprocessProps(options, callback) {
-      console.log("hero preprocess", options);
       return callback(null, options);
     }
   }]);
@@ -65395,7 +65542,7 @@ var HeroProduct = function (_React$Component) {
 
 module.exports = HeroProduct;
 
-},{"react":219}],300:[function(require,module,exports){
+},{"./BADButton.jsx":283,"./Switch.jsx":328,"react":219}],300:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -65949,7 +66096,7 @@ var Item = function (_React$Component) {
               'span',
               { className: 'garment_caption' },
               '(',
-              this.props.shipment_id.substr(this.props.shipment_id.length - 4),
+              this.props.shipment_id.substr(this.props.shipment_id.length - 6),
               ' ',
               this.props.content_index + 1,
               ' of ',
@@ -67582,24 +67729,153 @@ var PageEditHeroProduct = function (_React$Component) {
       this.props.onChange(update);
     }
   }, {
+    key: "handleNewCard",
+    value: function handleNewCard() {
+      if (!this.props.onChange) return;
+      var update = this.props || {};
+      update = JSON.parse(JSON.stringify(update));
+      update.options = update.options || [];
+      update.options.push({});
+      this.props.onChange(update);
+    }
+  }, {
+    key: "handleRemoveCard",
+    value: function handleRemoveCard(index) {
+      if (!this.props.onChange) return;
+      var update = this.props || {};
+      update = JSON.parse(JSON.stringify(update));
+      update.options = update.options || [];
+      update.options.splice(index, 1);
+      this.props.onChange(update);
+    }
+  }, {
+    key: "handleUpdateOption",
+    value: function handleUpdateOption(index, key, value) {
+      if (!this.props.onChange) return;
+      var update = this.props || {};
+      update = JSON.parse(JSON.stringify(update));
+      update.options[index][key] = value.trim();
+      this.props.onChange(update);
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
 
+      var options = this.props.options || [];
+      var option_cards = [];
+      options.forEach(function (option, index) {
+        option_cards.push(React.createElement(
+          "div",
+          { key: option_cards.length, className: "option" },
+          React.createElement(
+            "div",
+            { className: "fields" },
+            React.createElement(
+              "div",
+              null,
+              React.createElement(
+                "label",
+                null,
+                "name"
+              ),
+              React.createElement("input", { type: "text", onChange: function onChange(event) {
+                  _this2.handleUpdateOption(index, "name", event.target.value);
+                }, value: option.name || "" })
+            ),
+            React.createElement(
+              "div",
+              null,
+              React.createElement(
+                "label",
+                null,
+                "selector image"
+              ),
+              React.createElement("input", { type: "text", onChange: function onChange(event) {
+                  _this2.handleUpdateOption(index, "selector_image", event.target.value);
+                }, value: option.selector_image || "" })
+            ),
+            React.createElement(
+              "span",
+              { style: { cursor: "pointer" }, className: "remove", onClick: _this2.handleRemoveCard.bind(_this2, index), title: "delete" },
+              "\u2718"
+            )
+          )
+        ));
+      });
+
       return React.createElement(
         "div",
-        null,
+        { className: "edit_hero_product" },
         React.createElement(
           "div",
           null,
           React.createElement(
             "label",
             null,
-            "sku"
+            "image"
           ),
           React.createElement("input", { type: "text", onChange: function onChange(event) {
-              _this2.handleUpdate("sku", event.target.value);
-            }, value: this.props.sku, placeholder: "" })
+              _this2.handleUpdate("image", event.target.value);
+            }, value: this.props.image, placeholder: "" })
+        ),
+        React.createElement(
+          "div",
+          null,
+          React.createElement(
+            "label",
+            null,
+            "base sku"
+          ),
+          React.createElement("input", { type: "text", onChange: function onChange(event) {
+              _this2.handleUpdate("base_sku", event.target.value);
+            }, value: this.props.base_sku, placeholder: "" })
+        ),
+        React.createElement(
+          "div",
+          null,
+          React.createElement(
+            "label",
+            null,
+            "product name"
+          ),
+          React.createElement("input", { type: "text", onChange: function onChange(event) {
+              _this2.handleUpdate("name", event.target.value);
+            }, value: this.props.name })
+        ),
+        React.createElement(
+          "div",
+          null,
+          React.createElement(
+            "label",
+            null,
+            "product price"
+          ),
+          React.createElement("input", { type: "text", onChange: function onChange(event) {
+              _this2.handleUpdate("price", event.target.value);
+            }, value: this.props.price })
+        ),
+        React.createElement(
+          "div",
+          null,
+          React.createElement(
+            "label",
+            null,
+            "copy"
+          ),
+          React.createElement("textarea", { onChange: function onChange(event) {
+              _this2.handleUpdate("copy", event.target.value);
+            }, value: this.props.copy })
+        ),
+        React.createElement(
+          "div",
+          { className: "options" },
+          option_cards,
+          React.createElement(
+            "div",
+            { className: "option", style: { cursor: "pointer" }, onClick: this.handleNewCard.bind(this) },
+            "New Option"
+          )
         )
       );
     }

@@ -33,7 +33,7 @@
   font-family: "zurichbold_condensed", sans-serif;
   color: #000;
   font-weight: normal;
-  letter-spacing: 0px;
+  letter-spacing: 2px;
 }
 .zurichroman {
   font-family: 'zurich_condensedregular', sans-serif;
@@ -178,6 +178,11 @@ button.primary.busyState:after,
   animation-timing-function: ease;
   animation: busyState 1.5s infinite;
 }
+/* getsitecontrol popup */
+w-div button:before,
+w-div button:after {
+  display: none;
+}
 .notFancy:after {
   content: '';
   width: 0%;
@@ -264,7 +269,7 @@ actions,
   font-family: "zurichbold_condensed", sans-serif;
   color: #000;
   font-weight: normal;
-  letter-spacing: 0px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   font-size: 16px;
   display: block;
@@ -332,7 +337,7 @@ h2 {
   font-family: "zurichbold_condensed", sans-serif;
   color: #000;
   font-weight: normal;
-  letter-spacing: 0px;
+  letter-spacing: 2px;
 }
 h1 {
   font-size: 24px;
@@ -582,7 +587,11 @@ comments message {
 }
 .items .product_wrapper .item {
   border-bottom: 2px solid black;
-  padding-bottom: 30px;
+  padding-bottom: 20px;
+  margin-top: 10px;
+}
+.items .product_wrapper .item:first-of-type {
+  margin-top: 0px;
 }
 .items .product_wrapper .item:last-of-type {
   border-bottom: none;
@@ -687,6 +696,9 @@ comments message {
   .items .product_wrapper {
     grid-column: span 4;
     border-bottom: 2px solid #eaeaea;
+  }
+  .items .product_wrapper .item {
+    padding-bottom: 10px;
   }
   .items .product_wrapper .item .preview {
     height: 200px;
@@ -1014,7 +1026,7 @@ customize hud_controls button:after {
     width: 30px;
   }
 }
-customize .product_details .description {
+.product_details .description {
   margin: 20px auto;
   letter-spacing: 2px;
   line-height: 23px;
@@ -1023,7 +1035,7 @@ customize .product_details .description {
   grid-column-end: 4;
   margin-top: 40px;
 }
-customize .product_details .size_chart {
+.product_details .size_chart {
   margin: 20px auto;
   display: table;
   border-collapse: collapse;
@@ -1032,18 +1044,18 @@ customize .product_details .size_chart {
   grid-column-end: -1;
   margin-top: 40px;
 }
-customize .product_details .size_chart row {
+.product_details .size_chart row {
   border-bottom: 1px solid #eaeaea;
   display: table-row;
 }
-customize .product_details .size_chart row:last-child {
+.product_details .size_chart row:last-child {
   border-bottom: none;
 }
-customize .product_details .size_chart row span {
+.product_details .size_chart row span {
   display: table-cell;
   padding: 5px 5px 5px 10px;
 }
-customize .product_details .size_chart row span:first-child {
+.product_details .size_chart row span:first-child {
   border-right: 1px solid #eaeaea;
 }
 @media (min-width: 1000px) {
@@ -1318,7 +1330,7 @@ cart {
   font-family: "zurichbold_condensed", sans-serif;
   color: #000;
   font-weight: normal;
-  letter-spacing: 0px;
+  letter-spacing: 2px;
   margin-top: 10px;
   display: block;
 }
@@ -1502,9 +1514,11 @@ input_credit [name="exp_year"] {
 .page_edit element:last-of-type {
   border-bottom: none;
 }
+.page_edit element .card,
 .page_edit element card {
   margin-top: 30px;
 }
+.page_edit element .card .preview,
 .page_edit element card .preview {
   width: 150px;
   height: 150px;
@@ -1512,23 +1526,43 @@ input_credit [name="exp_year"] {
   background-repeat: no-repeat;
   background-position: center;
 }
-.page_edit element card fields {
+.page_edit element .fields,
+.page_edit element fields {
   width: 300px;
   margin-left: 75px;
 }
-.page_edit element card fields div {
+.page_edit element .fields div,
+.page_edit element fields div {
   position: relative;
 }
-.page_edit element card fields label {
+.page_edit element .fields label,
+.page_edit element fields label {
   position: absolute;
   right: 305px;
   top: 28px;
+}
+.page_edit .remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 .page_edit .actions {
   position: fixed;
   bottom: 0px;
   width: 100%;
   background-color: #fff;
+}
+.edit_hero_product .options {
+  display: flex;
+  flex-wrap: wrap;
+}
+.edit_hero_product .option {
+  position: relative;
+  border: solid 1px #fff;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  min-width: 300px;
+  padding: 5px;
 }
 component_edit {
   display: flex;
@@ -2000,7 +2034,7 @@ user name {
   font-family: "zurichbold_condensed", sans-serif;
   color: #000;
   font-weight: normal;
-  letter-spacing: 0px;
+  letter-spacing: 2px;
   text-align: center;
 }
 .purchase_complete p {
@@ -2031,7 +2065,7 @@ user name {
   font-family: "zurichbold_condensed", sans-serif;
   color: #000;
   font-weight: normal;
-  letter-spacing: 0px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   font-size: 8px;
   bottom: 0px;
@@ -2274,5 +2308,56 @@ menu.expanded login {
 @media (min-width: 1000px) {
   login {
     margin: 30px 0 0 0;
+  }
+}
+.hero_product {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.hero_product .media {
+  width: 100%;
+}
+.hero_product .media img {
+  width: 100%;
+}
+.hero_product .add_to_cart .options {
+  display: flex;
+  justify-content: center;
+}
+.hero_product .add_to_cart .options .option {
+  margin: 5px;
+  margin-bottom: 0px;
+  cursor: pointer;
+}
+.hero_product .add_to_cart .options .option img {
+  border: solid 1px #eaeaea;
+  border-radius: 50%;
+  width: 65px;
+  height: 65px;
+}
+.hero_product .add_to_cart .options .option.selected img {
+  border: solid 1px #7f5cff;
+}
+.hero_product .copy {
+  padding: 0 60px;
+}
+@media (min-width: 1000px) {
+  .hero_product {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero_product .media {
+    grid-column-start: 2;
+    grid-row: 1;
+  }
+  .hero_product .add_to_cart.haz_options {
+    height: 160px;
+  }
+  .hero_product .copy {
+    grid-column-start: 1;
+    grid-row-start: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 }
