@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
+      "/home/default/bowndrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -65303,7 +65303,7 @@ var Gallery = function (_React$Component) {
 
         var media = React.createElement("img", { src: item.image, style: { width: "100%" } });
         if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
-          media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false });
+          media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false, muted: true, playsInline: true });
         }
         gallery_cards.push(React.createElement(
           "a",
@@ -66733,6 +66733,15 @@ var LayoutHeader = function (_React$Component) {
           'button',
           { className: 'primary' },
           'Inspo'
+        )
+      ));
+      menu_items.push(React.createElement(
+        'a',
+        { key: menu_items.length, href: '/gift_guide' },
+        React.createElement(
+          'button',
+          { className: 'primary' },
+          'Gift Guide'
         )
       ));
       // links to admin pages

@@ -31,7 +31,7 @@ class Gallery extends React.Component {
       );
       if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
         media = (
-          <video src={item.image} style={{width: "100%"}} autoPlay loop controls={false}/>
+          <video src={item.image} style={{width: "100%"}} autoPlay loop controls={false} muted playsInline/>
         );
       }
       gallery_cards.push(
