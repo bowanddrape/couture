@@ -1517,6 +1517,7 @@ input_credit [name="exp_year"] {
 .page_edit element .card,
 .page_edit element card {
   margin-top: 30px;
+  position: relative;
 }
 .page_edit element .card .preview,
 .page_edit element card .preview {

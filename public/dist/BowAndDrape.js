@@ -66843,8 +66843,7 @@ var LayoutHeader = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (LayoutHeader.__proto__ || Object.getPrototypeOf(LayoutHeader)).call(this, props));
 
     _this.state = {
-      expanded: false,
-      desktop_mode: false
+      expanded: false
     };
     return _this;
   }
@@ -66932,10 +66931,6 @@ var LayoutHeader = function (_React$Component) {
             'Admin Pages'
           )
         ));
-      }
-
-      if (this.state.desktop_mode) {
-        return React.createElement('div', { className: 'header' });
       }
 
       return React.createElement(
