@@ -100,7 +100,7 @@ class HeroProduct extends React.Component {
         <div className="media">
           <img src={this.props.image}/>
         </div>
-        <div className={`add_to_cart ${this.props.options.length?"haz_options":""}`}>
+        <div className={`add_to_cart ${this.props.options&&this.props.options.length?"haz_options":""}`}>
           {option_wrapper}
           <div className="productName">{this.props.name} <span className="productPrice">${this.props.price}</span></div>
           <BADButton className="primary addCart" onClick={this.handleAddToCart.bind(this)}>Add To Cart</BADButton>
