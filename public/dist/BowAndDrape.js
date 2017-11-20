@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
+      "/home/default/bowndrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -64689,7 +64689,7 @@ var FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-var tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
+var tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
 
 var FulfillShipments = function (_React$Component) {
   _inherits(FulfillShipments, _React$Component);
@@ -65326,7 +65326,8 @@ var Gallery = function (_React$Component) {
 
         var media = React.createElement("img", { src: item.image, style: { width: "100%" } });
         if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
-          media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false });
+          media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false, muted: true, playsInline: true });
+          if (item.has_audio) media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false });
         }
         gallery_cards.push(React.createElement(
           "a",
@@ -67566,7 +67567,8 @@ var PageEditGallery = function (_React$Component) {
     value: function handleUpdateItem(index, key, value) {
       if (!this.props.onChange) return;
       var items = this.props.items;
-      items[index][key] = value.trim();
+      if (typeof value == "string") value = value.trim();
+      items[index][key] = value;
       this.props.onChange({ items: items });
     }
   }, {
@@ -67613,6 +67615,18 @@ var PageEditGallery = function (_React$Component) {
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
                     _this2.handleUpdateItem(index, "image", event.target.value);
                   }, value: item.image || "" })
+              ),
+              React.createElement(
+                "div",
+                { className: "checkbox" },
+                React.createElement(
+                  "label",
+                  null,
+                  "has_audio"
+                ),
+                React.createElement("input", { type: "checkbox", onChange: function onChange(event) {
+                    _this2.handleUpdateItem(index, "has_audio", event.target.checked);
+                  }, checked: !!item.has_audio })
               ),
               React.createElement(
                 "div",

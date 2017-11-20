@@ -1541,6 +1541,10 @@ input_credit [name="exp_year"] {
   right: 305px;
   top: 28px;
 }
+.page_edit element .fields .checkbox label,
+.page_edit element fields .checkbox label {
+  top: 0px;
+}
 .page_edit .remove {
   position: absolute;
   top: 10px;
