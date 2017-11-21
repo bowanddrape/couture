@@ -14,7 +14,6 @@ class LayoutHeader extends React.Component {
     super(props);
     this.state = {
       expanded: false,
-      desktop_mode: false,
     }
   }
 
@@ -35,33 +34,22 @@ class LayoutHeader extends React.Component {
       menu_items.push(<a href="/page" key={menu_items.length}><button className="primary">Admin Pages</button></a>);
     }
 
-    if (this.state.desktop_mode) {
-      return (
-        <div className="header">
-        </div>
-      )
-    }
-
-
     return (
-
       <div className="header">
         <div className="headerInner">
-        <handle className={this.state.expanded?"expanded":""} onClick={()=>{this.setState({expanded:!this.state.expanded})}}/>
-        <a className="logo" href="/"><img src="/logo_mini.svg" /></a>
-        <CartMenu key={menu_items.length} />
-        <menu className={this.state.expanded?"expanded":""}>
-          <menu_items>
-            {menu_items}
-          </menu_items>
-          <UserProfile {...this.props}/>
-        </menu>
+          <handle className={this.state.expanded?"expanded":""} onClick={()=>{this.setState({expanded:!this.state.expanded})}}/>
+          <a className="logo" href="/"><img src="/logo_mini.svg" /></a>
+          <CartMenu key={menu_items.length} />
+          <menu className={this.state.expanded?"expanded":""}>
+            <menu_items>
+              {menu_items}
+            </menu_items>
+            <UserProfile {...this.props}/>
+          </menu>
         </div>
       </div>
-
     );
   }
-
 }
 
 module.exports = LayoutHeader;

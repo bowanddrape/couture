@@ -67060,6 +67060,25 @@ var LayoutMain = function (_React$Component) {
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         React.createElement(LayoutBorderWrap, null),
         React.createElement(LayoutHeader, { user: this.state.user }),
+        React.createElement(
+          'div',
+          { className: 'announcement', style: { color: "#fff", backgroundColor: "#ff5c5c", width: "100%", textAlign: "center" } },
+          React.createElement(
+            'div',
+            { style: { fontFamily: "Open Sans" } },
+            'Black Friday starts now for our Besties (that means you, valued customer)'
+          ),
+          React.createElement(
+            'div',
+            { style: { fontFamily: "zurichbold_condensed" } },
+            'BUY ONE SWEATSHIRT GET ONE 50% OFF! ',
+            React.createElement(
+              'span',
+              { style: { fontSize: "10px" } },
+              'USE CODE: BLACKFRIYAY'
+            )
+          )
+        ),
         content,
         React.createElement(LayoutFooter, { user: this.state.user }),
         React.createElement('script', { src: '/BowAndDrape.js' }),
@@ -69314,7 +69333,7 @@ var ProductList = function (_React$Component) {
       return React.createElement(
         'customize',
         null,
-        React.createElement('style', { dangerouslySetInnerHTML: { __html: '\n          .header + .gallery {\n            display: none;\n          }\n        ' } }),
+        React.createElement('style', { dangerouslySetInnerHTML: { __html: '\n          .header + .gallery, .announcement + .gallery {\n            display: none;\n          }\n        ' } }),
         this.props.edit ? React.createElement(ComponentEdit, _extends({}, product_raw, { inherits: product })) : null,
         React.createElement(
           'div',

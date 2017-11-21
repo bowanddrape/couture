@@ -168,7 +168,7 @@ class ProductList extends React.Component {
     return (
       <customize>
         <style dangerouslySetInnerHTML={{__html:`
-          .header + .gallery {
+          .header + .gallery, .announcement + .gallery {
             display: none;
           }
         `}} />
