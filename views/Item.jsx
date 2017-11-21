@@ -235,7 +235,7 @@ class Item extends React.Component {
           remove: ["new", "needs_picking"],
         },
         "needs_pressing": {
-          add: [["needs_qaing"]],
+          add: [["needs_qaing"],["needs_picking"]],
           remove: ["needs_pressing"],
         },
         "needs_qaing": {
