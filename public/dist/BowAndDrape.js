@@ -66892,6 +66892,15 @@ var LayoutHeader = function (_React$Component) {
           'Gift Guide'
         )
       ));
+      menu_items.push(React.createElement(
+        'a',
+        { key: menu_items.length, href: '/rtw_sale' },
+        React.createElement(
+          'button',
+          { className: 'primary' },
+          'SALE'
+        )
+      ));
       // links to admin pages
       if (this.props.user && this.props.user.roles && this.props.user.roles.length) {
         menu_items.push(React.createElement(
