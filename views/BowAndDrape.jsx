@@ -151,6 +151,7 @@ module.exports = {
     MandateUserLogin: require('./MandateUserLogin.jsx'),
     WarningNotice: require('./WarningNotice.jsx'),
     FacebookLogin: require('./FacebookLogin.jsx'),
+    MetricsDash: require('./MetricsDash.jsx'),
   },
   dispatcher,
   api,
