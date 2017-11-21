@@ -30,10 +30,9 @@ class Dashboard {
   }
 
   static validateDate(dateString){
-    // Make sure we don't have a janky date. Format is 'mm/dd/yy'
-    // TODO Maybe have option to skip the year portion
-    // Evaluate the string to check format
-    if(!/^\d{1,2}\/\d{1,2}\/\d{2}$/.test(dateString)){
+    // Make sure we don't have a janky date. Format is 'yyyy/mm/dd'
+    if(!/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateString)){
+      console.log("bad dateString");
       return false;
     }
     let epochDate = new Date(dateString).getTime()/1000;

@@ -20,13 +20,15 @@ class MetricsDash extends React.Component {
       const target = event.target;
       const value = target.type === 'checkbox' ? target.checked : target.value;
       const name = target.name;
+
       this.setState((prevState) => {
-        return (prevState.searchParams[name] = value);
+        let searchParams = Object.assign({}, this.state.searchParams);
+        searchParams[name] = value;
+        return ({searchParams});
       });
     }
 
     handleSearch() {
-      //TODO THIS STUFF IS COPY PASTA, CHANGE IT!
       BowAndDrape.api("POST", "/dashboard", this.state.searchParams, (err, result) => {
         if (err) {
           alert("Error on POSTing");
@@ -64,21 +66,19 @@ class MetricsDash extends React.Component {
               <div>
                 <label>Start Date: </label>
                 <input
-                 type="text"
+                 type="date"
                  onChange={this.handleInputChange.bind(this)}
                  value={this.state.searchParams["start"]}
                  name="start"
-                 placeholder="mm/dd/yy"
                 />
              </div>
              <div>
                <label>Stop Date: </label>
                <input
-                type="text"
+                type="date"
                 onChange={this.handleInputChange.bind(this)}
                 value={this.state.searchParams["stop"]}
                 name="stop"
-                placeholder="mm/dd/yy"
                />
             </div>
             </row>
