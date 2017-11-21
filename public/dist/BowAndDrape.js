@@ -63133,7 +63133,8 @@ var Cart = function (_React$Component) {
           )
         ),
         React.createElement('script', { type: 'text/javascript', src: 'https://js.stripe.com/v2/' }),
-        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          if ("' + process.env.STRIPE_KEY + '"!="undefined")\n            Stripe.setPublishableKey("' + process.env.STRIPE_KEY + '");\n        ' } })
+        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          if ("' + process.env.STRIPE_KEY + '"!="undefined")\n            Stripe.setPublishableKey("' + process.env.STRIPE_KEY + '");\n        ' } }),
+        React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          gtag(\'event\', \'conversion\', {\n            send_to: \'AW-995909245/xQ9LCNm2p3kQ_bzx2gM\',\n            value: 1.0,\n            currency: \'USD\',\n          });\n        ' } })
       );
     }
   }], [{
