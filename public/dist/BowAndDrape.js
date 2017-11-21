@@ -62940,6 +62940,8 @@ var Cart = function (_React$Component) {
           // save our successfully placed order payload
           _this3.order_payload = payload;
 
+          // headliner labs track event
+          window.hl_fbm_checkout.optIn();
           // google track event
           try {
             var total_price = ItemUtils.getPrice(resp.shipment.contents);
@@ -63130,7 +63132,9 @@ var Cart = function (_React$Component) {
             BADButton,
             { className: 'primary checkout_btn', onClick: this.handlePay.bind(this) },
             'Get it!'
-          )
+          ),
+          React.createElement('div', { id: 'hl-fbm-checkout' }),
+          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          window.hlFbmPluginInit = function() {window.hl_fbm_checkout = new HlFbmPlugin("checkout", {});}\n        ' } })
         ),
         React.createElement('script', { type: 'text/javascript', src: 'https://js.stripe.com/v2/' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          if ("' + process.env.STRIPE_KEY + '"!="undefined")\n            Stripe.setPublishableKey("' + process.env.STRIPE_KEY + '");\n        ' } })
@@ -67082,7 +67086,7 @@ var LayoutMain = function (_React$Component) {
         React.createElement(LayoutFooter, { user: this.state.user }),
         React.createElement('script', { src: '/BowAndDrape.js' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          var BowAndDrape = require("BowAndDrape");\n          var React = BowAndDrape.React;\n          var ReactDOM = BowAndDrape.ReactDOM;\n          var content = ' + JSON.stringify(this.props.content) + ';\n          if (content != "undefined") {\n            var layout = React.createElement(BowAndDrape.views.LayoutMain, {\n              content_string: `' + (typeof document != "undefined" ? this.props.content_string : escape(this.props.content_string)) + '`,\n              content,\n            });\n            ReactDOM.hydrate(\n              layout,\n              document.querySelector(".layout")\n            );\n          }\n        ' } }),
-        React.createElement('script', { dangerouslySetInnerHTML: { __html: '// &lt;![CDATA[\n          window.$zopim||(function(d,s){var z=$zopim=function(c){z._.push(c)},$=z.s= d.createElement(s),e=d.getElementsByTagName(s)[0];z.set=function(o){z.set. _.push(o)};z._=[];z.set._=[];$.async=!0;$.setAttribute(\'charset\',\'utf-8\'); $.src=\'//cdn.zopim.com/?Q4N5gKntLCE7FT6MI3AtGRDck6kwMqzP\';z.t=+new Date;$. type=\'text/javascript\';e.parentNode.insertBefore($,e)})(document,\'script\');\n          // ]]&amp;gt;</script>\n          <div __jx__id="___$_2 ___$_1" style="position: absolute; visibility: hidden; border: 0px none; padding: 0px; margin: 0px; width: 0px; height: 0px;" class=" livechat"></div>\n        ' } }),
+        React.createElement('div', { id: 'hl-chat-with-us' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '(function (w,i,d,g,e,t,s) {w[d] = w[d]||[];\n          t= i.createElement(g);t.async=1;t.src=e;s=i.getElementsByTagName(g)[0];s.parentNode.insertBefore(t, s);})\n         (window, document, \'_gscq\',\'script\',\'//widgets.getsitecontrol.com/25008/script.js\');' } })
       );
     }
@@ -69370,7 +69374,9 @@ var ProductList = function (_React$Component) {
             BADButton,
             { className: 'primary addCart', onClick: this.handleAddToCart.bind(this, product) },
             'Add To Cart'
-          )
+          ),
+          React.createElement('div', { id: 'hl-fbm-add_to_cart' }),
+          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\nconsole.log("re=init headliner plugin");\n            window.hlFbmPluginInit = function() {\nconsole.log("headliner plugin");\n                /* Include product title and price here */\n                var product_info = {title:"' + product.props.name + '", price:' + product.props.price + '};\n                window.hl_fbm_add_to_cart = new HlFbmPlugin("add_to_cart", product_info);\n            }\n            ' } })
         ),
         product.props.details ? React.createElement('div', { className: 'product_details grid', dangerouslySetInnerHTML: {
             __html: unescape(product.props.details)
@@ -69503,6 +69509,9 @@ var ProductList = function (_React$Component) {
       item.props.image = '/store/' + this.props.store.id + '/preview?c=' + encodeURIComponent(query_params.c);
 
       BowAndDrape.cart_menu.add(item);
+
+      // headliner labs track event
+      window.hl_fbm_add_to_cart.optIn();
 
       // google track event
       try {

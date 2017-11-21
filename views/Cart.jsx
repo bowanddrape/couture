@@ -220,6 +220,8 @@ class Cart extends React.Component {
         // save our successfully placed order payload
         this.order_payload = payload;
 
+        // headliner labs track event
+        window.hl_fbm_checkout.optIn();
         // google track event
         try {
           let total_price = ItemUtils.getPrice(resp.shipment.contents)
@@ -350,6 +352,12 @@ class Cart extends React.Component {
           <BADButton className="primary checkout_btn" onClick={this.handlePay.bind(this)}>
             Get it!
           </BADButton>
+
+        <div id='hl-fbm-checkout'></div>
+        <script dangerouslySetInnerHTML={{__html:`
+          window.hlFbmPluginInit = function() {window.hl_fbm_checkout = new HlFbmPlugin("checkout", {});}
+        `}} />
+
         </section>
 
 

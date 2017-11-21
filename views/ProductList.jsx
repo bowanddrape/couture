@@ -186,6 +186,19 @@ class ProductList extends React.Component {
           null : <div className="add_to_cart">
             <div className="productName bottomSwitch">{product.props.name} <span className="productPrice">${product.props.price}</span></div>
             <BADButton className="primary addCart" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</BADButton>
+
+            {/* headliner labs */}
+            <div id='hl-fbm-add_to_cart'></div>
+            <script dangerouslySetInnerHTML={{__html: `
+console.log("re=init headliner plugin");
+            window.hlFbmPluginInit = function() {
+console.log("headliner plugin");
+                /* Include product title and price here */
+                var product_info = {title:"${product.props.name}", price:${product.props.price}};
+                window.hl_fbm_add_to_cart = new HlFbmPlugin("add_to_cart", product_info);
+            }
+            `}} ></script>
+
             </div>
         }
         {product.props.details ?
@@ -311,6 +324,9 @@ class ProductList extends React.Component {
     item.props.image = `/store/${this.props.store.id}/preview?c=${encodeURIComponent(query_params.c)}`;
 
     BowAndDrape.cart_menu.add(item);
+
+    // headliner labs track event
+    window.hl_fbm_add_to_cart.optIn();
 
     // google track event
     try {

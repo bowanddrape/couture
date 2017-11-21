@@ -2366,3 +2366,9 @@ menu.expanded login {
     justify-content: center;
   }
 }
+@media (min-width: 1000px) {
+  #hl-fbm-add_to_cart {
+    position: relative;
+    top: -15px;
+  }
+}
