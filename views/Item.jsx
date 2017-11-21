@@ -325,7 +325,7 @@ class Item extends React.Component {
           {this.props.fulfillment ?
             <div className="garment_id">
               GarmentID#: {this.props.garment_id},
-              <span className="garment_caption">({this.props.shipment_id.substr(this.props.shipment_id.length-4)} {this.props.content_index+1} of {this.props.total_num_products})</span>
+              <span className="garment_caption">({this.props.shipment_id.substr(this.props.shipment_id.length-6)} {this.props.content_index+1} of {this.props.total_num_products})</span>
             </div>
             : null
           }

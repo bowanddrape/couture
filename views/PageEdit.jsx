@@ -4,6 +4,7 @@ const PageEditGallery = require("./PageEditGallery.jsx");
 const PageEditSignup = require("./PageEditSignup.jsx");
 const PageEditTextContent = require("./PageEditTextContent.jsx");
 const PageEditCarousel = require("./PageEditCarousel.jsx");
+const PageEditHeroProduct = require("./PageEditHeroProduct.jsx");
 
 /***
 Admin widget for managing CMS pages
@@ -117,6 +118,11 @@ class PageEdit extends React.Component {
         case "Carousel":
           edit_props = (
             <PageEditCarousel onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
+          );
+          break;
+        case "HeroProduct":
+          edit_props = (
+            <PageEditHeroProduct onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
           );
           break;
         default:

@@ -361,6 +361,14 @@ class Cart extends React.Component {
             Stripe.setPublishableKey("${process.env.STRIPE_KEY}");
         `}} >
         </script>
+
+        <script dangerouslySetInnerHTML={{__html:`
+          gtag('event', 'conversion', {
+            send_to: 'AW-995909245/xQ9LCNm2p3kQ_bzx2gM',
+            value: 1.0,
+            currency: 'USD',
+          });
+        `}} />
       </div>
     );
   }

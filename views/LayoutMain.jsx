@@ -70,6 +70,16 @@ class LayoutMain extends React.Component {
         <link rel="stylesheet" href="/styles.css" type="text/css"></link>
         <LayoutBorderWrap />
         <LayoutHeader user={this.state.user}/>
+
+        <div className="announcement" style={{color:"#fff",backgroundColor:"#ff5c5c",width:"100%",textAlign:"center"}}>
+          <div style={{fontFamily: "zurichbold_condensed"}}>
+            BUY ONE SWEATSHIRT GET ONE 50% OFF!
+          </div>
+          <div style={{fontFamily: "zurichbold_condensed"}}>
+            <span style={{fontSize:"10px"}}>USE CODE: BLACKFRIYAY</span>
+          </div>
+        </div>
+
         {content}
         <LayoutFooter user={this.state.user}/>
 

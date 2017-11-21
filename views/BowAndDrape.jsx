@@ -142,6 +142,7 @@ module.exports = {
     Items: require('./Items.jsx'),
     ComponentsEdit: require('./ComponentsEdit.jsx'),
     Gallery: require('./Gallery.jsx'),
+    HeroProduct: require('./HeroProduct.jsx'),
     Signup: require('./Signup.jsx'),
     TextContent: require('./TextContent.jsx'),
     VSSAdmin: require('./VSSAdmin.jsx'),

@@ -15,8 +15,9 @@
     &:last-of-type {
       border-bottom: none;
     }
-    card {
+    .card, card {
       margin-top: 30px;
+      position: relative;
       .preview {
         width: 150px;
         height: 150px;
@@ -24,26 +25,47 @@
         background-repeat: no-repeat;
         background-position: center;
       }
-      fields {
-        width: 300px;
-        margin-left: 75px;
-        div {
-          position: relative;
-        }
-        label {
-          position: absolute;
-          right: 305px;
-          top: 28px;
-        }
+    }
+    .fields, fields {
+      width: 300px;
+      margin-left: 75px;
+      div {
+        position: relative;
+      }
+      label {
+        position: absolute;
+        right: 305px;
+        top: 28px;
+      }
+      .checkbox label {
+        top: 0px;
       }
     }
-    input[type="text"] {
-    }
+  }
+  .remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
   }
   .actions {
     position: fixed;
     bottom: 0px;
     width: 100%;
     background-color: @color_primary;
+  }
+}
+
+.edit_hero_product {
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .option {
+    position: relative;
+    border: solid 1px @color_primary;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    min-width: 300px;
+    padding: 5px;
   }
 }

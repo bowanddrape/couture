@@ -18,7 +18,7 @@ class OrderPlacedEmail extends React.Component {
           <h1 style={styles.h1}>YOUR ORDER</h1>
           <h1 style={styles.h1}>HAS BEEN PLACED</h1>
           <a href={this.props.order_link} style={{textDecoration:"none"}}>
-            <div style={styles.block_link}>Order ID {this.props.order_id}</div>
+            <div style={styles.block_link}>Order ID {this.props.order_id.substr(this.props.order_id.length-6)}</div>
           </a>
           <img src={"https://couture.bowanddrape.com/Icon-Phone-Red-Heart.png"} style={{width:"150px",margin:"auto",display:"block"}}/>
           <div style={{textAlign:"center"}}>
