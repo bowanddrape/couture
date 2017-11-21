@@ -72,11 +72,11 @@ class LayoutMain extends React.Component {
         <LayoutHeader user={this.state.user}/>
 
         <div className="announcement" style={{color:"#fff",backgroundColor:"#ff5c5c",width:"100%",textAlign:"center"}}>
-          <div style={{fontFamily:"Open Sans"}}>
-            Black Friday starts now for our Besties (that means you, valued customer)
+          <div style={{fontFamily: "zurichbold_condensed"}}>
+            BUY ONE SWEATSHIRT GET ONE 50% OFF!
           </div>
           <div style={{fontFamily: "zurichbold_condensed"}}>
-            BUY ONE SWEATSHIRT GET ONE 50% OFF! <span style={{fontSize:"10px"}}>USE CODE: BLACKFRIYAY</span>
+            <span style={{fontSize:"10px"}}>USE CODE: BLACKFRIYAY</span>
           </div>
         </div>
 

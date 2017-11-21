@@ -67065,13 +67065,12 @@ var LayoutMain = function (_React$Component) {
           { className: 'announcement', style: { color: "#fff", backgroundColor: "#ff5c5c", width: "100%", textAlign: "center" } },
           React.createElement(
             'div',
-            { style: { fontFamily: "Open Sans" } },
-            'Black Friday starts now for our Besties (that means you, valued customer)'
+            { style: { fontFamily: "zurichbold_condensed" } },
+            'BUY ONE SWEATSHIRT GET ONE 50% OFF!'
           ),
           React.createElement(
             'div',
             { style: { fontFamily: "zurichbold_condensed" } },
-            'BUY ONE SWEATSHIRT GET ONE 50% OFF! ',
             React.createElement(
               'span',
               { style: { fontSize: "10px" } },
