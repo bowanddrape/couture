@@ -46,19 +46,15 @@
         }
       }
 
-      @media (min-width: @desktop_min_width) {
-        .preview {
-          max-width: 300px;
-          height: auto;
-          width: 50%;
-          margin: auto;
-        }
-      }
       .preview {
-        max-width: 300px;
         height: auto;
         width: 50%;
-        margin: auto;
+      }
+      @media (min-width: @desktop_min_width) {
+        .preview {
+          height: auto;
+          width: 50%;
+        }
       }
       .price {
         display: none;
@@ -175,4 +171,9 @@
       margin-top: 0;
     }
   }
+
+  .fulfillmentStation .items .product_wrapper {
+      grid-column: span 6;
+    }
 }
+
