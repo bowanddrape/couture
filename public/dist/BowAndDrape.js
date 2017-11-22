@@ -69541,7 +69541,7 @@ var ProductList = function (_React$Component) {
             'Add To Cart'
           ),
           React.createElement('div', { id: 'hl-fbm-add_to_cart' }),
-          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\nconsole.log("re=init headliner plugin");\n            window.hlFbmPluginInit = function() {\nconsole.log("headliner plugin");\n                /* Include product title and price here */\n                var product_info = {title:"' + product.props.name + '", price:' + product.props.price + '};\n                window.hl_fbm_add_to_cart = new HlFbmPlugin("add_to_cart", product_info);\n            }\n            ' } })
+          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n            window.hlFbmPluginInit = function() {\n                /* Include product title and price here */\n                var product_info = {title:"' + product.props.name + '", price:"' + product.props.price + '"};\n                window.hl_fbm_add_to_cart = new HlFbmPlugin("add_to_cart", product_info);\n            }\n            ' } })
         ),
         product.props.details ? React.createElement('div', { className: 'product_details grid', dangerouslySetInnerHTML: {
             __html: unescape(product.props.details)

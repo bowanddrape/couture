@@ -190,11 +190,9 @@ class ProductList extends React.Component {
             {/* headliner labs */}
             <div id='hl-fbm-add_to_cart'></div>
             <script dangerouslySetInnerHTML={{__html: `
-console.log("re=init headliner plugin");
             window.hlFbmPluginInit = function() {
-console.log("headliner plugin");
                 /* Include product title and price here */
-                var product_info = {title:"${product.props.name}", price:${product.props.price}};
+                var product_info = {title:"${product.props.name}", price:"${product.props.price}"};
                 window.hl_fbm_add_to_cart = new HlFbmPlugin("add_to_cart", product_info);
             }
             `}} ></script>
