@@ -74,6 +74,7 @@ const Component = require('./models/Component.js');
 const PromoCode = require('./models/PromoCode.js');
 const VSS = require('./models/VSS.js');
 const Page = require('./models/Page.js');
+const Dashboard = require('./models/Dashboard.js');
 
 
 const LayoutMain = require('./views/LayoutMain');
@@ -152,6 +153,7 @@ app.use(Fulfillment.handleHTTP);
 app.use(Store.handleHTTP);
 app.use(Log.handleHTTP);
 app.use(VSS.handleHTTP);
+app.use(Dashboard.handleHTTP);
 app.use((req, res, next) => {new Signup().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
