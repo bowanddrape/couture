@@ -113,14 +113,22 @@ comments {
   shipments {
     border: none;
   }
+  .announcement, .border-wrap {
+    display: none;
+  }
   .action_bar {
     display: none;
   }
-  .fulfillment_admin > h1 {
-    display: none;
-  }
-  .station_links {
-    display: none;
+  .fulfillment_admin {
+    & > h1, .station_links, .fulfillment_stickers > h2 {
+      display: none;
+    }
+    .fulfillment_stickers {
+      padding: 0;
+    }
+    tab_contents {
+      margin: 0;
+    }
   }
   switch.expanded {
     display: none;
@@ -128,6 +136,10 @@ comments {
   .items, .item {
     page-break-before: always;
     page-break-after: always;
+  }
+  .items.packing_slip, .packing_slip .item {
+    page-break-before: auto;
+    page-break-after: auto;
   }
   .items .product_wrapper .item .preview {
     height: 300px !important;

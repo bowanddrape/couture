@@ -1,5 +1,6 @@
 
 const React = require('react');
+const async = require('async');
 const Shipment = require('./Shipment.jsx');
 const Tabs = require('./Tabs.jsx');
 const Scrollable = require('./Scrollable.jsx');
@@ -8,7 +9,7 @@ const FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-const tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
+const tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
 
 class FulfillShipments extends React.Component {
   constructor(props) {
@@ -47,6 +48,24 @@ class FulfillShipments extends React.Component {
     });
   }
 
+  handleMarkStickersPrinted() {
+    let api_calls = this.state.needs_stickers.map((shipment) => {
+      return (callback) => {
+        BowAndDrape.api("POST", "/shipment/tagcontent", {
+          id: shipment.id,
+          content_index: "*",
+          add_tags: ["needs_picking","sticker printed"],
+          remove_tags: ["needs_stickers"],
+        }, callback);
+      };
+    });
+    async.parallel(api_calls, (err, results) => {
+      if (err) return alert("error: "+err);
+      console.log(err, results);
+      this.refreshTaggedShipments();
+    });
+  }
+
   render() {
     let fulfillment_stations = null;
     if (typeof(window)!="undefined" && this.props.station_types) {
@@ -66,14 +85,26 @@ class FulfillShipments extends React.Component {
     let tagged_tab_contents = [];
     tagged_tabs.forEach((tag) => {
       // seperate handling for some states
-      if (["stickering"].indexOf(tag)>=0) return;
+      if (["needs_stickers"].indexOf(tag)>=0) {
+        return tagged_tab_contents.push(
+          <shipments key={tagged_tab_contents.length} className="fulfillment_stickers" name={tag+" "+this.state.needs_stickers.length}>
+            <h2>{tag}</h2>
+            <div className="action_bar">
+              <button onClick={this.handleMarkStickersPrinted.bind(this)}>
+                Done printing
+              </button>
+            </div>
+            <FulfillmentStickers shipments={this.state.needs_stickers} />
+          </shipments>
+        );
+      }
 
       let tab_contents = [];
       this.state[tag.replace(/-/g,"")].forEach((shipment, index) => {
         // ignore dupe shipments
         if (this.state[tag.replace(/-/g,"")].findIndex((s)=>{return s.id==shipment.id})!=index) return;
         tab_contents.push(
-          <Shipment key={tab_contents.length} fulfillment={true} edit_tags={true} {...shipment} />
+          <Shipment key={shipment.id} fulfillment={true} edit_tags={true} {...shipment} />
         );
       });
       tagged_tab_contents.push(
@@ -89,12 +120,6 @@ class FulfillShipments extends React.Component {
         <h1>Store "{this.props.store.props.name}"</h1>
         {fulfillment_stations}
         <Tabs onChange={this.refreshTaggedShipments.bind(this)}>
-{/* TODO do this
-          <shipments name={"Needs Stickers"+this.state.stickering.length}>
-            <h2>Needs Stickers</h2>
-            <FulfillmentStickers shipments={this.state.stickering} />
-          </shipments>
-*/}
           {tagged_tab_contents}
           <shipments>
             <h2>In Transit</h2>
