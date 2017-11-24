@@ -66439,7 +66439,8 @@ var Items = function (_React$Component) {
         var contents = JSON.parse(JSON.stringify(_this4.state.contents));
         ItemUtils.applyPromoCode(contents, promo, function (err, items) {
           if (err) return Errors.emitError("promo", err.toString());
-          _this4.updateContents(items);
+          //this.updateContents(items);
+          BowAndDrape.cart_menu.update(items);
         });
       });
     }

@@ -137,7 +137,8 @@ class Items extends React.Component {
       let contents = JSON.parse(JSON.stringify(this.state.contents));
       ItemUtils.applyPromoCode(contents, promo, (err, items) => {
         if (err) return Errors.emitError("promo", err.toString());
-        this.updateContents(items);
+        //this.updateContents(items);
+        BowAndDrape.cart_menu.update(items);
       });
     });
   }
