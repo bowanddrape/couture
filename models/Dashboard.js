@@ -44,26 +44,65 @@ class Dashboard {
     let stop_date = searchParams["stop"];
 
     let queriesObj = {
-      sum: {
-        string: "SELECT sum(cast(payments#>>'{0, price}' as float)/100) FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3",
-        props: [start_date, stop_date, 'e03d3875-d349-4375-8071-40928aa625f5'],
+      getPayments: {
+        query:{
+          type: "sum",
+          string: "SELECT sum(cast(payments#>>'{0, price}' as float)/100) FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3",
+          props: [start_date, stop_date, 'e03d3875-d349-4375-8071-40928aa625f5'],
+        },
+        format:{
+          title: "Payments Sum",
+          columnNames: ["Total"],
+          type: "sum",
+          columns: 1,
+        },
+      },
+      getInventory: {
+        query: {
+          type: "inventory",
+          string: "SELECT inventory FROM inventory WHERE facility_id=$1",
+          props: ['988e00d0-4b27-4ab4-ac00-59fcba6847d1'],
+        },
+        format: {
+          title: "Inventory",
+          columnNames: ["Item", "Quantity"],
+          type: "inventory",
+          columns: 2,
+        },
       },
     };
 
     let queries = [];
-  	for (let query in queriesObj) {
-    	if (queriesObj.hasOwnProperty(query)) {
+  	for (let queryType in queriesObj) {
+    	if (queriesObj.hasOwnProperty(queryType)) {
         queries.push((callback) => {
-          SQLTable.sqlQuery(null, queriesObj[query]["string"], queriesObj[query]["props"], callback)
+          SQLTable.sqlQuery(null, queriesObj[queryType]["query"]["string"], queriesObj[queryType]["query"]["props"], callback)
         });
       }
   	}
-    // TODO Add more queries
+
     async.parallel(queries, (err, results) => {
       // results[0] should be the results from the callback of the 0th query
-      metricsCallback(null, results[0]);
+      // format our data before sending it along
+      let metrics = [];
+      results.forEach((result)=>{
+        // return rows and format
+        for (let queryType in queriesObj){
+          let type = queriesObj[queryType]["query"]["type"];
+          let fieldType = result["fields"][0]["name"];
+          // check for match between queriesObj and result
+          if (fieldType === type){
+            metrics.push({
+              format: Object.assign({},queriesObj[queryType]["format"]),
+              data: result["rows"],
+            });
+          }
+        }
+      });
+      metricsCallback(null, metrics);
     });
   }
+
 
   static handleGET(req, res) {
     // Manages all GET requests to /dashboard
