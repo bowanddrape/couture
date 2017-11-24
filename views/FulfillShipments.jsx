@@ -61,7 +61,6 @@ class FulfillShipments extends React.Component {
     });
     async.parallel(api_calls, (err, results) => {
       if (err) return alert("error: "+err);
-      console.log(err, results);
       this.refreshTaggedShipments();
     });
   }

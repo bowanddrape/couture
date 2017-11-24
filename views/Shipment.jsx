@@ -51,6 +51,18 @@ class Shipment extends React.Component {
     shipment.to_id = id;
     shipment.received = Math.round(new Date().getTime()/1000);
     BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
+      if (sink == "canceled") {
+        BowAndDrape.api("POST", "/shipment/tagcontent", {
+          id: this.props.id,
+          content_index: "*",
+          add_tags: ["canceled"],
+          remove_tags: ["new", "needs_embroidery", "needs_airbrush", "at_embroidery", "at_airbrush", "on_hold", "needs_picking"],
+        }, (err, results) =>  {
+          BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
+            this.setState({hidden:true});
+          });
+        });
+      }
       this.setState(shipment);
     });
   }

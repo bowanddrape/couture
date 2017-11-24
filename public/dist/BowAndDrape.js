@@ -64756,7 +64756,6 @@ var FulfillShipments = function (_React$Component) {
       });
       async.parallel(api_calls, function (err, results) {
         if (err) return alert("error: " + err);
-        console.log(err, results);
         _this3.refreshTaggedShipments();
       });
     }
@@ -70333,6 +70332,18 @@ var Shipment = function (_React$Component) {
       shipment.to_id = id;
       shipment.received = Math.round(new Date().getTime() / 1000);
       BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
+        if (sink == "canceled") {
+          BowAndDrape.api("POST", "/shipment/tagcontent", {
+            id: _this2.props.id,
+            content_index: "*",
+            add_tags: ["canceled"],
+            remove_tags: ["new", "needs_embroidery", "needs_airbrush", "at_embroidery", "at_airbrush", "on_hold", "needs_picking"]
+          }, function (err, results) {
+            BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
+              _this2.setState({ hidden: true });
+            });
+          });
+        }
         _this2.setState(shipment);
       });
     }
