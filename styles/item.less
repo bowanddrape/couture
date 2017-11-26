@@ -45,6 +45,17 @@
           font-weight: normal;
         }
       }
+
+      .preview {
+        height: auto;
+        width: 50%;
+      }
+      @media (min-width: @desktop_min_width) {
+        .preview {
+          height: auto;
+          width: 50%;
+        }
+      }
       .price {
         display: none;
       }
@@ -160,4 +171,9 @@
       margin-top: 0;
     }
   }
+
+  .fulfillmentStation .items .product_wrapper {
+      grid-column: span 6;
+    }
 }
+

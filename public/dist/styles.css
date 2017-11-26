@@ -611,6 +611,16 @@ comments message {
   font-size: 15px;
   font-weight: normal;
 }
+.items .product_wrapper .item.fulfillment .preview {
+  height: auto;
+  width: 50%;
+}
+@media (min-width: 1000px) {
+  .items .product_wrapper .item.fulfillment .preview {
+    height: auto;
+    width: 50%;
+  }
+}
 .items .product_wrapper .item.fulfillment .price {
   display: none;
 }
@@ -708,6 +718,9 @@ comments message {
     grid-column: span 2;
     padding: 0 0 0 40px;
     margin-top: 0;
+  }
+  .fulfillmentStation .items .product_wrapper {
+    grid-column: span 6;
   }
 }
 customize {

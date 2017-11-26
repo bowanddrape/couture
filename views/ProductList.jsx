@@ -192,7 +192,7 @@ class ProductList extends React.Component {
             <script dangerouslySetInnerHTML={{__html: `
             window.hlFbmPluginInit = function() {
                 /* Include product title and price here */
-                var product_info = {title:"${product.props.name}", price:${product.props.price}};
+                var product_info = {title:"${product.props.name}", price:"${product.props.price}"};
                 window.hl_fbm_add_to_cart = new HlFbmPlugin("add_to_cart", product_info);
             }
             `}} ></script>

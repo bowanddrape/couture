@@ -262,11 +262,6 @@ class Page extends JSONAPI {
         gtag('js', new Date());
         gtag('config', 'UA-52623236-1');
         gtag('event', 'page_view');
-        gtag('event', 'conversion', {
-          send_to: 'AW-995909245/xQ9LCNm2p3kQ_bzx2gM',
-          value: 1.0,
-          currency: 'USD',
-        });
       </script>
       <!-- End Google Analytics -->
 
