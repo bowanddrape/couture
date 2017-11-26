@@ -105,7 +105,7 @@ class Items extends React.Component {
     ItemUtils.recurseAssembly(items, (component) => {
       // hardcoded defaults, if not set.
       let default_manufacture_time = {
-        parallel: 7,
+        parallel: 5,
         serial: 0,
       }
       // FIXME
@@ -113,7 +113,7 @@ class Items extends React.Component {
       if (/letter_embroidery/.test(component.sku))
         default_manufacture_time.parallel = 10;
       if (/letter_airbrush/.test(component.sku))
-        default_manufacture_time.parallel = 15;
+        default_manufacture_time.parallel = 10;
       // extract the manufacture_time for this component
       let manufacture_time = component.props.manufacture_time || {};
       manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;

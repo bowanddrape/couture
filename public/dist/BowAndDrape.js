@@ -66459,12 +66459,12 @@ var Items = function (_React$Component) {
       ItemUtils.recurseAssembly(items, function (component) {
         // hardcoded defaults, if not set.
         var default_manufacture_time = {
-          parallel: 7,
+          parallel: 5,
           serial: 0
           // FIXME
           // embroidery and airbrush will take longer, too lazy to update the db
         };if (/letter_embroidery/.test(component.sku)) default_manufacture_time.parallel = 10;
-        if (/letter_airbrush/.test(component.sku)) default_manufacture_time.parallel = 15;
+        if (/letter_airbrush/.test(component.sku)) default_manufacture_time.parallel = 10;
         // extract the manufacture_time for this component
         var manufacture_time = component.props.manufacture_time || {};
         manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
