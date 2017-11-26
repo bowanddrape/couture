@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
+      "/home/default/bowndrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -62940,6 +62940,8 @@ var Cart = function (_React$Component) {
           // save our successfully placed order payload
           _this3.order_payload = payload;
 
+          // headliner labs track event
+          window.hl_fbm_checkout.optIn();
           // google track event
           try {
             var total_price = ItemUtils.getPrice(resp.shipment.contents);
@@ -63130,7 +63132,9 @@ var Cart = function (_React$Component) {
             BADButton,
             { className: 'primary checkout_btn', onClick: this.handlePay.bind(this) },
             'Get it!'
-          )
+          ),
+          React.createElement('div', { id: 'hl-fbm-checkout' }),
+          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          window.hlFbmPluginInit = function() {window.hl_fbm_checkout = new HlFbmPlugin("checkout", {});}\n        ' } })
         ),
         React.createElement('script', { type: 'text/javascript', src: 'https://js.stripe.com/v2/' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          if ("' + process.env.STRIPE_KEY + '"!="undefined")\n            Stripe.setPublishableKey("' + process.env.STRIPE_KEY + '");\n        ' } }),
@@ -69636,7 +69640,9 @@ var ProductList = function (_React$Component) {
             BADButton,
             { className: 'primary addCart', onClick: this.handleAddToCart.bind(this, product) },
             'Add To Cart'
-          )
+          ),
+          React.createElement('div', { id: 'hl-fbm-add_to_cart' }),
+          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n            window.hlFbmPluginInit = function() {\n                /* Include product title and price here */\n                var product_info = {title:"' + product.props.name + '", price:"' + product.props.price + '"};\n                window.hl_fbm_add_to_cart = new HlFbmPlugin("add_to_cart", product_info);\n            }\n            ' } })
         ),
         product.props.details ? React.createElement('div', { className: 'product_details grid', dangerouslySetInnerHTML: {
             __html: unescape(product.props.details)
@@ -69769,6 +69775,9 @@ var ProductList = function (_React$Component) {
       item.props.image = '/store/' + this.props.store.id + '/preview?c=' + encodeURIComponent(query_params.c);
 
       BowAndDrape.cart_menu.add(item);
+
+      // headliner labs track event
+      window.hl_fbm_add_to_cart.optIn();
 
       // google track event
       try {
