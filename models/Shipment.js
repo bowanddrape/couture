@@ -59,6 +59,10 @@ class Shipment extends JSONAPI {
     if (req.method=='GET' && req.user)
       return true;
 
+    // allow anyone to get shipping quote
+    if (req.path=="/shipment/quote")
+      return true;
+
     return super.hasApiPermission(req, res);
   }
 
@@ -83,9 +87,11 @@ class Shipment extends JSONAPI {
       let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE props#>>'{imported}' IS NULL) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $1`; 
       return SQLTable.sqlQuery(Shipment, query, [tag], (err, shipments) => {
         // remove an extra field we made just for the db select
-        shipments.forEach((shipment) => {
-          delete shipment.content_array;
-        });
+        if (shipments) {
+          shipments.forEach((shipment) => {
+            delete shipment.content_array;
+          });
+        }
         res.json(shipments);
       });
     }
@@ -97,14 +103,24 @@ class Shipment extends JSONAPI {
   onApiSave(req, res, object, callback) {
     // if this was a request for shipping rates, return that instead
     if (req.path=="/shipment/quote") {
-      return this.constructor.get(object.id, (err, shipment) => {
-        if (err) return res.status(400).json({error:err});
-        ShipProvider.quote(shipment, (err, rates) => {
+      if (object.id) {
+        return this.constructor.get(object.id, (err, shipment) => {
           if (err) return res.status(400).json({error:err});
-          res.json(rates);
+          ShipProvider.quote(shipment, (err, rates) => {
+            if (err) return res.status(400).json({error:err});
+            res.json(rates);
+          });
         });
+      } // has shipment.id
+
+      if (!object.contents || !object.address)
+        return res.status(400).json({error:"malformed shippingrate query"});
+
+      return ShipProvider.quote(object, (err, rates) => {
+        if (err) return res.status(400).json({error:err});
+        res.json(rates);
       });
-    }
+    } // /shipment/quote
 
     // if this was a request to buy a label, do that
     if (req.path=="/shipment/buylabel") {

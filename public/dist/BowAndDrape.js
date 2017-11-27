@@ -62731,7 +62731,9 @@ var Cart = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Cart.__proto__ || Object.getPrototypeOf(Cart)).call(this, props));
 
     _this.state = {
-      user: {},
+      user: {
+        credits: 0
+      },
       no_login_prompt: false,
       items: _this.props.items,
       card: {
@@ -62762,7 +62764,8 @@ var Cart = function (_React$Component) {
         country: ""
       },
       processing_payment: false,
-      done: false
+      done: false,
+      promo: { code: "", props: {} }
     };
 
     if (!_this.props.store[0].id) {
@@ -62775,7 +62778,6 @@ var Cart = function (_React$Component) {
     key: 'componentDidMount',
     // preprocessProps()
 
-
     value: function componentDidMount() {
       var _this2 = this;
 
@@ -62784,6 +62786,7 @@ var Cart = function (_React$Component) {
         BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
       }
       BowAndDrape.dispatcher.on("user", function (user) {
+        if (!user) user = { credits: 0 };
         _this2.setState({ user: user });
         if (!user.email) return;
         // if the user is signed in, get latest shipping/billing info
@@ -62799,18 +62802,72 @@ var Cart = function (_React$Component) {
           }
           _this2.setState({ shipping: shipping, billing: billing, same_billing: same_billing });
         });
-        if (_this2.refs.Items) _this2.refs.Items.updateCredit(user.credits);
       });
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      if (this.state.shipping.street != prevState.shipping.street) {
+        this.updateNonProductItems();
+      }
     }
   }, {
     key: 'updateContents',
     value: function updateContents(items) {
+      var _this3 = this;
+
       Errors.clear();
       items = items || [];
-
-      this.setState({ items: items });
+      var promo = { code: "", props: {} };
+      items.forEach(function (item) {
+        if (item.props && /^promo/i.test(item.props.name)) {
+          promo = item;
+        }
+      });
+      this.setState({ items: items, promo: promo }, function () {
+        _this3.updateNonProductItems();
+      });
 
       if (!items.length) Errors.emitError(null, "Cart is empty");
+    }
+  }, {
+    key: 'updateNonProductItems',
+    value: function updateNonProductItems() {
+      var _this4 = this;
+
+      ItemUtils.updatePromo(this.state.items, this.state.promo, function (err, items, promo) {
+        // update shipping line
+        ItemUtils.updateShipping(items, _this4.state.shipping, promo, function (err, items) {
+          if (err) return Errors.emit(null, err);
+          // update account credit line
+          _this4.setState(function (prevState) {
+            ItemUtils.applyCredits(_this4.state.user.credits, items);
+            return { items: items };
+          });
+        });
+      });
+    }
+
+    // user is typing a change to the promo code
+
+  }, {
+    key: 'handleUpdatePromoCode',
+    value: function handleUpdatePromoCode(code) {
+      this.setState(function (prev_state) {
+        prev_state.promo.code = code;
+        prev_state.promo.props.name = "Promo: " + code;
+        return { promo: prev_state.promo };
+      });
+    }
+  }, {
+    key: 'handleApplyPromoCode',
+    value: function handleApplyPromoCode() {
+      var update_cart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      if (!BowAndDrape) return;
+      var items = JSON.parse(JSON.stringify(this.state.items));
+      items.push(this.state.promo);
+      BowAndDrape.cart_menu.update(items);
     }
   }, {
     key: 'handleToggleSameBilling',
@@ -62842,16 +62899,24 @@ var Cart = function (_React$Component) {
   }, {
     key: 'handleSetSectionState',
     value: function handleSetSectionState(section, state) {
+      var _this5 = this;
+
       var update = {};
       if (section) {
         var prev_state = this.state[section] || {};
         update[section] = Object.assign(prev_state, state);
-        // special handling for shipping to display warning about customs
-        // TODO put this somewhere else (maybe in render()?)
         if (section == "shipping") {
+          // special handling for shipping to display warning about customs
           if (state.country) {
             if (update[section].country != "USA") Errors.emitError("shipping", "Bow & Drape is not responsible for any additional import fees that arise after the item has left the United States");
           }
+
+          // update shipping quote as well
+          return this.setState(update, function () {
+            ItemUtils.updateShipping(_this5.state.items, _this5.state.shipping, _this5.state.promo, function (err, items) {
+              _this5.setState({ items: items });
+            });
+          });
         }
         this.setState(update);
       }
@@ -62902,7 +62967,7 @@ var Cart = function (_React$Component) {
   }, {
     key: 'handlePay',
     value: function handlePay() {
-      var _this3 = this;
+      var _this6 = this;
 
       // clear out errors so we can fill them with new ones
       Errors.clear();
@@ -62913,7 +62978,11 @@ var Cart = function (_React$Component) {
 
       // make sure we have all the mandatory data we need
       if (!this.state.shipping.email) {
-        Errors.emitError("shipping", "Pease enter email address");
+        Errors.emitError("shipping", "Please enter email address");
+        return this.setState({ processing_payment: false });
+      }
+      if (!this.state.shipping.name) {
+        Errors.emitError("shipping", "Please enter name");
         return this.setState({ processing_payment: false });
       }
       if (!this.state.shipping.street) {
@@ -62933,15 +63002,19 @@ var Cart = function (_React$Component) {
       var placeOrder = function placeOrder(payload) {
         BowAndDrape.api("POST", "/order", payload, function (err, resp) {
           if (err) {
-            _this3.setState({ processing_payment: false });
+            _this6.setState({ processing_payment: false });
             return Errors.emitError(null, err);
           }
 
           // save our successfully placed order payload
-          _this3.order_payload = payload;
+          _this6.order_payload = payload;
 
           // headliner labs track event
-          window.hl_fbm_checkout.optIn();
+          try {
+            window.hl_fbm_checkout.optIn();
+          } catch (err) {
+            console.log(err);
+          }
           // google track event
           try {
             var total_price = ItemUtils.getPrice(resp.shipment.contents);
@@ -62964,7 +63037,7 @@ var Cart = function (_React$Component) {
           }
           // facebook track event
           try {
-            var _total_price = ItemUtils.getPrice(_this3.order_payload.contents);
+            var _total_price = ItemUtils.getPrice(_this6.order_payload.contents);
             var facebook_content_ids = resp.shipment.contents.map(function (item) {
               return item.sku;
             }).filter(function (sku) {
@@ -62981,7 +63054,7 @@ var Cart = function (_React$Component) {
           }
 
           BowAndDrape.cart_menu.update([]);
-          _this3.setState({ done: true });
+          _this6.setState({ done: true });
           // we need to update the user, as account credits may have changed
           BowAndDrape.api("POST", "/user/login", {}, function (err, resp) {
             BowAndDrape.dispatcher.handleAuth(resp);
@@ -62999,7 +63072,7 @@ var Cart = function (_React$Component) {
       // initiate the billing
       payment_method_client.getClientNonce(this.props.payment_authorization, this.state, function (err, payment_nonce) {
         if (err) {
-          _this3.setState({ processing_payment: false });
+          _this6.setState({ processing_payment: false });
           Errors.emitError("card", err);
           return;
         }
@@ -63011,7 +63084,7 @@ var Cart = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this7 = this;
 
       if (this.state.done) {
         if (document) document.querySelector("body").scrollTop = 0;
@@ -63047,9 +63120,12 @@ var Cart = function (_React$Component) {
         React.createElement(Items, {
           ref: 'Items',
           contents: this.state.items,
+          promo: this.state.promo,
           onUpdate: function onUpdate(items) {
-            _this4.setState({ items: items });
+            _this7.setState({ items: items });
           },
+          handleUpdatePromoCode: this.handleUpdatePromoCode.bind(this),
+          handleApplyPromoCode: this.handleApplyPromoCode.bind(this, true),
           is_cart: 'true'
         }),
         this.state.user.email ? null : React.createElement(
@@ -64500,7 +64576,7 @@ var Errors = function (_React$Component) {
       // no listeners server side, obviously
       if (!BowAndDrape) return;
       var appendMessage = function appendMessage(message) {
-        console.log("handling error message: " + message);
+        console.log(_this2.props.label + " handling error message: " + message);
         _this2.setState(function (prevState) {
           var errors = prevState.errors.slice(0);
           if (errors.indexOf(message) < 0) errors.push(message);
@@ -65652,7 +65728,7 @@ var InputAddress = function (_React$Component) {
         for (var i = 0; i < place_fields.length; i++) {
           var element = parse_place.querySelector('.' + place_fields[i]);
           var key = place_fields[i].replace(/-.*/, "");
-          if (element) address[key] = element.innerHTML;
+          if (element) address[key] = element.innerHTML;else address[key] = "";
         }
         _this2.handleSetSectionState(address);
       });
@@ -66180,7 +66256,7 @@ var Item = function (_React$Component) {
           ) : null,
           assembly,
           this.props.sku ? React.createElement(Price, { price: this.props.props.price, quantity: quantity }) : null,
-          React.createElement(Price, { price: this.props.props.price * quantity })
+          React.createElement(Price, { total: true, price: this.props.props.price, quantity: quantity })
         )
       );
     }
@@ -66212,6 +66288,8 @@ module.exports = Item;
 
 },{"./ItemUtils.js":302,"./Price.jsx":320,"react":219}],302:[function(require,module,exports){
 "use strict";
+
+var Errors = require('./Errors.jsx');
 
 var recurseAssembly = function recurseAssembly(component, foreach) {
   if (!component) return;
@@ -66270,6 +66348,13 @@ var applyPromoCode = function applyPromoCode(items, promo, callback) {
   // TODO if the promo is a percent, maybe decrease the cost of cart items (for tax)
   // figure out value of our promo
   promo.props.price = -1 * Math.max(Math.round(total_price * promo.props.percent) / 100 || 0, promo.props.absolute || 0);
+  // special hardcoded logic for "presents" promo
+  if (promo.code.toLowerCase() == "presents") {
+    promo.props.price = 0;
+    if (total_price > 100) promo.props.price = -24;
+    if (total_price > 200) promo.props.price = -50;
+    if (total_price > 300) promo.props.price = -100;
+  }
   if (!new RegExp("^promo:", "i").test(promo.props.name)) {
     promo.props.name = "Promo: " + (promo.props.name || promo.code);
   }
@@ -66294,7 +66379,7 @@ var applyCredits = function applyCredits(credits, items) {
     props: {
       name: "Account balance",
       price: -1 * credit_price,
-      description: credits - credit_price + " remaining in balance"
+      info: "$" + credit_price + " applied, $" + (credits - credit_price) + " remaining"
     }
   });
 };
@@ -66316,16 +66401,121 @@ var countBusinessDays = function countBusinessDays(days) {
   return time / 1000;
 };
 
+var querying_promo = null;
+var updatePromo = function updatePromo(contents, promo, callback) {
+  if (querying_promo) querying_promo.abort();
+  Errors.clear("promo");
+
+  // only one promo code at a time, remove any previous ones
+  contents.forEach(function (item, index) {
+    if (new RegExp("^promo:", "i").test(item.props.name)) contents.splice(index, 1);
+  });
+
+  if (!promo || !promo.code) return callback(null, contents, promo);
+
+  querying_promo = BowAndDrape.api("GET", "/promocode", { code: promo.code.toLowerCase() }, function (err, result) {
+    querying_promo = null;
+    if (!err && !result.length) err = "No such promo code";
+    if (err) {
+      Errors.emitError("promo", err.toString());
+      if (promo && promo.props && promo.props.name) {
+        promo.props.price = "N/A";
+        promo.props.info = err.toString();
+        contents.push(promo);
+      }
+      return callback(null, contents, promo);
+    }
+    promo = result[0];
+    applyPromoCode(contents, promo, function (err, items) {
+      if (err) {
+        Errors.emitError("promo", err.toString());
+      }
+      return callback(null, contents, promo);
+    });
+  });
+};
+
+var querying_shipment_rate = null;
+var updateShipping = function updateShipping(contents, address, promo, callback) {
+  if (querying_shipment_rate) {
+    querying_shipment_rate.abort();
+  }
+  // default shipping quote.
+  var shipping_quote = {
+    days: 5,
+    amount: 7,
+    currency_local: "USD"
+    // remove any previous shipping line
+  };contents.forEach(function (item, index) {
+    if (/^Shipping /.test(item.props.name)) return contents.splice(index, 1);
+  });
+  // doesn't cost anything to ship nothing
+  if (!contents.length) return callback(null, contents);
+
+  if (!address || !address.name || !address.street || !address.country) {
+    contents.push({
+      props: {
+        name: "Shipping & Handling:",
+        price: "enter address for quote"
+      }
+    });
+    return callback(null, contents);
+  }
+
+  // TODO show that we're quoting shipping, cancel previous quote when quoting
+  querying_shipment_rate = BowAndDrape.api("POST", "/shipment/quote", {
+    contents: contents,
+    address: address
+  }, function (err, response) {
+    // mark as done quoting
+    querying_shipment_rate = null;
+    // go based on the first quote we see
+    if (response && response.length) shipping_quote = response[0];
+    var shipping_cost = shipping_quote.amount;
+    var shipping_info = "";
+    // min shipping cost is 7
+    if (shipping_cost < 7) shipping_cost = 7;
+    // domestic orders may conditionally get free shipping
+    var domestic = address.country.toLowerCase().trim() == "usa" || address.country.toLowerCase().trim() == "united states";
+    if (domestic) {
+      // apply free shipping promos
+      if (promo && promo.props && promo.props.free_ship) {
+        shipping_cost = 0;
+        shipping_info = "Promo eligible for free shipping!";
+      }
+      // free domestic shipping for 75+ orders
+      var total_price = getPrice(contents, function (item) {
+        // only count product
+        return !!item.sku;
+      });
+      if (total_price >= 75) {
+        shipping_cost = 0;
+        shipping_info = "Free domestic shipping on orders of $75!";
+      }
+    } // if (domestic)
+    contents.push({
+      props: {
+        name: "Shipping & Handling:",
+        price: shipping_cost,
+        info: shipping_info
+      }
+    });
+    return callback(null, contents);
+  });
+};
+
 module.exports = {
   recurseAssembly: recurseAssembly,
   recurseOptions: recurseOptions,
   getPrice: getPrice,
   applyPromoCode: applyPromoCode,
+  updatePromo: updatePromo,
   applyCredits: applyCredits,
-  countBusinessDays: countBusinessDays
+  countBusinessDays: countBusinessDays,
+  updateShipping: updateShipping
 };
 
-},{}],303:[function(require,module,exports){
+},{"./Errors.jsx":293}],303:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -66359,17 +66549,15 @@ var Items = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Items.__proto__ || Object.getPrototypeOf(Items)).call(this, props));
 
-    _this.state = { expanded: false,
+    _this.state = {
+      expanded: false,
       contents: _this.props.contents || [],
       shipping_quote: {
         days: 5,
         amount: 7,
         currency_local: "USD"
       },
-      promo: {
-        code: ""
-      },
-      account_credit: 0
+      promo: _this.props.promo || { code: "" }
     };
     return _this;
   }
@@ -66380,71 +66568,9 @@ var Items = function (_React$Component) {
       if (next_props.contents) {
         this.setState({ contents: next_props.contents });
       }
-    }
-
-    // TODO maybe put this in ItemUtils.js
-
-  }, {
-    key: 'updateShipping',
-    value: function updateShipping(callback) {
-      var _this2 = this;
-
-      if (!this.props.is_cart) return;
-      this.setState(function (prevState) {
-        var contents = JSON.parse(JSON.stringify(prevState.contents));
-        // TODO maybe get a new shipping quote. Hardcoded for now
-        var shipping_quote = prevState.shipping_quote;
-        // remove any previous shipping line
-        contents.forEach(function (item, index) {
-          if (/^Shipping /.test(item.props.name)) return contents.splice(index, 1);
-        });
-        // doesn't cost anything to ship nothing
-        if (!contents.length) {
-          return { contents: contents };
-        }
-        var total_price = ItemUtils.getPrice(contents, function (item) {
-          // don't include account credits in this price
-          if (new RegExp("^Account balance", "i").test(item.props.name)) return false;
-          return true;
-        });
-        var shipping_cost = shipping_quote.amount;
-        // free domestic shipping for 75+ orders
-        if (total_price >= 75 && shipping_quote.currency_local.toLowerCase() == "usd") shipping_cost = 0;
-        if (_this2.state.promo.props && _this2.state.promo.props.free_ship) shipping_cost = 0;
-        contents.push({
-          props: {
-            name: "Shipping & Handling:",
-            price: shipping_cost
-          }
-        });
-        return { contents: contents };
-      }, callback); // this.setState()
-    }
-  }, {
-    key: 'updateCredit',
-    value: function updateCredit(credit) {
-      this.setState({ account_credit: credit });
-    }
-  }, {
-    key: 'updateContents',
-    value: function updateContents(contents) {
-      var _this3 = this;
-
-      contents = contents || [];
-      this.setState({ contents: contents }, function () {
-        // update shipping line
-        _this3.updateShipping(function () {
-          // update account credit line
-          _this3.setState(function (prevState) {
-            var contents = JSON.parse(JSON.stringify(prevState.contents));
-            ItemUtils.applyCredits(prevState.account_credit, contents);
-            return { contents: contents };
-          }, function () {
-            // as a final callback, call onUpdate from parent?
-            if (_this3.props.onUpdate) _this3.props.onUpdate(contents);
-          });
-        });
-      });
+      if (next_props.promo) {
+        this.setState({ promo: next_props.promo });
+      }
     }
 
     // TODO maybe put this in ItemUtils.js
@@ -66465,6 +66591,7 @@ var Items = function (_React$Component) {
           // embroidery and airbrush will take longer, too lazy to update the db
         };if (/letter_embroidery/.test(component.sku)) default_manufacture_time.parallel = 10;
         if (/letter_airbrush/.test(component.sku)) default_manufacture_time.parallel = 10;
+        component.props = component.props || {};
         // extract the manufacture_time for this component
         var manufacture_time = component.props.manufacture_time || {};
         manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
@@ -66476,34 +66603,14 @@ var Items = function (_React$Component) {
       return days_needed_parallel + days_needed_serial;
     }
   }, {
-    key: 'handleApplyDiscountCode',
-    value: function handleApplyDiscountCode() {
-      var _this4 = this;
-
-      if (!BowAndDrape) return;
-      BowAndDrape.api("GET", "/promocode", { code: this.state.promo.code.toLowerCase() }, function (err, result) {
-        if (err) return Errors.emitError("promo", err.toString());
-        if (!result.length) return Errors.emitError("promo", "no such promo code");
-        var promo = result[0];
-        _this4.setState({ promo: promo });
-        // FIXME this is a race as contents could be modified between
-        // clone and set, but I can't figure out how to wrap this properly
-        var contents = JSON.parse(JSON.stringify(_this4.state.contents));
-        ItemUtils.applyPromoCode(contents, promo, function (err, items) {
-          if (err) return Errors.emitError("promo", err.toString());
-          //this.updateContents(items);
-          BowAndDrape.cart_menu.update(items);
-        });
-      });
-    }
-  }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this2 = this;
 
       var line_items = [];
       var summary_items = [];
       var has_promo = false;
+      var promo_errors = [];
       var total_num_products = 0;
       var subtotal = 0;
       var total_price = 0;
@@ -66517,10 +66624,11 @@ var Items = function (_React$Component) {
 
       // get list totals
       for (var i = 0; i < this.state.contents.length; i++) {
+        if (!this.state.contents[i].props) continue;
         var quantity = this.state.contents[i].quantity || 1;
-        total_price += quantity * this.state.contents[i].props.price;
+        if (!isNaN(parseFloat(this.state.contents[i].props.price))) total_price += quantity * parseFloat(this.state.contents[i].props.price);
         if (this.state.contents[i].sku) {
-          subtotal += quantity * this.state.contents[i].props.price;
+          subtotal += quantity * parseFloat(this.state.contents[i].props.price);
           total_num_products += quantity;
         }
       }
@@ -66550,7 +66658,9 @@ var Items = function (_React$Component) {
             edit_tags: this.props.edit_tags
           }, this.state.contents[_i])));
         } else {
-          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: summary_items.length }, this.state.contents[_i], { onRemove: remove, is_email: this.props.is_email })));
+          var key = summary_items.length;
+          if (this.state.contents[_i].props && this.state.contents[_i].props.name) key = this.state.contents[_i].props.name;
+          summary_items.push(React.createElement(Item, _extends({ style: style_summary, key: key }, this.state.contents[_i], { onRemove: remove, is_email: this.props.is_email })));
         }
       }
 
@@ -66620,28 +66730,28 @@ var Items = function (_React$Component) {
                 React.createElement(Price, { style: style_summary.price_total, price: total_price })
               )
             ),
+            React.createElement(
+              'div',
+              { style: style_summary.img_preview_container },
+              React.createElement(Errors, { label: 'promo' })
+            ),
             has_promo || !this.props.is_cart ? null : React.createElement(
               'div',
               { className: 'item promo', style: Object.assign({}, style_summary.item, { padding: "none" }) },
               React.createElement(
                 'div',
-                { style: style_summary.img_preview_container },
-                React.createElement(Errors, { label: 'promo' })
-              ),
-              React.createElement(
-                'div',
                 { className: 'promo_input', style: style_summary.deets },
                 React.createElement('input', { placeholder: 'Promo code', className: 'clearInput', type: 'text', value: this.state.promo.code, onChange: function onChange(event) {
-                    _this5.setState({ promo: { code: event.target.value } });
+                    _this2.props.handleUpdatePromoCode(event.target.value);
                   }, onKeyUp: function onKeyUp(event) {
                     if (event.which == 13) {
-                      _this5.handleApplyDiscountCode();
+                      _this2.props.handleApplyPromoCode();
                     }
                   } }),
                 React.createElement(
                   'button',
                   { onClick: function onClick() {
-                      _this5.handleApplyDiscountCode();
+                      _this2.props.handleApplyPromoCode();
                     } },
                   'Apply'
                 )
@@ -68644,10 +68754,24 @@ var Price = function (_React$Component) {
   _createClass(Price, [{
     key: "render",
     value: function render() {
-      var price = parseFloat(this.props.price);
       var style = { color: "#000" };
-      if (price < 0) style.color = "#d6492a";
-      if (price == 0) style.opacity = "0.5";
+      var price = this.props.price;
+      if (!isNaN(parseFloat(this.props.price))) {
+        if (this.props.total) {
+          var quantity = this.props.quantity || 1;
+          price *= quantity;
+        }
+        price = parseFloat(this.props.price);
+        if (price < 0) {
+          style.color = "#d6492a";
+          price = "-$" + Math.abs(price).toFixed(2);
+        } else if (price == 0) {
+          style.opacity = "0.5";
+          price = "$" + price.toFixed(2);
+        } else {
+          price = "$" + price.toFixed(2);
+        }
+      }
       style = Object.assign({}, this.props.style, style);
 
       return React.createElement(
@@ -68656,9 +68780,9 @@ var Price = function (_React$Component) {
         React.createElement(
           "span",
           { style: style.price },
-          price ? "$" + price.toFixed(2) : "Free!"
+          price
         ),
-        this.props.quantity ? " x " + this.props.quantity : null
+        this.props.quantity && !this.props.total ? " x " + this.props.quantity : null
       );
     }
   }]);
@@ -69777,7 +69901,11 @@ var ProductList = function (_React$Component) {
       BowAndDrape.cart_menu.add(item);
 
       // headliner labs track event
-      window.hl_fbm_add_to_cart.optIn();
+      try {
+        window.hl_fbm_add_to_cart.optIn();
+      } catch (err) {
+        console.log(err);
+      }
 
       // google track event
       try {
@@ -72236,6 +72364,10 @@ var api = function api(method, endpoint, body, callback) {
     } catch (err) {
       callback("invalid server response =(");
     }
+    if (this.status == 0) {
+      // if this request was aborted, do nothing
+      return;
+    }
     if (this.status != 200) {
       if (response.error) return callback(response.error);
       return callback(response);
@@ -72251,6 +72383,7 @@ var api = function api(method, endpoint, body, callback) {
     });
   } // build payload
   xhr.send(payload);
+  return xhr;
 }; // api
 
 module.exports = {

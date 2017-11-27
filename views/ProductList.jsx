@@ -324,7 +324,9 @@ class ProductList extends React.Component {
     BowAndDrape.cart_menu.add(item);
 
     // headliner labs track event
-    window.hl_fbm_add_to_cart.optIn();
+    try {
+      window.hl_fbm_add_to_cart.optIn();
+    } catch(err) {console.log(err)}
 
     // google track event
     try {

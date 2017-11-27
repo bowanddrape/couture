@@ -32,7 +32,7 @@ class Errors extends React.Component {
     // no listeners server side, obviously
     if (!BowAndDrape) return;
     let appendMessage = (message) => {
-      console.log("handling error message: "+message);
+      console.log(`${this.props.label} handling error message: ${message}`);
       this.setState((prevState) => {
         let errors = prevState.errors.slice(0);
         if (errors.indexOf(message)<0)

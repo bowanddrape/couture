@@ -15,17 +15,15 @@ props:
 class Items extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {      expanded: false,
+    this.state = {
+      expanded: false,
       contents: this.props.contents || [],
       shipping_quote: {
         days: 5,
         amount: 7,
         currency_local: "USD",
       },
-      promo: {
-        code: "",
-      },
-      account_credit: 0,
+      promo: this.props.promo || {code: ""},
     }
   }
 
@@ -33,67 +31,9 @@ class Items extends React.Component {
     if (next_props.contents) {
       this.setState({contents:next_props.contents});
     }
-  }
-
-  // TODO maybe put this in ItemUtils.js
-  updateShipping(callback) {
-    if (!this.props.is_cart) return;
-    this.setState((prevState) => {
-      let contents = JSON.parse(JSON.stringify(prevState.contents));
-      // TODO maybe get a new shipping quote. Hardcoded for now
-      let shipping_quote = prevState.shipping_quote;
-      // remove any previous shipping line
-      contents.forEach((item, index) => {
-        if (/^Shipping /.test(item.props.name))
-          return contents.splice(index, 1);
-      });
-      // doesn't cost anything to ship nothing
-      if (!contents.length) {
-        return ({contents: contents});
-      }
-      let total_price = ItemUtils.getPrice(contents, (item)=>{
-        // don't include account credits in this price
-        if (new RegExp("^Account balance", "i").test(item.props.name))
-          return false;
-        return true;
-      });
-      let shipping_cost = shipping_quote.amount;
-      // free domestic shipping for 75+ orders
-      if (total_price>=75 && shipping_quote.currency_local.toLowerCase()=="usd")
-        shipping_cost = 0;
-      if (this.state.promo.props && this.state.promo.props.free_ship)
-        shipping_cost = 0;
-      contents.push({
-        props: {
-          name: "Shipping & Handling:",
-          price: shipping_cost
-        }
-      });
-      return ({contents: contents});
-    }, callback); // this.setState()
-  }
-
-  updateCredit(credit) {
-    this.setState({account_credit:credit});
-  };
-
-  updateContents(contents) {
-    contents = contents || [];
-    this.setState({contents}, () => {
-      // update shipping line
-      this.updateShipping(() => {
-        // update account credit line
-        this.setState((prevState) => {
-          let contents = JSON.parse(JSON.stringify(prevState.contents));
-          ItemUtils.applyCredits(prevState.account_credit, contents);
-          return ({contents});
-        }, () => {
-          // as a final callback, call onUpdate from parent?
-          if (this.props.onUpdate)
-            this.props.onUpdate(contents);
-        });
-      });
-    });
+    if (next_props.promo) {
+      this.setState({promo:next_props.promo});
+    }
   }
 
   // TODO maybe put this in ItemUtils.js
@@ -114,6 +54,7 @@ class Items extends React.Component {
         default_manufacture_time.parallel = 10;
       if (/letter_airbrush/.test(component.sku))
         default_manufacture_time.parallel = 10;
+      component.props = component.props || {};
       // extract the manufacture_time for this component
       let manufacture_time = component.props.manufacture_time || {};
       manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
@@ -125,28 +66,11 @@ class Items extends React.Component {
     return days_needed_parallel + days_needed_serial;
   }
 
-  handleApplyDiscountCode() {
-    if (!BowAndDrape) return;
-    BowAndDrape.api("GET", "/promocode", {code:this.state.promo.code.toLowerCase()}, (err, result) => {
-      if (err) return Errors.emitError("promo", err.toString());
-      if (!result.length) return Errors.emitError("promo", "no such promo code");
-      let promo = result[0];
-      this.setState({promo: promo});
-      // FIXME this is a race as contents could be modified between
-      // clone and set, but I can't figure out how to wrap this properly
-      let contents = JSON.parse(JSON.stringify(this.state.contents));
-      ItemUtils.applyPromoCode(contents, promo, (err, items) => {
-        if (err) return Errors.emitError("promo", err.toString());
-        //this.updateContents(items);
-        BowAndDrape.cart_menu.update(items);
-      });
-    });
-  }
-
   render() {
     let line_items = [];
     let summary_items = [];
     let has_promo = false;
+    let promo_errors = [];
     let total_num_products = 0;
     let subtotal = 0;
     let total_price = 0;
@@ -160,10 +84,12 @@ class Items extends React.Component {
 
     // get list totals
     for (let i=0; i<this.state.contents.length; i++) {
+      if (!this.state.contents[i].props) continue;
       let quantity = this.state.contents[i].quantity || 1;
-      total_price += quantity * this.state.contents[i].props.price;
+      if (!isNaN(parseFloat(this.state.contents[i].props.price)))
+        total_price += quantity * parseFloat(this.state.contents[i].props.price);
       if (this.state.contents[i].sku) {
-        subtotal += quantity * this.state.contents[i].props.price;
+        subtotal += quantity * parseFloat(this.state.contents[i].props.price);
         total_num_products += quantity;
       }
     }
@@ -197,7 +123,10 @@ class Items extends React.Component {
           />
         );
       } else {
-        summary_items.push(<Item style={style_summary} key={summary_items.length} {...this.state.contents[i]} onRemove={remove} is_email={this.props.is_email}/>);
+        let key = summary_items.length;
+        if (this.state.contents[i].props && this.state.contents[i].props.name)
+          key = this.state.contents[i].props.name;
+        summary_items.push(<Item style={style_summary} key={key} {...this.state.contents[i]} onRemove={remove} is_email={this.props.is_email}/>);
       }
     }
 
@@ -238,16 +167,16 @@ class Items extends React.Component {
               <div style={style_summary.img_preview_container} />
               <div className="deets" style={Object.assign({}, style_summary.deets, {paddingTop: "28px"})}>
                 <span className="sum-bold">Total:</span>
-                <Price  style={style_summary.price_total} price={total_price}/>
+                <Price style={style_summary.price_total} price={total_price}/>
               </div>
             </div>
 
+            <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
             {has_promo || !this.props.is_cart ? null :
               <div className="item promo" style={Object.assign({},style_summary.item,{padding:"none"})}>
-                <div style={style_summary.img_preview_container}><Errors label="promo" /></div>
                 <div className="promo_input" style={style_summary.deets}>
-                  <input placeholder="Promo code" className="clearInput" type="text" value={this.state.promo.code} onChange={(event)=>{this.setState({promo:{code:event.target.value}})}} onKeyUp={(event)=>{if(event.which==13){this.handleApplyDiscountCode()}}}/>
-                  <button onClick={()=>{this.handleApplyDiscountCode()}}>Apply</button>
+                  <input placeholder="Promo code" className="clearInput" type="text" value={this.state.promo.code} onChange={(event)=>{this.props.handleUpdatePromoCode(event.target.value)}} onKeyUp={(event)=>{if(event.which==13){this.props.handleApplyPromoCode()}}}/>
+                  <button onClick={()=>{this.props.handleApplyPromoCode()}}>Apply</button>
                 </div>
               </div>
             }

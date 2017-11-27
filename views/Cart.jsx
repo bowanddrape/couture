@@ -27,7 +27,9 @@ class Cart extends React.Component {
     super(props);
 
     this.state = {
-      user: {},
+      user: {
+        credits: 0,
+      },
       no_login_prompt: false,
       items: this.props.items,
       card: {
@@ -59,6 +61,7 @@ class Cart extends React.Component {
       },
       processing_payment: false,
       done: false,
+      promo: {code:"", props:{}},
     };
 
     if (!this.props.store[0].id) {
@@ -85,13 +88,13 @@ class Cart extends React.Component {
     callback(null, options);
   } // preprocessProps()
 
-
   componentDidMount() {
     if (!this.props.ignoreWebCart) {
       // populate cart contents
       BowAndDrape.dispatcher.on("update_cart", this.updateContents.bind(this));
     }
     BowAndDrape.dispatcher.on("user", (user) => {
+      if (!user) user = {credits:0};
       this.setState({user});
       if (!user.email) return;
       // if the user is signed in, get latest shipping/billing info
@@ -107,19 +110,60 @@ class Cart extends React.Component {
         }
         this.setState({shipping, billing, same_billing});
       });
-      if (this.refs.Items)
-        this.refs.Items.updateCredit(user.credits);
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.shipping.street!=prevState.shipping.street) {
+      this.updateNonProductItems();
+    }
   }
 
   updateContents(items) {
     Errors.clear();
     items = items || [];
-
-    this.setState({items});
+    let promo = {code:"",props:{}};
+    items.forEach((item) => {
+      if (item.props && /^promo/i.test(item.props.name)) {
+        promo = item;
+      }
+    });
+    this.setState({items, promo}, () => {
+      this.updateNonProductItems();
+    });
 
     if (!items.length)
       Errors.emitError(null, "Cart is empty");
+  }
+
+  updateNonProductItems() {
+    ItemUtils.updatePromo(this.state.items, this.state.promo, (err, items, promo) => {
+      // update shipping line
+      ItemUtils.updateShipping(items, this.state.shipping, promo, (err, items) => {
+        if (err) return Errors.emit(null, err);
+        // update account credit line
+        this.setState((prevState) => {
+          ItemUtils.applyCredits(this.state.user.credits, items);
+          return ({items});
+        });
+      });
+    });
+  }
+
+  // user is typing a change to the promo code
+  handleUpdatePromoCode(code) {
+    this.setState((prev_state) => {
+      prev_state.promo.code = code;
+      prev_state.promo.props.name = "Promo: "+code;
+      return ({promo: prev_state.promo});
+    });
+  }
+
+  handleApplyPromoCode(update_cart = false) {
+    if (!BowAndDrape) return;
+    let items = JSON.parse(JSON.stringify(this.state.items));
+    items.push(this.state.promo);
+    BowAndDrape.cart_menu.update(items);
   }
 
   handleToggleSameBilling(e) {
@@ -149,13 +193,19 @@ class Cart extends React.Component {
     if (section) {
       let prev_state = this.state[section] || {};
       update[section] = Object.assign(prev_state, state);
-      // special handling for shipping to display warning about customs
-      // TODO put this somewhere else (maybe in render()?)
       if (section=="shipping") {
+        // special handling for shipping to display warning about customs
         if (state.country) {
           if (update[section].country!="USA")
             Errors.emitError("shipping", "Bow & Drape is not responsible for any additional import fees that arise after the item has left the United States");
         }
+
+        // update shipping quote as well
+        return this.setState(update, () => {
+          ItemUtils.updateShipping(this.state.items, this.state.shipping, this.state.promo, (err, items) => {
+            this.setState({items});
+          });
+        });
       }
       this.setState(update);
     }
@@ -193,7 +243,11 @@ class Cart extends React.Component {
 
     // make sure we have all the mandatory data we need
     if (!this.state.shipping.email) {
-      Errors.emitError("shipping", "Pease enter email address");
+      Errors.emitError("shipping", "Please enter email address");
+      return this.setState({processing_payment:false});
+    }
+    if (!this.state.shipping.name) {
+      Errors.emitError("shipping", "Please enter name");
       return this.setState({processing_payment:false});
     }
     if (!this.state.shipping.street) {
@@ -221,7 +275,9 @@ class Cart extends React.Component {
         this.order_payload = payload;
 
         // headliner labs track event
-        window.hl_fbm_checkout.optIn();
+        try {
+          window.hl_fbm_checkout.optIn();
+        } catch(err) {console.log(err)}
         // google track event
         try {
           let total_price = ItemUtils.getPrice(resp.shipment.contents)
@@ -313,9 +369,12 @@ class Cart extends React.Component {
         <Items
           ref="Items"
           contents={this.state.items}
+          promo={this.state.promo}
           onUpdate={(items)=>{
             this.setState({items})
           }}
+          handleUpdatePromoCode={this.handleUpdatePromoCode.bind(this)}
+          handleApplyPromoCode={this.handleApplyPromoCode.bind(this, true)}
           is_cart="true"
         />
 
@@ -359,7 +418,6 @@ class Cart extends React.Component {
         `}} />
 
         </section>
-
 
 
 {/* Needed by stripe, not needed by braintree */}

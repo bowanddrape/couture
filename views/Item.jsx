@@ -341,7 +341,7 @@ class Item extends React.Component {
             <Price price={this.props.props.price} quantity={quantity} />
             : null
           }
-          <Price  price={this.props.props.price*quantity} />
+          <Price total={true} price={this.props.props.price} quantity={quantity} />
         </div>
       </div>
     )

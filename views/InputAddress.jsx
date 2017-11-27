@@ -36,7 +36,10 @@ class InputAddress extends React.Component {
       for (let i=0; i<place_fields.length; i++) {
         let element = parse_place.querySelector('.'+place_fields[i]);
         let key = place_fields[i].replace(/-.*/, "");
-        if (element) address[key] = element.innerHTML;
+        if (element)
+          address[key] = element.innerHTML;
+        else
+          address[key] = "";
       }
       this.handleSetSectionState(address);
     });

@@ -687,7 +687,8 @@ comments message {
   border-bottom: 3px solid #000;
   text-transform: lowercase;
 }
-.items .summary_items .promo_input input:active {
+.items .summary_items .promo_input input:active,
+.items .summary_items .promo_input input:focus {
   border-bottom: 3px solid #000;
 }
 .items .summary_items .promo_input button {
