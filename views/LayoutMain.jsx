@@ -73,10 +73,10 @@ class LayoutMain extends React.Component {
 
         <div className="announcement" style={{color:"#fff",backgroundColor:"#ff5c5c",width:"100%",textAlign:"center"}}>
           <div style={{fontFamily: "zurichbold_condensed"}}>
-            BUY ONE SWEATSHIRT, GET ONE 50% OFF!
+            CYBER MONDAY 25% OFF SITE-WIDE!
           </div>
           <div style={{fontFamily: "zurichbold_condensed"}}>
-            <span style={{fontSize:"10px"}}>USE CODE: BLACKFRIYAY</span>
+            <span style={{fontSize:"10px"}}>USE CODE: CYBER25</span>
           </div>
         </div>
 
