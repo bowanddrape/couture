@@ -6,8 +6,11 @@ class FulfillmentStickers extends React.Component {
     if (!this.props.shipments) return null;
 
     let garment_ids = [];
-    this.props.shipments.forEach((shipment) => {
+    this.props.shipments.forEach((shipment, index) => {
       if (!shipment.fulfillment_id) return;
+      // ignore dupe shipments
+      if (this.props.shipments.findIndex((s)=>{return s.id==shipment.id})!=index) return;
+
       let total_num_products = 0;
       shipment.contents.forEach((item, index) => {
         let quantity = item.quantity || 1;

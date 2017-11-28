@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowndrape/couture/node_modules/browserify-sign"
+      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -62940,6 +62940,8 @@ var Cart = function (_React$Component) {
           // save our successfully placed order payload
           _this3.order_payload = payload;
 
+          // headliner labs track event
+          window.hl_fbm_checkout.optIn();
           // google track event
           try {
             var total_price = ItemUtils.getPrice(resp.shipment.contents);
@@ -63130,7 +63132,9 @@ var Cart = function (_React$Component) {
             BADButton,
             { className: 'primary checkout_btn', onClick: this.handlePay.bind(this) },
             'Get it!'
-          )
+          ),
+          React.createElement('div', { id: 'hl-fbm-checkout' }),
+          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          window.hlFbmPluginInit = function() {window.hl_fbm_checkout = new HlFbmPlugin("checkout", {});}\n        ' } })
         ),
         React.createElement('script', { type: 'text/javascript', src: 'https://js.stripe.com/v2/' }),
         React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n          if ("' + process.env.STRIPE_KEY + '"!="undefined")\n            Stripe.setPublishableKey("' + process.env.STRIPE_KEY + '");\n        ' } }),
@@ -64682,6 +64686,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+var async = require('async');
 var Shipment = require('./Shipment.jsx');
 var Tabs = require('./Tabs.jsx');
 var Scrollable = require('./Scrollable.jsx');
@@ -64690,7 +64695,7 @@ var FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-var tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
+var tagged_tabs = ["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
 
 var FulfillShipments = function (_React$Component) {
   _inherits(FulfillShipments, _React$Component);
@@ -64739,9 +64744,29 @@ var FulfillShipments = function (_React$Component) {
       });
     }
   }, {
+    key: 'handleMarkStickersPrinted',
+    value: function handleMarkStickersPrinted() {
+      var _this3 = this;
+
+      var api_calls = this.state.needs_stickers.map(function (shipment) {
+        return function (callback) {
+          BowAndDrape.api("POST", "/shipment/tagcontent", {
+            id: shipment.id,
+            content_index: "*",
+            add_tags: ["needs_picking", "sticker printed"],
+            remove_tags: ["needs_stickers"]
+          }, callback);
+        };
+      });
+      async.parallel(api_calls, function (err, results) {
+        if (err) return alert("error: " + err);
+        _this3.refreshTaggedShipments();
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       var fulfillment_stations = null;
       if (typeof window != "undefined" && this.props.station_types) {
@@ -64768,19 +64793,39 @@ var FulfillShipments = function (_React$Component) {
       var tagged_tab_contents = [];
       tagged_tabs.forEach(function (tag) {
         // seperate handling for some states
-        if (["stickering"].indexOf(tag) >= 0) return;
+        if (["needs_stickers"].indexOf(tag) >= 0) {
+          return tagged_tab_contents.push(React.createElement(
+            'shipments',
+            { key: tagged_tab_contents.length, className: 'fulfillment_stickers', name: tag + " " + _this4.state.needs_stickers.length },
+            React.createElement(
+              'h2',
+              null,
+              tag
+            ),
+            React.createElement(
+              'div',
+              { className: 'action_bar' },
+              React.createElement(
+                'button',
+                { onClick: _this4.handleMarkStickersPrinted.bind(_this4) },
+                'Done printing'
+              )
+            ),
+            React.createElement(FulfillmentStickers, { shipments: _this4.state.needs_stickers })
+          ));
+        }
 
         var tab_contents = [];
-        _this3.state[tag.replace(/-/g, "")].forEach(function (shipment, index) {
+        _this4.state[tag.replace(/-/g, "")].forEach(function (shipment, index) {
           // ignore dupe shipments
-          if (_this3.state[tag.replace(/-/g, "")].findIndex(function (s) {
+          if (_this4.state[tag.replace(/-/g, "")].findIndex(function (s) {
             return s.id == shipment.id;
           }) != index) return;
-          tab_contents.push(React.createElement(Shipment, _extends({ key: tab_contents.length, fulfillment: true, edit_tags: true }, shipment)));
+          tab_contents.push(React.createElement(Shipment, _extends({ key: shipment.id, fulfillment: true, edit_tags: true }, shipment)));
         });
         tagged_tab_contents.push(React.createElement(
           'shipments',
-          { key: tagged_tab_contents.length, name: tag + " " + _this3.state[tag.replace(/-/g, "")].length },
+          { key: tagged_tab_contents.length, name: tag + " " + _this4.state[tag.replace(/-/g, "")].length },
           React.createElement(
             'h2',
             null,
@@ -64859,7 +64904,7 @@ var FulfillShipments = function (_React$Component) {
               'Search'
             ),
             React.createElement('input', { type: 'text', placeholder: 'search by id', value: this.state.search_query, onChange: function onChange(event) {
-                _this3.setState({ search_query: event.target.value });
+                _this4.setState({ search_query: event.target.value });
               } }),
             React.createElement(Scrollable, {
               component: Shipment,
@@ -64878,7 +64923,7 @@ var FulfillShipments = function (_React$Component) {
 
 module.exports = FulfillShipments;
 
-},{"./FulfillmentStickers.jsx":297,"./Scrollable.jsx":325,"./Shipment.jsx":326,"./Tabs.jsx":330,"react":219}],296:[function(require,module,exports){
+},{"./FulfillmentStickers.jsx":297,"./Scrollable.jsx":325,"./Shipment.jsx":326,"./Tabs.jsx":330,"async":16,"react":219}],296:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -65222,11 +65267,18 @@ var FulfillmentStickers = function (_React$Component) {
   _createClass(FulfillmentStickers, [{
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       if (!this.props.shipments) return null;
 
       var garment_ids = [];
-      this.props.shipments.forEach(function (shipment) {
+      this.props.shipments.forEach(function (shipment, index) {
         if (!shipment.fulfillment_id) return;
+        // ignore dupe shipments
+        if (_this2.props.shipments.findIndex(function (s) {
+          return s.id == shipment.id;
+        }) != index) return;
+
         var total_num_products = 0;
         shipment.contents.forEach(function (item, index) {
           var quantity = item.quantity || 1;
@@ -66407,12 +66459,12 @@ var Items = function (_React$Component) {
       ItemUtils.recurseAssembly(items, function (component) {
         // hardcoded defaults, if not set.
         var default_manufacture_time = {
-          parallel: 7,
+          parallel: 5,
           serial: 0
           // FIXME
           // embroidery and airbrush will take longer, too lazy to update the db
         };if (/letter_embroidery/.test(component.sku)) default_manufacture_time.parallel = 10;
-        if (/letter_airbrush/.test(component.sku)) default_manufacture_time.parallel = 15;
+        if (/letter_airbrush/.test(component.sku)) default_manufacture_time.parallel = 10;
         // extract the manufacture_time for this component
         var manufacture_time = component.props.manufacture_time || {};
         manufacture_time.parallel = manufacture_time.parallel || default_manufacture_time.parallel;
@@ -66890,7 +66942,7 @@ var LayoutHeader = function (_React$Component) {
         React.createElement(
           'button',
           { className: 'primary' },
-          'Gift Guide'
+          'Gifts'
         )
       ));
       // links to admin pages
@@ -67068,7 +67120,7 @@ var LayoutMain = function (_React$Component) {
           React.createElement(
             'div',
             { style: { fontFamily: "zurichbold_condensed" } },
-            'BUY ONE SWEATSHIRT, GET ONE 50% OFF!'
+            'CYBER MONDAY 25% OFF SITE-WIDE!'
           ),
           React.createElement(
             'div',
@@ -67076,7 +67128,7 @@ var LayoutMain = function (_React$Component) {
             React.createElement(
               'span',
               { style: { fontSize: "10px" } },
-              'USE CODE: BLACKFRIYAY'
+              'USE CODE: CYBER25'
             )
           )
         ),
@@ -67199,29 +67251,88 @@ var MetricsDash = function (_React$Component) {
           return err;
         }
         _this3.setState(function (prevState) {
-          return { hasMetrics: true, metrics: result.metrics["rows"] };
+          return {
+            hasMetrics: true,
+            metricsData: result
+          };
         });
       });
     }
   }, {
     key: 'renderMetrics',
     value: function renderMetrics() {
+      // fill in table data!
       if (this.state.hasMetrics) {
         var queries = [];
-        this.state.metrics.forEach(function (query, index) {
-          var type = Object.keys(query)[0];
+        this.state.metricsData.metrics.forEach(function (query, index) {
+          var tableTitle = query["format"]["title"];
+          var columnNames = query["format"]["columnNames"];
+          var type = query["format"]["type"];
+          var numCols = query["format"]["columns"];
+          // Construct our header of column names
+          var header = [];
+          columnNames.forEach(function (name, index) {
+            header.push(React.createElement(
+              'th',
+              { key: index },
+              name
+            ));
+          });
+          // Fill in our data
+          var columnData = [];
+          var data = query["data"][0][type];
+          // switch based on column numbers
+          switch (numCols) {
+            case 1:
+              columnData.push(React.createElement(
+                'tr',
+                { key: columnData.length },
+                React.createElement(
+                  'td',
+                  null,
+                  data
+                )
+              ));
+              break;
+
+            case 2:
+              for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                  columnData.push(React.createElement(
+                    'tr',
+                    { key: columnData.length },
+                    React.createElement(
+                      'td',
+                      null,
+                      key
+                    ),
+                    React.createElement(
+                      'td',
+                      null,
+                      data[key]
+                    )
+                  ));
+                }
+              }
+              break;
+          } // switch
+
           queries.push(React.createElement(
-            'tr',
+            'table',
             { key: queries.length },
             React.createElement(
-              'td',
+              'thead',
               null,
-              type
+              React.createElement(
+                'tr',
+                null,
+                header
+              )
             ),
             React.createElement(
-              'td',
+              'tbody',
               null,
-              query[type]
+              columnData
             )
           ));
         });
@@ -67233,6 +67344,7 @@ var MetricsDash = function (_React$Component) {
     key: 'render',
     value: function render() {
       var metrics = this.renderMetrics();
+      //let metrics = null;
       return React.createElement(
         'div',
         { className: 'metrics_dash' },
@@ -67283,15 +67395,7 @@ var MetricsDash = function (_React$Component) {
         React.createElement(
           'div',
           { className: 'display_metrics' },
-          React.createElement(
-            'table',
-            null,
-            React.createElement(
-              'tbody',
-              null,
-              metrics
-            )
-          )
+          metrics
         )
       );
     }
@@ -69536,7 +69640,9 @@ var ProductList = function (_React$Component) {
             BADButton,
             { className: 'primary addCart', onClick: this.handleAddToCart.bind(this, product) },
             'Add To Cart'
-          )
+          ),
+          React.createElement('div', { id: 'hl-fbm-add_to_cart' }),
+          React.createElement('script', { dangerouslySetInnerHTML: { __html: '\n            window.hlFbmPluginInit = function() {\n                /* Include product title and price here */\n                var product_info = {title:"' + product.props.name + '", price:"' + product.props.price + '"};\n                window.hl_fbm_add_to_cart = new HlFbmPlugin("add_to_cart", product_info);\n            }\n            ' } })
         ),
         product.props.details ? React.createElement('div', { className: 'product_details grid', dangerouslySetInnerHTML: {
             __html: unescape(product.props.details)
@@ -69669,6 +69775,9 @@ var ProductList = function (_React$Component) {
       item.props.image = '/store/' + this.props.store.id + '/preview?c=' + encodeURIComponent(query_params.c);
 
       BowAndDrape.cart_menu.add(item);
+
+      // headliner labs track event
+      window.hl_fbm_add_to_cart.optIn();
 
       // google track event
       try {
@@ -70232,6 +70341,18 @@ var Shipment = function (_React$Component) {
       shipment.to_id = id;
       shipment.received = Math.round(new Date().getTime() / 1000);
       BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
+        if (sink == "canceled") {
+          BowAndDrape.api("POST", "/shipment/tagcontent", {
+            id: _this2.props.id,
+            content_index: "*",
+            add_tags: ["canceled"],
+            remove_tags: ["new", "needs_embroidery", "needs_airbrush", "at_embroidery", "at_airbrush", "on_hold", "needs_picking"]
+          }, function (err, results) {
+            BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
+              _this2.setState({ hidden: true });
+            });
+          });
+        }
         _this2.setState(shipment);
       });
     }
@@ -70250,8 +70371,8 @@ var Shipment = function (_React$Component) {
         return BowAndDrape.api("POST", "/shipment/tagcontent", {
           id: this.props.id,
           content_index: "*",
-          add_tags: ["needs_picking"],
-          remove_tags: ["new"]
+          add_tags: ["needs_stickers"],
+          remove_tags: ["new", "at_embroidery", "at_airbrush"]
         }, function (err, results) {
           BowAndDrape.api("POST", "/shipment", shipment, function (err, ret) {
             _this3.setState({ hidden: true });

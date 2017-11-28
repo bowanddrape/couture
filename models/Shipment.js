@@ -199,9 +199,10 @@ class Shipment extends JSONAPI {
     // If there's an api call to approve this for production, do extra steps
     // TODO in the future check if we already have a fulfillment_id
     if (object.id && object.approved){
-      let query = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 RETURNING *"
+      let query = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 AND fulfillment_id IS NULL RETURNING *"
       return SQLTable.sqlExec(query, [object.approved, object.id], (err, result) => {
         if (err) return res.json({error:err});
+        if (!result.rows.length) return super.onApiSave(req, res, object, callback);
         let next_fulfillment_id = result.rows[0].fulfillment_id || 1;
         object.fulfillment_id = next_fulfillment_id;
         // FIXME currently hardcoding all fullments to come from 216 factory

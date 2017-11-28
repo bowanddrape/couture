@@ -73,10 +73,10 @@ class LayoutMain extends React.Component {
 
         <div className="announcement" style={{color:"#fff",backgroundColor:"#ff5c5c",width:"100%",textAlign:"center"}}>
           <div style={{fontFamily: "zurichbold_condensed"}}>
-            BUY ONE SWEATSHIRT, GET ONE 50% OFF!
+            CYBER MONDAY 25% OFF SITE-WIDE!
           </div>
           <div style={{fontFamily: "zurichbold_condensed"}}>
-            <span style={{fontSize:"10px"}}>USE CODE: BLACKFRIYAY</span>
+            <span style={{fontSize:"10px"}}>USE CODE: CYBER25</span>
           </div>
         </div>
 
@@ -109,6 +109,10 @@ class LayoutMain extends React.Component {
           // ]]&amp;gt;</script>
           <div __jx__id="___$_2 ___$_1" style="position: absolute; visibility: hidden; border: 0px none; padding: 0px; margin: 0px; width: 0px; height: 0px;" class=" livechat"></div>
         `}} ></script>
+
+        {/* headliner labs chat
+        <div id='hl-chat-with-us'></div>
+        */}
 
          <script dangerouslySetInnerHTML={{__html: `(function (w,i,d,g,e,t,s) {w[d] = w[d]||[];
           t= i.createElement(g);t.async=1;t.src=e;s=i.getElementsByTagName(g)[0];s.parentNode.insertBefore(t, s);})
