@@ -66942,7 +66942,7 @@ var LayoutHeader = function (_React$Component) {
         React.createElement(
           'button',
           { className: 'primary' },
-          'Gift Guide'
+          'Gifts'
         )
       ));
       // links to admin pages
