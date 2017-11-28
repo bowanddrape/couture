@@ -120,7 +120,8 @@ class Page extends JSONAPI {
             immediate[key] = JSON.parse(req.query[key]);
           } catch(err) {
             // otherwise strip quotes as they mess with JSON format
-            immediate[key] = req.query[key].replace(/"/g, '');
+            if (typeof(req.query[key])=='string')
+              immediate[key] = req.query[key].replace(/"/g, '');
           }
         }
         let queries = [];
