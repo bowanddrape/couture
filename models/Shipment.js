@@ -80,7 +80,7 @@ class Shipment extends JSONAPI {
     // get list of shipments by tag
     if (/\/shipment\/tagged/.test(req.path)) {
       let tag = req.query.tag;
-      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE props#>>'{imported}' IS NULL) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $1`; 
+      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE props#>>'{imported}' IS NULL) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $1`;
       return SQLTable.sqlQuery(Shipment, query, [tag], (err, shipments) => {
         // remove an extra field we made just for the db select
         shipments.forEach((shipment) => {
@@ -159,8 +159,34 @@ class Shipment extends JSONAPI {
         let query = `UPDATE shipments SET contents=$1 WHERE id=$2`;
         client.query(query, [JSON.stringify(shipment.contents), shipment.id], (err, result) => {
           if (err) return callback(err);
-          res.json(shipment);
-          callback(null);
+
+          // compare against tags we care about like 'needs_picking', etc;
+          let stationTags = new Set(["new", "on_hold", "needs_airbrush", "needs_embroidery",
+            "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing",
+            "needs_qaing", "needs_packing", "shipped"]);
+
+          // Add a new row in the metrics table if a stationTag is removed
+          if (object.remove_tags.size > 0){
+            let rTag = object.remove_tags.values().next();
+            if (stationTags.has(rTag.value)){
+              let metricsQuery = 'INSERT INTO metrics (props) VALUES($1)';
+              let values = {
+                user: req.user.email,
+                tag: rTag.value,
+                shipment_id: shipment.id,
+              };
+              client.query(metricsQuery, [values], (err, result) => {
+                if (err) return callback(err);
+                res.json(shipment);
+                callback(null);
+              });
+            }
+          }
+          else {
+            // Proceed as usual if a tag we don't care about is removed
+            res.json(shipment);
+            callback(null);
+          }
         });
       });
 
@@ -168,7 +194,7 @@ class Shipment extends JSONAPI {
         res.json({error: err}).end();
       }
       return SQLTable.sqlExecTransaction(update_tags_tasks, onError);
-    }
+    } // shipment/tagcontent
 
     // If there's an api call to approve this for production, do extra steps
     // TODO in the future check if we already have a fulfillment_id
