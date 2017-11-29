@@ -24,6 +24,7 @@ class LayoutHeader extends React.Component {
     menu_items.push(<a key={menu_items.length} href="/shop"><button className="primary">Shop</button></a>);
     menu_items.push(<a key={menu_items.length} href="/inspo"><button className="primary">Inspo</button></a>);
     menu_items.push(<a key={menu_items.length} href="/gift_guide"><button className="primary">Gifts</button></a>);
+    menu_items.push(<a key={menu_items.length} href="/rtw_sale"><button className="primary">Sale</button></a>);
     // links to admin pages
     if (this.props.user&&this.props.user.roles&&this.props.user.roles.length) {
       menu_items.push(<a href="/store" key={menu_items.length}><button className="primary">Admin Store</button></a>);

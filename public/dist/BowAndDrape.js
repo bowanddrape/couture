@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowndrape/couture/node_modules/browserify-sign"
+      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -66943,6 +66943,15 @@ var LayoutHeader = function (_React$Component) {
           'button',
           { className: 'primary' },
           'Gifts'
+        )
+      ));
+      menu_items.push(React.createElement(
+        'a',
+        { key: menu_items.length, href: '/rtw_sale' },
+        React.createElement(
+          'button',
+          { className: 'primary' },
+          'Sale'
         )
       ));
       // links to admin pages
