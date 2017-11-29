@@ -23301,7 +23301,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
+      "/home/default/bowndrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23336,7 +23336,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -67114,24 +67114,6 @@ var LayoutMain = function (_React$Component) {
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         React.createElement(LayoutBorderWrap, null),
         React.createElement(LayoutHeader, { user: this.state.user }),
-        React.createElement(
-          'div',
-          { className: 'announcement', style: { color: "#fff", backgroundColor: "#ff5c5c", width: "100%", textAlign: "center" } },
-          React.createElement(
-            'div',
-            { style: { fontFamily: "zurichbold_condensed" } },
-            'CYBER MONDAY 25% OFF SITE-WIDE!'
-          ),
-          React.createElement(
-            'div',
-            { style: { fontFamily: "zurichbold_condensed" } },
-            React.createElement(
-              'span',
-              { style: { fontSize: "10px" } },
-              'USE CODE: CYBER25'
-            )
-          )
-        ),
         content,
         React.createElement(LayoutFooter, { user: this.state.user }),
         React.createElement('script', { src: '/BowAndDrape.js' }),
