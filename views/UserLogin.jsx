@@ -89,7 +89,7 @@ class UserLogin extends React.Component {
             <button className="loginNav" onClick={()=>{this.setState({loginState:'login'})}}>Back to Sign In</button>
           </div>
           <div>
-            <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="text" name="email"/>
+            <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="email" name="email"/>
             <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password"/>
             <button className="primary registerBtn" onClick={this.login.bind(this)}>Create Account</button>
             <button className="primary loginBtn" onClick={this.login.bind(this)}>Sign In</button>

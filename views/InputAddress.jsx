@@ -59,7 +59,7 @@ class InputAddress extends React.Component {
 
         {this.props.section_title=="Shipping Address" ?
           <row><div>
-            <input type="text" onChange={this.handleFieldChange} value={this.props.email} name="email" placeholder="Email"/>
+            <input type="email" onChange={this.handleFieldChange} value={this.props.email} name="email" placeholder="Email"/>
           </div></row> : null
         }
         <row><div>

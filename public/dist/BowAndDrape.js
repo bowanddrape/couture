@@ -65759,7 +65759,7 @@ var InputAddress = function (_React$Component) {
           React.createElement(
             "div",
             null,
-            React.createElement("input", { type: "text", onChange: this.handleFieldChange, value: this.props.email, name: "email", placeholder: "Email" })
+            React.createElement("input", { type: "email", onChange: this.handleFieldChange, value: this.props.email, name: "email", placeholder: "Email" })
           )
         ) : null,
         React.createElement(
@@ -71708,7 +71708,7 @@ var UserLogin = function (_React$Component) {
             null,
             React.createElement('input', { ref: function ref(input) {
                 _this3.fields.email = input;
-              }, placeholder: 'email address', type: 'text', name: 'email' }),
+              }, placeholder: 'email address', type: 'email', name: 'email' }),
             React.createElement('input', { ref: function ref(input) {
                 _this3.fields.password = input;
               }, placeholder: 'password', onKeyUp: function onKeyUp(event) {

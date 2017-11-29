@@ -1462,7 +1462,8 @@ input_credit [name="exp_year"] {
   margin-top: 20px;
 }
 .billing-check .cart-wrapper input[type="text"],
-.billing-check .cart-wrapper input[type="password"] {
+.billing-check .cart-wrapper input[type="password"],
+.billing-check .cart-wrapper input[type="email"] {
   background-color: #fff;
   border: 1px solid lightgrey;
   min-width: 230px;
@@ -1474,12 +1475,14 @@ input_credit [name="exp_year"] {
   font-size: 14px;
 }
 .billing-check .cart-wrapper login input[type="text"],
-.billing-check .cart-wrapper login input[type="password"] {
+.billing-check .cart-wrapper login input[type="password"],
+.billing-check .cart-wrapper login input[type="email"] {
   margin-right: 20px;
 }
 @media (max-width: 1000px) {
   .cart-wrapper input[type="text"],
-  .cart-wrapper input[type="password"] {
+  .cart-wrapper input[type="password"],
+  .cart-wrapper input[type="email"] {
     font-size: 16px;
   }
   .items .product_wrapper {
@@ -1652,7 +1655,8 @@ signup > div label {
   top: -3px;
   text-align: right;
 }
-signup > div input[type="text"] {
+signup > div input[type="text"],
+signup > div input[type="email"] {
   width: 100%;
   box-sizing: content-box;
   font-size: 16px;
@@ -2161,7 +2165,8 @@ input.error {
   color: #ff5c5c;
 }
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="email"] {
   background-color: #f8f8f8;
   border-color: #f8f8f8;
   font-family: "Open Sans", Arial, sans-serif;
@@ -2178,16 +2183,19 @@ input[type="password"] {
   -webkit-appearance: none;
 }
 input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="email"]:focus {
   border-color: #7f5cff;
 }
 input[type="text"].clearInput,
-input[type="password"].clearInput {
+input[type="password"].clearInput,
+input[type="email"].clearInput {
   background-color: transparent;
   border-color: transparent;
 }
 input[type="text"].clearInput:focus,
-input[type="password"].clearInput:focus {
+input[type="password"].clearInput:focus,
+input[type="email"].clearInput:focus {
   border: none;
 }
 .cartLoginWrap {
@@ -2202,7 +2210,8 @@ login {
   margin: 30px auto 0 auto;
 }
 login input[type="text"],
-login input[type="password"] {
+login input[type="password"],
+login input[type="email"] {
   width: 100%;
   display: block;
 }
