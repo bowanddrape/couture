@@ -67052,7 +67052,16 @@ var LayoutHeader = function (_React$Component) {
         React.createElement(
           'button',
           { className: 'primary' },
-          'Gift Guide'
+          'Gifts'
+        )
+      ));
+      menu_items.push(React.createElement(
+        'a',
+        { key: menu_items.length, href: '/rtw_sale' },
+        React.createElement(
+          'button',
+          { className: 'primary' },
+          'Sale'
         )
       ));
       // links to admin pages
@@ -67224,24 +67233,6 @@ var LayoutMain = function (_React$Component) {
         React.createElement('link', { rel: 'stylesheet', href: '/styles.css', type: 'text/css' }),
         React.createElement(LayoutBorderWrap, null),
         React.createElement(LayoutHeader, { user: this.state.user }),
-        React.createElement(
-          'div',
-          { className: 'announcement', style: { color: "#fff", backgroundColor: "#ff5c5c", width: "100%", textAlign: "center" } },
-          React.createElement(
-            'div',
-            { style: { fontFamily: "zurichbold_condensed" } },
-            'CYBER MONDAY 25% OFF SITE-WIDE!'
-          ),
-          React.createElement(
-            'div',
-            { style: { fontFamily: "zurichbold_condensed" } },
-            React.createElement(
-              'span',
-              { style: { fontSize: "10px" } },
-              'USE CODE: CYBER25'
-            )
-          )
-        ),
         content,
         React.createElement(LayoutFooter, { user: this.state.user }),
         React.createElement('script', { src: '/BowAndDrape.js' }),

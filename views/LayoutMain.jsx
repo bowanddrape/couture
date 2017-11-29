@@ -71,6 +71,7 @@ class LayoutMain extends React.Component {
         <LayoutBorderWrap />
         <LayoutHeader user={this.state.user}/>
 
+        {/*
         <div className="announcement" style={{color:"#fff",backgroundColor:"#ff5c5c",width:"100%",textAlign:"center"}}>
           <div style={{fontFamily: "zurichbold_condensed"}}>
             CYBER MONDAY 25% OFF SITE-WIDE!
@@ -79,6 +80,7 @@ class LayoutMain extends React.Component {
             <span style={{fontSize:"10px"}}>USE CODE: CYBER25</span>
           </div>
         </div>
+        */}
 
         {content}
         <LayoutFooter user={this.state.user}/>
