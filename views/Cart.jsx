@@ -161,6 +161,7 @@ class Cart extends React.Component {
 
   handleApplyPromoCode(update_cart = false) {
     if (!BowAndDrape) return;
+    if (!this.state.promo || !this.state.promo.code) return;
     let items = JSON.parse(JSON.stringify(this.state.items));
     items.push(this.state.promo);
     BowAndDrape.cart_menu.update(items);

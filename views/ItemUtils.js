@@ -55,6 +55,9 @@ let applyPromoCode = (items, promo, callback) => {
   let reason = "Not Applicable";
   if (promo.props.info)
     reason += `: "${promo.props.info}"`;
+  if (promo.props.min_total && total_price<promo.props.min_total)
+    return callback(reason);
+
   // TODO if the promo is a percent, maybe decrease the cost of cart items (for tax)
   // figure out value of our promo
   promo.props.price = -1 * Math.max((Math.round(total_price*promo.props.percent)/100||0), (promo.props.absolute||0));
