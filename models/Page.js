@@ -1,5 +1,4 @@
 
-
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const async = require('async');
@@ -30,6 +29,7 @@ const whitelisted_components = [
   "WarningNotice",
   "Carousel",
   "HeroProduct",
+  "Announcement",
 ]
 
 /*
@@ -99,6 +99,8 @@ class Page extends JSONAPI {
         // Check for redirect
         if (pages[i].redirect)
           return res.redirect(pages[i].redirect);
+        // add announcements?
+        pages[i].elements.unshift({type:"Announcement",props:{}});
         return pages[i].render(req, res);
       } // for pages
       next();

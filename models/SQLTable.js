@@ -182,6 +182,7 @@ class SQLTable {
           where + ` AND ${column} IS NOT NULL`:
           `WHERE ${column} IS NOT NULL`;
       } else {
+        // TODO we want some way of > and < queries
         values.push(constraints[column]);
         where = where ?
           where + ` AND ${column}=$${values.length}`:

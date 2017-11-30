@@ -158,6 +158,7 @@ module.exports = {
     WarningNotice: require('./WarningNotice.jsx'),
     FacebookLogin: require('./FacebookLogin.jsx'),
     MetricsDash: require('./MetricsDash.jsx'),
+    Announcement: require('./Announcement.jsx'),
   },
   dispatcher,
   api,
