@@ -191,18 +191,16 @@ class Shipment extends JSONAPI {
                 tag: rTag.value,
                 shipment_id: shipment.id,
               };
-              client.query(metricsQuery, [values], (err, result) => {
+              return client.query(metricsQuery, [values], (err, result) => {
                 if (err) return callback(err);
                 res.json(shipment);
                 callback(null);
               });
             }
           }
-          else {
-            // Proceed as usual if a tag we don't care about is removed
-            res.json(shipment);
-            callback(null);
-          }
+          // Proceed as usual if a tag we don't care about is removed
+          res.json(shipment);
+          callback(null);
         });
       });
 
