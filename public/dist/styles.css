@@ -2406,6 +2406,7 @@ menu.expanded login {
 @media (min-width: 1000px) {
   #hl-fbm-add_to_cart {
     position: relative;
-    top: -15px;
+    top: -60px;
+    left: 540px;
   }
 }
