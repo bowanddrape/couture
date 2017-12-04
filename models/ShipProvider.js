@@ -64,7 +64,7 @@ class ShipProvider {
       value_amount: "1",
       value_currency: "USD",
       origin_country: "US",
-    }
+    };
 
     // Creating the CustomsDeclaration
     // (CustomsDeclaration are NOT required for domestic shipments)
@@ -93,6 +93,8 @@ class ShipProvider {
       callback("There was an error creating customs declaration: "+err);
     }) // shippo.customsdeclaration.create
     .then(function(shipment) {
+      if (!shipment)
+        return callback("could not create shipment from customs declaration: "+err);
       shippo.shipment.rates(shipment.object_id)
       .then(function(rates) {
         let ret = rates.results.sort((a, b) => {

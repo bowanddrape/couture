@@ -143,8 +143,8 @@ class Store extends SQLTable {
         product_list.componentWillMount();
         if (!product_list.initial_product) return Page.renderNotFound(req, res);
 
-        let width = parseInt(req.query['w']) || 200;
-        let height = parseInt(req.query['h']) || 200;
+        let width = parseInt(req.query['w']) || 550;
+        let height = parseInt(req.query['h']) || 600;
         let camera_index = parseInt(req.query['camera']) || 0;
         let resolution = 2;
         let customizer = new Customizer({width:width*resolution, height:height*resolution, resolution});

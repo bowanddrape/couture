@@ -1,5 +1,4 @@
 
-
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const async = require('async');
@@ -30,6 +29,7 @@ const whitelisted_components = [
   "WarningNotice",
   "Carousel",
   "HeroProduct",
+  "Announcement",
 ]
 
 /*
@@ -99,6 +99,8 @@ class Page extends JSONAPI {
         // Check for redirect
         if (pages[i].redirect)
           return res.redirect(pages[i].redirect);
+        // add announcements?
+        pages[i].elements.unshift({type:"Announcement",props:{}});
         return pages[i].render(req, res);
       } // for pages
       next();
@@ -120,7 +122,8 @@ class Page extends JSONAPI {
             immediate[key] = JSON.parse(req.query[key]);
           } catch(err) {
             // otherwise strip quotes as they mess with JSON format
-            immediate[key] = req.query[key].replace(/"/g, '');
+            if (typeof(req.query[key])=='string')
+              immediate[key] = req.query[key].replace(/"/g, '');
           }
         }
         let queries = [];
@@ -250,6 +253,8 @@ class Page extends JSONAPI {
       <meta property="og:title" content="${title}"/>
       <meta property="og:type" content="website"/>
       ${image_header}
+
+      <script defer src="//plugin.headlinerlabs.com/users/bowanddrape.js"></script>
 
       <meta name="google-site-verification" content="cYV8ia9c-3X6qd6qznEX4-VLO8F35cVSiH7q2usl1Is" />
       <!-- Global Site Tag (gtag.js) - Google Analytics -->

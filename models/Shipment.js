@@ -59,6 +59,10 @@ class Shipment extends JSONAPI {
     if (req.method=='GET' && req.user)
       return true;
 
+    // allow anyone to get shipping quote
+    if (req.path=="/shipment/quote")
+      return true;
+
     return super.hasApiPermission(req, res);
   }
 
@@ -80,12 +84,14 @@ class Shipment extends JSONAPI {
     // get list of shipments by tag
     if (/\/shipment\/tagged/.test(req.path)) {
       let tag = req.query.tag;
-      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE props#>>'{imported}' IS NULL) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $1`; 
+      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE props#>>'{imported}' IS NULL) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $1`;
       return SQLTable.sqlQuery(Shipment, query, [tag], (err, shipments) => {
         // remove an extra field we made just for the db select
-        shipments.forEach((shipment) => {
-          delete shipment.content_array;
-        });
+        if (shipments) {
+          shipments.forEach((shipment) => {
+            delete shipment.content_array;
+          });
+        }
         res.json(shipments);
       });
     }
@@ -97,14 +103,24 @@ class Shipment extends JSONAPI {
   onApiSave(req, res, object, callback) {
     // if this was a request for shipping rates, return that instead
     if (req.path=="/shipment/quote") {
-      return this.constructor.get(object.id, (err, shipment) => {
-        if (err) return res.status(400).json({error:err});
-        ShipProvider.quote(shipment, (err, rates) => {
+      if (object.id) {
+        return this.constructor.get(object.id, (err, shipment) => {
           if (err) return res.status(400).json({error:err});
-          res.json(rates);
+          ShipProvider.quote(shipment, (err, rates) => {
+            if (err) return res.status(400).json({error:err});
+            res.json(rates);
+          });
         });
+      } // has shipment.id
+
+      if (!object.contents || !object.address)
+        return res.status(400).json({error:"malformed shippingrate query"});
+
+      return ShipProvider.quote(object, (err, rates) => {
+        if (err) return res.status(400).json({error:err});
+        res.json(rates);
       });
-    }
+    } // /shipment/quote
 
     // if this was a request to buy a label, do that
     if (req.path=="/shipment/buylabel") {
@@ -159,6 +175,30 @@ class Shipment extends JSONAPI {
         let query = `UPDATE shipments SET contents=$1 WHERE id=$2`;
         client.query(query, [JSON.stringify(shipment.contents), shipment.id], (err, result) => {
           if (err) return callback(err);
+
+          // compare against tags we care about like 'needs_picking', etc;
+          let stationTags = new Set(["new", "on_hold", "needs_airbrush", "needs_embroidery",
+            "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing",
+            "needs_qaing", "needs_packing", "shipped"]);
+
+          // Add a new row in the metrics table if a stationTag is removed
+          if (object.remove_tags.size > 0){
+            let rTag = object.remove_tags.values().next();
+            if (stationTags.has(rTag.value)){
+              let metricsQuery = 'INSERT INTO metrics (props) VALUES($1)';
+              let values = {
+                user: req.user.email,
+                tag: rTag.value,
+                shipment_id: shipment.id,
+              };
+              return client.query(metricsQuery, [values], (err, result) => {
+                if (err) return callback(err);
+                res.json(shipment);
+                callback(null);
+              });
+            }
+          }
+          // Proceed as usual if a tag we don't care about is removed
           res.json(shipment);
           callback(null);
         });
@@ -168,14 +208,15 @@ class Shipment extends JSONAPI {
         res.json({error: err}).end();
       }
       return SQLTable.sqlExecTransaction(update_tags_tasks, onError);
-    }
+    } // shipment/tagcontent
 
     // If there's an api call to approve this for production, do extra steps
     // TODO in the future check if we already have a fulfillment_id
     if (object.id && object.approved){
-      let query = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 RETURNING *"
+      let query = "UPDATE shipments SET (approved, fulfillment_id) = ($1, (SELECT fulfillment_id FROM shipments WHERE fulfillment_id IS NOT NULL ORDER BY fulfillment_id DESC LIMIT 1) + 1) WHERE id=$2 AND fulfillment_id IS NULL RETURNING *"
       return SQLTable.sqlExec(query, [object.approved, object.id], (err, result) => {
         if (err) return res.json({error:err});
+        if (!result.rows.length) return super.onApiSave(req, res, object, callback);
         let next_fulfillment_id = result.rows[0].fulfillment_id || 1;
         object.fulfillment_id = next_fulfillment_id;
         // FIXME currently hardcoding all fullments to come from 216 factory

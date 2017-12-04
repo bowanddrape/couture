@@ -36,7 +36,10 @@ class InputAddress extends React.Component {
       for (let i=0; i<place_fields.length; i++) {
         let element = parse_place.querySelector('.'+place_fields[i]);
         let key = place_fields[i].replace(/-.*/, "");
-        if (element) address[key] = element.innerHTML;
+        if (element)
+          address[key] = element.innerHTML;
+        else
+          address[key] = "";
       }
       this.handleSetSectionState(address);
     });
@@ -56,7 +59,7 @@ class InputAddress extends React.Component {
 
         {this.props.section_title=="Shipping Address" ?
           <row><div>
-            <input type="text" onChange={this.handleFieldChange} value={this.props.email} name="email" placeholder="Email"/>
+            <input type="email" onChange={this.handleFieldChange} value={this.props.email} name="email" placeholder="Email"/>
           </div></row> : null
         }
         <row><div>

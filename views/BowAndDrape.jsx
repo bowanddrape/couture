@@ -102,6 +102,10 @@ let api = function(method, endpoint, body, callback) {
     } catch(err) {
       callback("invalid server response =(");
     }
+    if (this.status==0) {
+      // if this request was aborted, do nothing
+      return;
+    }
     if (this.status!=200) {
       if (response.error) return callback(response.error);
       return callback(response);
@@ -121,6 +125,7 @@ let api = function(method, endpoint, body, callback) {
     });
   } // build payload
   xhr.send(payload);
+  return xhr;
 } // api
 
 module.exports = {
@@ -153,6 +158,7 @@ module.exports = {
     WarningNotice: require('./WarningNotice.jsx'),
     FacebookLogin: require('./FacebookLogin.jsx'),
     MetricsDash: require('./MetricsDash.jsx'),
+    Announcement: require('./Announcement.jsx'),
   },
   dispatcher,
   api,
