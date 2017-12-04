@@ -305,8 +305,13 @@ class Item extends React.Component {
 
     let style = this.props.style || Item.style;
     let preview_img = this.props.props.image;
-    if (preview_img && this.props.is_email)
-      preview_img = "https://couture.bowanddrape.com"+preview_img;
+    if (preview_img) {
+      if (this.props.is_email)
+        preview_img = "https://couture.bowanddrape.com"+preview_img;
+      else if (typeof(window)!="undefined" && window.location.hostname=="www.bowanddrape.com")
+        preview_img = "https://cdn.bowanddrape.com"+preview_img;
+
+    }
 
     return (
       <div className={className} style={style.item}>

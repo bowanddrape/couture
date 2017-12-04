@@ -74161,7 +74161,9 @@ var Item = function (_React$Component) {
 
       var style = this.props.style || Item.style;
       var preview_img = this.props.props.image;
-      if (preview_img && this.props.is_email) preview_img = "https://couture.bowanddrape.com" + preview_img;
+      if (preview_img) {
+        if (this.props.is_email) preview_img = "https://couture.bowanddrape.com" + preview_img;else if (typeof window != "undefined" && window.location.hostname == "www.bowanddrape.com") preview_img = "https://cdn.bowanddrape.com" + preview_img;
+      }
 
       return React.createElement(
         'div',
