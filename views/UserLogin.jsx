@@ -81,8 +81,8 @@ class UserLogin extends React.Component {
     this.fields = this.fields || {};
     return (
       <login className={this.state.loginState} style={this.props.style}>
-        <Errors label="login" />
         <section className="loginForm">
+          <Errors label="login" />
           <div className="resetAction">
             <span className="formHead">Forgot Password</span>
             Enter your email address and we’ll send you instructions to reset your password.
@@ -108,8 +108,6 @@ class UserLogin extends React.Component {
             </div>
           </div>
         </section>
-
-
         {this.props.cta ? <div className="cta">{this.props.cta}</div> : null}
       </login>
     );
