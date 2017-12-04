@@ -23787,7 +23787,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowndrape/couture/node_modules/browserify-sign"
+      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23822,7 +23822,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -37370,7 +37370,7 @@ module.exports={
         "spec": ">=1.10.0 <2.0.0",
         "type": "range"
       },
-      "/home/default/bowndrape/couture"
+      "/home/default/bowanddrape/couture"
     ]
   ],
   "_from": "pg-native@>=1.10.0 <2.0.0",
@@ -37408,7 +37408,7 @@ module.exports={
   "_shasum": "94e61ccbb85a7f3436b2e526315c7581107fe40c",
   "_shrinkwrap": null,
   "_spec": "pg-native@^1.10.0",
-  "_where": "/home/default/bowndrape/couture",
+  "_where": "/home/default/bowanddrape/couture",
   "author": {
     "name": "Brian M. Carlson"
   },
@@ -41604,7 +41604,7 @@ module.exports={
         "spec": ">=6.1.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowndrape/couture"
+      "/home/default/bowanddrape/couture"
     ]
   ],
   "_from": "pg@>=6.1.0 <7.0.0",
@@ -41638,7 +41638,7 @@ module.exports={
   "_shasum": "c364011060eac7a507a2ae063eb857ece910e27f",
   "_shrinkwrap": null,
   "_spec": "pg@^6.1.0",
-  "_where": "/home/default/bowndrape/couture",
+  "_where": "/home/default/bowanddrape/couture",
   "author": {
     "name": "Brian Carlson",
     "email": "brian.m.carlson@gmail.com"
@@ -74161,7 +74161,7 @@ var Item = function (_React$Component) {
 
       var style = this.props.style || Item.style;
       var preview_img = this.props.props.image;
-      if (preview_img) {
+      if (preview_img && preview_img.charAt(0) == '/') {
         if (this.props.is_email) preview_img = "https://couture.bowanddrape.com" + preview_img;else if (typeof window != "undefined" && window.location.hostname == "www.bowanddrape.com") preview_img = "https://cdn.bowanddrape.com" + preview_img;
       }
 
