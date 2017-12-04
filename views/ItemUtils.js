@@ -64,11 +64,13 @@ let applyPromoCode = (items, promo, callback) => {
   // special hardcoded logic for "presents" promo
   if (promo.code.toLowerCase()=="presents") {
     promo.props.price = 0;
-    if (total_price>100)
-      promo.props.price = -24;
-    if (total_price>200)
+    if (total_price>=75)
+      promo.props.price = -15;
+    if (total_price>=100)
+      promo.props.price = -25;
+    if (total_price>=200)
       promo.props.price = -50;
-    if (total_price>300)
+    if (total_price>=300)
       promo.props.price = -100;
   }
   if (!new RegExp("^promo:", "i").test(promo.props.name)) {

@@ -23787,7 +23787,7 @@ module.exports={
         "spec": ">=6.0.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/couture/node_modules/browserify-sign"
+      "/home/default/bowndrape/couture/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -23822,7 +23822,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/default/bowanddrape/couture/node_modules/browserify-sign",
+  "_where": "/home/default/bowndrape/couture/node_modules/browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -37370,7 +37370,7 @@ module.exports={
         "spec": ">=1.10.0 <2.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/couture"
+      "/home/default/bowndrape/couture"
     ]
   ],
   "_from": "pg-native@>=1.10.0 <2.0.0",
@@ -37408,7 +37408,7 @@ module.exports={
   "_shasum": "94e61ccbb85a7f3436b2e526315c7581107fe40c",
   "_shrinkwrap": null,
   "_spec": "pg-native@^1.10.0",
-  "_where": "/home/default/bowanddrape/couture",
+  "_where": "/home/default/bowndrape/couture",
   "author": {
     "name": "Brian M. Carlson"
   },
@@ -41604,7 +41604,7 @@ module.exports={
         "spec": ">=6.1.0 <7.0.0",
         "type": "range"
       },
-      "/home/default/bowanddrape/couture"
+      "/home/default/bowndrape/couture"
     ]
   ],
   "_from": "pg@>=6.1.0 <7.0.0",
@@ -41638,7 +41638,7 @@ module.exports={
   "_shasum": "c364011060eac7a507a2ae063eb857ece910e27f",
   "_shrinkwrap": null,
   "_spec": "pg@^6.1.0",
-  "_where": "/home/default/bowanddrape/couture",
+  "_where": "/home/default/bowndrape/couture",
   "author": {
     "name": "Brian Carlson",
     "email": "brian.m.carlson@gmail.com"
@@ -74322,9 +74322,10 @@ var applyPromoCode = function applyPromoCode(items, promo, callback) {
   // special hardcoded logic for "presents" promo
   if (promo.code.toLowerCase() == "presents") {
     promo.props.price = 0;
-    if (total_price > 100) promo.props.price = -24;
-    if (total_price > 200) promo.props.price = -50;
-    if (total_price > 300) promo.props.price = -100;
+    if (total_price >= 75) promo.props.price = -15;
+    if (total_price >= 100) promo.props.price = -25;
+    if (total_price >= 200) promo.props.price = -50;
+    if (total_price >= 300) promo.props.price = -100;
   }
   if (!new RegExp("^promo:", "i").test(promo.props.name)) {
     promo.props.name = "Promo: " + (promo.props.name || promo.code);
