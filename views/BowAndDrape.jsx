@@ -159,6 +159,7 @@ module.exports = {
     FacebookLogin: require('./FacebookLogin.jsx'),
     MetricsDash: require('./MetricsDash.jsx'),
     Announcement: require('./Announcement.jsx'),
+    AnnouncementEdit: require('./AnnouncementEdit.jsx'),
   },
   dispatcher,
   api,
