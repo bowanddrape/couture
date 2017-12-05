@@ -62,20 +62,49 @@
       .taglist {
         display: flex;
         .tag {
-          color: @color_primary;
-          background-color: @color_secondary;
+          color: @color_secondary;
+          background-color: #e5ff00;
           border: solid 1px @color_secondary;
           padding: 2px;
           border-radius: 3px;
           margin: 0 2px;
         }
+        .tag.new, .tag.sticker.printed, .tag.sticker_printed {
+          background-color: #fff;
+        }
         .tag.on_hold {
-          border: solid 1px @color_support_2;
-          box-shadow: 2px 2px 1px @color_support_2;
+          background-color: #eaabc9;
+        }
+        .tag.needs_airbrush {
+          background-color: #caf7cd;
+        }
+        .tag.at_airbrush {
+          background-color: #7bcea80;
+        }
+        .tag.needs_embroidery {
+          background-color: #a5e1ff;
+        }
+        .tag.at_embroidery {
+          background-color: #579af2;
+        }
+        .tag.needs_picking {
+          background-color: #bcabea;
+        }
+        .tag.needs_pressing {
+          background-color: #e2aba5;
+        }
+        .tag.needs_qaing {
+          background-color: #f9b159;
+        }
+        .tag.needs_packing {
+          background-color: #d3d3d3;
+        }
+        .tag.shipped {
+          background-color: @color_secondary;
+          color: @color_primary;
         }
         .tag.vip {
-          border: solid 1px @color_support_3;
-          box-shadow: 2px 2px 1px @color_support_3;
+          background-color: #e50d02;
         }
       }
       .add_tag {
