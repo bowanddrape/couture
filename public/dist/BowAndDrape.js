@@ -74997,7 +74997,7 @@ var LayoutFooter = function (_React$Component) {
       menu_items.push(React.createElement(
         'a',
         { key: menu_items.length, href: '/contact' },
-        'Customer Service'
+        'Contact Us'
       ));
       menu_items.push(React.createElement(
         'a',
