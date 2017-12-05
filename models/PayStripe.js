@@ -21,7 +21,7 @@ class PayStripe {
   static charge(nonce, amount, callback) {
     // stripe "usd" amounts are in pennies =(
     return stripe.charges.create({
-      amount: amount*100,
+      amount: Math.round(amount*100),
       currency: "usd",
       source: nonce,
     }, (err, charge) => {
