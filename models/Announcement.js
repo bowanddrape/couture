@@ -23,6 +23,9 @@ class Announcement extends JSONAPI {
 
   handleHTTPPage(req, res, next) {
     Announcement.getAll({}, (err, announcements) => {
+      announcements = announcements.sort((a, b) => {
+        return a.start-b.start;
+      })
       Page.render(req, res, AnnouncementEdit, {announcements});
     });
   }
