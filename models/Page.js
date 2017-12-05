@@ -178,8 +178,9 @@ class Page extends JSONAPI {
     return async.parallel(render_elements, (err, data) => {
       if(err) return res.status(500).end(JSON.stringify(err));
       let head_props = {};
-      if (data.length)
-        head_props = data[0].props;
+      data.forEach((component) => {
+        head_props = Object.assign(head_props, component.props);
+      });
       if (this.title)
         head_props.title = this.title;
       if (this.description)
@@ -235,9 +236,7 @@ class Page extends JSONAPI {
   static getHTMLHead(req, res, props) {
     let image_header = "";
     if (props.c && props.store) {
-      let width = 256;
-      let height = 256;
-      image_header = `<meta property="og:image:width" content="${width}"/><meta property="og:image:height" content="${height}"/><meta property="og:image" content="https://${req.headers.host}/store/${props.store.id}/preview?w=${width}&h=${height}&c=${encodeURIComponent(props.c)}"/>`
+      image_header = `<meta property="og:image:width" content="550"/><meta property="og:image:height" content="600"/><meta property="og:image" content="https://${req.headers.host}/store/${props.store.id}/preview?c=${encodeURIComponent(props.c)}"/>`
     }
 
     let title = props.title || "Bow&Drape"+req.path.replace(/\//g, " ");
