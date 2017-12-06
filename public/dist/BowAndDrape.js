@@ -74064,50 +74064,40 @@ var Item = function (_React$Component) {
         ));
       }
 
-      var assembly_phrase = "";
+      var assembly_phrase = [];
       var assembly = [];
       var assembly_contents = {};
       if (this.props.fulfillment && this.props.assembly) {
         for (var _i = 0; _i < this.props.assembly.length; _i++) {
           ItemUtils.recurseAssembly(this.props.assembly[_i], function (component) {
-            // haute imported entries will have "text" set
-            if (component.props && component.props.image && component.text) {
-              assembly_phrase += component.text;
-              var letters = {};
-              component.text.split("").forEach(function (letter) {
-                // Skip spaces
-                if (letter != " ") {
-                  if (letters[letter]) return letters[letter].quantity += 1;
-                  letters[letter] = { letter: letter, quantity: 1 };
-                }
-              });
-              var letter_strings = [];
-              Object.keys(letters).sort().forEach(function (letter) {
-                if (letters[letter].quantity == 1) return letter_strings.push(letters[letter].letter);
-                letter_strings.push(letters[letter].letter + "x" + letters[letter].quantity);
-              });
-              assembly.push(React.createElement(
-                'div',
-                { key: assembly.length, className: 'legacy' },
-                React.createElement('img', { src: component.props.image }),
-                letter_strings.join("  ")
-              ));
-              return;
-            }
-
             var sku = component.sku || component.props.name;
 
             // ignore anything you can't see
             if (!component.props || !component.props.image) return;
             var last_sku_tok = sku.split("_").pop();
-            assembly_phrase += last_sku_tok;
+            // only add single-letters
+            if (last_sku_tok.length == 1) {
+              var _style = { fontWeight: "bold" };
+              if (/embroidery/.test(sku)) _style = { fontStyle: "italic" };
+              assembly_phrase.push(React.createElement(
+                'span',
+                { key: assembly_phrase.length, style: _style },
+                last_sku_tok
+              ));
+            }
             // skip skus corresponding to spaces
             if (last_sku_tok == " ") return;
+            // skip embroidery for picklist
+            if (/embroidery/.test(sku)) return;
 
             component.quantity = component.quantity || 1;
             if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
           }); // recurseAssembly
-          assembly_phrase += " ";
+          assembly_phrase.push(React.createElement(
+            'span',
+            { key: assembly_phrase.length },
+            ' '
+          ));
         } // this.props.assembly.forEach
         Object.keys(assembly_contents).sort().forEach(function (sku) {
           var label = assembly_contents[sku].props.name || sku;
