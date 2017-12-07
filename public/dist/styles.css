@@ -257,7 +257,7 @@ actions,
 .card {
   position: relative;
   height: 245px;
-  width: 245px;
+  width: 275px;
   margin: 10px 25px 110px 25px;
   border-radius: 4px;
   background-size: contain;
@@ -642,20 +642,51 @@ comments message {
   display: flex;
 }
 .items .product_wrapper .item.fulfillment .taglist .tag {
-  color: #fff;
-  background-color: #000;
+  color: #000;
+  background-color: #e5ff00;
   border: solid 1px #000;
   padding: 2px;
   border-radius: 3px;
   margin: 0 2px;
 }
+.items .product_wrapper .item.fulfillment .taglist .tag.new,
+.items .product_wrapper .item.fulfillment .taglist .tag.sticker.printed,
+.items .product_wrapper .item.fulfillment .taglist .tag.sticker_printed {
+  background-color: #fff;
+}
 .items .product_wrapper .item.fulfillment .taglist .tag.on_hold {
-  border: solid 1px #ff5c5c;
-  box-shadow: 2px 2px 1px #ff5c5c;
+  background-color: #eaabc9;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.needs_airbrush {
+  background-color: #caf7cd;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.at_airbrush {
+  background-color: #7bcea80;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.needs_embroidery {
+  background-color: #a5e1ff;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.at_embroidery {
+  background-color: #579af2;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.needs_picking {
+  background-color: #bcabea;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.needs_pressing {
+  background-color: #e2aba5;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.needs_qaing {
+  background-color: #f9b159;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.needs_packing {
+  background-color: #d3d3d3;
+}
+.items .product_wrapper .item.fulfillment .taglist .tag.shipped {
+  background-color: #000;
+  color: #fff;
 }
 .items .product_wrapper .item.fulfillment .taglist .tag.vip {
-  border: solid 1px #f5c9ca;
-  box-shadow: 2px 2px 1px #f5c9ca;
+  background-color: #e50d02;
 }
 .items .product_wrapper .item.fulfillment .add_tag {
   display: flex;

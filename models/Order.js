@@ -143,7 +143,8 @@ class Order {
         // if it ain't free, charge for it
         if (total_price > total_payments) {
           // process payment
-          return payment_method.charge(payment_nonce, total_price-total_payments, (err, charge) => {
+          let charge_amount = (Math.round((total_price-total_payments)*100)/100);
+          return payment_method.charge(payment_nonce, charge_amount, (err, charge) => {
             if (err) return callback(err);
             // update payments, then save shipment
             payments.push({type: charge.type, price: charge.amount});

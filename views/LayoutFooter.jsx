@@ -24,7 +24,7 @@ class LayoutFooter extends React.Component {
     menu_items.push(<a className="social twitter" key={menu_items.length} href="//twitter.com/bowanddrape" target="_blank"></a>);
     menu_items.push(<a className="social instagram" key={menu_items.length} href="//instagram.com/bowanddrape/" target="_blank"></a>);
     menu_items.push(<a className="social facebook" key={menu_items.length} href="//facebook.com/BowAndDrape/" target="_blank"></a>);
-    menu_items.push(<a key={menu_items.length} href="/contact">Customer Service</a>);
+    menu_items.push(<a key={menu_items.length} href="/contact">Contact Us</a>);
     menu_items.push(<a key={menu_items.length} href="/legal">Legal</a>);
     menu_items.push(<a key={menu_items.length} href="/customize_your_own">Make Your Own</a>);
 

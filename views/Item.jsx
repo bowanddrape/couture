@@ -141,44 +141,28 @@ class Item extends React.Component {
       )
     }
 
-    let assembly_phrase = "";
+    let assembly_phrase = [];
     let assembly = [];
     let assembly_contents = {};
     if (this.props.fulfillment && this.props.assembly) {
       for (let i=0; i<this.props.assembly.length; i++) {
         ItemUtils.recurseAssembly(this.props.assembly[i], (component) => {
-          // haute imported entries will have "text" set
-          if (component.props && component.props.image && component.text) {
-            assembly_phrase += component.text;
-            let letters = {};
-            component.text.split("").forEach((letter) => {
-              // Skip spaces
-              if (letter != " "){
-                if (letters[letter])
-                  return letters[letter].quantity += 1;
-                letters[letter] = {letter, quantity:1};
-              }
-            });
-            let letter_strings = [];
-            Object.keys(letters).sort().forEach((letter) => {
-              if (letters[letter].quantity==1)
-                return letter_strings.push(letters[letter].letter);
-              letter_strings.push(letters[letter].letter+"x"+letters[letter].quantity);
-            });
-            assembly.push(
-              <div key={assembly.length} className="legacy"><img src={component.props.image}/>{letter_strings.join("  ")}</div>
-            );
-            return;
-          }
-
           let sku = component.sku || component.props.name;
 
           // ignore anything you can't see
           if (!component.props || !component.props.image) return;
           let last_sku_tok = sku.split("_").pop();
-          assembly_phrase += last_sku_tok;
+          // only add single-letters
+          if (last_sku_tok.length==1) {
+            let style = {fontWeight:"bold"};
+            if (/embroidery/.test(sku))
+              style = {fontStyle:"italic"};
+            assembly_phrase.push(<span key={assembly_phrase.length} style={style}>{last_sku_tok}</span>);
+          }
           // skip skus corresponding to spaces
           if (last_sku_tok == " ") return;
+          // skip embroidery for picklist
+          if (/embroidery/.test(sku)) return;
 
           component.quantity = component.quantity || 1;
           if (!assembly_contents[sku])
@@ -186,7 +170,7 @@ class Item extends React.Component {
           else
             assembly_contents[sku].quantity += component.quantity;
         }); // recurseAssembly
-        assembly_phrase += " ";
+        assembly_phrase.push(<span key={assembly_phrase.length}> </span>);
       } // this.props.assembly.forEach
       Object.keys(assembly_contents).sort().forEach((sku) => {
         let label = assembly_contents[sku].props.name || sku;
@@ -305,8 +289,13 @@ class Item extends React.Component {
 
     let style = this.props.style || Item.style;
     let preview_img = this.props.props.image;
-    if (preview_img && this.props.is_email)
-      preview_img = "https://couture.bowanddrape.com"+preview_img;
+    if (preview_img && preview_img.charAt(0)=='/') {
+      if (this.props.is_email)
+        preview_img = "https://couture.bowanddrape.com"+preview_img;
+      else if (typeof(window)!="undefined" && window.location.hostname=="www.bowanddrape.com")
+        preview_img = "https://cdn.bowanddrape.com"+preview_img;
+
+    }
 
     return (
       <div className={className} style={style.item}>
