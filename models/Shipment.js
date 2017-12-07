@@ -186,10 +186,15 @@ class Shipment extends JSONAPI {
             let rTag = object.remove_tags.values().next();
             if (stationTags.has(rTag.value)){
               let metricsQuery = 'INSERT INTO metrics (props) VALUES($1)';
-              let values = {
+                let index = '*';
+                if (object.content_index != '*') {
+                  index = (object.content_index == 0 ? 0: object.content_index - 1);
+                }
+                let values = {
                 user: req.user.email,
                 tag: rTag.value,
                 shipment_id: shipment.id,
+                content_index: index,
               };
               return client.query(metricsQuery, [values], (err, result) => {
                 if (err) return callback(err);
