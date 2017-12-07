@@ -74235,8 +74235,6 @@ var Item = function (_React$Component) {
             }
             // skip skus corresponding to spaces
             if (last_sku_tok == " ") return;
-            // skip embroidery for picklist
-            if (/embroidery/.test(sku)) return;
 
             component.quantity = component.quantity || 1;
             if (!assembly_contents[sku]) assembly_contents[sku] = JSON.parse(JSON.stringify(component));else assembly_contents[sku].quantity += component.quantity;
