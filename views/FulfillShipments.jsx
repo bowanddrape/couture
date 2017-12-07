@@ -45,17 +45,23 @@ class FulfillShipments extends React.Component {
         if (result && result.rows)
           options.ship_today = result.rows;
 
-        // get facilities
-        Facility.getAll({}, (err, facility_list) => {
-          if (err || !facility_list.length)
-            return Page.renderNotFound(req, res);
-          // convert facilities list to array
-          options.facilities = {};
-          facility_list.map((facility) => {
-            options.facilities[facility.id] = facility;
-          });
-          callback(null, options);
-        }); // get facilities
+        // get count of shipped items
+        SQLTable.sqlQuery(null, "WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE to_id!='e03d3875-d349-4375-8071-40928aa625f5') SELECT count(1) as count FROM shipment_contents WHERE content_array->'tags' ? 'shipped'", [], (err, result) => {
+          if (result && result.rows && result.rows.length)
+            options.shipped_count = result.rows[0].count;
+
+          // get facilities
+          Facility.getAll({}, (err, facility_list) => {
+            if (err || !facility_list.length)
+              return Page.renderNotFound(req, res);
+            // convert facilities list to array
+            options.facilities = {};
+            facility_list.map((facility) => {
+              options.facilities[facility.id] = facility;
+            });
+            callback(null, options);
+          }); // get facilities
+        }); // get shipped count
       }); // get about-to-be-late shipments
     }); // get late shipments
   }
@@ -177,7 +183,7 @@ class FulfillShipments extends React.Component {
             {late}
           </shipments>
           <shipments>
-            <h2>Shipped</h2>
+            <h2>{`Shipped ${this.props.shipped_count}`}</h2>
             <Scrollable
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
