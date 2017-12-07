@@ -70,14 +70,22 @@ class MetricsDash extends React.Component {
                 "needs_embroidery": 0,
                 "needs_airbrush":   0,
                 "needs_stickers":   0,
+                "new":              0,
+                "on_hold":          0,
               }
               data.forEach((obj)=>{
                 // check if the user exists in our userMap
-                if (!obj.hasOwnProperty(obj.props.name)) {
-                  users[obj.props.user] = tags;
+                let hasUser = users.hasOwnProperty(obj.props.user);
+                console.log(`Has User: ${hasUser}`);
+                if (!hasUser) {
+
+                  users[obj.props.user] = Object.assign({}, tags);
                 }
                 let count = users[obj.props.user][obj.props.tag];
-                users[obj.props.user][obj.props.tag] = count + 1;
+                if (tags.hasOwnProperty(obj.props.tag)){
+                  // exclude tags other than the production ones
+                  users[obj.props.user][obj.props.tag] = count + 1;
+                }
               });
               for(let name in users){
                 if (users.hasOwnProperty(name)){
