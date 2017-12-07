@@ -7,18 +7,19 @@ class MetricsDash extends React.Component {
       this.state = {
         hasMetrics: false,
         searchParams: {
-          start:'',
-          stop: '',
+          start: Math.round(new Date().getTime()/1000),
+          stop: Math.round(new Date().getTime()/1000),
         },
       }
     }
 
     handleInputChange(event) {
-      const target = event.target;
-      const value = target.type === 'checkbox' ? target.checked : target.value;
-      const name = target.name;
+      let name = event.target.getAttribute("name");
+      let value = event.target.value;
 
       this.setState((prevState) => {
+        if (name=="start" || name=="stop")
+          value = new Date(value+" EST").getTime()/1000;
         let searchParams = Object.assign({}, this.state.searchParams);
         searchParams[name] = value;
         return ({searchParams});
@@ -27,10 +28,7 @@ class MetricsDash extends React.Component {
 
     handleSearch() {
       BowAndDrape.api("POST", "/dashboard", this.state.searchParams, (err, result) => {
-        if (err) {
-          alert("Error on POSTing");
-          return err;
-        }
+        if (err) return console.log(err);
         this.setState((prevState)=>{
           return ({
             hasMetrics: true,
@@ -74,32 +72,26 @@ class MetricsDash extends React.Component {
                 "on_hold":          0,
               }
               data.forEach((obj)=>{
-                // check if the user exists in our userMap
-                let hasUser = users.hasOwnProperty(obj.props.user);
-                console.log(`Has User: ${hasUser}`);
-                if (!hasUser) {
+                // init user if not exists in our userMap
+                users[obj.props.user] = users[obj.props.user] ||
+                  Object.assign({}, tags);
 
-                  users[obj.props.user] = Object.assign({}, tags);
-                }
-                let count = users[obj.props.user][obj.props.tag];
+                // exclude tags other than the production ones
                 if (tags.hasOwnProperty(obj.props.tag)){
-                  // exclude tags other than the production ones
-                  users[obj.props.user][obj.props.tag] = count + 1;
+                  users[obj.props.user][obj.props.tag] += 1;
                 }
               });
               for(let name in users){
-                if (users.hasOwnProperty(name)){
-                  for(let tag in users[name]){
-                    if(users[name].hasOwnProperty(tag)){
-                      columnData.push(
-                        <tr key = {columnData.length}>
-                          <td>{name}</td>
-                          <td>{tag}</td>
-                          <td>{users[name][tag]}</td>
-                        </tr>
-                      );
-                    }
-                  }
+                if (!users[name]) continue;
+                for(let tag in users[name]){
+                  if (!users[name][tag]) continue;
+                  columnData.push(
+                    <tr key = {columnData.length}>
+                      <td>{name}</td>
+                      <td>{tag}</td>
+                      <td>{users[name][tag]}</td>
+                    </tr>
+                  );
                 }
               }
               break;
@@ -185,7 +177,10 @@ class MetricsDash extends React.Component {
       });
 
       let metrics = this.renderMetrics();
-      //let metrics = null;
+
+      let start = new Date(this.state.searchParams.start*1000);
+      let stop = new Date(this.state.searchParams.stop*1000);
+
       return(
         <div className="metrics_dash">
           <section>Search Metrics</section>
@@ -195,7 +190,7 @@ class MetricsDash extends React.Component {
                 <input
                  type="date"
                  onChange={this.handleInputChange.bind(this)}
-                 value={this.state.searchParams["start"]}
+                 value={start.toISOString().substr(0,10)}
                  name="start"
                 />
              </div>
@@ -204,7 +199,7 @@ class MetricsDash extends React.Component {
                <input
                 type="date"
                 onChange={this.handleInputChange.bind(this)}
-                value={this.state.searchParams["stop"]}
+                value={stop.toISOString().substr(0,10)}
                 name="stop"
                />
             </div>

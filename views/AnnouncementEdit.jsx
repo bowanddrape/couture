@@ -19,7 +19,7 @@ class AnnouncementEdit extends React.Component {
     this.setState((prev_state) => {
       let announcements = prev_state.announcements.slice(0);
       if (name=="start" || name=="stop") {
-        value = new Date(value).getTime()/1000;
+        value = new Date(value+" EST").getTime()/1000;
       }
       announcements[index][name] = value;
       return ({announcements});
