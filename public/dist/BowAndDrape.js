@@ -70681,7 +70681,7 @@ var AnnouncementEdit = function (_React$Component) {
       this.setState(function (prev_state) {
         var announcements = prev_state.announcements.slice(0);
         if (name == "start" || name == "stop") {
-          value = new Date(value).getTime() / 1000;
+          value = new Date(value + " EST").getTime() / 1000;
         }
         announcements[index][name] = value;
         return { announcements: announcements };
@@ -75509,7 +75509,7 @@ var MandateUserLogin = function (_React$Component) {
 module.exports = MandateUserLogin;
 
 },{"./UserLogin.jsx":381,"react":263}],357:[function(require,module,exports){
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -75520,10 +75520,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
-
-/*
- *
- */
 
 var MetricsDash = function (_React$Component) {
   _inherits(MetricsDash, _React$Component);
@@ -75536,38 +75532,35 @@ var MetricsDash = function (_React$Component) {
     _this.state = {
       hasMetrics: false,
       searchParams: {
-        start: '',
-        stop: ''
+        start: Math.round(new Date().getTime() / 1000),
+        stop: Math.round(new Date().getTime() / 1000)
       }
     };
     return _this;
   }
 
   _createClass(MetricsDash, [{
-    key: 'handleInputChange',
+    key: "handleInputChange",
     value: function handleInputChange(event) {
       var _this2 = this;
 
-      var target = event.target;
-      var value = target.type === 'checkbox' ? target.checked : target.value;
-      var name = target.name;
+      var name = event.target.getAttribute("name");
+      var value = event.target.value;
 
       this.setState(function (prevState) {
+        if (name == "start" || name == "stop") value = new Date(value + " EST").getTime() / 1000;
         var searchParams = Object.assign({}, _this2.state.searchParams);
         searchParams[name] = value;
         return { searchParams: searchParams };
       });
     }
   }, {
-    key: 'handleSearch',
+    key: "handleSearch",
     value: function handleSearch() {
       var _this3 = this;
 
       BowAndDrape.api("POST", "/dashboard", this.state.searchParams, function (err, result) {
-        if (err) {
-          alert("Error on POSTing");
-          return err;
-        }
+        if (err) return console.log(err);
         _this3.setState(function (prevState) {
           return {
             hasMetrics: true,
@@ -75577,7 +75570,7 @@ var MetricsDash = function (_React$Component) {
       });
     }
   }, {
-    key: 'renderMetrics',
+    key: "renderMetrics",
     value: function renderMetrics() {
       // fill in table data!
       if (this.state.hasMetrics) {
@@ -75585,72 +75578,161 @@ var MetricsDash = function (_React$Component) {
         this.state.metricsData.metrics.forEach(function (query, index) {
           var tableTitle = query["format"]["title"];
           var columnNames = query["format"]["columnNames"];
-          var type = query["format"]["type"];
-          var numCols = query["format"]["columns"];
+          var formatType = query["format"]["type"];
+
           // Construct our header of column names
           var header = [];
           columnNames.forEach(function (name, index) {
             header.push(React.createElement(
-              'th',
+              "th",
               { key: index },
               name
             ));
           });
+
           // Fill in our data
           var columnData = [];
-          var data = query["data"][0][type];
-          // switch based on column numbers
-          switch (numCols) {
-            case 1:
-              columnData.push(React.createElement(
-                'tr',
-                { key: columnData.length },
-                React.createElement(
-                  'td',
-                  null,
-                  data
-                )
-              ));
-              break;
+          var data = query["data"];
 
-            case 2:
-              for (var key in data) {
-                if (data.hasOwnProperty(key)) {
+          switch (formatType) {
+            case "production":
+              var users = {};
+              var tags = {
+                "needs_picking": 0,
+                "needs_pressing": 0,
+                "needs_qaing": 0,
+                "needs_packing": 0,
+                "needs_embroidery": 0,
+                "needs_airbrush": 0,
+                "needs_stickers": 0,
+                "new": 0,
+                "on_hold": 0
+              };
+              data.forEach(function (obj) {
+                // init user if not exists in our userMap
+                users[obj.props.user] = users[obj.props.user] || Object.assign({}, tags);
+
+                // exclude tags other than the production ones
+                if (tags.hasOwnProperty(obj.props.tag)) {
+                  users[obj.props.user][obj.props.tag] += 1;
+                }
+              });
+              for (var name in users) {
+                if (!users[name]) continue;
+                for (var tag in users[name]) {
+                  if (!users[name][tag]) continue;
                   columnData.push(React.createElement(
-                    'tr',
+                    "tr",
                     { key: columnData.length },
                     React.createElement(
-                      'td',
+                      "td",
                       null,
-                      key
+                      name
                     ),
                     React.createElement(
-                      'td',
+                      "td",
                       null,
-                      data[key]
+                      tag
+                    ),
+                    React.createElement(
+                      "td",
+                      null,
+                      users[name][tag]
                     )
                   ));
                 }
               }
               break;
+
+            case "sum":
+              data.forEach(function (obj) {
+                for (var key in obj) {
+                  if (obj.hasOwnProperty(key)) {
+                    columnData.push(React.createElement(
+                      "tr",
+                      { key: columnData.length },
+                      React.createElement(
+                        "td",
+                        null,
+                        obj[key]
+                      )
+                    ));
+                  }
+                }
+              });
+              break;
+
+            case "inventory":
+              data.forEach(function (obj) {
+                var inventory = obj["inventory"];
+                for (var key in inventory) {
+                  if (inventory.hasOwnProperty(key)) {
+                    columnData.push(React.createElement(
+                      "tr",
+                      { key: columnData.length },
+                      React.createElement(
+                        "td",
+                        null,
+                        key
+                      ),
+                      React.createElement(
+                        "td",
+                        null,
+                        inventory[key]
+                      )
+                    ));
+                  }
+                }
+              });
+              break;
+
+            case "daily_sum":
+              data.forEach(function (obj) {
+                var tdata = [];
+                for (var key in obj) {
+                  if (obj.hasOwnProperty(key)) {
+                    tdata.push(React.createElement(
+                      "td",
+                      null,
+                      obj[key]
+                    ));
+                  }
+                }
+                columnData.push(React.createElement(
+                  "tr",
+                  { key: columnData.length },
+                  tdata
+                ));
+              });
+
+              break;
           } // switch
 
           queries.push(React.createElement(
-            'table',
-            { key: queries.length },
+            "div",
+            null,
             React.createElement(
-              'thead',
+              "h2",
               null,
-              React.createElement(
-                'tr',
-                null,
-                header
-              )
+              tableTitle
             ),
             React.createElement(
-              'tbody',
-              null,
-              columnData
+              "table",
+              { key: queries.length },
+              React.createElement(
+                "thead",
+                null,
+                React.createElement(
+                  "tr",
+                  null,
+                  header
+                )
+              ),
+              React.createElement(
+                "tbody",
+                null,
+                columnData
+              )
             )
           ));
         });
@@ -75659,60 +75741,75 @@ var MetricsDash = function (_React$Component) {
       return null;
     }
   }, {
-    key: 'render',
+    key: "render",
     value: function render() {
+      // header menu with options: Inventory, Sales, Production
+      // have a default view drawn from one of the menu options
+      var menu_options = ["Inventory", "Sales", "Production"];
+      var menu_items = [];
+      menu_options.forEach(function (option) {
+        menu_items.push(React.createElement(
+          "button",
+          { className: "primary", key: menu_items.length },
+          option
+        ));
+      });
+
       var metrics = this.renderMetrics();
-      //let metrics = null;
+
+      var start = new Date(this.state.searchParams.start * 1000);
+      var stop = new Date(this.state.searchParams.stop * 1000);
+
       return React.createElement(
-        'div',
-        { className: 'metrics_dash' },
+        "div",
+        { className: "metrics_dash" },
         React.createElement(
-          'section',
+          "section",
           null,
-          'Search Metrics'
+          "Search Metrics"
         ),
         React.createElement(
-          'row',
+          "row",
           null,
           React.createElement(
-            'div',
+            "div",
             null,
             React.createElement(
-              'label',
+              "label",
               null,
-              'Start Date: '
+              "Start Date: "
             ),
-            React.createElement('input', {
-              type: 'date',
+            React.createElement("input", {
+              type: "date",
               onChange: this.handleInputChange.bind(this),
-              value: this.state.searchParams["start"],
-              name: 'start'
+              value: start.toISOString().substr(0, 10),
+              name: "start"
             })
           ),
           React.createElement(
-            'div',
+            "div",
             null,
             React.createElement(
-              'label',
+              "label",
               null,
-              'Stop Date: '
+              "Stop Date: "
             ),
-            React.createElement('input', {
-              type: 'date',
+            React.createElement("input", {
+              type: "date",
               onChange: this.handleInputChange.bind(this),
-              value: this.state.searchParams["stop"],
-              name: 'stop'
+              value: stop.toISOString().substr(0, 10),
+              name: "stop"
             })
           )
         ),
         React.createElement(
-          'button',
+          "button",
           { onClick: this.handleSearch.bind(this) },
-          'Search'
+          "Search"
         ),
         React.createElement(
-          'div',
-          { className: 'display_metrics' },
+          "div",
+          { className: "display_metrics" },
           metrics
         )
       );
