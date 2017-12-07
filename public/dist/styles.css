@@ -2434,6 +2434,9 @@ menu.expanded login {
     justify-content: center;
   }
 }
+.metrics_dash {
+  padding: 10px;
+}
 @media (min-width: 1000px) {
   #hl-fbm-add_to_cart {
     position: relative;
