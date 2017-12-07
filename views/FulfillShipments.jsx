@@ -9,7 +9,7 @@ const FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-const tagged_tabs = ["new", "anna", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped"];
+const tagged_tabs = ["new", "anna", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing"];
 
 class FulfillShipments extends React.Component {
   constructor(props) {
@@ -28,6 +28,36 @@ class FulfillShipments extends React.Component {
       }
       BowAndDrape.facilities = this.props.facilities;
     }
+  }
+
+  static preprocessProps(options, callback) {
+    const SQLTable = require('../models/SQLTable.js');
+    const Facility = require('../models/Facility');
+    // get late shipments
+    SQLTable.sqlQuery(null, "SELECT shipments.* FROM (WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE delivery_promised-432000<date_part('epoch',NOW()) AND to_id!='e03d3875-d349-4375-8071-40928aa625f5') SELECT id, count(1) AS count, string_agg(content_array#>>'{tags}',' ') AS tags FROM shipment_contents WHERE content_array->'sku' IS NOT NULL GROUP BY id) AS s, shipments WHERE s.count<>(CHAR_LENGTH(s.tags)-CHAR_LENGTH(REPLACE(s.tags, 'shipped', '')))/CHAR_LENGTH('shipped') AND shipments.id=s.id", [], (err, result) => {
+      options.late = [];
+      if (result && result.rows)
+        options.late = result.rows;
+
+      // get shipments about to be late
+      SQLTable.sqlQuery(null, "SELECT shipments.* FROM (WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE delivery_promised-432000-86400<date_part('epoch',NOW()) AND delivery_promised-432000>date_part('epoch',NOW()) AND to_id!='e03d3875-d349-4375-8071-40928aa625f5') SELECT id, count(1) AS count, string_agg(content_array#>>'{tags}',' ') AS tags FROM shipment_contents WHERE content_array->'sku' IS NOT NULL GROUP BY id) AS s, shipments WHERE s.count<>(CHAR_LENGTH(s.tags)-CHAR_LENGTH(REPLACE(s.tags, 'shipped', '')))/CHAR_LENGTH('shipped') AND shipments.id=s.id", [], (err, result) => {
+        options.ship_today = [];
+        if (result && result.rows)
+          options.ship_today = result.rows;
+
+        // get facilities
+        Facility.getAll({}, (err, facility_list) => {
+          if (err || !facility_list.length)
+            return Page.renderNotFound(req, res);
+          // convert facilities list to array
+          options.facilities = {};
+          facility_list.map((facility) => {
+            options.facilities[facility.id] = facility;
+          });
+          callback(null, options);
+        }); // get facilities
+      }); // get about-to-be-late shipments
+    }); // get late shipments
   }
 
   componentDidMount() {
@@ -114,12 +144,47 @@ class FulfillShipments extends React.Component {
       );
     });
 
+    let late = []
+    if (this.props.late) {
+      this.props.late.forEach((shipment) => {
+        late.push(
+          <Shipment key={shipment.id} fulfillment={true} edit_tags={true} {...shipment} />
+        );
+      });
+    }
+
+    let ship_today = []
+    if (this.props.ship_today) {
+      this.props.ship_today.forEach((shipment) => {
+        ship_today.push(
+          <Shipment key={shipment.id} fulfillment={true} edit_tags={true} {...shipment} />
+        );
+      });
+    }
+
     return (
       <div className="fulfillment_admin">
         <h1>Store "{this.props.store.props.name}"</h1>
         {fulfillment_stations}
         <Tabs onChange={this.refreshTaggedShipments.bind(this)}>
           {tagged_tab_contents}
+          <shipments>
+            <h2>{`Ship Today ${ship_today.length}`}</h2>
+            {ship_today}
+          </shipments>
+          <shipments>
+            <h2>{`Late ${late.length}`}</h2>
+            {late}
+          </shipments>
+          <shipments>
+            <h2>Shipped</h2>
+            <Scrollable
+              component={Shipment}
+              component_props={{fulfillment:true,edit_tags:true}}
+              endpoint={`/shipment/tagged?tag=shipped`}
+              page = {{sort:"delivery_promised", direction:"ASC"}}
+            />
+          </shipments>
           <shipments>
             <h2>In Transit</h2>
             <Scrollable
