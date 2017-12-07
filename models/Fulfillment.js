@@ -1,6 +1,5 @@
 
 const Store = require('./Store');
-const Facility = require('./Facility');
 const Shipment = require('./Shipment');
 const Page = require('./Page');
 
@@ -89,23 +88,12 @@ class Fulfillment {
         return Page.renderNotFound(req, res);
       }
 
-      // get facilities
-      // TODO put this in FulfillShipments::preprocessProps
-      Facility.getAll({}, (err, facility_list) => {
-        if (err || !facility_list.length)
-          return Page.renderNotFound(req, res);
-        // convert facilities list to array
-        let facilities = {};
-        facility_list.map((facility) => {
-          facilities[facility.id] = facility;
-        });
-
-        Page.render(req, res, FulfillShipments, {
-          store: store,
-          facilities: facilities,
-          station_types,
-        });
-      }); // Facility.getAll
+      FulfillShipments.preprocessProps({
+        store: store,
+        station_types,
+      }, (err, props) => {
+        Page.render(req, res, FulfillShipments, props);
+      });
     }); // get store
   }
 }
