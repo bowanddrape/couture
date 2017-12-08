@@ -26,6 +26,7 @@ class LayoutFooter extends React.Component {
     menu_items.push(<a className="social facebook" key={menu_items.length} href="//facebook.com/BowAndDrape/" target="_blank"></a>);
     menu_items.push(<a key={menu_items.length} href="/contact">Contact Us</a>);
     menu_items.push(<a key={menu_items.length} href="/legal">Legal</a>);
+    menu_items.push(<a key={menu_items.length} href="https://bowdrape.zendesk.com/hc/en-us">FAQ</a>);
     menu_items.push(<a key={menu_items.length} href="/customize_your_own">Make Your Own</a>);
 
     if (this.state.desktop_mode) {

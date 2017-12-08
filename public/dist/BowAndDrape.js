@@ -75142,6 +75142,11 @@ var LayoutFooter = function (_React$Component) {
       ));
       menu_items.push(React.createElement(
         'a',
+        { key: menu_items.length, href: 'https://bowdrape.zendesk.com/hc/en-us' },
+        'FAQ'
+      ));
+      menu_items.push(React.createElement(
+        'a',
         { key: menu_items.length, href: '/customize_your_own' },
         'Make Your Own'
       ));
