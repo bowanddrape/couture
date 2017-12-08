@@ -27,15 +27,22 @@
       }
     }
     .fields, fields {
-      width: 300px;
       margin-left: 75px;
+      .option_group {
+        display: flex;
+        input[type="file"], input[type="checkbox"] {
+          margin-top: 30px;
+        }
+      }
       div {
         position: relative;
       }
       label {
         position: absolute;
-        right: 305px;
+        width: 70px;
+        left: -75px;
         top: 28px;
+        text-align: right;
       }
       .checkbox label {
         top: 0px;

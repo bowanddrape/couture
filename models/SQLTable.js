@@ -161,7 +161,7 @@ class SQLTable {
         // if we have props, search that too
         let sql_constraint = `${sql.pkey}::text ~* $${values.length}`;
         if (sql.fields.indexOf("props") >= 0)
-          sql_constraint = `(props->>'name' ~* $${values.length} OR props->>'legacy_id' ~* $${values.length} OR ${sql_constraint})`;
+          sql_constraint = `(props->>'name' ~* $${values.length} OR address->>'name' ~* $${values.length} OR ${sql_constraint})`;
         if (sql.fields.indexOf("email") >= 0)
           sql_constraint = `(email ~* $${values.length} OR ${sql_constraint})`;
 

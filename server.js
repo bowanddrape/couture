@@ -53,7 +53,7 @@ let upload = multer({
       cb(null, `attachment; filename=${file.originalname}`);
     },
     key: function (req, file, cb) {
-      let key = "test";
+      let key = file.originalname;
       if (req.body.sku)
         key = req.body.sku;
       if (req.path.substring(1)=='order')
