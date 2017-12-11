@@ -158,6 +158,7 @@ module.exports = {
     WarningNotice: require('./WarningNotice.jsx'),
     FacebookLogin: require('./FacebookLogin.jsx'),
     MetricsDash: require('./MetricsDash.jsx'),
+    DashboardPromos: require('./DashboardPromos.jsx'),
     Announcement: require('./Announcement.jsx'),
     AnnouncementEdit: require('./AnnouncementEdit.jsx'),
   },

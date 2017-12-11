@@ -5,9 +5,9 @@ const Shipment = require('./Shipment.js');
 const SQLTable = require('./SQLTable.js');
 const async = require('async');
 
+const DashboardPromos = require('../views/DashboardPromos.jsx');
 
 class Dashboard {
-
 
   static handleHTTP(req, res, next){
     // only handle this request if it's for us
@@ -18,10 +18,15 @@ class Dashboard {
     if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
       return Page.renderNotFound(req, res);
 
+    if (req.path_tokens[1] == "promos")
+      return DashboardPromos.preprocessProps(req.query, (err, props) => {
+        Page.render(req, res, DashboardPromos, props);
+      });
+
     // Handle GET
-    if (req.path_tokens.length==1 && req.method == 'GET'){
-      return Dashboard.handleGET(req, res);
-    }
+    if (req.path_tokens.length==1 && req.method == 'GET')
+      return Page.render(req, res, MetricsDash, {});
+
     // Handle POST
     if (req.method == 'POST')
       return Dashboard.handlePOST(req, res);  //handle POST request
@@ -89,7 +94,7 @@ class Dashboard {
       queries.push((callback) => {
         SQLTable.sqlQuery(null, metric.query.string, metric.query.props,
           (err, result) => {
-            if(err) return callback;
+            if(err) return callback(err);
             result.format = metric.format;
             return callback(err, result);
           }
@@ -111,13 +116,6 @@ class Dashboard {
       metricsCallback(null, metrics);
     });
   } // getMetrics()
-
-
-  static handleGET(req, res) {
-    // Manages all GET requests to /dashboard
-    let props = {};
-    return Page.render(req, res, MetricsDash, props);
-  }  //  handleGET()
 
   static handlePOST(req, res) {
     Dashboard.getMetrics(req.body, (err, result)=>{
