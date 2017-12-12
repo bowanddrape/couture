@@ -22,9 +22,6 @@ class Gallery extends React.Component {
         item.href = item.href.replace(/^https:\/\/couture\.bowanddrape\.com/, "");
         item.href = item.href.replace(/^https:\/\/www\.bowanddrape\.com/, "");
       }
-      let max_width = null;
-      if (/px/.test(item.width))
-        max_width = (parseInt(item.width)*4)+"px";
 
       let media = (
         <img src={item.image} style={{width: "100%"}} />
@@ -34,12 +31,20 @@ class Gallery extends React.Component {
         if (item.has_audio)
           media = (<video src={item.image} style={{width: "100%"}} autoPlay loop controls={false}/>);
       }
+
+      let style = {
+        width: item.width,
+        margin: `${border}`,
+      };
+      if (/px/.test(item.width)) {
+        style.maxWidth = (parseInt(item.width)*4)+"px";
+        if (item.image_dims) {
+          style.minHeight = item.image_dims[1]/item.image_dims[0]*parseFloat(item.width);
+        }
+      }
+
       gallery_cards.push(
-        <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={{
-          width: item.width,
-          maxWidth: max_width,
-          margin: `${border}`,
-        }} >
+        <a key={gallery_cards.length} className={item.href?"card":"card not_link"} href={item.href||null} style={style} >
           {media}
           {item.caption ?
             <div className="caption" >

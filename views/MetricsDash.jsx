@@ -1,6 +1,5 @@
 const React = require('react');
 
-
 class MetricsDash extends React.Component {
     constructor(props) {
       super(props);

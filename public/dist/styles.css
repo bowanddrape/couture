@@ -1591,8 +1591,17 @@ input_credit [name="exp_year"] {
 }
 .page_edit element .fields,
 .page_edit element fields {
-  width: 300px;
   margin-left: 75px;
+}
+.page_edit element .fields .option_group,
+.page_edit element fields .option_group {
+  display: flex;
+}
+.page_edit element .fields .option_group input[type="file"],
+.page_edit element fields .option_group input[type="file"],
+.page_edit element .fields .option_group input[type="checkbox"],
+.page_edit element fields .option_group input[type="checkbox"] {
+  margin-top: 30px;
 }
 .page_edit element .fields div,
 .page_edit element fields div {
@@ -1601,8 +1610,10 @@ input_credit [name="exp_year"] {
 .page_edit element .fields label,
 .page_edit element fields label {
   position: absolute;
-  right: 305px;
+  width: 70px;
+  left: -75px;
   top: 28px;
+  text-align: right;
 }
 .page_edit element .fields .checkbox label,
 .page_edit element fields .checkbox label {

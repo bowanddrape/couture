@@ -51,7 +51,6 @@ class Dashboard {
           description: "",
         },
       },
-
       {
         query:{
           string: "SELECT CAST(CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE) AS TEXT), sum(cast(payments#>>'{0, price}' as float)/100), count(1) FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3 GROUP BY 1 ORDER BY 1;",

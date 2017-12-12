@@ -19,6 +19,7 @@ class PageEdit extends React.Component {
       description: this.props.description || "",
       redirect: this.props.redirect || "",
       elements: this.props.elements,
+      files: [],
     };
   }
 
@@ -61,6 +62,14 @@ class PageEdit extends React.Component {
     this.setState({elements});
   }
 
+  handleUpdateFile(file) {
+    this.setState((prev_state) => {
+      let files = prev_state.files.slice(0);
+      files.push(file);
+      return {files};
+    });
+  }
+
   handleSave() {
     if (!this.state.path)
       return alert("please set a path");
@@ -72,10 +81,13 @@ class PageEdit extends React.Component {
       if (typeof(element.props)=="string")
         element.props = JSON.parse(element.props);
     });
+    this.state.files.forEach((file) => {
+      page["file_"+file.name.replace(/ /g,"")] = file;
+    });
     BowAndDrape.api("POST", "/page", page, (err, result) => {
       if (err)
         return BowAndDrape.dispatcher.emit("error", err.error);
-      location.reload();
+//      location.reload();
     });
   }
 
@@ -102,7 +114,7 @@ class PageEdit extends React.Component {
       switch (this.state.elements[i].type) {
         case "Gallery":
           edit_props = (
-            <PageEditGallery onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
+            <PageEditGallery onFileUpload={this.handleUpdateFile.bind(this)} onChange={this.handleUpdateProps.bind(this, i, "props")} {...this.state.elements[i].props}/>
           );
           break;
         case "Signup":

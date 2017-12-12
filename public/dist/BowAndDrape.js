@@ -336,7 +336,7 @@ var SQLTable = function () {
           values.push('.*' + constraints[column] + '.*');
           // if we have props, search that too
           var sql_constraint = sql.pkey + '::text ~* $' + values.length;
-          if (sql.fields.indexOf("props") >= 0) sql_constraint = '(props->>\'name\' ~* $' + values.length + ' OR props->>\'legacy_id\' ~* $' + values.length + ' OR ' + sql_constraint + ')';
+          if (sql.fields.indexOf("props") >= 0) sql_constraint = '(props->>\'name\' ~* $' + values.length + ' OR address->>\'name\' ~* $' + values.length + ' OR ' + sql_constraint + ')';
           if (sql.fields.indexOf("email") >= 0) sql_constraint = '(email ~* $' + values.length + ' OR ' + sql_constraint + ')';
 
           where = where ? where + (' AND ' + sql_constraint) : 'WHERE ' + sql_constraint;
@@ -73806,21 +73806,27 @@ var Gallery = function (_React$Component) {
           item.href = item.href.replace(/^https:\/\/couture\.bowanddrape\.com/, "");
           item.href = item.href.replace(/^https:\/\/www\.bowanddrape\.com/, "");
         }
-        var max_width = null;
-        if (/px/.test(item.width)) max_width = parseInt(item.width) * 4 + "px";
 
         var media = React.createElement("img", { src: item.image, style: { width: "100%" } });
         if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
           media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false, muted: true, playsInline: true });
           if (item.has_audio) media = React.createElement("video", { src: item.image, style: { width: "100%" }, autoPlay: true, loop: true, controls: false });
         }
+
+        var style = {
+          width: item.width,
+          margin: "" + border
+        };
+        if (/px/.test(item.width)) {
+          style.maxWidth = parseInt(item.width) * 4 + "px";
+          if (item.image_dims) {
+            style.minHeight = item.image_dims[1] / item.image_dims[0] * parseFloat(item.width);
+          }
+        }
+
         gallery_cards.push(React.createElement(
           "a",
-          { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: {
-              width: item.width,
-              maxWidth: max_width,
-              margin: "" + border
-            } },
+          { key: gallery_cards.length, className: item.href ? "card" : "card not_link", href: item.href || null, style: style },
           media,
           item.caption ? React.createElement(
             "div",
@@ -76003,7 +76009,8 @@ var PageEdit = function (_React$Component) {
       title: _this.props.title || "",
       description: _this.props.description || "",
       redirect: _this.props.redirect || "",
-      elements: _this.props.elements
+      elements: _this.props.elements,
+      files: []
     };
     return _this;
   }
@@ -76054,6 +76061,15 @@ var PageEdit = function (_React$Component) {
       this.setState({ elements: elements });
     }
   }, {
+    key: "handleUpdateFile",
+    value: function handleUpdateFile(file) {
+      this.setState(function (prev_state) {
+        var files = prev_state.files.slice(0);
+        files.push(file);
+        return { files: files };
+      });
+    }
+  }, {
     key: "handleSave",
     value: function handleSave() {
       if (!this.state.path) return alert("please set a path");
@@ -76063,9 +76079,12 @@ var PageEdit = function (_React$Component) {
       page.elements.forEach(function (element) {
         if (typeof element.props == "string") element.props = JSON.parse(element.props);
       });
+      this.state.files.forEach(function (file) {
+        page["file_" + file.name.replace(/ /g, "")] = file;
+      });
       BowAndDrape.api("POST", "/page", page, function (err, result) {
         if (err) return BowAndDrape.dispatcher.emit("error", err.error);
-        location.reload();
+        //      location.reload();
       });
     }
   }, {
@@ -76098,7 +76117,7 @@ var PageEdit = function (_React$Component) {
         var edit_props = null;
         switch (_this2.state.elements[_i].type) {
           case "Gallery":
-            edit_props = React.createElement(PageEditGallery, _extends({ onChange: _this2.handleUpdateProps.bind(_this2, _i, "props") }, _this2.state.elements[_i].props));
+            edit_props = React.createElement(PageEditGallery, _extends({ onFileUpload: _this2.handleUpdateFile.bind(_this2), onChange: _this2.handleUpdateProps.bind(_this2, _i, "props") }, _this2.state.elements[_i].props));
             break;
           case "Signup":
             edit_props = React.createElement(PageEditSignup, _extends({ onChange: _this2.handleUpdateProps.bind(_this2, _i, "props") }, _this2.state.elements[_i].props));
@@ -76414,6 +76433,26 @@ var PageEditGallery = function (_React$Component) {
       this.props.onChange({ items: items });
     }
   }, {
+    key: "handleUpdateFile",
+    value: function handleUpdateFile(index, key, value) {
+      var _this2 = this;
+
+      var callFileHandlers = function callFileHandlers() {
+        _this2.handleUpdateItem(index, key, "https://s3.amazonaws.com/www.bowanddrape.com/page_uploads/" + value.name);
+        if (_this2.props.onFileUpload) _this2.props.onFileUpload(value);
+      };
+
+      if (!/\.mp4/.test(value.name)) {
+        var image = new Image();
+        image.src = window.URL.createObjectURL(value);
+        return image.onload = function () {
+          _this2.handleUpdateItem(index, key + "_dims", [image.naturalWidth, image.naturalHeight]);
+          callFileHandlers();
+        };
+      }
+      callFileHandlers();
+    }
+  }, {
     key: "handleNewCard",
     value: function handleNewCard() {
       if (!this.props.onChange) return;
@@ -76434,7 +76473,7 @@ var PageEditGallery = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       var items = [];
       if (this.props.items) {
@@ -76448,27 +76487,30 @@ var PageEditGallery = function (_React$Component) {
               null,
               React.createElement(
                 "div",
-                null,
+                { className: "option_group" },
                 React.createElement(
                   "label",
                   null,
                   "image"
                 ),
-                React.createElement("input", { type: "text", onChange: function onChange(event) {
-                    _this2.handleUpdateItem(index, "image", event.target.value);
-                  }, value: item.image || "" })
-              ),
-              React.createElement(
-                "div",
-                { className: "checkbox" },
+                React.createElement("input", { type: "file", onChange: function onChange(event) {
+                    _this3.handleUpdateFile(index, "image", event.target.files[0]);
+                  }, placeholder: item.image || "", name: "image" }),
                 React.createElement(
-                  "label",
-                  null,
-                  "has_audio"
+                  "div",
+                  { className: "checkbox" },
+                  "has_audio",
+                  React.createElement("input", { type: "checkbox", onChange: function onChange(event) {
+                      _this3.handleUpdateItem(index, "has_audio", event.target.checked);
+                    }, checked: !!item.has_audio })
                 ),
-                React.createElement("input", { type: "checkbox", onChange: function onChange(event) {
-                    _this2.handleUpdateItem(index, "has_audio", event.target.checked);
-                  }, checked: !!item.has_audio })
+                React.createElement(
+                  "div",
+                  null,
+                  React.createElement("input", { type: "text", name: "image", onChange: function onChange(event) {
+                      _this3.handleUpdateItem(index, "image", event.target.value);
+                    }, value: item.image || "" })
+                )
               ),
               React.createElement(
                 "div",
@@ -76479,7 +76521,7 @@ var PageEditGallery = function (_React$Component) {
                   "href"
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
-                    _this2.handleUpdateItem(index, "href", event.target.value);
+                    _this3.handleUpdateItem(index, "href", event.target.value);
                   }, value: item.href || "" })
               ),
               React.createElement(
@@ -76491,7 +76533,7 @@ var PageEditGallery = function (_React$Component) {
                   "width"
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
-                    _this2.handleUpdateItem(index, "width", event.target.value);
+                    _this3.handleUpdateItem(index, "width", event.target.value);
                   }, value: item.width || "", placeholder: "90px" })
               ),
               React.createElement(
@@ -76503,13 +76545,13 @@ var PageEditGallery = function (_React$Component) {
                   "caption"
                 ),
                 React.createElement("input", { type: "text", onChange: function onChange(event) {
-                    _this2.handleUpdateItem(index, "caption", event.target.value);
+                    _this3.handleUpdateItem(index, "caption", event.target.value);
                   }, value: item.caption || "" })
               )
             ),
             React.createElement(
               "span",
-              { style: { cursor: "pointer" }, className: "remove", onClick: _this2.handleRemoveCard.bind(_this2, index), title: "delete" },
+              { style: { cursor: "pointer" }, className: "remove", onClick: _this3.handleRemoveCard.bind(_this3, index), title: "delete" },
               "\u2718"
             )
           ));
@@ -76518,7 +76560,7 @@ var PageEditGallery = function (_React$Component) {
 
       return React.createElement(
         "div",
-        null,
+        { className: "edit_gallery" },
         React.createElement(
           "div",
           null,
@@ -76528,7 +76570,7 @@ var PageEditGallery = function (_React$Component) {
             "border"
           ),
           React.createElement("input", { type: "text", onChange: function onChange(event) {
-              _this2.handleUpdate("border", event.target.value);
+              _this3.handleUpdate("border", event.target.value);
             }, value: this.props.border, placeholder: "5px" })
         ),
         React.createElement(
