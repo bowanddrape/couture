@@ -72,7 +72,7 @@ class Order {
         return res.json({error: "Cart not properly linked to store"});
       // set shipment destination
       shipment.to_id = Facility.special_ids.customer_ship;
-
+      shipment.from_id = store.facility_id;
       let handleCheckInventory = (client, callback) => {
         // TODO in the future, let SQLTable.get take in an optional pg client
         // until then, just run straight sql commands
