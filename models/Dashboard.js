@@ -86,10 +86,22 @@ class Dashboard {
       {
         query: {
           string: "SELECT inventory FROM inventory WHERE facility_id=$1",
+          props: ['83bcecf8-6881-4202-bb1c-051f77f27d90'],
+        },
+        format: {
+          title: "Virtual Sample Sale Inventory",
+          columnNames: ["Item", "Quantity"],
+          type: "inventory",
+          description: "Inventory of VSS facility",
+        },
+      },
+      {
+        query: {
+          string: "SELECT inventory FROM inventory WHERE facility_id=$1",
           props: ['988e00d0-4b27-4ab4-ac00-59fcba6847d1'],
         },
         format: {
-          title: "Inventory",
+          title: "Factory 216 Inventory",
           columnNames: ["Item", "Quantity"],
           type: "inventory",
           description: "Inventory of facility 216",
