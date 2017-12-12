@@ -224,8 +224,17 @@ class Shipment extends JSONAPI {
         if (!result.rows.length) return super.onApiSave(req, res, object, callback);
         let next_fulfillment_id = result.rows[0].fulfillment_id || 1;
         object.fulfillment_id = next_fulfillment_id;
-        // FIXME currently hardcoding all fullments to come from 216 factory
-        object.from_id = Facility.special_ids["216"];
+        // We can remove this bit once all stores are marking their from_id's
+        // check object store id and assign the appropriate from_id for now
+        let store_id = result.rows[0].store_id;
+        if (store_id == 'd955f9f3-e9ae-475a-a944-237862b589b3'){
+          // check if our store is the VSS store
+          object.from_id = Facility.special_ids["vss"]
+        }
+        else {
+          // Assign 216 as there are no other stores currently
+          object.from_id = Facility.special_ids["216"];
+        }
         super.onApiSave(req, res, object, callback);
       });
     };
