@@ -1,7 +1,7 @@
 {
   "author": "graphicsforge",
   "scripts": {
-    "build_js": "mkdir -p public/dist && ./node_modules/browserify/bin/cmd.js --exclude ./models/Inventory.js --exclude ./models/PayStripe.js -t [ babelify --presets [ react es2015 ] ] -r ./views/BowAndDrape.jsx:BowAndDrape -o public/dist/BowAndDrape.js",
+    "build_js": "mkdir -p public/dist && ./node_modules/browserify/bin/cmd.js --exclude ./models/Inventory.js --exclude ./models/PayStripe.js -g [ envify --NODE_ENV production] -t [ babelify --presets [ react es2015 ] ] -r ./views/BowAndDrape.jsx:BowAndDrape | ./node_modules/uglify-js/bin/uglifyjs -c -m -o public/dist/BowAndDrape.js",
     "build_sprites": "./node_modules/.bin/sprity create public/dist/ public/*.png -c / -p less -s sprite.less --cachebuster --engine sprity-gm",
     "build_styles": "lessc ./styles/styles.less public/dist/styles.css",
     "build": "npm run build_js && npm run build_sprites && npm run build_styles",
@@ -62,10 +62,11 @@
     "babel-loader": "^6.2.5",
     "babel-preset-react": "^6.16.0",
     "browserify": "~13.0.0",
+    "envify": "^4.1.0",
     "react-dom": "~16.0.0",
     "sprity-cli": "^1.0.1",
-    "sprity-less": "^1.0.3",
     "sprity-gm": "^1.0.2",
+    "sprity-less": "^1.0.3",
     "webpack": "^1.13.2"
   }
 }
