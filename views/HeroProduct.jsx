@@ -22,7 +22,7 @@ class HeroProduct extends React.Component {
   handleAddToCart(event) {
     let sku = this.props.base_sku;
     let options = [this.props.base_sku];
-    if (typeof(this.props.options[this.state.selected_option])!="undefined") {
+    if (this.props.options && typeof(this.props.options[this.state.selected_option])!="undefined") {
       let option_name = this.props.options[this.state.selected_option].name;
       sku += `_${option_name}`;
       options.push(option_name);
@@ -38,8 +38,6 @@ class HeroProduct extends React.Component {
         options: options,
       },
     };
-    // fill in human-readable options
-    if (typeof(this.props.options[this.state.selected_option])!="undefined")
 
     // set item url
     item.props.url = location.href;
