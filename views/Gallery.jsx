@@ -22,6 +22,9 @@ class Gallery extends React.Component {
         item.href = item.href.replace(/^https:\/\/couture\.bowanddrape\.com/, "");
         item.href = item.href.replace(/^https:\/\/www\.bowanddrape\.com/, "");
       }
+      if (item.image) {
+        item.image = item.image.replace(/^https:\/\/s3\.amazonaws\.com\/www.bowanddrape.com/, "https://s3.bowanddrape.com");
+      }
 
       let media = (
         <img src={item.image} style={{width: "100%"}} />
