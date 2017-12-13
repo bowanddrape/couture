@@ -251,6 +251,7 @@ class Page extends JSONAPI {
       ${description_header}
       <meta property="og:title" content="${title}"/>
       <meta property="og:type" content="website"/>
+      <meta charset="utf-8"/>
       ${image_header}
 
       <script defer src="//plugin.headlinerlabs.com/users/bowanddrape.js"></script>

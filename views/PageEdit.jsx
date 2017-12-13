@@ -87,7 +87,7 @@ class PageEdit extends React.Component {
     BowAndDrape.api("POST", "/page", page, (err, result) => {
       if (err)
         return BowAndDrape.dispatcher.emit("error", err.error);
-//      location.reload();
+      location.reload();
     });
   }
 
@@ -148,18 +148,18 @@ class PageEdit extends React.Component {
             {whitelisted_components}
           </select>
           {edit_props}
-          <span style={{cursor:"pointer",position:"absolute",right:"5px",top:"5px"}} className="remove" onClick={this.handleRemoveElement.bind(this, i)} title="delete">✘</span>
+          <span style={{cursor:"pointer",position:"absolute",right:"5px",top:"5px"}} className="remove" onClick={this.handleRemoveElement.bind(this, i)} title="delete">{'✘'}</span>
           <div className="reorder_actions" style={{position:"absolute",right:"30px",top:"5px",display:"flex",flexDirection:"column"}}>
             { (i>1) ?
-              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementTop.bind(this, i)} title="move to top">⇪</span>
+              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementTop.bind(this, i)} title="move to top">{'⇪'}</span>
               : null
             }
             { (i>0) ?
-              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementUp.bind(this, i)} title="move up">⇧</span>
+              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementUp.bind(this, i)} title="move up">{'⇧'}</span>
               : null
             }
             { (i<this.state.elements.length-1) ?
-              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementDown.bind(this, i)} title="move down">⇩</span>
+              <span style={{cursor:"pointer"}} onClick={this.handleMoveElementDown.bind(this, i)} title="move down">{'⇩'}</span>
               : null
             }
           </div>

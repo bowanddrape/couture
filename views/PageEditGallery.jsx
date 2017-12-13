@@ -81,7 +81,7 @@ class PageEditGallery extends React.Component {
               <div><label>width</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "width", event.target.value)}} value={item.width||""} placeholder="90px"/></div>
               <div><label>caption</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "caption", event.target.value)}} value={item.caption||""} /></div>
             </fields>
-            <span style={{cursor:"pointer"}} className="remove" onClick={this.handleRemoveCard.bind(this, index)} title="delete">✘</span>
+            <span style={{cursor:"pointer"}} className="remove" onClick={this.handleRemoveCard.bind(this, index)} title="delete">{'✘'}</span>
           </card>
         );
       });
