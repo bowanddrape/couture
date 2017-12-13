@@ -19,8 +19,15 @@ class Announcement extends React.Component {
     if (!this.props.text)
       return null;
 
+    let style = {
+      color: "#fff",
+      backgroundColor: "#ff5c5c",
+      width: "100%",
+      textAlign: "center",
+      fontFamily: "zurichbold_condensed",
+    };
     return (
-      <div className="announcement" style={{color:"#fff",backgroundColor:"#ff5c5c",width:"100%",textAlign:"center",fontFamily: "zurichbold_condensed"}}>
+      <div className="announcement" style={style}>
         <div style={{fontFamily: "zurichbold_condensed"}} dangerouslySetInnerHTML={{__html:`
           ${this.props.text}
         `}} />

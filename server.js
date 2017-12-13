@@ -124,7 +124,10 @@ app.use((req, res, next) => {
 
 // static assets
 app.use((req, res, next) => {
-  let options = {index:'index.html'};
+  let options = {
+    index:'index.html',
+    maxAge: 600000,
+  };
   // dependant on our request headers, we may be looking to return json
   if (!req.accepts('*/*') && req.accepts('application/json')) {
     options.index = 'index.json';
