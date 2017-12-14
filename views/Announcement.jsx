@@ -25,6 +25,7 @@ class Announcement extends React.Component {
       width: "100%",
       textAlign: "center",
       fontFamily: "zurichbold_condensed",
+      padding: "5px 0px",
     };
     return (
       <div className="announcement" style={style}>
