@@ -77,7 +77,7 @@ class Shipment extends React.Component {
         id: this.props.id,
         content_index: "*",
         add_tags: ["needs_stickers"],
-        remove_tags: ["new", "at_embroidery", "at_airbrush"],
+        remove_tags: ["new"],
       }, (err, results) =>  {
         BowAndDrape.api("POST", "/shipment", shipment, (err, ret) =>{
           this.setState({hidden:true});
