@@ -65,9 +65,12 @@ class PageEditGallery extends React.Component {
     let items = [];
     if (this.props.items) {
       this.props.items.forEach((item, index) => {
+        let preview_image = item.image;
+        if (preview_image)
+          preview_image = preview_image.replace(/ /g, "%20");
         items.push(
           <card key={index} style={{display:"flex"}}>
-            <div className="preview" style={{backgroundImage:`url(${item.image.replace(/ /g, "%20")})`}} />
+            <div className="preview" style={{backgroundImage:`url(${preview_image})`}} />
             <fields>
               <div className="option_group">
                 <label>image</label>
