@@ -465,7 +465,7 @@ input[type="button"]:focus {
 shipments {
   display: block;
   padding: 10px;
-  border: solid 5px #ffa7c0;
+  border: solid 5px #f5c9ca;
 }
 shipment {
   position: relative;
@@ -1885,6 +1885,7 @@ product_options switch.expanded {
   padding: 0px 7px;
   border-radius: 700px;
   background-color: #ff5c5c;
+  color: #fff;
   font-size: 11px;
   right: -24px;
 }
@@ -1915,6 +1916,10 @@ product_options switch.expanded {
   width: auto;
   border: none;
   margin: 12px auto;
+}
+.header menu a button.highlight,
+.header menu a .button.highlight {
+  color: #ff0000;
 }
 .header menu a button:hover,
 .header menu a .button:hover {

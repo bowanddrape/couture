@@ -71,6 +71,7 @@
       padding: 0px 7px;
       border-radius: 700px;
       background-color: @color_support_2;
+      color: @color_primary;
       font-size: 11px;
       right: -24px;
     }
@@ -88,27 +89,30 @@
 
 
     menu_items {
-        position: relative;
-        display: inline-block;
+      position: relative;
+      display: inline-block;
     }
-    a{
+    a {
       &:hover {
       text-decoration: none;
     }
     button, .button {
-    .zurichroman;
-    font-size: 14px;
-    height: auto;
-    width: auto;
-    border: none;
-    margin: 12px auto;
-    &:hover {
-      color: @color_highlight;
+      .zurichroman;
+      font-size: 14px;
+      height: auto;
+      width: auto;
+      border: none;
+      margin: 12px auto;
+      &.highlight {
+        color: @color_current_campaign;
+      }
+      &:hover {
+        color: @color_highlight;
+      }
+      &:before { display:none; }
+      &:after { display:none; }
     }
-    &:before { display:none; }
-    &:after { display:none; }
   }
-}
 }
 
 
