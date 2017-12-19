@@ -6,7 +6,27 @@ Display a bunch of images
 ***/
 class Gallery extends React.Component {
 
+  constructor(_props) {
+    let props = Object.assign({}, {items:[]}, _props);
+    super(props);
+    this.state = {
+      items_loaded: 0,
+      load_delay_timeout: false,
+    }
+    this.handleItemLoad = this.handleItemLoad.bind(this);
+  }
+
+  handleItemLoad() {
+    this.setState((prev_state) => {
+      return {items_loaded:prev_state.items_loaded+1}
+    });
+  }
+
   componentDidMount() {
+    setTimeout(() => {
+if (this.state.items_loaded<this.props.items.length)
+      this.setState({load_delay_timeout:true});
+    }, 2000);
   }
 
   render() {
@@ -27,12 +47,12 @@ class Gallery extends React.Component {
       }
 
       let media = (
-        <img src={item.image} style={{width: "100%"}} />
+        <img onLoad={this.handleItemLoad} src={item.image} style={{width: "100%"}} />
       );
       if (/\.mp4/.test(item.image) || /\.webm/.test(item.image)) {
-        media = (<video src={item.image} style={{width: "100%"}} autoPlay loop controls={false} muted playsInline />);
+        media = (<video onLoad={this.handleItemLoad} src={item.image} style={{width: "100%"}} autoPlay loop controls={false} muted playsInline />);
         if (item.has_audio)
-          media = (<video src={item.image} style={{width: "100%"}} autoPlay loop controls={false}/>);
+          media = (<video onLoad={this.handleItemLoad} src={item.image} style={{width: "100%"}} autoPlay loop controls={false}/>);
       }
 
       let style = {
@@ -65,6 +85,30 @@ class Gallery extends React.Component {
         )
       }
     });
+
+    // display loading state
+    if (this.props.items && this.state.items_loaded<this.props.items.length && !this.state.load_delay_timeout) {
+      let loading_items = [];
+      items.forEach((item, index) => {
+        let width = this.props.items.length > 1? 30 : 100;
+        let style = {
+          width: `${width}%`,
+          margin: `${border}`,
+        };
+        if (item.image_dims) {
+          style.height = (item.image_dims[1]/item.image_dims[0]*width)+"vw";
+        }
+        loading_items.push(
+          <div className="card" style={style} key={index}><div className="loading_spinner"/></div>
+        )
+      });
+      return (
+        <div className="gallery deck" style={{margin:"0 auto"}}>
+          <div style={{display:"none"}}>{gallery_cards}</div>
+          {loading_items}
+        </div>
+      );
+    }
 
     return (
       <div className="gallery deck" style={{margin:"0 auto"}}

@@ -187,6 +187,33 @@ actions, .actions {
   }
 }
 
+.loading_spinner {
+  display: block;
+  position: relative;
+  width: 75%;
+  height: 75%;
+  margin-top: 10px;
+  border-radius: 1000px;
+  margin: auto;
+  background: @color_primary;
+  pointer-events: none;
+  border: 5px solid transparent;
+  background-clip: padding-box;
+}
+
+.loading_spinner::after {
+  position: absolute;
+  top: -5px; bottom: -5px;
+  left: -5px; right: -5px;
+  content: '';
+  z-index: -1;
+  border-radius: 1000px;
+  background: @gradient-loading;
+  animation-duration: 5s;
+  animation-name: gradient_loading;
+  animation-iteration-count: infinite;
+}
+
 .deck {
   display: flex;
   flex-direction: row;
