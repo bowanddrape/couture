@@ -1,4 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,600,800');
+@keyframes gradient_loading {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 100px 100px;
+  }
+}
 @font-face {
   font-family: 'zurichbold_condensed';
   src: url('zurichbt-boldcondensed-webfont.woff2') format('woff2'), url('zurichbt-boldcondensed-webfont.woff') format('woff'), url('zurichbt-boldcondensed-webfont.ttf') format('truetype');
@@ -246,6 +254,33 @@ actions,
   bottom: 5px;
   background-color: #fff;
   z-index: -1;
+}
+.loading_spinner {
+  display: block;
+  position: relative;
+  width: 75%;
+  height: 75%;
+  margin-top: 10px;
+  border-radius: 1000px;
+  margin: auto;
+  background: #fff;
+  pointer-events: none;
+  border: 5px solid transparent;
+  background-clip: padding-box;
+}
+.loading_spinner::after {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: -5px;
+  right: -5px;
+  content: '';
+  z-index: -1;
+  border-radius: 1000px;
+  background: repeating-linear-gradient(135deg, #f5c9ca, #7f5cff, #5ca9ff, #ff5c5c, #ffdd5c, #f5c9ca);
+  animation-duration: 5s;
+  animation-name: gradient_loading;
+  animation-iteration-count: infinite;
 }
 .deck {
   display: flex;
