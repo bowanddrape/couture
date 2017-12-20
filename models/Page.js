@@ -235,6 +235,7 @@ class Page extends JSONAPI {
   // helper functions to get <head> stuff, usually used to popoulate meta tags
   static getHTMLHead(req, res, props) {
     let image_header = "";
+    props = props || {};
     if (props.c && props.store) {
       image_header = `<meta property="og:image:width" content="550"/><meta property="og:image:height" content="600"/><meta property="og:image" content="https://${req.headers.host}/store/${props.store.id}/preview?c=${encodeURIComponent(props.c)}"/>`
     }
