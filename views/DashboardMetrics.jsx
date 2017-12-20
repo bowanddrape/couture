@@ -120,7 +120,7 @@ class DashboardMetrics extends React.Component {
 
 
     let inventory_series = [];
-    if (this.props.component_use && this.props.component_use[0]) {
+    if (this.props.component_use && this.props.component_use[0] && this.props.component_use[0].skus) {
       Object.keys(this.props.component_use[0].skus).sort().forEach((sku) => {
         inventory_series.push({
           name: sku,
