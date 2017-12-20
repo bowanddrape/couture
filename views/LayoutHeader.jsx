@@ -33,6 +33,7 @@ class LayoutHeader extends React.Component {
     if (this.props.user&&this.props.user.roles&&this.props.user.roles.indexOf("bowanddrape")>=0) {
       menu_items.push(<a href="/announcement" key={menu_items.length}><button className="primary">Announcements</button></a>);
       menu_items.push(<a href="/page" key={menu_items.length}><button className="primary">Admin Pages</button></a>);
+      menu_items.push(<a href="/dashboard" key={menu_items.length}><button className="primary">Dashboard</button></a>);
     }
 
     return (

@@ -6,14 +6,14 @@ const Shipment = require('./Shipment.jsx');
 /***
 Query and display promo dashboard
 ***/
-class DashboardPromos extends React.Component {
+class DashboardHome extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       search_params: {
-        start: parseInt(props.start) || Math.round(new Date().getTime()/1000),
-        stop: parseInt(props.stop) || Math.round(new Date().getTime()/1000),
+        start: props.start || Math.round(new Date().getTime()/1000),
+        stop: props.stop || Math.round(new Date().getTime()/1000),
       },
     };
   }
@@ -22,14 +22,14 @@ class DashboardPromos extends React.Component {
     const async = require('async');
     const SQLTable = require('../models/SQLTable.js');
 
-    let start = parseInt(options.start) || Math.round(new Date().getTime()/1000);
-    let stop = parseInt(options.stop) || Math.round(new Date().getTime()/1000);
+    let start = options.start || Math.round(new Date().getTime()/1000);
+    let stop = options.stop || Math.round(new Date().getTime()/1000);
 
     let data_sources = [
       {
-        key: "promo_orders",
-        query: "WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE requested>$1 AND requested<$2) SELECT * FROM shipment_contents WHERE content_array#>>'{props, name}' like 'Promo: %'",
-        props: [start, stop],
+        key: "orders_by_day",
+        query: "SELECT CAST(CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE) AS TEXT), sum(cast(payments#>>'{0, price}' as float)/100), count(1) FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3 GROUP BY 1 ORDER BY 1;",
+        props: [start, stop, 'e03d3875-d349-4375-8071-40928aa625f5'],
       },
     ];
 
@@ -56,24 +56,25 @@ class DashboardPromos extends React.Component {
       let search_params = Object.assign({}, this.state.search_params);
       search_params[name] = value;
       return ({search_params});
-    }, () => {
-      let url = `${document.location.origin}${document.location.pathname}?${querystring.stringify(this.state.search_params)}`;
-      document.location.href = url;
     });
   }
 
   render() {
 
-    let shipments = [];
-    this.props.promo_orders.forEach((order) => {  
-      shipments.push(<Shipment key={order.id} {...order}/>);
+    let metrics = [];
+    this.props.orders_by_day.forEach((datapoint) => {
+      metrics.push(
+        <div key={metrics.length}>
+          {datapoint.toString()}
+        </div>
+      );
     });
 
     let start = new Date(this.state.search_params.start*1000);
     let stop = new Date(this.state.search_params.stop*1000);
 
     return (
-      <div className="dashboard promos">
+      <div className="dashboard">
         <div className="filter">
           <div>
             <label>Start Date: </label>
@@ -94,11 +95,14 @@ class DashboardPromos extends React.Component {
             />
           </div>
         </div>
-
-        {shipments}
+        <div style={{display:"flex"}}>
+          <a className="button" href={`/dashboard/metrics?start=${this.state.search_params.start}&stop=${this.state.search_params.sstop}`}>Metrics</a>
+          <a className="button" href={`/dashboard/promos?start=${this.state.search_params.start}&stop=${this.state.search_params.stop}`}>Promos</a>
+        </div>
+        {metrics}
       </div>
     )
   }
 }
 
-module.exports = DashboardPromos;
+module.exports = DashboardHome;
