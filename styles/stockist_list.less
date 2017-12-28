@@ -1,0 +1,29 @@
+
+.stockist_list {
+  padding: 10px;
+  .title {
+    .headerfont;
+    font-size: 25px;
+  }
+  .country {
+  }
+  .state {
+    margin-left: 20px;
+  }
+  .store {
+    margin-left: 20px;
+    margin-bottom: 20px;
+    & > div {
+      margin-left: 100px;
+      position: relative;
+      label {
+        position: absolute;
+        text-align: right;
+        font-weight: bold;
+        left: -120px;
+        display: inline-block;
+        width: 100px;
+      }
+    }
+  }
+}

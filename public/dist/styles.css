@@ -1,12 +1,4 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,600,800');
-@keyframes gradient_loading {
-  0% {
-    background-position: 0px 0px;
-  }
-  100% {
-    background-position: 100px 100px;
-  }
-}
 @font-face {
   font-family: 'zurichbold_condensed';
   src: url('zurichbt-boldcondensed-webfont.woff2') format('woff2'), url('zurichbt-boldcondensed-webfont.woff') format('woff'), url('zurichbt-boldcondensed-webfont.ttf') format('truetype');
@@ -35,11 +27,11 @@
   font-family: "Open Sans", Arial, sans-serif;
   line-height: 1.43;
   letter-spacing: 1.3px;
-  color: #000;
+  color: #000000;
 }
 .headerfont {
   font-family: "zurichbold_condensed", sans-serif;
-  color: #000;
+  color: #000000;
   font-weight: normal;
   letter-spacing: 2px;
 }
@@ -51,7 +43,7 @@ h1,
 h2,
 h3 {
   font-family: "zurichbold_condensed", sans-serif;
-  color: #000;
+  color: #000000;
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -60,7 +52,7 @@ h4 {
   font-weight: 800;
   line-height: 1.43;
   letter-spacing: 1.3px;
-  color: #000;
+  color: #000000;
   text-transform: uppercase;
 }
 .center {
@@ -83,7 +75,7 @@ body {
   font-family: "Open Sans", Arial, sans-serif;
   line-height: 1.43;
   letter-spacing: 1.3px;
-  color: #000;
+  color: #000000;
   font-size: 14px;
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
@@ -96,7 +88,7 @@ body {
 }
 a {
   text-decoration: none;
-  color: #000;
+  color: #000000;
 }
 a.button {
   padding: 16px 0 0 0;
@@ -106,11 +98,11 @@ button,
   text-align: center;
   white-space: nowrap;
   height: 56px;
-  border: 5px solid #000;
+  border: 5px solid #000000;
   display: block;
   position: relative;
-  background-color: #fff;
-  color: #000;
+  background-color: #ffffff;
+  color: #000000;
   text-decoration: none;
   padding: 0;
   margin: 6px auto;
@@ -222,7 +214,7 @@ w-div button:after {
   padding: 6px 0px;
   cursor: pointer;
   border: none;
-  border-bottom: solid 1px #000;
+  border-bottom: solid 1px #000000;
 }
 .cta:hover {
   text-decoration: none;
@@ -252,7 +244,7 @@ actions,
   right: 5px;
   top: 5px;
   bottom: 5px;
-  background-color: #fff;
+  background-color: #ffffff;
   z-index: -1;
 }
 .loading_spinner {
@@ -263,7 +255,7 @@ actions,
   margin-top: 10px;
   border-radius: 1000px;
   margin: auto;
-  background: #fff;
+  background: #ffffff;
   pointer-events: none;
   border: 5px solid transparent;
   background-clip: padding-box;
@@ -302,7 +294,7 @@ actions,
 .card label,
 .card .label {
   font-family: "zurichbold_condensed", sans-serif;
-  color: #000;
+  color: #000000;
   font-weight: normal;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -322,7 +314,7 @@ actions,
   padding: 10px 13px 15px 13px;
   background-repeat: no-repeat;
   background-position: center;
-  color: #fff;
+  color: #ffffff;
 }
 .card swatches {
   position: absolute;
@@ -337,7 +329,7 @@ actions,
   width: 15px;
   height: 15px;
   margin: 0px 2px;
-  border: solid 1px #000;
+  border: solid 1px #000000;
   border-radius: 10px;
 }
 .card swatches > div img {
@@ -370,7 +362,7 @@ a.card.not_link {
 h1,
 h2 {
   font-family: "zurichbold_condensed", sans-serif;
-  color: #000;
+  color: #000000;
   font-weight: normal;
   letter-spacing: 2px;
 }
@@ -475,17 +467,25 @@ input[type="button"]:focus {
     padding-top: 0px;
   }
 }
+@keyframes gradient_loading {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 100px 100px;
+  }
+}
 .fulfillment_admin > h1 {
   position: fixed;
   top: 90px;
-  background-color: #fff;
+  background-color: #ffffff;
   width: 100%;
   z-index: 1;
 }
 .fulfillment_admin .station_links {
   position: fixed;
   top: 140px;
-  background-color: #fff;
+  background-color: #ffffff;
   width: 100%;
   z-index: 1;
 }
@@ -569,7 +569,7 @@ comments message {
 }
 .timestamp {
   display: inline-block;
-  color: #000;
+  color: #000000;
   opacity: 0.5;
   width: 180px;
 }
@@ -677,9 +677,9 @@ comments message {
   display: flex;
 }
 .items .product_wrapper .item.fulfillment .taglist .tag {
-  color: #000;
+  color: #000000;
   background-color: #e5ff00;
-  border: solid 1px #000;
+  border: solid 1px #000000;
   padding: 2px;
   border-radius: 3px;
   margin: 0 2px;
@@ -717,8 +717,8 @@ comments message {
   background-color: #d3d3d3;
 }
 .items .product_wrapper .item.fulfillment .taglist .tag.shipped {
-  background-color: #000;
-  color: #fff;
+  background-color: #000000;
+  color: #ffffff;
 }
 .items .product_wrapper .item.fulfillment .taglist .tag.vip {
   background-color: #e50d02;
@@ -1422,7 +1422,7 @@ cart {
 .sum-bold,
 .name {
   font-family: "zurichbold_condensed", sans-serif;
-  color: #000;
+  color: #000000;
   font-weight: normal;
   letter-spacing: 2px;
   margin-top: 10px;
@@ -1663,7 +1663,7 @@ input_credit [name="exp_year"] {
   position: fixed;
   bottom: 0px;
   width: 100%;
-  background-color: #fff;
+  background-color: #ffffff;
 }
 .edit_hero_product .options {
   display: flex;
@@ -1671,7 +1671,7 @@ input_credit [name="exp_year"] {
 }
 .edit_hero_product .option {
   position: relative;
-  border: solid 1px #fff;
+  border: solid 1px #ffffff;
   margin-right: 10px;
   margin-bottom: 10px;
   min-width: 300px;
@@ -1753,8 +1753,8 @@ switch switch_option {
   z-index: 2;
   position: relative;
   margin: 0 10px;
-  border: solid 2px #fff;
-  color: #000;
+  border: solid 2px #ffffff;
+  color: #000000;
   max-width: 165px;
   box-sizing: border-box;
   cursor: pointer;
@@ -1786,7 +1786,7 @@ switch.expanded:after {
   right: 5px;
   top: 5px;
   bottom: 5px;
-  background-color: #fff;
+  background-color: #ffffff;
   z-index: -1;
 }
 switch.expanded switch_option:not(.selected) {
@@ -1809,9 +1809,9 @@ product_options switch.expanded {
   justify-content: center;
 }
 .component_picker switch switch_option {
-  background-color: #fff;
+  background-color: #ffffff;
   border: solid 1px #eaeaea;
-  color: #000;
+  color: #000000;
   border-radius: 50%;
   padding: 8px;
   margin: 10px;
@@ -1842,7 +1842,7 @@ product_options switch.expanded {
   right: 5px;
   top: 5px;
   bottom: 5px;
-  background-color: #fff;
+  background-color: #ffffff;
   z-index: -1;
 }
 .component_picker switch.expanded switch_option:not(.selected) {
@@ -1920,7 +1920,7 @@ product_options switch.expanded {
   padding: 0px 7px;
   border-radius: 700px;
   background-color: #ff5c5c;
-  color: #fff;
+  color: #ffffff;
   font-size: 11px;
   right: -24px;
 }
@@ -1979,7 +1979,7 @@ user {
 user img {
   border-radius: 5px;
   margin-right: 20px;
-  border: solid 2px #fff;
+  border: solid 2px #ffffff;
   width: 50px;
   position: relative;
   top: 20px;
@@ -2118,7 +2118,7 @@ user name {
 }
 .footer signup div:last-of-type input {
   border: none;
-  border-bottom: 5px solid #000;
+  border-bottom: 5px solid #000000;
   background: none;
   text-transform: lowercase;
 }
@@ -2151,7 +2151,7 @@ user name {
 }
 .purchase_complete h1 {
   font-family: "zurichbold_condensed", sans-serif;
-  color: #000;
+  color: #000000;
   font-weight: normal;
   letter-spacing: 2px;
   text-align: center;
@@ -2182,14 +2182,14 @@ user name {
 }
 .gallery .caption {
   font-family: "zurichbold_condensed", sans-serif;
-  color: #000;
+  color: #000000;
   font-weight: normal;
   letter-spacing: 2px;
   text-transform: uppercase;
   font-size: 8px;
   bottom: 0px;
   z-index: 1;
-  background-color: #fff;
+  background-color: #ffffff;
   width: 100%;
   text-align: center;
   padding: 3px 0;
@@ -2198,7 +2198,7 @@ user name {
   font-family: Arvo;
   position: initial;
   background: none;
-  color: #000;
+  color: #000000;
   padding: 0 0 0 2px;
 }
 @media (min-width: 1000px) {
@@ -2218,7 +2218,7 @@ user name {
   }
 }
 errors {
-  color: #fff;
+  color: #ffffff;
   background-color: #ff5c5c;
   padding: 5px;
   margin: 15px auto;
@@ -2254,7 +2254,7 @@ input[type="email"] {
   font-family: "Open Sans", Arial, sans-serif;
   line-height: 1.43;
   letter-spacing: 1.3px;
-  color: #000;
+  color: #000000;
   border: 1px solid #f8f8f8;
   min-width: 230px;
   width: auto;
@@ -2308,7 +2308,7 @@ login .loginNav {
   font-family: "Open Sans", Arial, sans-serif;
   line-height: 1.43;
   letter-spacing: 1.3px;
-  color: #000;
+  color: #000000;
   display: block;
   position: relative;
   text-align: left;
@@ -2493,4 +2493,33 @@ menu.expanded login {
     position: relative;
     top: -15px;
   }
+}
+.stockist_list {
+  padding: 10px;
+}
+.stockist_list .title {
+  font-family: "zurichbold_condensed", sans-serif;
+  color: #000000;
+  font-weight: normal;
+  letter-spacing: 2px;
+  font-size: 25px;
+}
+.stockist_list .state {
+  margin-left: 20px;
+}
+.stockist_list .store {
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+.stockist_list .store > div {
+  margin-left: 100px;
+  position: relative;
+}
+.stockist_list .store > div label {
+  position: absolute;
+  text-align: right;
+  font-weight: bold;
+  left: -120px;
+  display: inline-block;
+  width: 100px;
 }

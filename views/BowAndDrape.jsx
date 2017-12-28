@@ -162,6 +162,7 @@ module.exports = {
     DashboardPromos: require('./DashboardPromos.jsx'),
     Announcement: require('./Announcement.jsx'),
     AnnouncementEdit: require('./AnnouncementEdit.jsx'),
+    StockistList: require('./StockistList.jsx'),
   },
   dispatcher,
   api,
