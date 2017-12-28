@@ -230,13 +230,12 @@ class DashboardMetrics extends React.Component {
   render() {
 
     let metrics = [];
+    let total_revenue = 0;
+    let total_orders = 0;
     if (this.props.orders_by_day) {
       this.props.orders_by_day.forEach((datapoint) => {
-        metrics.push(
-          <div key={metrics.length}>
-            {JSON.stringify(datapoint)}
-          </div>
-        );
+        total_revenue += datapoint.revenue;
+        total_orders += parseInt(datapoint.count);
       });
     }
 
@@ -264,6 +263,11 @@ class DashboardMetrics extends React.Component {
               name="stop"
             />
           </div>
+        </div>
+
+        <div style={{padding:"20px"}}>
+          <div>Total Revenue: {total_revenue.toFixed(2)}</div>
+          <div>Total Num Orders: {total_orders}</div>
         </div>
 
         <script src="https://code.highcharts.com/highcharts.js"></script>
