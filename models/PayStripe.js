@@ -18,12 +18,17 @@ class PayStripe {
     });
   }
 
-  static charge(nonce, amount, callback) {
+  static charge(shipment, nonce, amount, callback) {
     // stripe "usd" amounts are in pennies =(
     return stripe.charges.create({
       amount: Math.round(amount*100),
       currency: "usd",
       source: nonce,
+      metadata: {
+        shipment_id: shipment.id,
+        email: shipment.email,
+        name: shipment.billing_address?shipment.billing_address.name:"",
+      },
     }, (err, charge) => {
       if (err) {
         return callback("Could not process credit transaction! "+err.message);
