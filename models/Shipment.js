@@ -177,9 +177,7 @@ class Shipment extends JSONAPI {
           if (err) return callback(err);
 
           // compare against tags we care about like 'needs_picking', etc;
-          let stationTags = new Set(["new", "on_hold", "needs_airbrush", "needs_embroidery",
-            "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing",
-            "needs_qaing", "needs_packing", "shipped"]);
+          let stationTags = new Set(["new", "on_hold", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "shipped", "return", "exchange", "repair", "remake"]);
 
           // Add a new row in the metrics table if a stationTag is removed
           if (object.remove_tags.size > 0){
