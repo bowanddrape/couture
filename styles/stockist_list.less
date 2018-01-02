@@ -4,16 +4,23 @@
   .title {
     .headerfont;
     font-size: 25px;
+    text-transform: uppercase;
   }
   .country {
   }
   .state {
     margin-left: 20px;
   }
+  .store_list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
   .store {
     margin-left: 20px;
     margin-bottom: 20px;
-    & > div {
+    width: 500px;
+    & .info > * {
       margin-left: 100px;
       position: relative;
       label {
