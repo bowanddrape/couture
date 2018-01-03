@@ -1,10 +1,11 @@
 {
   "author": "graphicsforge",
   "scripts": {
-    "build_js": "mkdir -p public/dist && ./node_modules/browserify/bin/cmd.js --exclude ./models/Inventory.js --exclude ./models/PayStripe.js -g [ envify --NODE_ENV production] -t [ babelify --presets [ react es2015 ] ] -r ./views/BowAndDrape.jsx:BowAndDrape | ./node_modules/uglify-js/bin/uglifyjs -c -m -o public/dist/BowAndDrape.js",
+    "build_js": "mkdir -p public/dist && ./node_modules/browserify/bin/cmd.js --exclude ./models/Inventory.js --exclude ./models/PayStripe.js -g [ envify --NODE_ENV production] -t [ babelify --presets [ react es2015 ] ] -r ./views/BowAndDrape.jsx:BowAndDrape > public/dist/BowAndDrape.js",
+    "build_minjs": "mkdir -p public/dist && ./node_modules/browserify/bin/cmd.js --exclude ./models/Inventory.js --exclude ./models/PayStripe.js -g [ envify --NODE_ENV production] -t [ babelify --presets [ react es2015 ] ] -r ./views/BowAndDrape.jsx:BowAndDrape | ./node_modules/uglify-js/bin/uglifyjs -c -m -o public/dist/BowAndDrape.js",
     "build_sprites": "./node_modules/.bin/sprity create public/dist/ public/*.png -c / -p less -s sprite.less --cachebuster --engine sprity-gm",
     "build_styles": "lessc ./styles/styles.less public/dist/styles.css",
-    "build": "npm run build_js && npm run build_sprites && npm run build_styles",
+    "build": "npm run build_minjs && npm run build_sprites && npm run build_styles",
     "fs_cache": "curl -s -o public/dist/customize-your-own.html http://localhost/customize-your-own",
     "start": "npm run build && sudo node server.js"
   },
@@ -16,7 +17,7 @@
     "babelify": "~7.3.0",
     "bcryptjs": "^2.4.0",
     "braintree": "^2.1.1",
-    "braintree-web": "^3.15.0",
+    "braintree-web": "^3.27.0",
     "browserify": "^13.0.1",
     "compression": "^1.6.2",
     "cookie-parser": "^1.4.3",

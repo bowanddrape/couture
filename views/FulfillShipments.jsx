@@ -9,7 +9,7 @@ const FulfillmentStickers = require('./FulfillmentStickers.jsx');
 /***
 Admin page to display list of orders at various states of shipment
 ***/
-const tagged_tabs = ["new", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "on_hold", "anna", "remake", "return", "open", "canceled"];
+const tagged_tabs = ["new", "needs_airbrush", "needs_embroidery", "at_airbrush", "at_embroidery", "needs_stickers", "needs_picking", "needs_pressing", "needs_qaing", "needs_packing", "on_hold", "anna", "remake", "return", "open_return", "canceled"];
 
 class FulfillShipments extends React.Component {
   constructor(props) {
@@ -122,7 +122,7 @@ class FulfillShipments extends React.Component {
       // seperate handling for some states
       if (["needs_stickers"].indexOf(tag)>=0) {
         return tagged_tab_contents.push(
-          <shipments key={tagged_tab_contents.length} className="fulfillment_stickers" name={tag+" "+this.state.needs_stickers.length}>
+          <shipments key={tag} className="fulfillment_stickers" name={tag+" "+this.state.needs_stickers.length}>
             <h2>{tag}</h2>
             <div className="action_bar">
               <button onClick={this.handleMarkStickersPrinted.bind(this)}>
