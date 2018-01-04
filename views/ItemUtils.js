@@ -37,7 +37,10 @@ let getPrice = (items, filter) => {
   items.forEach((item, index) => {
     if (typeof(filter)=="function" && !filter(item)) return;
     let quant = item.quantity || 1;
-    total_price += parseFloat(item.props.price) * quant;
+    let price = parseFloat(item.props.price);
+    if (isNaN(price))
+      price = 0;
+    total_price += price * quant;
   });
   return total_price;
 }
