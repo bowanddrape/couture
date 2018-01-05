@@ -85,6 +85,7 @@ let applyPromoCode = (items, promo, callback) => {
 
 // items gets passed in by reference and updated
 let applyCredits = (credits, items) => {
+console.log("applyCredits", credits)
   // remove any previous credits line
   items.forEach((item, index) => {
     // TODO generalize special line items like these
@@ -94,8 +95,6 @@ let applyCredits = (credits, items) => {
   // credits should never be negative anyways
   if (!credits || credits < 0) return;
   let total_price = getPrice(items);
-  // don't apply credit to a nothing
-  if (!total_price) return;
   let credit_price = Math.min(total_price, credits);
   items.push({
     props: {
