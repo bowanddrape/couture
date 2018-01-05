@@ -8,12 +8,17 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: auto;
+}
+
+  .name {
+    .headerfont;
+    margin-top: 10px;
+    display: block;
+  }
 
   .product_wrapper {
-    border-top:2px solid @color_support_0;
     padding: 10px;
     grid-column: span 6;
-
 
     .item {
       border-bottom: 2px solid black;
@@ -178,31 +183,30 @@
     }
   }
 
-}
-
 @media (min-width: @desktop_min_width) {
-  .items{
-    .product_wrapper {
-      .item {
-        padding-bottom: 10px;
-        .preview {
-          height: 200px;
-        }
+  .product_wrapper {
+    .item {
+      padding-bottom: 10px;
+      .preview {
+        height: 200px;
       }
-      grid-column: span 4;
-      border-bottom: 2px solid @color_support_0;
     }
+    grid-column: span 4;
+  }
 
-    .summary_items {
-      display: inline-block;
-      grid-column: span 2;
-      padding: 0 0 0 40px;
-      margin-top: 0;
-    }
+  .summary_items {
+    display: inline-block;
+    grid-column: span 2;
+    padding: 0 0 0 40px;
+    margin-top: 0;
+
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
   }
 
   .fulfillmentStation .items .product_wrapper {
-      grid-column: span 6;
-    }
+    grid-column: span 6;
+  }
 }
 

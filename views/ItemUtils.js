@@ -85,7 +85,6 @@ let applyPromoCode = (items, promo, callback) => {
 
 // items gets passed in by reference and updated
 let applyCredits = (credits, items) => {
-console.log("applyCredits", credits)
   // remove any previous credits line
   items.forEach((item, index) => {
     // TODO generalize special line items like these
