@@ -9,8 +9,8 @@ const UserLogin = require('./UserLogin.jsx');
 const Errors = require('./Errors.jsx');
 const BADButton = require('./BADButton.jsx');
 
-const payment_method_client = require('./PayStripeClient.js');
-//const payment_method_client = require('./PayBraintreeClient.js');
+//const payment_method_client = require('./PayStripeClient.js');
+const payment_method_client = require('./PayBraintreeClient.js');
 
 /***
 Draws the cart page.
@@ -71,8 +71,8 @@ class Cart extends React.Component {
 
   static preprocessProps(options, callback) {
     // TODO select payment method
-    const payment_method = require('../models/PayStripe.js');
-    //const payment_method = require('../models/PayBraintree.js');
+    //const payment_method = require('../models/PayStripe.js');
+    const payment_method = require('../models/PayBraintree.js');
 
     // get braintree client token
     if (payment_method.getClientAuthorization) {
@@ -117,6 +117,10 @@ class Cart extends React.Component {
     if (this.state.shipping.street!=prevState.shipping.street) {
       this.updateNonProductItems();
     }
+    // update paypal button
+    payment_method_client.drawPaypal(this.props.payment_authorization, this.state, (err, payment_nonce) => {
+console.log("paypalled", err, payment_nonce);
+    });
   }
 
   updateContents(items) {
@@ -216,6 +220,7 @@ class Cart extends React.Component {
     return (
       <input_credit>
         <section className="sectionTitle">Payment Info</section>
+        <div id="paypal-button" />
         <Errors label="card" />
         <div className="paymentWrap">
           <div className="cardNumWrap">
@@ -420,6 +425,8 @@ class Cart extends React.Component {
 
         </section>
 
+{/* Needed by paypal */}
+        <script src="https://www.paypalobjects.com/api/checkout.js" data-version-4></script>
 
 {/* Needed by stripe, not needed by braintree */}
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
