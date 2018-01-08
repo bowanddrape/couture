@@ -7,85 +7,11 @@
   margin: 0 auto;
 }
 
-cart {
-  grid-column-start: 1;
-  grid-column-end: -1;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: auto;
-}
-
-.billing-check {
-  grid-column-start: 1;
-  grid-column-end: -1;
-  margin-top: 40px;
-
-  input[type="radio"] {
-    margin-right: 5px;
-  }
-  .radioLabel {
-      margin-right: 15px;
-  }
-
-  .radioWrap {
-    display: inline-block;
-  }
-}
-
-.sameCheckbox {
-  margin-bottom: 20px;
-}
-
-.checkout_section {
-  grid-column-start: 1;
-  grid-column-end: -1;
-  margin-top: 40px;
-
-  input {
-    display: inline-block;
-  }
-
-  login {
-    input {
-      margin-right: 10px;
-    }
-
-    .btnWrap {
-      button {
-        display: inline-block;
-        margin-right: 20px;
-      }
-    }
-  }
-}
-
 .cart_header {
   grid-column: span 6;
 }
 
-.checkout_section {
-  section {
-  }
-  row {
-    display: flex;
-    flex-flow: row wrap;
-  }
-  label {
-    text-align: right;
-  }
-  div {
-    margin-right: 15px;
-  }
-}
-
-.sum-bold, .name {
-  .headerfont;
-  margin-top: 10px;
-  display: block;
-}
-
 input_address {
-  .checkout_section;
   [name="apt"], [name="region"] {
     width: 40px;
   }
@@ -98,110 +24,70 @@ input_address {
 }
 
 input_credit {
-  .checkout_section;
   [name="cvc"], [name="exp_month"], [name="exp_year"] {
     width: 40px;
   }
 }
 
-.sectionTitle {
-  font-weight: bold;
-  font-size: 18px;
+.cart {
 
-  &:after {
-    position: relative;
-    content: '';
-    width: 30px;
-    background: black;
-    height: 2px;
-  }
-}
-
-.addressArea {
-  display: inline-block;
-  grid-column-start: 1;
-  grid-column-end: -1;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: auto;
-
-    input_address{
-    grid-column-start: 1;
-    grid-column-end: 6;
-  }
-}
-
-.cardInput {
-  margin-top: 20px;
-  display: inline-block;
-  grid-column-start: 1;
-  grid-column-end: -1;
-  padding: 10px 0;
-  border-top: 2px solid black;
-}
-
-.billing-check {
-  .sectionTitle {
-    margin-top: 20px;
+  #paypal-button {
+    text-align: center;
   }
 
-.cart-wrapper{
-  input[type="text"], input[type="password"], input[type="email"] {
-    background-color: #fff;
-    border: 1px solid lightgrey;
-    min-width: 230px;
-    width: auto;
-    min-height: 40px;
-    margin: 10px auto;
-    padding: 5px 10px;
-    outline: none;
-    font-size: 14px
-  }
-  login{
-    input[type="text"], input[type="password"], input[type="email"] {
-      margin-right: 20px;
+  & > section {
+    grid-column: span 4;
+    padding: 10px 0;
+
+    border-top: 2px solid @color_support_0;
+
+    input {
+      display: inline-block;
+    }
+    row {
+      display: flex;
+      flex-flow: row wrap;
+    }
+    label {
+      text-align: right;
+    }
+    div {
+      margin-right: 15px;
+    }
+
+    .section_title {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+
+      &:after {
+        position: relative;
+        content: '';
+        width: 30px;
+        background: black;
+        height: 2px;
+      }
     }
   }
-}
+
 }
 
 @media (max-width: @desktop_min_width) {
-  .cart-wrapper{
+  .cart {
     input[type="text"], input[type="password"], input[type="email"] {
       font-size: 16px
     }
   }
-
-  .items {
-    .product_wrapper {
-        grid-column: span 6;
-    }
-
-    .summary_items {
-      grid-column: span 6;
-      padding: 0;
-
-    }
-  }
 }
 
-.loginToggle {
-  grid-column-start: 1;
-  grid-column-end: -1;
-
+form.toggle {
   input[type="radio"] {
     margin-right: 5px;
   }
   .radioLabel {
-      margin-right: 15px;
+    margin-right: 15px;
   }
 }
-
-.loginHeader {
-  grid-column-start: 1;
-  grid-column-end: -1;
-}
-
 
 .paymentWrap {
   input[type="text"].cardNum {

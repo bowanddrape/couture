@@ -54,17 +54,22 @@ class InputAddress extends React.Component {
   render() {
     return (
       <input_address>
-        <section className="sectionTitle">{this.props.section_title}</section>
+        <div className="section_title">{this.props.section_title}</div>
         {this.props.errors?this.props.errors:null}
 
         {this.props.section_title=="Shipping Address" ?
           <row><div>
+            <h5>Email</h5>
             <input type="email" onChange={this.handleFieldChange} value={this.props.email} name="email" placeholder="Email"/>
           </div></row> : null
         }
+
+        <h5>Name</h5>
         <row><div>
           <input type="text" onChange={this.handleFieldChange} value={this.props.name} name="name" placeholder="Name"/>
         </div></row>
+
+        <h5>Address</h5>
         <row>
           <div>
             <input type="text" onChange={this.handleFieldChange} id={"address_autocomplete"+this.props.section_title.substring(0,4)} value={this.props.street} name="street" placeholder="Street Address"/>
