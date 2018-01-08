@@ -1,12 +1,6 @@
 
 @import "./colors.less";
 
-.grid {
-  display: grid;
-  width: 80vw;
-  margin: 0 auto;
-}
-
 .cart_header {
   grid-column: span 6;
 }
@@ -36,9 +30,7 @@ input_credit {
   }
 
   & > section {
-    grid-column: span 4;
-    padding: 10px 0;
-
+    grid-column: span 6;
     border-top: 2px solid @color_support_0;
 
     input {
@@ -72,10 +64,15 @@ input_credit {
 
 }
 
-@media (max-width: @desktop_min_width) {
+@media (min-width: @desktop_min_width) {
   .cart {
     input[type="text"], input[type="password"], input[type="email"] {
       font-size: 16px
+    }
+
+    & > section {
+      grid-column: span 4;
+      padding: 10px 0;
     }
   }
 }

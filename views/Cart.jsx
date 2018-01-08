@@ -118,11 +118,13 @@ class Cart extends React.Component {
     if (this.state.shipping.street!=prevState.shipping.street) {
       this.updateNonProductItems();
     }
-    // update paypal button
-    payment_method_client.drawPaypal(this.props.payment_authorization, this.state, (err, payment) => {
-      if (err) return Errors.emitError("payment", err);
-      this.handlePay(payment.nonce);
-    });
+    if (this.state.payment_method!=prevState.payment_method || !equal(this.state.items, prevState.items)) {
+      // update paypal button
+      payment_method_client.drawPaypal(this.props.payment_authorization, this.state, (err, payment) => {
+        if (err) return Errors.emitError("payment", err);
+        this.handlePay(payment.nonce);
+      });
+    }
   }
 
   updateContents(items) {
@@ -262,14 +264,17 @@ class Cart extends React.Component {
     // make sure we have all the mandatory data we need
     if (!this.state.shipping.email) {
       Errors.emitError("shipping", "Please enter email address");
+      Errors.emitError("payment", "Check shipping info");
       return this.setState({processing_payment:false});
     }
     if (!this.state.shipping.name) {
       Errors.emitError("shipping", "Please enter name");
+      Errors.emitError("payment", "Check shipping info");
       return this.setState({processing_payment:false});
     }
     if (!this.state.shipping.street) {
       Errors.emitError("shipping", "If you don't tell us where to ship it, we're keeping it and wearing it");
+      Errors.emitError("payment", "Check shipping info");
       return this.setState({processing_payment:false});
     }
 
@@ -365,7 +370,8 @@ class Cart extends React.Component {
 
   render() {
     if (this.state.done){
-      if (document) document.querySelector("body").scrollTop = 0;
+      if (typeof(document)!="undefined")
+        document.querySelector("body").scrollTop = 0;
       return <ThanksPurchaseComplete
         items={this.order_payload.contents}
         email={this.order_payload.email}
@@ -383,7 +389,12 @@ class Cart extends React.Component {
       let payment_method = null;
       switch (this.state.payment_method) {
         case "paypal":
-          payment_method = (<div id="paypal-button" />);
+          payment_method = (
+            <div>
+              <div id="paypal-button" />
+              <img id="paypal-loading" src="/loading.gif" style={{display:"block",margin:"auto"}}/>
+            </div>
+          );
           break;
         default:
           payment_method = this.renderInputCredit();
@@ -391,9 +402,9 @@ class Cart extends React.Component {
       payment_info = (
         <section className={this.state.no_login_prompt?"":"hidden"}>
           <div className="section_title">Payment Info</div>
-          <form>
-            <input type="radio" name="payment_method" value="credit" defaultChecked={true} onChange={this.handleTogglePaymentMethod.bind(this)}/> <span className="radio_label">Credit Card</span>
-            <input type="radio" name="payment_method" value="paypal" onChange={this.handleTogglePaymentMethod.bind(this)}/><span className="radio_label">Paypal</span>
+          <form className="toggle">
+            <input type="radio" name="payment_method" id="payment_method_credit" value="credit" defaultChecked={true} onChange={this.handleTogglePaymentMethod.bind(this)}/><label htmlFor="payment_method_credit" className="radio_label">Credit Card</label>
+            <input type="radio" name="payment_method" id="payment_method_paypal" value="paypal" onChange={this.handleTogglePaymentMethod.bind(this)}/><label htmlFor="payment_method_paypal" className="radio_label">Paypal</label>
           </form>
           <Errors label="payment" />
           {payment_method}
@@ -411,6 +422,7 @@ class Cart extends React.Component {
 
     return (
       <div className="cart grid">
+        <Errors/>
         <h2 className="cart_header">My Cart</h2>
         <Items
           ref="Items"
@@ -428,10 +440,10 @@ class Cart extends React.Component {
           <section>
             <div className="section_title">Checkout</div>
             <form className="toggle">
-              <input type="radio" name="guest_checkout" value={false} defaultChecked={true} onChange={this.handleToggleGuestCheckout.bind(this)}/>
-              <span className="radio_label">Login</span>
-              <input type="radio" name="guest_checkout" value={true} onChange={this.handleToggleGuestCheckout.bind(this)}/>
-              <span className="radio_label">Checkout As Guest</span>
+              <input type="radio" id="guest_false" name="guest_checkout" value={false} defaultChecked={true} onChange={this.handleToggleGuestCheckout.bind(this)}/>
+              <label htmlFor="guest_false" className="radio_label">Login</label>
+              <input type="radio" id="guest_true" name="guest_checkout" value={true} onChange={this.handleToggleGuestCheckout.bind(this)}/>
+              <label htmlFor="guest_true" className="radio_label">Checkout As Guest</label>
             </form>
             <div className={this.state.no_login_prompt?"hidden":""} >
               <UserLogin />
@@ -439,13 +451,13 @@ class Cart extends React.Component {
           </section>
         }
 
-        <Errors/>
         <section className={this.state.no_login_prompt?"":"hidden"}>
           <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
           <div className="billing-check">
             <form className="toggle">
-              <input type="radio" name="same_billing" value={true} defaultChecked={this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/> <span className="radio_label">Same Billing address</span>
-              <input type="radio" name="same_billing" value={false} defaultChecked={!this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/> <span className="radio_label">Different Billing address</span>
+              <span>Billing address is </span>
+              <input type="radio" name="same_billing" id="same_billing_true" value={true} checked={this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/><label htmlFor="same_billing_true" className="radio_label">The Same</label>
+              <input type="radio" name="same_billing" id="same_billing_false" value={false} checked={!this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/><label htmlFor="same_billing_false" className="radio_label">Different</label>
             </form>
             { this.state.same_billing ? null :
               <InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>

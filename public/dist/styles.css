@@ -91,7 +91,6 @@ body {
   margin: 0;
 }
 .layout_main {
-  overflow-x: hidden;
   padding: 80px 0 0 0;
 }
 a {
@@ -386,9 +385,6 @@ h5 {
 input[type="radio"] {
   margin-right: 5px;
 }
-.radio_label {
-  margin-right: 15px;
-}
 .payment_info address {
   margin-top: 6px;
 }
@@ -638,7 +634,7 @@ comments message {
   display: block;
 }
 .product_wrapper {
-  padding: 10px;
+  padding-top: 10px;
   grid-column: span 6;
   /* .item */
 }
@@ -772,7 +768,7 @@ comments message {
 .summary_items .summary_items_inner {
   padding: 20px;
   border: 2px solid #eaeaea;
-  display: inline-block;
+  display: block;
 }
 .summary_items .summary_items_header {
   border-bottom: 2px solid #eaeaea;
@@ -810,7 +806,7 @@ comments message {
     margin-top: 0;
     position: -webkit-sticky;
     position: sticky;
-    top: 0;
+    top: 112px;
   }
   .fulfillmentStation .items .product_wrapper {
     grid-column: span 6;
@@ -1374,11 +1370,6 @@ switch_option img {
     margin-top: 15px;
   }
 }
-.grid {
-  display: grid;
-  width: 80vw;
-  margin: 0 auto;
-}
 .cart_header {
   grid-column: span 6;
 }
@@ -1401,8 +1392,7 @@ input_credit [name="exp_year"] {
   text-align: center;
 }
 .cart > section {
-  grid-column: span 4;
-  padding: 10px 0;
+  grid-column: span 6;
   border-top: 2px solid #eaeaea;
 }
 .cart > section input {
@@ -1430,11 +1420,15 @@ input_credit [name="exp_year"] {
   background: black;
   height: 2px;
 }
-@media (max-width: 1000px) {
+@media (min-width: 1000px) {
   .cart input[type="text"],
   .cart input[type="password"],
   .cart input[type="email"] {
     font-size: 16px;
+  }
+  .cart > section {
+    grid-column: span 4;
+    padding: 10px 0;
   }
 }
 form.toggle input[type="radio"] {
@@ -2362,5 +2356,110 @@ menu.expanded login {
   #hl-fbm-add_to_cart {
     position: relative;
     top: -15px;
+  }
+}
+form.toggle {
+  margin: 1em 0;
+}
+form.toggle span {
+  display: block;
+}
+form.toggle input[type="radio"] {
+  display: none;
+}
+form.toggle input[type="radio"] + label {
+  text-align: center;
+  white-space: nowrap;
+  height: 56px;
+  border: 5px solid #000;
+  display: block;
+  position: relative;
+  background-color: #fff;
+  color: #000;
+  text-decoration: none;
+  padding: 0;
+  margin: 6px auto;
+  width: 100%;
+  max-width: 180px;
+  font-family: 'arvobold';
+  font-weight: normal;
+  letter-spacing: 2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  align-items: flex-start;
+  -webkit-appearance: none;
+  text-rendering: auto;
+  word-spacing: normal;
+  text-indent: 0px;
+  text-shadow: none;
+  /* CSS for button busy states */
+  display: inline-block;
+  width: auto;
+  max-width: unset;
+  height: auto;
+  padding: 10px;
+  border: solid 5px #eaeaea;
+}
+form.toggle input[type="radio"] + label:after {
+  content: '';
+  width: 100%;
+  height: 56px;
+  position: absolute;
+  z-index: -2;
+  top: -5px;
+  left: 0px;
+  background-color: #7f5cff;
+  transition: top .2s ease, left .2s linear;
+}
+form.toggle input[type="radio"] + label:focus {
+  box-shadow: none;
+}
+form.toggle input[type="radio"] + label:before {
+  content: '';
+  width: 100%;
+  height: 56px;
+  position: absolute;
+  z-index: -2;
+  top: -5px;
+  left: 0px;
+  background-color: #ff5c5c;
+  transition: top .2s ease, left .2s linear;
+}
+form.toggle input[type="radio"] + label:hover:after {
+  top: 0px;
+  left: 10px;
+}
+form.toggle input[type="radio"] + label:hover:before {
+  top: -10px;
+  left: 16px;
+}
+form.toggle input[type="radio"] + label.primary {
+  margin: 12px auto;
+}
+form.toggle input[type="radio"] + label.primary.busyState {
+  background-color: #eaeaea;
+}
+form.toggle input[type="radio"] + label.primary.busyState:before {
+  animation-timing-function: ease;
+  animation: busyState 1.5s infinite;
+}
+form.toggle input[type="radio"] + label.primary.busyState:after {
+  animation-timing-function: ease;
+  animation: busyState 1.5s infinite;
+}
+form.toggle input[type="radio"] + label:before {
+  display: none;
+}
+form.toggle input[type="radio"] + label:after {
+  display: none;
+}
+form.toggle input[type="radio"]:checked + label {
+  border: solid 5px #7f5cff;
+}
+@media (min-width: 1000px) {
+  form.toggle span {
+    display: inline-block;
+    margin-right: 10px;
   }
 }

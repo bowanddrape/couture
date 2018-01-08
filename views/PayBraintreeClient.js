@@ -72,9 +72,8 @@ class BraintreeClient {
             console.error('checkout.js error', err);
           }
         }, container).then(function () {
-          // The PayPal button will be rendered in an html element with the id
-          // `paypal-button`. This function will be called when the PayPal button
-          // is set up and ready to be used.
+          // paypal button is ready
+          document.querySelector("#paypal-loading").style.display = "none";
         });
       });
     });

@@ -1,0 +1,38 @@
+
+@import "./boilerplate.less";
+
+form.toggle {
+  margin: 1em 0;
+  span {
+    display: block;
+  }
+  input[type="radio"] {
+    display: none;
+  }
+  input[type="radio"] + label {
+    .button;
+    display: inline-block;
+    width: auto;
+    max-width: unset;
+    height: auto;
+    padding: 10px;
+    border: solid 5px @color_support_0;
+
+    &:hover {
+    }
+    &:before { display: none; }
+    &:after { display: none; }
+  }
+  input[type="radio"]:checked + label {
+    border: solid 5px @color_highlight;
+  }
+}
+
+@media (min-width: @desktop_min_width) {
+  form.toggle {
+    span {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  }
+}
