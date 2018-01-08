@@ -38,7 +38,7 @@ class PayStripe {
       }
       callback(null, {
         type: "stripe",
-        amount: charge.amount,
+        amount: charge.amount/100,
       });
     });
   }
