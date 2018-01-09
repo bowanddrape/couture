@@ -227,6 +227,24 @@ class DashboardMetrics extends React.Component {
     });
   }
 
+  exportCSV(array, header, format) {
+    let rows = [];
+    rows.push(header.join(','));
+    array.forEach((row) => {
+      rows.push(format(row).join(','));
+    });
+    return rows.join("\n");
+  }
+  exportComponentUseCSV() {
+    return this.exportCSV(
+      Object.keys(this.props.component_use[0].skus).sort(),
+      ["sku", "quantity"],
+      (row) => {
+        return [row, this.props.component_use[0].skus[row]];
+      }
+    );
+  }
+
   render() {
 
     let metrics = [];
@@ -274,8 +292,13 @@ class DashboardMetrics extends React.Component {
         <script src="https://code.highcharts.com/modules/series-label.js"></script>
         <script src="https://code.highcharts.com/modules/exporting.js"></script>
         <div id="time_container"></div>
+
+        <a className="export cta" href={"data:text/csv;charset=utf-8,"+encodeURIComponent(this.exportComponentUseCSV())} download="component_use.csv">
+          download csv
+        </a>
         <div id="inventory_container"></div>
         <div id="factory_container"></div>
+
       </div>
     )
   }
