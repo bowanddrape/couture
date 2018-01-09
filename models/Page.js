@@ -30,6 +30,7 @@ const whitelisted_components = [
   "Carousel",
   "HeroProduct",
   "Announcement",
+  "StockistList",
 ]
 
 /*

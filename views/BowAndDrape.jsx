@@ -74,6 +74,16 @@ dispatcher.on("loaded", () => {
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
   ga('create', 'UA-52623236-1', 'auto');
   ga('send', 'pageview');
+  // script stuff for wavetext effect
+  Array.prototype.forEach.call(document.getElementsByClassName("wavetext"), (element) => {
+    let text = element.innerHTML.toString().split("");
+    element.innerHTML = "";
+    text.forEach((letter) => {
+      let span = document.createElement("span");
+      span.innerHTML = letter;
+      element.appendChild(span);
+    });
+  });
 });
 
 // helper function mostly for making XHR calls. Our API expects multipart form
@@ -162,6 +172,7 @@ module.exports = {
     DashboardPromos: require('./DashboardPromos.jsx'),
     Announcement: require('./Announcement.jsx'),
     AnnouncementEdit: require('./AnnouncementEdit.jsx'),
+    StockistList: require('./StockistList.jsx'),
   },
   dispatcher,
   api,
