@@ -569,7 +569,6 @@ comments message {
 .timestamp {
   display: inline-block;
   color: #000;
-  opacity: 0.5;
   width: 180px;
 }
 @media print {
@@ -597,18 +596,15 @@ comments message {
   switch.expanded {
     display: none;
   }
-  .items,
-  .item {
+  .items.fulfillment,
+  .item.fulfillment {
     page-break-before: always;
     page-break-after: always;
   }
   .items.packing_slip,
-  .packing_slip .item {
+  .item.packing_slip {
     page-break-before: auto;
     page-break-after: auto;
-  }
-  .items .product_wrapper .item .preview {
-    height: 300px !important;
   }
   .add_tag {
     display: none !important;
@@ -618,13 +614,6 @@ comments message {
     page-break-after: always;
   }
 }
-.items {
-  grid-column-start: 1;
-  grid-column-end: -1;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: auto;
-}
 .name {
   font-family: "zurichbold_condensed", sans-serif;
   color: #000;
@@ -633,54 +622,54 @@ comments message {
   margin-top: 10px;
   display: block;
 }
-.product_wrapper {
+.items {
   padding-top: 10px;
   grid-column: span 6;
   /* .item */
 }
-.product_wrapper .item {
+.items .item {
   border-bottom: 2px solid black;
   padding-bottom: 20px;
   margin-top: 10px;
 }
-.product_wrapper .item:first-of-type {
+.items .item:first-of-type {
   margin-top: 0px;
 }
-.product_wrapper .item:last-of-type {
+.items .item:last-of-type {
   border-bottom: none;
 }
-.product_wrapper .item .preview {
+.items .item .preview {
   height: 140px;
 }
-.product_wrapper .item .deets {
+.items .item .deets {
   display: inline-block;
   margin-left: 20px;
 }
-.product_wrapper .item.fulfillment .garment_id {
+.items .item.fulfillment .garment_id {
   font-size: 25px;
   font-weight: bold;
 }
-.product_wrapper .item.fulfillment .garment_id .garment_caption {
+.items .item.fulfillment .garment_id .garment_caption {
   font-size: 15px;
   font-weight: normal;
 }
-.product_wrapper .item.fulfillment .preview {
+.items .item.fulfillment .preview {
   height: auto;
   width: 50%;
 }
 @media (min-width: 1000px) {
-  .product_wrapper .item.fulfillment .preview {
+  .items .item.fulfillment .preview {
     height: auto;
     width: 50%;
   }
 }
-.product_wrapper .item.fulfillment .price {
+.items .item.fulfillment .price {
   display: none;
 }
-.product_wrapper .item.fulfillment .taglist {
+.items .item.fulfillment .taglist {
   display: flex;
 }
-.product_wrapper .item.fulfillment .taglist .tag {
+.items .item.fulfillment .taglist .tag {
   color: #000;
   background-color: #e5ff00;
   border: solid 1px #000;
@@ -688,79 +677,70 @@ comments message {
   border-radius: 3px;
   margin: 0 2px;
 }
-.product_wrapper .item.fulfillment .taglist .tag.new,
-.product_wrapper .item.fulfillment .taglist .tag.sticker.printed,
-.product_wrapper .item.fulfillment .taglist .tag.sticker_printed {
+.items .item.fulfillment .taglist .tag.new,
+.items .item.fulfillment .taglist .tag.sticker.printed,
+.items .item.fulfillment .taglist .tag.sticker_printed {
   background-color: #fff;
 }
-.product_wrapper .item.fulfillment .taglist .tag.on_hold {
+.items .item.fulfillment .taglist .tag.on_hold {
   background-color: #eaabc9;
 }
-.product_wrapper .item.fulfillment .taglist .tag.needs_airbrush {
+.items .item.fulfillment .taglist .tag.needs_airbrush {
   background-color: #caf7cd;
 }
-.product_wrapper .item.fulfillment .taglist .tag.at_airbrush {
+.items .item.fulfillment .taglist .tag.at_airbrush {
   background-color: #7bcea80;
 }
-.product_wrapper .item.fulfillment .taglist .tag.needs_embroidery {
+.items .item.fulfillment .taglist .tag.needs_embroidery {
   background-color: #a5e1ff;
 }
-.product_wrapper .item.fulfillment .taglist .tag.at_embroidery {
+.items .item.fulfillment .taglist .tag.at_embroidery {
   background-color: #579af2;
 }
-.product_wrapper .item.fulfillment .taglist .tag.needs_picking {
+.items .item.fulfillment .taglist .tag.needs_picking {
   background-color: #bcabea;
 }
-.product_wrapper .item.fulfillment .taglist .tag.needs_pressing {
+.items .item.fulfillment .taglist .tag.needs_pressing {
   background-color: #e2aba5;
 }
-.product_wrapper .item.fulfillment .taglist .tag.needs_qaing {
+.items .item.fulfillment .taglist .tag.needs_qaing {
   background-color: #f9b159;
 }
-.product_wrapper .item.fulfillment .taglist .tag.needs_packing {
+.items .item.fulfillment .taglist .tag.needs_packing {
   background-color: #d3d3d3;
 }
-.product_wrapper .item.fulfillment .taglist .tag.shipped {
+.items .item.fulfillment .taglist .tag.shipped {
   background-color: #000;
   color: #fff;
 }
-.product_wrapper .item.fulfillment .taglist .tag.vip {
+.items .item.fulfillment .taglist .tag.vip {
   background-color: #e50d02;
 }
-.product_wrapper .item.fulfillment .add_tag {
+.items .item.fulfillment .add_tag {
   display: flex;
 }
-.product_wrapper .item.fulfillment .add_tag > * {
+.items .item.fulfillment .add_tag > * {
   margin: 0;
 }
-.product_wrapper .item.fulfillment .assembly .legacy img {
+.items .item.fulfillment .assembly .legacy img {
   height: 28px;
 }
-.product_wrapper .item.fulfillment .assembly_image {
+.items .item.fulfillment .assembly_image {
   display: inline-block;
   width: 20px;
   height: 20px;
   border: solid 4px #ccc;
   background-color: #ccc;
 }
-.product_wrapper .item.fulfillment .assembly_image img {
+.items .item.fulfillment .assembly_image img {
   margin: auto;
   display: block;
 }
-/* product_wrapper */
+/* items */
 .summary_items {
   grid-column: span 6;
   padding: 0;
   margin-top: 30px;
-}
-.summary_items .promo_input input {
-  border: none;
-  border-bottom: 3px solid #000;
-  text-transform: lowercase;
-}
-.summary_items .promo_input input:active,
-.summary_items .promo_input input:focus {
-  border-bottom: 3px solid #000;
 }
 .summary_items .promo_input button {
   display: inline-block;
@@ -774,7 +754,8 @@ comments message {
   border-bottom: 2px solid #eaeaea;
 }
 /* .summary_items */
-.fulfillment .summary_items {
+.summary_items.fulfillment,
+.summary_items.packing_slip {
   display: none;
 }
 .remove {
@@ -789,14 +770,14 @@ comments message {
 .remove:before {
   background-color: white;
 }
-@media (min-width: 1000px) {
-  .product_wrapper {
+@media (min-width: 1000px), print {
+  .items:not(.fulfillment):not(.packing_slip) {
     grid-column: span 4;
   }
-  .product_wrapper .item {
+  .items:not(.fulfillment):not(.packing_slip) .item {
     padding-bottom: 10px;
   }
-  .product_wrapper .item .preview {
+  .items:not(.fulfillment):not(.packing_slip) .item .preview {
     height: 200px;
   }
   .summary_items {
@@ -808,7 +789,7 @@ comments message {
     position: sticky;
     top: 112px;
   }
-  .fulfillmentStation .items .product_wrapper {
+  .fulfillmentStation .items {
     grid-column: span 6;
   }
 }
@@ -1420,7 +1401,7 @@ input_credit [name="exp_year"] {
   background: black;
   height: 2px;
 }
-@media (min-width: 1000px) {
+@media (min-width: 1000px), print {
   .cart input[type="text"],
   .cart input[type="password"],
   .cart input[type="email"] {
@@ -1430,12 +1411,6 @@ input_credit [name="exp_year"] {
     grid-column: span 4;
     padding: 10px 0;
   }
-}
-form.toggle input[type="radio"] {
-  margin-right: 5px;
-}
-form.toggle .radioLabel {
-  margin-right: 15px;
 }
 .paymentWrap input[type="text"].cardNum {
   display: inline-block;
@@ -1599,9 +1574,7 @@ signup > div label {
 signup > div input[type="text"],
 signup > div input[type="email"] {
   width: 100%;
-  box-sizing: content-box;
   font-size: 16px;
-  padding: 2px;
 }
 signup > div:last-of-type {
   margin-bottom: 16px;
@@ -1980,15 +1953,9 @@ user name {
   display: inline-block;
   margin-right: 15px;
 }
-.footer signup div:last-of-type input {
-  border: none;
-  border-bottom: 5px solid #000;
-  background: none;
-  text-transform: lowercase;
-}
 .footer signup button {
   display: inline-block;
-  top: 5px;
+  top: -2px;
 }
 @media (min-width: 1000px) {
   .footer .footer-menu a {
@@ -2132,17 +2099,6 @@ input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus {
   border-color: #7f5cff;
-}
-input[type="text"].clearInput,
-input[type="password"].clearInput,
-input[type="email"].clearInput {
-  background-color: transparent;
-  border-color: transparent;
-}
-input[type="text"].clearInput:focus,
-input[type="password"].clearInput:focus,
-input[type="email"].clearInput:focus {
-  border: none;
 }
 .cartLoginWrap {
   grid-column-start: 1;

@@ -184,7 +184,7 @@ let updateShipping = (contents, address, promo, callback) => {
     contents.push({
       props: {
         name: "Shipping & Handling:",
-        price: "enter address for quote"
+        price: "address required"
       }
     });
     return callback(null, contents);

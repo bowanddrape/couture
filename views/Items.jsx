@@ -77,10 +77,6 @@ class Items extends React.Component {
 
     let style = Item.style;
     let style_summary = Item.style_summary;
-    // hide irrelevant things on packing slip
-    if (this.props.packing_slip) {
-      style_summary.item = Object.assign({}, style_summary.item, {display:"none"});
-    }
 
     // get list totals
     for (let i=0; i<this.state.contents.length; i++) {
@@ -133,14 +129,14 @@ class Items extends React.Component {
     if (typeof(window)!="undefined" && !line_items.length)
       return null;
 
-    let classname = "items";
+    let classname = "";
     if (this.props.packing_slip)
       classname += " packing_slip";
     if (this.props.fulfillment)
       classname += " fulfillment";
 
     let summary_items_container = (
-      <div className="summary_items">
+      <div className={"summary_items"+classname}>
         <div className="summary_items_inner">
           <h3 className="summary_items_header">Summary</h3>
           {/* item subtotal */}
@@ -158,15 +154,7 @@ class Items extends React.Component {
           </div>
           {summary_items}
 
-          {/* item price total */}
-          <div className="item" style={Object.assign({},style_summary.item,{minHeight: "28px"})}>
-            <div style={style_summary.img_preview_container} />
-            <div className="deets" style={Object.assign({}, style_summary.deets, {paddingTop: "28px"})}>
-              <span className="name">Total:</span>
-              <Price style={style_summary.price_total} price={total_price}/>
-            </div>
-          </div>
-
+          {/* promo code */}
           <div style={style_summary.img_preview_container}>
             <Errors label="promo" />
           </div>
@@ -178,12 +166,22 @@ class Items extends React.Component {
               </div>
             </div>
           }
+
+          {/* item price total */}
+          <div className="item" style={Object.assign({},style_summary.item,{minHeight: "28px"})}>
+            <div style={style_summary.img_preview_container} />
+            <div className="deets" style={Object.assign({}, style_summary.deets, {paddingTop: "28px"})}>
+              <span className="name">Total:</span>
+              <Price style={style_summary.price_total} price={total_price}/>
+            </div>
+          </div>
+
         </div>
       </div>
     )
 
     return [(
-        <div className="product_wrapper">
+        <div className={"items"+classname}>
           {line_items}
         </div>
       ), summary_items_container

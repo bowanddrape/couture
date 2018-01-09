@@ -192,9 +192,9 @@ class FulfillmentStation extends React.Component {
     return (
       <div>
         {wrong_station_message}
-        <div className="items"><div className="product_wrapper">
+        <div className="items">
           {view}
-        </div></div>
+        </div>
         {actions}
       </div>
     );

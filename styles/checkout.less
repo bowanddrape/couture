@@ -64,7 +64,7 @@ input_credit {
 
 }
 
-@media (min-width: @desktop_min_width) {
+@media (min-width: @desktop_min_width), print {
   .cart {
     input[type="text"], input[type="password"], input[type="email"] {
       font-size: 16px
@@ -74,15 +74,6 @@ input_credit {
       grid-column: span 4;
       padding: 10px 0;
     }
-  }
-}
-
-form.toggle {
-  input[type="radio"] {
-    margin-right: 5px;
-  }
-  .radioLabel {
-    margin-right: 15px;
   }
 }
 

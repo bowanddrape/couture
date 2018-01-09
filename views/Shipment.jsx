@@ -237,7 +237,7 @@ class Shipment extends React.Component {
       payment_info = (
         <div>
           <h1 style={Object.assign({},Item.style.item,{borderBottom:"none",borderTop:"solid 1px #000",margin:"12px auto"})}>PAYMENT INFO</h1>
-          <div className="payment_info" style={Object.assign({},Item.style.item,{borderBottom:"none",fontSize:"18px",justifyContent:"space-between"})}>
+          <div className="payment_info" style={Object.assign({},Item.style.item,{display:"flex",borderBottom:"none",fontSize:"18px",justifyContent:"space-between"})}>
             <div style={{float:"left"}}>
               Billing Information
               <Address {...this.props.billing_address}/>
@@ -261,7 +261,7 @@ class Shipment extends React.Component {
           {borderBottom:"none",margin:"34px auto",justifyContent:"space-between"})}>
           <div>ITEMS ( {product_quantity} )</div>
         </h1>
-        <contents>
+        <contents className="grid">
           {line_items}
           <Items contents={this.props.contents}
             fulfillment={this.props.fulfillment}
