@@ -236,6 +236,8 @@ class DashboardMetrics extends React.Component {
     return rows.join("\n");
   }
   exportComponentUseCSV() {
+    if (!this.props.component_use || !this.props.component_use.length || !this.props.component_use[0].skus)
+      return "";
     return this.exportCSV(
       Object.keys(this.props.component_use[0].skus).sort(),
       ["sku", "quantity"],
