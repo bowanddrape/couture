@@ -199,9 +199,12 @@ let updateShipping = (contents, address, promo, callback) => {
   }, (err, response) => {
     // mark as done quoting
     querying_shipment_rate = null;
-    // go based on the first quote we see
+    // initialize based on the first quote we see
     if (response && response.length)
       shipping_quote = response[0];
+    // maybe don't choose the cheapest if there's multiple options
+    if (response && response.length>1)
+      shipping_quote = response[1];
     let shipping_cost = shipping_quote.amount;
     let shipping_info = "";
     // min shipping cost is 7
@@ -224,6 +227,9 @@ let updateShipping = (contents, address, promo, callback) => {
         shipping_cost = 0;
         shipping_info = "Free domestic shipping on orders of $75!";
       }
+    } else {
+      if (shipping_cost < 25)
+        shipping_cost = 25;
     } // if (domestic)
     contents.push({
       props: {
