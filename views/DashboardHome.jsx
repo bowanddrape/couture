@@ -12,7 +12,7 @@ class DashboardHome extends React.Component {
     super(props);
     this.state = {
       search_params: {
-        start: props.start || Math.round(new Date().getTime()/1000),
+        start: props.start || Math.round(new Date().getTime()/1000) - 86400,
         stop: props.stop || Math.round(new Date().getTime()/1000),
       },
     };
@@ -26,11 +26,6 @@ class DashboardHome extends React.Component {
     let stop = options.stop || Math.round(new Date().getTime()/1000);
 
     let data_sources = [
-      {
-        key: "orders_by_day",
-        query: "SELECT CAST(CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE) AS TEXT), sum(cast(payments#>>'{0, price}' as float)/100), count(1) FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3 GROUP BY 1 ORDER BY 1;",
-        props: [start, stop, 'e03d3875-d349-4375-8071-40928aa625f5'],
-      },
     ];
 
     let queries = data_sources.map((source) => { return (callback) => {
@@ -62,13 +57,6 @@ class DashboardHome extends React.Component {
   render() {
 
     let metrics = [];
-    this.props.orders_by_day.forEach((datapoint) => {
-      metrics.push(
-        <div key={metrics.length}>
-          {datapoint.toString()}
-        </div>
-      );
-    });
 
     let start = new Date(this.state.search_params.start*1000);
     let stop = new Date(this.state.search_params.stop*1000);
@@ -96,7 +84,7 @@ class DashboardHome extends React.Component {
           </div>
         </div>
         <div style={{display:"flex"}}>
-          <a className="button" href={`/dashboard/metrics?start=${this.state.search_params.start}&stop=${this.state.search_params.sstop}`}>Metrics</a>
+          <a className="button" href={`/dashboard/metrics?start=${this.state.search_params.start}&stop=${this.state.search_params.stop}`}>Metrics</a>
           <a className="button" href={`/dashboard/promos?start=${this.state.search_params.start}&stop=${this.state.search_params.stop}`}>Promos</a>
         </div>
         {metrics}

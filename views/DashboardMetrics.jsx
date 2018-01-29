@@ -28,6 +28,10 @@ class DashboardMetrics extends React.Component {
 
     let data_sources = [
       {
+        key: "orders",
+        query: "WITH shipment_contents AS (SELECT id, jsonb_array_elements(contents) AS content_line_item, from_id, to_id, requested, delivery_promised, tracking_code, store_id, email, payments, address AS shipping_address, billing_address FROM shipments WHERE requested>$1 AND requested<$2 ORDER BY requested ASC) SELECT * FROM shipment_contents",
+        props: [start, stop],
+      }, {
         key: "orders_by_day",
         query: "SELECT EXTRACT(EPOCH FROM CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE)) AS date, sum(cast(payments#>>'{0, price}' as float)) AS revenue, count(1) AS count FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3 GROUP BY 1 ORDER BY 1;",
         props: [start, stop, Facility.special_ids.canceled],
@@ -246,6 +250,30 @@ class DashboardMetrics extends React.Component {
       }
     );
   }
+  exportOrdersCSV() {
+    if (!this.props.orders || !this.props.orders.length)
+      return "";
+    let order_keys = ["requested", "delivery_promised", "email", "shipping_address"];
+    let content_keys = ["name", "price", "tags"];
+
+    return this.exportCSV(
+      this.props.orders,
+      ["order_id"].concat(["content_basesku"], content_keys.map((key)=>{return "content_"+key}), order_keys),
+      (row) => {
+        let data = [
+          row.id,
+          row.content_line_item.sku,
+        ];
+        content_keys.forEach((key) => {
+          data.push(JSON.stringify(row.content_line_item.props[key]));
+        });
+        order_keys.forEach((key) => {
+          data.push(JSON.stringify(row[key]).replace(/,/g,";"));
+        });
+        return data;
+      }
+    );
+  }
 
   render() {
 
@@ -293,10 +321,14 @@ class DashboardMetrics extends React.Component {
         <script src="https://code.highcharts.com/highcharts.js"></script>
         <script src="https://code.highcharts.com/modules/series-label.js"></script>
         <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+        <a className="export cta" href={"data:text/csv;charset=utf-8,"+encodeURIComponent(this.exportOrdersCSV())} download="orders.csv">
+          download orders
+        </a>
         <div id="time_container"></div>
 
         <a className="export cta" href={"data:text/csv;charset=utf-8,"+encodeURIComponent(this.exportComponentUseCSV())} download="component_use.csv">
-          download csv
+          download component use
         </a>
         <div id="inventory_container"></div>
         <div id="factory_container"></div>

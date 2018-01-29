@@ -126,7 +126,6 @@ class StockistList extends React.Component {
 
       let delay = 1000;
       this.props.stockists.forEach((stockist, index) => {
-
         // skip lookup if we already have a location
         if (stockist.location) {
           addToMap(stockist);
@@ -150,55 +149,6 @@ class StockistList extends React.Component {
           });
         }, delay);
       });
-
-    });
-  }
-
-  componentDidMount() {
-BowAndDrape.stockists = this.props.stockists;
-    BowAndDrape.dispatcher.on("map_loaded", () => {
-      let geocoder = new google.maps.Geocoder();
-      var nyc = {lat: 40.6976684, lng: -74.260555};
-      var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 2,
-        center: nyc,
-      });
-      var contentString = '<div id="content">'+
-        '<div id="siteNotice">'+
-        '</div>'+
-        '<h1 id="firstHeading" class="firstHeading">Title</h1>'+
-        '<div id="bodyContent">'+
-          '<p>content</p>'+
-        '</div>'+
-      '</div>';
-      var infowindow = new google.maps.InfoWindow({
-        content: contentString
-      });
-
-      this.props.stockists.forEach((stockist, index) => {
-        setTimeout(() => {
-console.log("loaded "+index+" of "+this.props.stockists.length)
-          let address = `${stockist.address} ${stockist["city"]}, ${stockist["state"]} ${stockist["zip"]}`;
-          geocoder.geocode( {address}, function(results, status) {
-            if (status != 'OK')
-              console.log('Geocode was not successful for the following reason: ' + status);
-            if (!results)
-              return console.log("no result for "+address);
-stockist.location = {
-  lat: results[0].geometry.location.lat(),
-  lng: results[0].geometry.location.lng()
-};
-            var marker = new google.maps.Marker({
-              position: results[0].geometry.location,
-              map: map
-            });
-            marker.addListener('click', function() {
-              infowindow.open(map, marker);
-            });
-          });
-        }, index*1500);
-      });
-
     });
   }
 
