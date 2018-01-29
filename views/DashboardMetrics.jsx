@@ -266,10 +266,14 @@ class DashboardMetrics extends React.Component {
           row.content_line_item.tags?row.content_line_item.tags.join("|"):"",
         ];
         content_keys.forEach((key) => {
-          data.push(JSON.stringify(row.content_line_item.props[key]));
+          data.push(JSON.stringify(row.content_line_item.props[key]).replace(/,/g,"|").replace(/"/g,""));
         });
         order_keys.forEach((key) => {
-          data.push(JSON.stringify(row[key]).replace(/,/g,"|"));
+          if (["requested", "delivery_promised"].indexOf(key) != -1) {
+            let date = new Date(parseFloat(row[key])*1000);
+            return data.push(`${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`);
+          }
+          data.push(JSON.stringify(row[key]).replace(/,/g,"|").replace(/"/g,""));
         });
         return data;
       }
