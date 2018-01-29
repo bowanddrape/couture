@@ -254,21 +254,22 @@ class DashboardMetrics extends React.Component {
     if (!this.props.orders || !this.props.orders.length)
       return "";
     let order_keys = ["requested", "delivery_promised", "email", "shipping_address"];
-    let content_keys = ["name", "price", "tags"];
+    let content_keys = ["name", "price"];
 
     return this.exportCSV(
       this.props.orders,
-      ["order_id"].concat(["content_basesku"], content_keys.map((key)=>{return "content_"+key}), order_keys),
+      ["order_id"].concat(["content_basesku", "content_tags"], content_keys.map((key)=>{return "content_"+key}), order_keys),
       (row) => {
         let data = [
           row.id,
           row.content_line_item.sku,
+          row.content_line_item.tags?row.content_line_item.tags.join("|"):"",
         ];
         content_keys.forEach((key) => {
           data.push(JSON.stringify(row.content_line_item.props[key]));
         });
         order_keys.forEach((key) => {
-          data.push(JSON.stringify(row[key]).replace(/,/g,";"));
+          data.push(JSON.stringify(row[key]).replace(/,/g,"|"));
         });
         return data;
       }
