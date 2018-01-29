@@ -66,14 +66,91 @@ const state_names = {
 class StockistList extends React.Component {
 
   static preprocessProps(options, callback) {
-    const csv=require('csvtojson')
-    options.stockists = options.stockists || [];
-    csv().fromFile("./stockists.csv")
-    .on('json', (row) => {
-      options.stockists.push(row);
-    }).on('done', (err) => {
-      if (err) console.log("error reading stockists.csv file "+err);
-      callback(err, options);
+    if (false) { // load from csv
+      const csv=require('csvtojson')
+      options.stockists = options.stockists || [];
+      csv().fromFile("./stockists.csv")
+      .on('json', (row) => {
+        options.stockists.push(row);
+      }).on('done', (err) => {
+        if (err) console.log("error reading stockists.csv file "+err);
+        callback(err, options);
+      });
+    } else {
+      require('fs').readFile('./stockists.json', 'utf8', (err, data) => {
+        if (err) return callback(err);
+        options.stockists = JSON.parse(data);
+        callback(err, options);
+      });
+    }
+  }
+
+  componentDidMount() {
+    BowAndDrape.stockists = this.props.stockists;
+    BowAndDrape.dispatcher.on("map_loaded", () => {
+      let geocoder = new google.maps.Geocoder();
+      let nyc = {lat: 40.6976684, lng: -74.260555};
+      let map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 5,
+        center: nyc,
+      });
+
+      // funciton to build map pop-up
+      let addToMap = (stockist) =>{
+        let contentString = `
+          <div id="content">
+            <div id="siteNotice"></div>
+            <h1 id="firstHeading" class="firstHeading">
+              ${stockist.retailer} at ${stockist["store name"]}
+            </h1>
+            <div id="bodyContent">
+              <p>
+                ${stockist.address}<br/>
+                ${stockist["city"]}, ${stockist["state"]} ${stockist["zip"]}
+              </p>
+              <p>${stockist.phone}</p>
+            </div>
+          </div>
+        `;
+        let infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+        let marker = new google.maps.Marker({
+          position: stockist.location,
+          map: map,
+        });
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+      }
+
+      let delay = 1000;
+      this.props.stockists.forEach((stockist, index) => {
+
+        // skip lookup if we already have a location
+        if (stockist.location) {
+          addToMap(stockist);
+          return;
+        }
+        // do the geocode lookup (slowly because of ratelimits)
+        delay += 1000;
+        setTimeout(() => {
+          console.log("geocode lookup "+index+" of "+this.props.stockists.length)
+          geocoder.geocode( {address}, function(results, status) {
+            if (status != 'OK')
+              console.log('Geocode was not successful for the following reason: ' + status);
+            if (!results)
+              return console.log("no result for "+address);
+
+            stockist.location = {
+              lat: results[0].geometry.location.lat(),
+              lng: results[0].geometry.location.lng(),
+            };
+            addToMap(stockist);
+          });
+        }, delay);
+      });
+
     });
   }
 
@@ -126,7 +203,6 @@ stockist.location = {
   }
 
   render() {
-
     let stockists = {};
     this.props.stockists.forEach((stockist) => {
       stockists[stockist.country] = stockists[stockist.country] || {};
