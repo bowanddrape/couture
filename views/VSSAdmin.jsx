@@ -33,6 +33,8 @@ class VSSAdmin extends React.Component {
     }
 
     handleSubmit() {
+      if (isNaN(parseFloat(this.state.props.price)))
+        return alert("invalid price");
       BowAndDrape.api("POST", "/vss", this.state, (err, resp) => {
         if (err) {
           alert("Error on POSTing");
