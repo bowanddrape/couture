@@ -305,7 +305,7 @@ class Shipment extends JSONAPI {
             } // description says "delivered"
 
             if (detail) {
-              detail.forEach((shipping_detail) => {
+              detail.forEach((shipping_detail, index) => {
                 // extract shipping label created date
                 if (/Shipping Label Created/.test(shipping_detail)) {
                   let date = parseDateFromText(shipping_detail);
@@ -313,7 +313,7 @@ class Shipment extends JSONAPI {
                     self.shipping_label_created = date.getTime()/1000;
                 }
                 // extract shipping carrier pickup date
-                if (/Arrived at /.test(shipping_detail) || /picked up /.test(shipping_detail)) {
+                if (index+1 < shipping_detail.length) {
                   let date = parseDateFromText(shipping_detail);
                   if (date && !isNaN(date.getTime()))
                     self.shipping_carrier_pickup = date.getTime()/1000;

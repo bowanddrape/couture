@@ -52,7 +52,7 @@ class DashboardPromos extends React.Component {
 
     this.setState((prevState) => {
       if (name=="start" || name=="stop")
-        value = new Date(value+" EST").getTime()/1000;
+        value = new Date(value).getTime()/1000;
       let search_params = Object.assign({}, this.state.search_params);
       search_params[name] = value;
       return ({search_params});

@@ -29,7 +29,7 @@ class DashboardMetrics extends React.Component {
     let data_sources = [
       {
         key: "orders",
-        query: "WITH shipment_contents AS (SELECT id, jsonb_array_elements(contents) AS content_line_item, from_id, to_id, requested, delivery_promised, tracking_code, store_id, email, payments, address AS shipping_address, billing_address FROM shipments WHERE requested>$1 AND requested<$2 ORDER BY requested ASC) SELECT * FROM shipment_contents",
+        query: "WITH shipment_contents AS (SELECT id, jsonb_array_elements(contents) AS content_line_item, from_id, to_id, requested, received, shipping_label_created, shipping_carrier_pickup, tracking_code, store_id, email, payments, address AS shipping_address, billing_address FROM shipments WHERE requested>$1 AND requested<$2 ORDER BY requested ASC) SELECT * FROM shipment_contents",
         props: [start, stop],
       }, {
         key: "orders_by_day",
@@ -221,7 +221,7 @@ class DashboardMetrics extends React.Component {
 
     this.setState((prevState) => {
       if (name=="start" || name=="stop")
-        value = new Date(value+" EST").getTime()/1000;
+        value = new Date(value).getTime()/1000;
       let search_params = Object.assign({}, this.state.search_params);
       search_params[name] = value;
       return ({search_params});
@@ -253,7 +253,7 @@ class DashboardMetrics extends React.Component {
   exportOrdersCSV() {
     if (!this.props.orders || !this.props.orders.length)
       return "";
-    let order_keys = ["requested", "delivery_promised", "email", "shipping_address"];
+    let order_keys = ["requested", "received", "shipping_label_created", "shipping_carrier_pickup","email", "shipping_address"];
     let content_keys = ["name", "price"];
 
     return this.exportCSV(
@@ -269,7 +269,7 @@ class DashboardMetrics extends React.Component {
           data.push(JSON.stringify(row.content_line_item.props[key]).replace(/,/g,"|").replace(/"/g,""));
         });
         order_keys.forEach((key) => {
-          if (["requested", "delivery_promised"].indexOf(key) != -1) {
+          if (["requested", "received", "shipping_label_created", "shipping_carrier_pickup"].indexOf(key) != -1) {
             let date = new Date(parseFloat(row[key])*1000);
             return data.push(`${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`);
           }
