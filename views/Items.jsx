@@ -77,10 +77,6 @@ class Items extends React.Component {
 
     let style = Item.style;
     let style_summary = Item.style_summary;
-    // hide irrelevant things on packing slip
-    if (this.props.packing_slip) {
-      style_summary.item = Object.assign({}, style_summary.item, {display:"none"});
-    }
 
     // get list totals
     for (let i=0; i<this.state.contents.length; i++) {
