@@ -50,6 +50,9 @@ class BraintreeClient {
         paypal.Button.render({
           env: 'sandbox',
           //env: 'production',
+          style: {
+            size: 'responsive',
+          },
           payment: function () {
             return paypalCheckoutInstance.createPayment({
               flow: "checkout",

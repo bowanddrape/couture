@@ -1369,9 +1369,6 @@ input_credit [name="exp_month"],
 input_credit [name="exp_year"] {
   width: 40px;
 }
-.cart #paypal-button {
-  text-align: center;
-}
 .cart > section {
   grid-column: span 6;
   border-top: 2px solid #eaeaea;
@@ -1383,11 +1380,11 @@ input_credit [name="exp_year"] {
   display: flex;
   flex-flow: row wrap;
 }
+.cart > section row input[type="text"] {
+  margin-right: 15px;
+}
 .cart > section label {
   text-align: right;
-}
-.cart > section div {
-  margin-right: 15px;
 }
 .cart > section .section_title {
   margin-top: 20px;
