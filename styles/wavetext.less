@@ -1,0 +1,28 @@
+
+@keyframes wave {
+  from { transform : translateY(0); }
+  to   { transform : translateY(-10px); }
+}
+
+.wavetext {
+  margin-top : 10px;
+  text-align : center;
+}
+
+.wavetext span {
+  display: inline-block;
+  animation-duration: 1.2s;
+  animation-name: wave;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: cubic-bezier(.31,.3,.38,.92);
+}
+
+@wave_period: 100;
+.wave_loop(@index) when(@index =< 140) {
+  .wavetext span:nth-child(@{index}) {
+    animation-delay: unit(mod(@index,@wave_period)/10, s);
+  }
+  .wave_loop(@index + 1);
+}
+.wave_loop(0);

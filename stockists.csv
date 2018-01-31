@@ -1,0 +1,421 @@
+retailer,store #,store name,address,city,state,zip,notes,phone,country
+Hudson's Bay Company,1138, Chinook Centre, 6455 Macleod Trail SW, Calgary,Alberta, AB T2H 0L1,Customization + Premades,, Canada
+Hudson's Bay Company,1101,Vancouver Downtown,674 Granville St, Vancouver,British Columbia, BC V6C 1Z6,Customization + Premades,, Canada
+Hudson's Bay Company,1560,Hudson's Bay Queen Street, 176 Yonge St, Toronto,Ontario, ON M5C 2L7,Customization + Premades,, Canada
+Hudson's Bay Company,1546,Scarborough Town Centre,300 Borough Dr,Toronto,Ontario, ON M1P 4P5,Customization + Premades,, Canada
+Nordstrom,380,Fashion Square,7055 E. Camelback Road,Scottsdale,AZ,85251,Loungewear & W+W,480-946-4111,USA
+Macy's,450,SCOTTSDALE FASHION SQUARE,7014 East Camelback Rd,Scottsdale,AZ,85251,Tops & Accessories,,USA
+Macy's,451,BILTMORE FASHION PARK,2410 East Camelback Rd,Phoenix,AZ,85016,Tops,,USA
+Macy's,452,ARROWHEAD TOWNE CENTER,7600 W Arrowhead Towne Center,Glendale,AZ,85308,Tops & Accessories,,USA
+Macy's,453,CHANDLER FASHION CENTER,3107 West Chandler Blvd,Chandler,AZ,85226,Tops & Accessories,,USA
+Macy's,454,PARADISE VALLEY,4500 East Cactus Rd,Phoenix,AZ,85032,Tops,,USA
+Macy's,465,SANTAN VILLAGE,2190 East Williams Field Rd,Gilbert,AZ,85295,Tops,,USA
+Nordstrom,384,Century City,10250 Santa Monica Boulevard Dept 3,Los Angeles,CA,90067,Loungewear,424-204-1177,USA
+Nordstrom,320,South Coast Plaza,3333 Bristol Street,Costa Mesa,CA,92626,Loungewear,714-549-8300,USA
+Nordstrom,326,The Shops at Mission Viejo,100 The Shops at Mission Viejo,Mission Viejo,CA,92691,Loungewear & W+W,949-347-2710,USA
+Nordstrom,333,Fashion Island,901 Newport Center Drive,Newport Beach,CA,92660,Loungewear,949-610-0700,USA
+Nordstrom,341,Topanga,21725 Victory Boulevard,Canoga Park,CA,91303,Loungewear,818-884-7900,USA
+Nordstrom,342,Del Amo Fashion Center,21500 Hawthorne Boulevard,Torrance,CA,90503,Loungewear,310-542-9440,USA
+Nordstrom,345,Santa Anita,400 S. Baldwin Avenue,Arcadia,CA,91007,Loungewear,626-821-6363,USA
+Nordstrom,349,Grove At Farmers Market,189 The Grove Drive,Los Angeles,CA,90036,Loungewear,323-930-2230,USA
+Nordstrom,353,Santa Monica Place,220 Broadway,Santa Monica,CA,90401,Loungewear,310-752-2701,USA
+Nordstrom,360,Fashion Valley Center,6997 Friars Road,San Diego,CA,92108,Loungewear,619-295-4441,USA
+Nordstrom,361,UTC,4401 La Jolla Village Drive,San Diego,CA,92122,Loungewear,858-457-4575,USA
+Nordstrom,423,Corte Madera,1870 Redwood Highway,Corte Madera,CA,94925,Loungewear,415-927-1690,USA
+Nordstrom,427,San Francisco Centre,865 Market Street,San Francisco,CA,94103,Loungewear & W+W,415-243-8500,USA
+Nordstrom,348,The Oaks,346 W. Hillcrest Drive,Thousand Oaks,CA,91360,W+W,805-418-4500,USA
+Nordstrom,325,The Galleria at Tyler in Riverside,3601 The Galleria at Tyler,Riverside,CA,92503,W+W,951-351-3170,USA
+Nordstrom,330,Irvine SpeCenterum Center,800 Spectrum Center Drive,Irvine,CA,92618,W+W,949-255-2800,USA
+Nordstrom,322,Los Cerritos Center,300 Los Cerritos Center,Cerritos,CA,90703,W+W,562-924-0940,USA
+Nordstrom,321,Brea Mall,500 Brea Mall Way,Brea,CA,92821,W+W,714-529-0123,USA
+Nordstrom,420,Hillsdale Mall,130 Hillsdale Shopping Center,San Mateo,CA,94403,W+W,650-570-5111,USA
+Nordstrom,429,Arden Fair,1651 Arden Way,Sacramento,CA,95815,W+W,916-646-2400,USA
+Nordstrom,430,Stoneridge,1600 Stoneridge Mall Road,Pleasanton,CA,94588,W+W,925-463-5050,USA
+Nordstrom,422,Stanford Shopping Center,550 Stanford Shopping Center,Palo Alto,CA,94304,W+W,650-323-5111,USA
+Bloomingdales,22,San Francisco,845 Market St,San Francisco,CA,94103,Premade Only (Dreamer Style),,USA
+Bloomingdales,31,Stanford CA,1 Stanford Shopping Center,Palo Alto,CA,94304,Premade Only (Dreamer Style),,USA
+Bloomingdales,28,Century City CA,10250 Santa Monica Blvd,Los Angeles,CA,90067,Premade Only (Dreamer Style),,USA
+Bloomingdales,29,Sherman Oaks,14060 Riverside Dr,Sherman Oaks,CA,91423,Premade Only (Dreamer Style),,USA
+Bloomingdales,30,Newport Beach Fashion,701 Newport Center Dr,Newport Beach,CA,92660,Premade Only (Dreamer Style),,USA
+Bloomingdales,32,Beverly Center,8500 Beverly Blvd,Los Angeles,CA,90048,Premade Only (Dreamer Style),,USA
+Bloomingdales,59,Santa Monica CA,315 Colorado Ave,Santa Monica,CA,90401,Premade Only (Dreamer Style),,USA
+Bloomingdales,60,Glendale Galleria,103 S. Brand Ave,Glendale,CA,91204,Premade Only (Dreamer Style),,USA
+Bloomingdales,61,San Diego - Fashion Valley,7057 Friars Rd,San Diego,CA,92108,Premade Only (Dreamer Style),,USA
+Bloomingdales,62,South Coast Plaza,3333 South Bristol St,Costa Mesa,CA,92626,Customization + Premades,,USA
+Macy's,323,CONCORD SUNVALLEY,341 Sun Valley Mall,Concord,CA,94520,Tops & Accessories,,USA
+Macy's,324,WALNUT CREEK BROADWAY PLAZA,1301 Broadway Plaza,Walnut Creek,CA,94596,Tops & Accessories,,USA
+Macy's,325,SANTA ROSA PLAZA,800 Santa Rosa Plaza,Santa Rosa,CA,95401,Tops,,USA
+Macy's,326,FAIRFIELD SOLANO,1544 Travis Blvd,Fairfield,CA,94533,Tops,,USA
+Macy's,328,CORTE MADERA VILLAGE,1400 Redwood HWY,Corte Madera,CA,94925,Tops,,USA
+Macy's,333,PLEASANTON STONERIDGE,1300 Stoneridge Mall Rd,Pleasanton,CA,94588,Tops & Accessories,,USA
+Macy's,334,STANFORD (CA),300 Standord Shopping Center,Palo Alto,CA,94304,Tops & Accessories,,USA
+Macy's,335,MODESTO VINTAGE FAIR,500 Vintage Faire,Modesto ,CA,95356,Tops & Accessories,,USA
+Macy's,338,STOCKTON SHERWOOD,5242 Pacific Ave,Stockton,CA,95207,Tops,,USA
+Macy's,358,VALLEY FAIR (CA),2801 Stevens Creek Blvd,Santa Clara,CA,95050,Tops & Accessories,,USA
+Macy's,359,FRESNO FASHION FAIR,4888 North Fresno St,Fresno,CA,93726,Tops & Accessories,,USA
+Macy's,360,OAKRIDGE CA,5411 Thornwood Dr,San Jose,CA,95123,Accessories,,USA
+Macy's,361,MONTEREY DEL MONTE CENTER,100 Del Monte Center,Monterey,CA,93940,Tops,,USA
+Macy's,363,SALINAS NORTHRIDGE,200 Northridge Center,Salinas,CA,93901,Tops,,USA
+Macy's,364,CAPITOLA,1865 41st Ave,Capitola,CA,95010,Tops,,USA
+Macy's,369,SHOPS AT RIVER PARK,7890 N Blackstone Ave,Fresno,CA,93720,Tops,,USA
+Macy's,406,SACRAMENTO DOWNTOWN PLAZA,414 K Street ,Sacramento,CA,95814,Tops & Accessories,,USA
+Macy's,407,ARDEN FAIR,1701 Arden Way,Sacramento,CA,95815,Tops & Accessories,,USA
+Macy's,408,ROSEVILLE GALLERIA,1197 Galleria Blvd,Roseville,CA,95678,Tops & Accessories,,USA
+Macy's,411,REDDING MT. SHASTA,1291 Hilltop Dr ,Redding,CA,96003,Tops,,USA
+Macy's,428,SAN FRANCISCO UNION SQUARE,170 O'Farrell St,San Francisco,CA,94102,Tops & Accessories,,USA
+Macy's,429,HILLSDALE (CA),115 Hillsdale Mall,San Mateo,CA,94403,Tops,,USA
+Macy's,448,VISALIA,2211 S Mooney Blvd,Visalia,CA,93277,Tops,,USA
+Macy's,481,DOWNEY STONEWOOD CENTER,9066 Stonewood St,Downey,CA,90241,Tops & Accessories,,USA
+Macy's,482,SANTA ANITA,400 South Baldwin,Arcadia,CA,91006,Tops & Accessories,,USA
+Macy's,483,LOS CERRITOS CENTER,500 Los Cerritos Center ,Cerritos,CA,90701,Tops & Accessories,,USA
+Macy's,484,THE SHOPS AT MONTEBELLO,2000 Montebello Town Center,Montebello,CA,90640,Tops & Accessories,,USA
+Macy's,485,WEST COVINA,1111 Plaza Drive ,West Covina,CA,91790,Tops & Accessories,,USA
+Macy's,486,MONTCLAIR PLAZA,5200 Montclair Plaza Lane,Montclair,CA,91763,Tops,,USA
+Macy's,487,LOS ANGELES DOWNTOWN PLAZA,750 West 7th St,Los Angeles,CA,90017,Tops & Accessories,,USA
+Macy's,491,NORTHRIDGE FASHION CENTER,9301 Tampa Ave,Northridge,CA,91324,Tops & Accessories,,USA
+Macy's,492,THOUSAND OAKS,590 W. Hillcrest Drive ,Thousand Oaks,CA,91360,Tops & Accessories,,USA
+Macy's,493,VALENCIA TOWN CENTER,26450 McBean Pkwy,Santa Clarita,CA,91355,Tops,,USA
+Macy's,495,BAKERSFIELD VALLEY PLAZA,2601 Ming Ave,Bakersfield,CA,93304,Tops & Accessories,,USA
+Macy's,496,SIMI VALLEY TOWN CENTER,1475 Simi Town Center Way,Simi Valley,CA,93065,Tops,,USA
+Macy's,497,LA CUMBRE PLAZA,3805 State St,Santa Barbara,CA,93105,Tops,,USA
+Macy's,499,SANTA MARIA TOWN CENTER,302 Town Center East,Santa Maria,CA,93454,Tops,,USA
+Macy's,501,SHERMAN OAKS FASHION SQUARE,14000 Riverside Dr,Sherman Oaks,CA,91423,Tops & Accessories,,USA
+Macy's,502,GLENDALE GALLERIA,2100 Glendale Galleria,Glendale,CA,91210,Tops & Accessories,,USA
+Macy's,503,TOPANGA,21900 Vanowen St,Canoga Park,CA,91304,Tops & Accessories,,USA
+Macy's,504,BURBANK TOWN CENTER,200 East Cypress,Burbank,CA,91502,Tops,,USA
+Macy's,508,PASADENA,401 South Lake Ave,Pasadena,CA,91101,Tops & Accessories,,USA
+Macy's,511,DEL AMO FASHION CENTER,21600 Hawthorne Blvd,Torrance,CA,90503,Tops & Accessories,,USA
+Macy's,512,BEVERLY CENTER,8500 Beverly Blvd,Los Angeles,CA,90048,Tops & Accessories,,USA
+Macy's,514,MANHATTAN BEACH,3400 Sepulveda Blvd,Manhattan Beach,CA,90266,Tops,,USA
+Macy's,516,CULVER CITY CENTER,6200 Slauson Ave,Culver City,CA,90230,Tops & Accessories,,USA
+Macy's,518,CENTURY CITY (CA),10250 Santa Monica Blvd,Los Angeles,CA,90067,Tops & Accessories,,USA
+Macy's,520,BALDWIN HILLS CRENSHAW PLAZA,4005 Crenshaw Blvd,Los Angeles,CA,90008,Tops,,USA
+Macy's,523,SOUTH COAST PLAZA,3333 Bristol St,Costa Mesa,CA,92626,Tops & Accessories,,USA
+Macy's,524,BREA (CA),200 Brea Mall,Brea,CA,92821,Tops & Accessories,,USA
+Macy's,526,MISSION VIEJO,300 Shops at Mission Viejo,Mission Viejo,CA,92691,Tops,,USA
+Macy's,527,SANTA ANA MAINPLACE,2850 North Main St,Santa Ana,CA,92701,Tops & Accessories,,USA
+Macy's,528,NEWPORT FASHION ISLAND,101 Newport Center Dr,Newport Beach,CA,92660,Tops & Accessories,,USA
+Macy's,533,VICTORIA GARDENS (CA),7855 Kew Ave,Rancho Cucamonga,CA,91739,Tops & Accessories,,USA
+Macy's,535,TEMECULA PROMENADE,40780 Winchester Blvd,Temecula,CA,92591,Tops & Accessories,,USA
+Macy's,536,RIVERSIDE GALLERIA AT TYLER,3500 Tyler Mall,Riverside,CA,92503,Tops,,USA
+Macy's,538,SAN BERNARDINO INLAND CENTER,400 Inland Center Dr,San Bernardino,CA,92408,Tops,,USA
+Macy's,544,FASHION VALLEY (CA),7017 Friars Rd,San Diego,CA,92108,Tops & Accessories,,USA
+Macy's,545,SHOPPES AT CARLSBAD,2559 El Camino Real,Carlsbad,CA,92008,Tops,,USA
+Macy's,547,UNIVERSITY TOWN CENTER (CA),4333 La Jolla Village Dr,San Diego,CA,92122,Tops,,USA
+Macy's,549,GROSSMONT SC,5500 Grossmont Center Dr,La Mesa,CA,91942,Tops,,USA
+Macy's,551,HORTON PLAZA,160 Horton Plaza,San Diego,CA,92101,Tops,,USA
+Macy's,557,VICTOR VALLEY MALL,14580 Bear Valley Road,Victorville,CA,92392,Tops,,USA
+Macy's,494,VENTURA PACIFIC VIEW,477 South Mills Rd,Ventura,CA,93003,Tops,,USA
+Macy's,534,PALM DESERT,72780 Highway 111,Palm Desert,CA,92260,Tops & Accessories,,USA
+Nordstrom,34,Park Meadows,8465 Park Meadows Center Drive,Lone Tree,CO,80124,W+W,303-799-3400,USA
+Macy's,344,CHERRY CREEK SC,15 South Steele St,Denver,CO,80209,Tops & Accessories,,USA
+Macy's,345,PARK MEADOWS,8455 Park Meadows Center Dr,Littleton,CO,80124,Tops & Accessories,,USA
+Macy's,349,BOULDER TWENTY NINTH STREET,1900 29th St,Boulder,CO,80301,Tops,,USA
+Macy's,351,LOVELAND SHOPS AT CENTERRA,5995 Skypond Dr,Loveland,CO,80538,Tops,,USA
+Macy's,354,ORCHARD TOWN CENTER (CO),14535 Delaware St,Westminster,CO,80023,Tops,,USA
+Nordstrom,526,Westfarms,600 Westfarms Mall,Farmington,CT,6032,W+W,860-521-9090,USA
+Macy's,4,WESTFARMS,100 Westfarms Mall,Farmington,CT,06032,Tops & Accessories,,USA
+Macy's,28,DANBURY FAIR,7 Backus Ave,Danbury,CT,06810,Tops & Accessories,,USA
+Macy's,116,CONNECTICUT POST,1201 Post Rd,Milford,CT,06460,Tops,,USA
+Macy's,68,METRO CENTER (DOWNTOWN DC),1201 G Street N.W.,Washington,DC,20005,Tops & Accessories,,USA
+Nordstrom,639,Christiana Mall,100 Christiana Mall,Newark,DE,19702,W+W,302-613-6000,USA
+Macy's,74,CHRISTIANA,501 Christiana Mall Road ,Newark,DE,19702,Tops & Accessories,,USA
+Nordstrom,763,Shops at Merrick Park,4310 Ponce de Leon Boulevard,Coral Gables,FL,33146,Loungewear,786-999-1313,USA
+Nordstrom,762,Town Center at Boca Raton,5820 Glades Road,Boca Raton,FL,33431,W+W,561-620-5555,USA
+Nordstrom,768,Dadeland Mall,7239 N. Kendal Drive,Miami,FL,33156,W+W,786-709-4100,USA
+Nordstrom,789,St. John Town Center,4835 Town Crossing Drive,Jacksonville,FL,32246,W+W,904-672-2200,USA
+Bloomingdales,2,Boca Raton,5840 Glades Rd,Boca Raton,FL,33431,Premade Only (Dreamer Style),,USA
+Bloomingdales,3,Aventura,19555 Biscayne Blvd,Aventura,FL,33180,Customization + Premades,,USA
+Bloomingdales,10,Palm Beach Gardens,3105 PGA Blvd,Palm Beach Gardens,FL,33410,Premade Only (Dreamer Style),,USA
+Bloomingdales,20,Orlando FL,4152 Conroy Rd,Orlando,FL,32839,Premade Only (Dreamer Style),,USA
+Bloomingdales,21,Miami - The Falls,8778 SW 136 St,Miami,FL,33176,Premade Only (Dreamer Style),,USA
+Macy's,757,BOCA RATON TOWN CENTER,5700 West Glades Rd,Boca Raton,FL,33431,Tops & Accessories,,USA
+Macy's,758,BROWARD MALL,8000 West Broward Blvd,Plantation,FL,33388,Tops & Accessories,,USA
+Macy's,759,CORAL SQUARE,9129 West Atlantic Blvd,Corla Springs,FL,33071,Tops & Accessories,,USA
+Macy's,760,THE GARDENS (FL),3107 PGA Blvd,Palm Beach Gardens,FL,33410,Tops & Accessories,,USA
+Macy's,761,GALLERIA (FT. LAUDERDALE),2314 East Sunrise Blvd,Ft Lauderdale,FL,33304,Tops & Accessories,,USA
+Macy's,762,WELLINGTON GREEN,10316 Forest Hill Blvd,Wellington,FL,33414,Tops & Accessories,,USA
+Macy's,769,AVENTURA,19535 Biscayne Blvd,Aventura,FL,33180,Tops & Accessories,,USA
+Macy's,770,MIAMI INTERNATIONAL,1205 NW 107th Ave,Miami,FL,33172,Tops & Accessories,,USA
+Macy's,771,PEMBROKE LAKES,11605 Pines Blvd,Pembroke Pines,FL,33026,Tops & Accessories,,USA
+Macy's,772,WESTLAND,1777 West 49th St,Hialeah,FL,33012,Tops & Accessories,,USA
+Macy's,773,SOUTH BEACH,1675 Meridian Ave,Miami Beach,FL,33139,Tops,,USA
+Macy's,774,MIAMI (DOWNTOWN),22 East Flagler St,Miami,FL,33131,Tops,,USA
+Macy's,776,DADELAND,7303 SW 88th St,Miami,FL,33156,Tops & Accessories,,USA
+Macy's,810,ORLANDO MILLENIA,4298 Millenia Blvd,Orlando,FL,32839,Tops & Accessories,,USA
+Macy's,811,FLORIDA MALL,8001 S Orange Blossom Trail,Orlando,FL,32809,Tops & Accessories,,USA
+Macy's,812,ALTAMONTE,451 E Altamonte Dr,Altamonte Springs,FL,32701,Tops,,USA
+Macy's,814,MERRITT SQUARE,777 E Merritt Island Causeway,Merritt Island,FL,32952,Tops,,USA
+Macy's,815,MELBOURNE SQUARE,1700 West New Haven Ave,Melbourne,FL,32904,Tops,,USA
+Macy's,821,TYRONE SQUARE,6901 22nd Ave North,St Petersburg,FL,33710,Tops,,USA
+Macy's,822,NAPLES COASTLAND Center,1800 9th Street North,Naples,FL,34102,Tops & Accessories,,USA
+Macy's,823,FORT MYERS EDISON,4125 Cleveland Ave,Ft Myers,FL,33901,Tops,,USA
+Macy's,828,MALL AT University Town Center,110 University Town Center Dr,Sarasota,FL,34243,Tops & Accessories,,USA
+Macy's,830,WEST SHORE PLAZA,298 Westshore Plaza,Tampa ,FL,33609,Tops & Accessories,,USA
+Macy's,831,COUNTRYSIDE,26256 US HWY 19 North,Clearwater,FL,33761,Tops & Accessories,,USA
+Macy's,832,CITRUS PARK,7801 Citrus Park Town Center,Tampa ,FL,33625,Tops,,USA
+Macy's,833,BRANDON TOWN CENTER,638 Brandon Town Center,Brandon,FL,33511,Tops,,USA
+Nordstrom,760,Perimeter Mall,4390 Ashford Dunwoody Road NE,Atlanta,GA,30346,W+W,770-394-1141,USA
+Bloomingdales,55,Lenox Square,3393 Peachtree Rd NE,Atlanta,GA,30326,Premade Only (Dreamer Style),,USA
+Macy's,730,LENOX SQUARE,3393 Peachtree Rd NE,Atlanta,GA,30326,Tops & Accessories,,USA
+Macy's,731,PERIMETER,4300 Ashford Dunwoody Rd,Atlanta,GA,30346,Tops & Accessories,,USA
+Macy's,732,NORTHPOINT ,5000 North Pointe Circle,Alpharetta,GA,30022,Tops & Accessories,,USA
+Macy's,733,MALL OF GEORGIA,3333 Buford Dr,Buford,GA,30519,Tops & Accessories,,USA
+Macy's,734,GWINNETT PLACE,2100 Pleasant Hill Rd,Duluth,GA,30096,Tops,,USA
+Macy's,735,AUGUSTA ,3450 Wrightsboro Rd,Augusta,GA,30909,Tops,,USA
+Macy's,743,TOWN CENTER AT COBB,400 Ernest G Barrett Pkwy,Kennesaw,GA,30144,Tops,,USA
+Macy's,744,CUMBERLAND,1300 Cumberland Mall,Atlanta,GA,30339,Tops & Accessories,,USA
+Macy's,745,SOUTHLAKE ,1500 Southlake Mall,Morrow,GA,30260,Tops,,USA
+Macy's,748,STONECREST ,8030 Mall Parkway ,Lithonia,GA,30038,Tops,,USA
+Macy's,468,MICRONESIA - GUAM,1088 West Marine Dr ,Dededo,Guam,96929,Tops & Accessories,,USA
+Nordstrom,706,Ala Moana,"1450 Ala Moana Boulevard, Suite 2950",Honolulu,HI,96814,W+W,808-953-6100,USA
+Macy's,466,ALA MOANA (OAHU),1450 Moana Boulevard ,Honolulu,HI,96814,Tops & Accessories,,USA
+Macy's,467,PEARLRIDGE (OAHU),98-205 Kaonohi St,Aiea,HI,96701,Tops,,USA
+Macy's,469,KAAHUMANU CENTER (MAUI),275 Kaahumanu Ave,Kahului,HI,96732,Tops,,USA
+Macy's,472,KUKUI GROVE (KAUAI),3-2600 Kaumualii Hwy,Lihue ,HI,96766,Tops,,USA
+Macy's,473,WAIKIKI (OAHU),2314 Kalakaua Ave,Honolulu,HI,96815,Tops,,USA
+Macy's,393,BOISE TOWNE SQUARE,370 N Milwaukee,Boise,ID,83704,Tops,,USA
+Nordstrom,220,Michigan Avenue,55 E. Grand Avenue,Chicago,IL,60611,Loungewear,312-464-1515,USA
+Nordstrom,221,Oakbrook,10 Oak Brook Center,Oak Brook,IL,60523,Loungewear & W+W,630-571-2121,USA
+Nordstrom,225,Woodfield Mall,6 Woodfield Shopping Cenyer,Schaumburg,IL,60173,W+W,847-605-2121,USA
+Bloomingdales,8,North Michigan,900 NMichigan Ave,Chicago,IL,60611,Premade Only (Dreamer Style),,USA
+Bloomingdales,26,Old Orchard,4963 Old Orchard Center,Skokie,IL,60077,Premade Only (Dreamer Style),,USA
+Macy's,215,STATE STREET,111 North State St,Chicago,IL,60602,Tops & Accessories,,USA
+Macy's,217,OAKBROOK CENTER,1 Oak Brook Center,Oak Brook,IL,60523,Tops & Accessories,,USA
+Macy's,218,OLD ORCHARD,4909 Old Orchard Center,Skokie,IL,60077,Tops & Accessories,,USA
+Macy's,219,WATER TOWER PLACE,835 North Michigan Ave,Chicago,IL,60611,Tops & Accessories,,USA
+Macy's,220,HAWTHORN CENTER,1 Hawthorn Center,Vernon Hills,IL,60061,Tops,,USA
+Macy's,227,NORTHBROOK COURT,1555 Northbrook Court,Northbrook,IL,60062,Tops,,USA
+Macy's,259,WOODFIELD,1 Woodfield Mall,Schaumburg,IL,60173,Tops & Accessories,,USA
+Macy's,261,ORLAND SQUARE,1 Orland Square,Orland Park,IL,60462,Tops & Accessories,,USA
+Macy's,263,FOX VALLEY (IL),1 Fox Valley Center,Aurora,IL,60504,Tops,,USA
+Macy's,277,THE PROMENADE BOLINGBROOK,645 Boughton Rd,Bolingbrook,IL,60440,Tops,,USA
+Nordstrom,238,Fashion Mall at Keystone,8702 Keystone Crossing,Indianapolis,IN,46240,W+W,317-810-9809,USA
+Macy's,598,CASTLETON SQUARE,6020 E 82nd St,Indianapolis,IN,46250,Tops & Accessories,,USA
+Macy's,599,GLENBROOK SQUARE,4201 Coldwater Road ,Fort Wayne,IN,46805,Tops,,USA
+Macy's,601,UNIVERSITY PARK ,6501 North Grape Road,Mishawaka,IN,46545,Tops,,USA
+Macy's,602,GREENWOOD PARK ,1251 US 31 North,Greenwood,IN,46142,Tops,,USA
+Macy's,603,TIPPECANOE,2415 Sagamore Parkway S Suite D,Lafayette,IN,47905,Tops,,USA
+Macy's,606,COLLEGE MALL ,3068 East Third St,Bloomington,IN,47401,Tops,,USA
+Macy's,654,EASTLAND MALL ,800 N Greenriver Rd,Evansville,IN,47715,Tops,,USA
+Nordstrom,230,Oak Park Mall,11143 W. 95th Street,Overland Park,KS,66214,W+W,913-492-8111,USA
+Macy's,609,TOWN CENTER PLAZA (KS),5100 West 119th St. ,Leawood,KS,66209,Tops & Accessories,,USA
+Macy's,610,OAK PARK,11201 West 95th St,Overland Park,KS,66214,Tops,,USA
+Macy's,561,FAYETTE (KY),3301 Nicholasville Rd,Lexington,KY,40503,Tops & Accessories,,USA
+Macy's,562,OXMOOR CENTER,7900 Shelbyville Rd,Louisville,KY,40222,Tops & Accessories,,USA
+Macy's,565,FLORENCE,5000 Mall Rd,Florence,KY,41042,Tops,,USA
+Macy's,693,LAKESIDE SC (LA),3301 Veterans Memorial Blvd,Metairie,LA,70002,Tops & Accessories,,USA
+Nordstrom,535,Burlington,75 Middlesex Turnpike,Burlington,MA,1803,W+W,781-345-7800,USA
+Nordstrom,534,South Shore Plaza,"250 Granite Street, Suite 227",Braintree,MA,2184,W+W,781-519-7200,USA
+Nordstrom,531,Natick Mall,290 Speen Street,Natick,MA,1760,W+W,508-318-2600,USA
+Bloomingdales,11,Chestnut Hill I & II,225 Boylston St,Newton,MA,02467,Premade Only (Dreamer Style),,USA
+Macy's,31,BOSTON (DOWNTOWN),450 Washington St,Boston,MA,02205,Tops & Accessories,,USA
+Macy's,34,NORTH SHORE MALL,210 Andover Street ,Peabody,MA,01960,Tops & Accessories,,USA
+Macy's,36,SOUTH SHORE PLAZA (MA),250 Granite St,Braintree,MA,02184,Tops & Accessories,,USA
+Macy's,37,BURLINGTON (MA),1300 Middlesex Turnpike,Burlington,MA,01803,Tops & Accessories,,USA
+Macy's,40,NATICK COLLECTION,1245 Worcester Rd,Natick,MA,01760,Tops & Accessories,,USA
+Macy's,178,HOLYOKE MALL AT INGLESIDE,400 Whitney Ave,Holyoke,MA,01040,Tops,,USA
+Macy's,189,DARTMOUTH (MA),362 State Road ,North Dartmouth,MA,02747,Tops,,USA
+Macy's,226,Square One Mall (Saugus) ,1277 Broadway Route 1 ,Saugus,MA,01906,Tops,,USA
+Nordstrom,631,The Mall in Columbia,10300 Little Patuxent Parkway,Columbia,MD,21044,W+W,410-715-2222,USA
+Bloomingdales,34,Chevy Chase - Wisconsin,5300 Western Ave,Chevy Chase,MD,20815,Premade Only (Dreamer Style),,USA
+Macy's,33,MONTGOMERY (MD),7125 Democracy Blvd,Bethesda,MD,20817,Tops & Accessories,,USA
+Macy's,45,COLUMBIA MALL MD,10300 Little Patuxent Pkwy,Columbia,MD,21044,Tops & Accessories,,USA
+Macy's,47,ANNAPOLIS ,1295 Annapolis Mall,Annapolis,MD,21401,Accessories,,USA
+Macy's,91,WHITE MARSH,8200 Perry Hall Blvd,Nottingham,MD,21236,Tops,,USA
+Macy's,38,SOUTH PORTLAND (ME),100 Maine Mall Rd,South Portland,ME,04106,Tops,,USA
+Nordstrom,228,Somerset North,2850 W. Big Beaver Road,Troy,MI,48084,W+W,248-816-5100,USA
+Macy's,301,SOMERSET COLLECTION,2750 West Big Beaver Rd,Troy,MI,48084,Tops & Accessories,,USA
+Macy's,302,TWELVE OAKS (MI),27550 Novi Rd,Novi,MI,48377,Tops & Accessories,,USA
+Macy's,303,OAKLAND - MI,500 W 14 Mile Rd,Troy,MI,48083,Accessories,,USA
+Macy's,304,LAKESIDE (MI),14200 Lakeside Circle,Sterling Heights,MI,48313,Tops,,USA
+Macy's,305,BRIARWOOD,700 Briarwood Circle,Ann Arbor,MI,48108,Tops,,USA
+Macy's,307,WOODLAND (MI),3165 28th St SE,Kentwood,MI,49512,Tops,,USA
+Macy's,308,GENESEE VALLEY CENTER,4600 Miller Rd,Flint,MI,48507,Tops,,USA
+Macy's,309,SOUTHLAND (MI),23000 Eureka Rd,Taylor,MI,48180,Tops,,USA
+Macy's,312,FAIRLANE TOWN CENTER,18900 Michigan Ave,Dearborn,MI,48126,Tops,,USA
+Macy's,316,THE CROSSROADS (MI),6666 S Westnedge Ave,Portage,MI,49002,Tops,,USA
+Macy's,231,SOUTHDALE CENTER,100 Southdale Center,Edina,MN,55435,Tops & Accessories,,USA
+Macy's,232,RIDGEDALE,12411 Wayzata Blvd,Minnetonka,MN,55305,Tops & Accessories,,USA
+Macy's,233,ROSEDALE CENTER,900 Rosedale Center,Roseville,MN,55113,Tops,,USA
+Macy's,235,BURNSVILLE CENTER,14251 Burnhaven Dr,Burnsville,MN,55306,Tops,,USA
+Macy's,236,MAPLEWOOD,3001 White Bear Ave,Maplewood,MN,55109,Tops,,USA
+Macy's,239,MALL OF AMERICA,4000 South West Court,Bloomington,MN,55425,Tops & Accessories,,USA
+Nordstrom,240,Saint Louis,1453 St. Louis Galleria,Saint Louis,MO,63117,W+W,314-884-4900,USA
+Macy's,643,ST. LOUIS GALLERIA,1550 St Louis Galleria,St Louis,MO,63117,Tops & Accessories,,USA
+Macy's,652,WEST COUNTY,2 West County Center,St Louis,MO,63131,Tops & Accessories,,USA
+Macy's,420,Bozeman Gallatin Valley Mall,2825 West Main Street ,Bozeman,MT,59718,Tops,,USA
+Nordstrom,750,Southpark,4400 Sharon Road,Charlotte,NC,28211,W+W,704-442-6000,USA
+Nordstrom,751,Streets at Southpoint,"6910 Fayetteville Road, Suite 500",Durham,NC,27713,W+W,919-806-3700,USA
+Macy's,782,CRABTREE VALLEY,4325 Glenwood Ave,Raleigh,NC,27612,Tops,,USA
+Macy's,783,THE STREETS OF SOUTH POINT,6910 Fayetteville Road Suite 300,South Durham,NC,27713,Accessories,,USA
+Macy's,41,MALL AT ROCKINGHAM PARK,85 Rockingham Park Blvd,Salem,NH,03079,Tops & Accessories,,USA
+Nordstrom,520,Garden State Plaza,501 Garden State Plaza,Paramus,NJ,7652,W+W,201-843-1122,USA
+Nordstrom,637,Cherry Hill,2000 Route 38,Cherry Hill,NJ,8002,W+W,856-773-5600,USA
+Bloomingdales,5,Bergen County - Riverside,400 Hackensack Ave,Hackensack,NJ,07601,Premade Only (Dreamer Style),,USA
+Bloomingdales,6,Short Hills,1200 Morris Turnpike,Short Hills,NJ,07078,Premade Only (Dreamer Style),,USA
+Bloomingdales,24,Bridgewater,410 Commons Way,Bridgewater,NJ,08807,Premade Only (Dreamer Style),,USA
+Bloomingdales,37,Willowbrook Place,1400 Willowbrook Mall,Wayne ,NJ,07470,Premade Only (Dreamer Style),,USA
+Macy's,8,MENLO PARK,275 Parsonage Rd,Edison,NJ,08837,Tops & Accessories,,USA
+Macy's,9,WOODBRIDGE CENTER,237 Woodbridge Center Dr,Woodbridge,NJ,07095,Tops,,USA
+Macy's,15,SHORT HILLS,1220 Morris Turnpike,Short Hills,NJ,07078,Tops & Accessories,,USA
+Macy's,17,FREEHOLD RACEWAY,3710 Route 9 South,Freehold,NJ,07728,Tops,,USA
+Macy's,52,MONMOUTH / MONMOUTH MALL,180 RT 35,Eatontown,NJ,07724,Tops & Accessories,,USA
+Macy's,59,CHERRY HILL,2000 Rt 38; Suite 200 Cherry Hill Mall,Cherry Hill,NJ,08002,Tops & Accessories,,USA
+Macy's,65,Quaker Bridge /Quaker Bridge Mall ,400 Quaker Bridge Road ,Lawrenceville ,NJ,08648,Tops & Accessories,,USA
+Macy's,66,DEPTFORD,1750 Almonesson Rd,Woodbury,NJ,08096,Tops,,USA
+Macy's,71,OCEAN COUNTY (NJ),1201 Hooper Ave,Toms River,NJ,08753,Tops,,USA
+Macy's,72,ROCKAWAY TOWNSQUARE,303 Mount Hope Ave,Rockaway,NJ,07866,Tops,,USA
+Macy's,75,GARDEN STATE PLAZA,500 Garden State Plaza,Paramus,NJ,07652,Tops & Accessories,,USA
+Macy's,76,WILLOWBROOK (NJ),100 Route 46,Wayne,NJ,07470,Tops & Accessories,,USA
+Macy's,80,HAMILTON,4401 Blackhorse Pike,Mays Landing,NJ,08330,Tops,,USA
+Macy's,81,BRIDGEWATER COMMONS,400 Commons Way,Bridgewater,NJ,08807,Tops & Accessories,,USA
+Macy's,174,NEWPORT CENTRE (NJ),20 Mall Drive East,Jersey City,NJ,07310,Tops,,USA
+Lord & Taylor,55,Westfield,609 North Ave, Westfield,NJ,7090,Customization + Premades,,USA
+Lord & Taylor,58, Quaker Bridge Mall, Quakerbridge Rd, Lawrenceville,NJ,8648,Customization + Premades,,USA
+Nordstrom,386,Fashion Show Mall,3200 Las Vegas Boulevard S,Las Vegas,NV,89109,W+W,702-862-2525,USA
+Macy's,409,RENO MEADOWOOD,5100 Meadowood Mall,Reno,NV,89502,Tops & Accessories,,USA
+Macy's,532,LAS VEGAS FASHION SHOW,3200 Las Vegas Blvd South,Las Vegas,NV,89109,Tops & Accessories,,USA
+Macy's,537,HENDERSON GALLERIA AT SUNSET,1304 Sunset Rd,Henderson,NV,89014,Tops,,USA
+Macy's,558,SUMMERLIN,10973 Summerlin Center Dr,Las Vegas,NV,89135,Tops,,USA
+Nordstrom,523,The Westchester,135 Westchester Avenue,White Plains,NY,10601,Loungewear & W+W,914-946-1122,USA
+Nordstrom,524,Roosevelt Field,630 Old Country Road,Garden City,NY,11530,W+W,516-746-0011,USA
+Bloomingdales,1,59th St. - New York,1000 Third Ave,New York,NY,10022,Customization + Premades + Pets coming!,,USA
+Bloomingdales,4,Huntington,270 Walt Whitman Rd,Huntington STA,NY,11746,Premade Only (Dreamer Style),,USA
+Bloomingdales,12,White Plains,175 Bloomingdale Rd,White Plains,NY,10605,Customization + Premades,,USA
+Bloomingdales,27,Roosevelt Field,630 Old Country Rd,Garden City,NY,11530,Customization + Premades,,USA
+Bloomingdales,53,Soho,504 Broadway,New York,NY,10012,Premade Only (Dreamer Style),,USA
+Macy's,1,QUEENS CENTER,90-01 Queens Blvd,Elmhurst,NY,11373,Tops & Accessories,,USA
+Macy's,2,BROOKLYN (DOWNTOWN),422 Fulton St,Brooklyn,NY,11201,Tops,,USA
+Macy's,3,HERALD SQUARE,151 West 34th St,New York,NY,10001,Tops & Accessories,,USA
+Macy's,5,MANHASSET,1100 Northern Blvd,Manhasset,NY,11030,Tops & Accessories,,USA
+Macy's,6,KINGS PLAZA,5400 Avenue U,Brooklyn,NY,11234,Tops & Accessories,,USA
+Macy's,7,Staten Island / Staten Island Mall,112 Richmond Hill Road,Staten Island,NY,10314,Tops & Accessories,,USA
+Macy's,13,SMITH HAVEN,2 Smith Haven Mall,Lake Grove,NY,11755,Tops & Accessories,,USA
+Macy's,19,VALLEY STREAM - GREEN ACRES,1000 Green Acres Mall,Valley Stream ,NY,11581,Tops & Accessories,,USA
+Macy's,53,ROOSEVELT FIELD,630 Old Country Rd,Garden City,NY,11530,Tops & Accessories,,USA
+Macy's,56,SOUTHSHORE (NY),1653 Sunrise Highway,Bay Shore,NY,11706,Tops,,USA
+Macy's,82,MALL AT BAY PLAZA,100 Baychester Ave,Bronx,NY,10475,Tops,,USA
+Macy's,83,COLONIE CENTER,200 Colonie Center,Albany,NY,12205,Tops & Accessories,,USA
+Macy's,132,EASTVIEW (NY),7979 Victor-Pittsford Rd,Victor,NY,14564,Tops,,USA
+Macy's,147,WALDEN GALLERIA,4 Walden Galleria,Cheektowanga,NY,14225,Tops & Accessories,,USA
+Macy's,148,DESTINY USA,9509 Carousel Center,Syracuse,NY,13204,Tops,,USA
+Macy's,170,Commack ,2 Veterans Memorial Hwy,Commack,NY,11725,Tops,,USA
+Macy's,173,CROSS COUNTY SC (NY),800 Central Park Ave,Yonkers,NY,10704,Tops & Accessories,,USA
+Macy's,185,FLUSHING (NY),136-50 Roosevelt Ave,Flushing,NY,11354,Tops & Accessories,,USA
+Macy's,206,PALISADES CENTER,1920 Palisades Center Drive,West Nyack,NY,10994,Tops,,USA
+Lord & Taylor,1,New York (5th Avenue),424 5th Ave, New York,NY,10018,Customization + Premades,,USA
+Lord & Taylor,3,Vernon Hills Shopping Center, 750 White Plains Rd, Scarsdale,NY,10583,Customization + Premades,,USA
+Nordstrom,239,Kenwood Towne Centre,7801 Montgomery Road,Cincinnati,OH,45236,W+W,513-699-4190,USA
+Nordstrom,234,Easton Town Center,4000 Worth Avenue,Columbus,OH,43219,W+W,614-416-7111,USA
+Nordstrom,227,Beachwood Place,26200 Cedar Road,Beachwood,OH,44122,W+W,216-378-2121,USA
+Macy's,560,KENWOOD TOWNE CENTRE,7875 Montgomery Rd,Cincinnati,OH,45236,Tops & Accessories,,USA
+Macy's,572,SUMMIT (OH),3265 West Market St,Akron,OH,44333,Tops & Accessories,,USA
+Macy's,573,GREAT NORTHERN (OH),25801 Brookpark Rd,North Olmsted,OH,44070,Tops,,USA
+Macy's,575,BELDEN,4300 Belden Village Ave,Canton,OH,44718,Tops,,USA
+Macy's,584,EASTON TOWN CENTER,4141 Easton Loop East,Columbus,OH,43219,Tops & Accessories,,USA
+Macy's,585,TUTTLE CROSSING,5123 Tuttle Crossing Blvd,Columbus,OH,43016,Tops & Accessories,,USA
+Macy's,586,POLARIS FASHION PLACE (OH),1300 Polaris Pkwy,Columbus,OH,43240,Tops & Accessories,,USA
+Macy's,587,DAYTON,2700 Miamisburg-Centerville Rd,Dayton,OH,45459,Tops,,USA
+Macy's,623,SOUTHERN PARK ,7401 Market St,Youngstown,OH,44512,Tops,,USA
+Macy's,679,PENN SQUARE (OK),1901 NW Expressway ,Oklahoma City,OK,73118,Tops,,USA
+Nordstrom,25,Washington Square,9700 S.W. Washington Square Road,Tigard,OR,97223,Loungewear & W+W,503-620-0555,USA
+Nordstrom,24,Clackamas Town Center,11900 S.E. 82nd Avenue,Happy Valley,OR,97086,W+W,503-652-1810,USA
+Macy's,381,CLACKAMAS TOWN CENTER,12100 SE 82nd Ave,Portland,OR,97266,Tops & Accessories,,USA
+Macy's,382,EUGENE VALLEY RIVER Center (OR),100 Valley River Center,Eugene,OR,97401,Tops,,USA
+Macy's,383,BEND RIVER,3188 N Highway 97 ,Bend,OR,97701,Tops,,USA
+Macy's,385,MEDFORD ROGUE VALLEY,1800 North Riverside Dr,Medford,OR,97501,Tops,,USA
+Macy's,387,SALEM CENTER,400 High Street NE,Salem,OR,97301,Tops,,USA
+Macy's,388,TANASBOURNE STREETS (OR),2055 Northwest Allie Ave,Hillsboro,OR,97124,Tops,,USA
+Macy's,392,WASHINGTON SQUARE (OR),9300 SW Washington Square Rd,Tigard,OR,97223,Tops & Accessories,,USA
+Nordstrom,629,King of Prussia,190 N. Gulph Road,King of Prussia,PA,19406,W+W,610-265-6111,USA
+Nordstrom,237,Ross Park,1000 Ross Park Mall Drive,Pittsburgh,PA,15237,W+W,412-548-4300,USA
+Bloomingdales,16,King Of Prussia,2 Rt 202 North 660 West Dekalb Pike ,King of Prussia,PA,19406,Premade Only (Dreamer Style),,USA
+Bloomingdales,17,Willow Grove Park,2400 Moreland Park Rd,Willow Grove,PA,19090,Premade Only (Dreamer Style),,USA
+Macy's,54,WILLOW GROVE PARK,2500 West  Moreland Rd,Willow Grove,PA,19090,Tops,,USA
+Macy's,64,OXFORD VALLEY,2300 East Lincoln Hwy,Langhorne,PA,19047,Tops,,USA
+Macy's,70,LEHIGH VALLEY,300 Lehigh Valley Mall,Whitehall,PA,18052,Tops & Accessories,,USA
+Macy's,90,KING OF PRUSSIA (THE COURT),680 West Dekalb Pike,King of Prussia,PA,19406,Tops & Accessories,,USA
+Macy's,155,ROOSEVELT (PA),2399 Cottman Ave,Philadelphia,PA,19149,Tops,,USA
+Macy's,213,CENTER CITY,1300 Market St,Philadelphia,PA,19107,Tops & Accessories,,USA
+Macy's,620,ROSS PARK,1004 Ross Park Mall,Pittsburgh,PA,15237,Tops & Accessories,,USA
+Macy's,621,SOUTH HILLS VILLAGE,100 South Hills Village,Pittsburgh,PA,15241,Tops & Accessories,,USA
+Macy's,622,MONROEVILLE,400 Monroeville Mall,Monroeville,PA,15146,Tops,,USA
+Macy's,632,THE MALL AT ROBINSON,3000 Robinsons Centre Dr,Pittsburgh,PA,15205,Tops,,USA
+Macy's,634,WESTMORELAND,5256 State Route 30,Greensburg,PA,15601,Tops,,USA
+Macy's,21,PLAZA LAS AMERICAS,525 FD Roosevelt Ave,San Juan,PR,00918,Tops & Accessories,,USA
+Macy's,806,PLAZA DEL CARIBE,2050 Ponce By Pass,Ponce,PR,00717,Tops,,USA
+Nordstrom,528,Providence Place,6 Providence Place,Providence,RI,2903,W+W,401-621-3111,USA
+Macy's,39,Warwick Mall,400 Bald Hill Road ,Warwick,RI,02886,Tops & Accessories,,USA
+Macy's,207,PROVIDENCE PLACE,7 Providence Place,Providence,RI,02903,Tops,,USA
+Macy's,781,HAYWOOD,700 Haywood Dr,Greenville,SC,29607,Tops,,USA
+Nordstrom,759,Green Hills,2130 Abbott Martin Road,Nashville,TN,37215,Loungewear,615-850-6700,USA
+Macy's,795,OAK COURT,Oak Court 4545 Poplar ,Memphis,TN,38117,Tops,,USA
+Macy's,796,WOLFCHASE GALLERIA,2840 N Germantown Pkwy,Barlett,TN,38133,Tops & Accessories,,USA
+Macy's,797,GREEN HILLS,3813 Hillsboro Pk,Nashville,TN,37215,Tops & Accessories,,USA
+Macy's,798,COOL SPRINGS GALLERIA,1790 Galleria Blvd,Franklin,TN,37067,Tops,,USA
+Nordstrom,723,Northpark,8687 N. Central Expressway,Dallas,TX,75225,Loungewear,214-231-3900,USA
+Nordstrom,730,Houston Galleria,5192 Hidalgo Street,Houston,TX,77056,Loungewear,832-201-2700,USA
+Nordstrom,732,The Shops at La Cantera,15900 La Cantera Parkway,San Antonio,TX,78256,W+W,210-332-1900,USA
+Nordstrom,731,Barton Creek Square Mall,2901 Capital of Texas Hwy S,Austin,TX,78746,W+W,512-691-3500,USA
+Nordstrom,720,The Dallas Galleria,5220 Alpha Road,Dallas,TX,75240,W+W,972-702-0055,USA
+Nordstrom,724,Stonebriar Mall,2613 Preston Road,Frisco,TX,75034,W+W,972-712-3794,USA
+Macy's,455,CIELO VISTA,8401 Gateway West,El Paso,TX,79925,Tops & Accessories,,USA
+Macy's,665,NORTHPARK CENTER ,8687 North Central Expressway,Dallas,TX,75225,Tops & Accessories,,USA
+Macy's,666,GALLERIA (DALLAS),13375 Noel Rd,Dallas,TX,75240,Tops & Accessories,,USA
+Macy's,667,STONEBRIAR CENTRE ,2609 Preston Rd,Frisco,TX,75034,Tops & Accessories,,USA
+Macy's,671,SHOPS AT WILLOW BEND ,6209 West Park Blvd,Plano,TX,75093,Tops,,USA
+Macy's,675,VILLAGE AT FAIRVIEW,201 Stacy Rd,Fairview,TX,75069,Tops,,USA
+Macy's,676,PARKS AT ARLINGTON,3841 South Cooper St,Arlington,TX,76015,Accessories,,USA
+Macy's,677,NORTH EAST TX,1101 Melbourne Rd ,Hurst,TX,76053,Tops & Accessories,,USA
+Macy's,686,MEMORIAL CITY,900 Gossner Road,Houston,TX,77024,Tops & Accessories,,USA
+Macy's,687,GALLERIA AT HOUSTON,5135 W Alabama,Houston,TX,77056,Tops & Accessories,,USA
+Macy's,688,FIRST COLONY,16511 SW Freeway,Sugar Land,TX,77478,Tops & Accessories,,USA
+Macy's,701,LA PLAZA,2100 South 10th St,Mcallen,TX,78503,Tops & Accessories,,USA
+Macy's,702,NORTH STAR TX,7400 San Pedro Ave STE 200,San Antonio,TX,78216,Tops & Accessories,,USA
+Macy's,704,BARTON CREEK SQUARE,2901 Capitol of Texas Hwy,Austin,TX,78746,Tops & Accessories,,USA
+Macy's,705,SHOPS AT LA CANTERA*,15900 La Cantera Pkwy,San Antonio,TX,78256,Tops & Accessories,,USA
+Macy's,706,LAKELINE ,11250 Lake Stop Blvd.,Austin,TX,78613,Tops,,USA
+Macy's,710,THE DOMAIN ,11701 North Mopac Expressway,Austin,TX,78759,Tops & Accessories,,USA
+Macy's,715,WILLOWBROOK ,4000 Willowbrook Mall,Houston,TX,77070,Tops & Accessories,,USA
+Macy's,716,WOODLANDS ,1201 Lake woodlands Dr,The Woodlands,TX,77380,Tops & Accessories,,USA
+Macy's,717,BAYBROOK,200 Baybrook Mall,Friendswood,TX,77546,Tops & Accessories,,USA
+Macy's,718,DEERBROOK ,20131 Highway 59 N,Humble,TX,77338,Tops & Accessories,,USA
+Macy's,720,ALMEDA,100 Almeda Mall,Houston,TX,77075,Tops,,USA
+Macy's,724,PEARLAND,11200 Broadway Suite 950,Pearland,TX,77584,Tops,,USA
+Nordstrom,32,Fashion Place,"6191 S. State Street, Suite 200",Murray,UT,84107,W+W,801-261-4402,USA
+Macy's,418,SOUTH TOWNE CENTER (UT),10600 South 110 West ,Sandy,UT,84070,Tops,,USA
+Macy's,427,Fashion Place,6117 South State StreetSuite 60,Murray,UT,84107,Tops,,USA
+Macy's,449,CITY CREEK CENTER,21 South Main Street,Salt Lake City,UT,84111,Tops,,USA
+Nordstrom,635,Short Pump Town Center,11812 W. Broad Street,Richmond,VA,23233,W+W,804-364-6900,USA
+Nordstrom,621,Pentagon City,1400 S. Hayes Street,Arlington,VA,22202,W+W,703-415-1121,USA
+Bloomingdales,14,Tysons Corner Flint,8100 Tysons Corner Center,MC Lean,VA,22102,Premade Only (Dreamer Style),,USA
+Macy's,23,TYSONS CORNER CENTER,8000 Tysons Corner Center,Mclean,VA,22102,Tops & Accessories,,USA
+Macy's,78,TYSONS GALLERIA,1651 International Dr,Mc Lean ,VA,22102,Tops,,USA
+Macy's,84,SPRINGFIELD ,6400 T Springfield Mall,Springfield,VA,22150,Accessories,,USA
+Macy's,95,FASHION Center AT PENTAGON CITY,1000 South Hayes St,Arlington,VA,22202,Tops & Accessories,,USA
+Macy's,166,SHORT PUMP TOWN CENTER,11872 West Broad Street ,Richmond,VA,23233,Tops & Accessories,,USA
+Macy's,249,LYNNHAVEN,701 South Lynnhaven Pkwy,Virginia Beach,VA,23452,Tops,,USA
+Nordstrom,1,Downtown Seattle,500 Pine Street,Seattle,WA,98101,Loungewear & W+W,206-628-2111,USA
+Nordstrom,4,Bellevue Square,100 Bellevue Square,Bellevue,WA,98004,Loungewear,425-455-5800,USA
+Nordstrom,6,Tacoma Mall,"4502 S. Steele Street, Suite 800",Tacoma,WA,98409,W+W,253-475-3630,USA
+Nordstrom,2,Northgate,401 N.E. Northgate Way,Seattle,WA,98125,W+W,206-364-8800,USA
+Nordstrom,10,Alderwood,3200 184th Street SW,Lynnwood,WA,98037,W+W,425-771-5755,USA
+Macy's,367,SEATTLE (DOWNTOWN),1601 Third Ave,Seattle,WA,98181,Tops,,USA
+Macy's,368,BELLEVUE SQUARE,400 Bellevue Square,Bellevue,WA,98004,Tops & Accessories,,USA
+Macy's,370,ALDERWOOD,18700 Alderwood Mall Blvd,Lynnwood,WA,98037,Tops & Accessories,,USA
+Macy's,372,BELLINGHAM BELLIS FAIR (WA),50 Bellis Fair Pkwy,Bellingham,WA,98226,Tops,,USA
+Macy's,373,SILVERDALE KITSAP (WA),10315 Silverdale Way ,Silverdale,WA,98383,Tops,,USA
+Macy's,374,REDMOND TOWN CENTER,7400 166th Ave NE,Redmond,WA,98052,Tops,,USA
+Macy's,384,VANCOUVER (WA),8208 NE Vancouver Mall Dr,Vancouver,WA,98662,Tops,,USA
+Macy's,395,SPOKANE VALLEY,14740 E Indiana Ave,Spokane,WA,99216,Tops,,USA
+Macy's,396,NORTHTOWN (WA),N 4770 Division,Spokane,WA,99207,Tops,,USA
+Macy's,433,SOUTHCENTER (WA),500 Southcenter Mall,Tukwila,WA,98188,Tops & Accessories,,USA
+Macy's,434,TACOMA,4502 South Steele #700,Tacoma,WA,98409,Tops,,USA
+Macy's,435,COLUMBIA CENTER ,400 Columbia Center ,Kennewick,WA,99336,Tops,,USA
+Macy's,436,OLYMPIA CAPITAL ,625 Black Lake Blvd SW #301,Olympia,WA,98502,Tops,,USA
+Macy's,437,YAKIMA VALLEY MALL ,2525 Main St,Union Gap,WA,98903,Tops,,USA
+Macy's,438,PUYALLUP SOUTH HILL ,3500 South Meridian ,Puyallup,WA,98373,Tops,,USA
+Macy's,440,WENATCHEE VALLEY ,445 Valley Mall Pkwy,E Wenatchee,WA,98802,Tops,,USA
+Macy's,260,MAYFAIR,2500 N Mayfair Rd,Wauwatosa,WI,53226,Tops & Accessories,,USA
+Macy's,563,HUNTINGTON,Unit 300 Huntington Mall ,Barboursville,WV,25504,Tops,,USA

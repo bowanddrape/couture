@@ -35,7 +35,7 @@ class Shipment extends JSONAPI {
     return {
       tablename: "shipments",
       pkey: "id",
-      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address", "billing_address", "fulfillment_id"]
+      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address", "billing_address", "fulfillment_id", "shipping_label_created", "shipping_carrier_pickup"]
     };
   }
 
@@ -242,53 +242,92 @@ class Shipment extends JSONAPI {
 
   // lookup USPS tracking state, updating ourselves if we were delivered
   lookupTracking(callback) {
+    let self = this;
+
+    // helper function to try and capture a time
+    let parseDateFromText = (text) => {
+      // FIXME add daylight savings time handling?
+      let matches = text.match(/ ([0-9]+):([0-9]+) (.m) on ([^\s]+ [^\s]+,? [^\s]+)/);
+      if (matches) {
+        let hour = parseInt(matches[1]) + (matches[3]=='pm'?12:0) - (matches[1]=='12'?12:0);
+        let min = matches[2];
+        let day = matches[4];
+        return new Date(`${day} ${hour}:${min} EST`);
+      }
+
+      matches = text.match(/([^\s]+ [^\s]+, [^\s]+),?( at)? ([0-9]+):([0-9]+) (.m)/);
+      if (matches) {
+        let hour = parseInt(matches[3]) + (matches[5]=='pm'?12:0) - (matches[3]=='12'?12:0);
+        let min = matches[4];
+        let day = matches[1];
+        return new Date(`${day} ${hour}:${min} EST`);
+      }
+      console.log("could not parse date from USPS state: "+text)
+      return null;
+    };
+
     if (!this.tracking_code || this.tracking_code=='')
       return callback(null);
 
-      let self = this;
       let request = http.request({
-          method: 'GET',
-          hostname: 'production.shippingapis.com',
-          path: encodeURI(`/ShippingAPI.dll?API=TrackV2&XML=<?xml version="1.0" encoding="UTF-8" ?><TrackRequest USERID="717BOWDR0178"><TrackID ID="${this.tracking_code}"></TrackID></TrackRequest>`)
-        }, (result) => {
-          result.setEncoding('utf8');
-          let tracking_data = '';
-          result.on('data', (data) => {
-            tracking_data += data;
-          });
-          result.on('end', () => {
-            xmlParseString(tracking_data, (err, tracking) => {
-              if (err) return callback(err);
-              let description = "";
-              try {
-                // usps api gives us back a text string, how lovely
-                description = tracking.TrackResponse.TrackInfo[0].TrackSummary[0];
-              } catch (err) {
-                return callback({error: "unhandled response from USPS tracking",response: tracking});
-              }
-              if (!/could not locate the tracking information/.test(description))
-                this.ship_description = description;
-              if (/ delivered /.test(description) && !/ not be delivered/.test(description)) {
-                let matches = description.match(/ ([0-9]+):([0-9]+) (.m) on ([^\s]+ [^\s]+ [^\s]+)/);
-                if (!matches) {
-                  console.log("unknown USPS state: "+description)
-                  return callback(null);
+        method: 'GET',
+        hostname: 'production.shippingapis.com',
+        path: encodeURI(`/ShippingAPI.dll?API=TrackV2&XML=<?xml version="1.0" encoding="UTF-8" ?><TrackRequest USERID="717BOWDR0178"><TrackID ID="${this.tracking_code}"></TrackID></TrackRequest>`)
+      }, (result) => {
+        result.setEncoding('utf8');
+        let tracking_data = '';
+        result.on('data', (data) => {
+          tracking_data += data;
+        });
+        result.on('end', () => {
+          xmlParseString(tracking_data, (err, tracking) => {
+            let description = "";
+            let detail = [];
+            try {
+              // usps api gives us back a text string, how lovely
+              description = tracking.TrackResponse.TrackInfo[0].TrackSummary[0];
+              detail = tracking.TrackResponse.TrackInfo[0].TrackDetail;
+            } catch (err) {
+            }
+
+            // save the shipping description
+            if (description && !/could not locate the tracking information/.test(description))
+              self.ship_description = description;
+
+            // extract delivered date
+            if (
+              (/ delivered /.test(self.ship_description) && !/ not be delivered/.test(self.ship_description))
+              || / was picked up /.test(self.ship_description)
+            ) {
+              let date = parseDateFromText(self.ship_description);
+              if (date && !isNaN(date.getTime()))
+                self.received = date.getTime()/1000;
+            } // description says "delivered"
+
+            if (detail) {
+              detail.forEach((shipping_detail, index) => {
+                // extract shipping label created date
+                if (/Shipping Label Created/.test(shipping_detail)) {
+                  let date = parseDateFromText(shipping_detail);
+                  if (date && !isNaN(date.getTime()))
+                    self.shipping_label_created = date.getTime()/1000;
                 }
-                // FIXME add daylight savings time handling
-                let hour = parseInt(matches[1]) + (matches[3]=='pm'?12:0) - (matches[1]=='12'?12:0);
-                let min = matches[2];
-                let day = matches[4];
-                let date = new Date(`${day} ${hour}:${min} EST`).getTime();
-                if (!isNaN(date))
-                  self.received = date/1000;
-              } // description says "delivered"
-              return callback(null);
-            }); // parse xml string
-          });
-        }
-      );
-      request.on('error', function(err) {console.log("Shipment::lookupTracking "+err);});
-      request.end();
+                // extract shipping carrier pickup date
+                if (index+1 < shipping_detail.length) {
+                  let date = parseDateFromText(shipping_detail);
+                  if (date && !isNaN(date.getTime()))
+                    self.shipping_carrier_pickup = date.getTime()/1000;
+                }
+              });
+            }
+
+            return callback(null);
+          }); // parse xml string
+        });
+      }
+    );
+    request.on('error', function(err) {console.log("Shipment::lookupTracking "+err);});
+    request.end();
   }
 
 }
