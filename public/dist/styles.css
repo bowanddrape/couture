@@ -768,9 +768,6 @@ comments message {
 .items .summary_items .summary_items_header {
   border-bottom: 2px solid #eaeaea;
 }
-.items.fulfillment .summary_items {
-  display: none;
-}
 .items .remove {
   text-decoration: underline;
   border: none;
