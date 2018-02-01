@@ -36,6 +36,10 @@ class DashboardMetrics extends React.Component {
         query: "SELECT EXTRACT(EPOCH FROM CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE)) AS date, sum(cast(payments#>>'{0, price}' as float)) AS revenue, count(1) AS count FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3 GROUP BY 1 ORDER BY 1;",
         props: [start, stop, Facility.special_ids.canceled],
       }, {
+        key: "newuser_orders_by_day",
+        query: "SELECT EXTRACT(EPOCH FROM CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE)) AS date, count(1) AS count FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3 AND NOT EXISTS (SELECT 1 FROM shipments s WHERE shipments.email=s.email AND shipments.requested>s.requested) GROUP BY 1 ORDER BY 1;",
+        props: [start, stop, Facility.special_ids.canceled],
+      }, {
         key: "component_use",
         query: "SELECT assembly_extract_skus(jsonb_agg(contents)) AS skus FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3",
         props: [start, stop, Facility.special_ids.customer_ship],
@@ -70,6 +74,10 @@ class DashboardMetrics extends React.Component {
       name: "num orders",
       data: [],
     };
+    let newuser_orders_by_day_count = {
+      name: "num orders new users",
+      data: [],
+    };
     if (this.props.orders_by_day) {
       this.props.orders_by_day.forEach((datapoint) => {
         if (datapoint.revenue)
@@ -78,10 +86,17 @@ class DashboardMetrics extends React.Component {
           orders_by_day_count.data.push([datapoint.date*1000, parseInt(datapoint.count)]);
       });
     }
+    if (this.props.newuser_orders_by_day) {
+      this.props.newuser_orders_by_day.forEach((datapoint) => {
+        if (datapoint.count)
+          newuser_orders_by_day_count.data.push([datapoint.date*1000, parseInt(datapoint.count)]);
+      });
+    }
 
     let time_series = [];
     time_series.push(orders_by_day_price);
     time_series.push(orders_by_day_count);
+    time_series.push(newuser_orders_by_day_count);
 
     Highcharts.chart('time_container', {
       chart: {
@@ -285,10 +300,16 @@ class DashboardMetrics extends React.Component {
     let metrics = [];
     let total_revenue = 0;
     let total_orders = 0;
+    let total_newuser_orders = 0;
     if (this.props.orders_by_day) {
       this.props.orders_by_day.forEach((datapoint) => {
         total_revenue += datapoint.revenue;
         total_orders += parseInt(datapoint.count);
+      });
+    }
+    if (this.props.newuser_orders_by_day) {
+      this.props.newuser_orders_by_day.forEach((datapoint) => {
+        total_newuser_orders += parseInt(datapoint.count);
       });
     }
 
@@ -321,6 +342,7 @@ class DashboardMetrics extends React.Component {
         <div style={{padding:"20px"}}>
           <div>Total Revenue: {total_revenue.toFixed(2)}</div>
           <div>Total Num Orders: {total_orders}</div>
+          <div>Total Num Orders(new user): {total_newuser_orders}</div>
         </div>
 
         <script src="https://code.highcharts.com/highcharts.js"></script>

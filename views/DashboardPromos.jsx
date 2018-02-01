@@ -95,6 +95,10 @@ class DashboardPromos extends React.Component {
           </div>
         </div>
 
+        <div style={{padding:"20px"}}>
+          <div>Total Num Orders: {shipments.length}</div>
+        </div>
+
         {shipments}
       </div>
     )
