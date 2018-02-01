@@ -213,7 +213,7 @@ class Shipment extends React.Component {
             <shipping_details>
               <div><label>Order_id: </label><a href={`/shipment/${this.props.id}`}>{this.props.props&&this.props.props.legacy_id?this.props.props.legacy_id:this.props.id}</a></div>
               <div><label>Order_placed: </label><Timestamp time={this.props.requested} /></div>
-              <div><label>Deliver_by: </label><Timestamp time={this.props.delivery_promised} /></div>
+              <div><label>Ship_by: </label><Timestamp time={this.props.ship_by} /></div>
               {from}
               {to}
               <div><label>User: </label>{this.props.email}</div>

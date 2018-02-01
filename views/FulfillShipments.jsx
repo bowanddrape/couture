@@ -34,13 +34,13 @@ class FulfillShipments extends React.Component {
     const SQLTable = require('../models/SQLTable.js');
     const Facility = require('../models/Facility');
     // get late shipments
-    SQLTable.sqlQuery(null, "SELECT shipments.* FROM (WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE delivery_promised-432000<date_part('epoch',NOW()) AND to_id!='e03d3875-d349-4375-8071-40928aa625f5') SELECT id, count(1) AS count, string_agg(content_array#>>'{tags}',' ') AS tags FROM shipment_contents WHERE content_array->'sku' IS NOT NULL GROUP BY id) AS s, shipments WHERE s.count<>(CHAR_LENGTH(s.tags)-CHAR_LENGTH(REPLACE(s.tags, 'shipped', '')))/CHAR_LENGTH('shipped') AND shipments.id=s.id", [], (err, result) => {
+    SQLTable.sqlQuery(null, "SELECT shipments.* FROM (WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE ship_by<date_part('epoch',NOW()) AND to_id!='e03d3875-d349-4375-8071-40928aa625f5') SELECT id, count(1) AS count, string_agg(content_array#>>'{tags}',' ') AS tags FROM shipment_contents WHERE content_array->'sku' IS NOT NULL GROUP BY id) AS s, shipments WHERE s.count<>(CHAR_LENGTH(s.tags)-CHAR_LENGTH(REPLACE(s.tags, 'shipped', '')))/CHAR_LENGTH('shipped') AND shipments.id=s.id", [], (err, result) => {
       options.late = [];
       if (result && result.rows)
         options.late = result.rows;
 
       // get shipments about to be late
-      SQLTable.sqlQuery(null, "SELECT shipments.* FROM (WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE delivery_promised-432000-86400<date_part('epoch',NOW()) AND delivery_promised-432000>date_part('epoch',NOW()) AND to_id!='e03d3875-d349-4375-8071-40928aa625f5') SELECT id, count(1) AS count, string_agg(content_array#>>'{tags}',' ') AS tags FROM shipment_contents WHERE content_array->'sku' IS NOT NULL GROUP BY id) AS s, shipments WHERE s.count<>(CHAR_LENGTH(s.tags)-CHAR_LENGTH(REPLACE(s.tags, 'shipped', '')))/CHAR_LENGTH('shipped') AND shipments.id=s.id", [], (err, result) => {
+      SQLTable.sqlQuery(null, "SELECT shipments.* FROM (WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE ship_by-86400<date_part('epoch',NOW()) AND ship_by>date_part('epoch',NOW()) AND to_id!='e03d3875-d349-4375-8071-40928aa625f5') SELECT id, count(1) AS count, string_agg(content_array#>>'{tags}',' ') AS tags FROM shipment_contents WHERE content_array->'sku' IS NOT NULL GROUP BY id) AS s, shipments WHERE s.count<>(CHAR_LENGTH(s.tags)-CHAR_LENGTH(REPLACE(s.tags, 'shipped', '')))/CHAR_LENGTH('shipped') AND shipments.id=s.id", [], (err, result) => {
         options.ship_today = [];
         if (result && result.rows)
           options.ship_today = result.rows;
@@ -188,7 +188,7 @@ class FulfillShipments extends React.Component {
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment/tagged?tag=shipped`}
-              page = {{sort:"delivery_promised", direction:"ASC"}}
+              page = {{sort:"ship_by", direction:"ASC"}}
             />
           </shipments>
           <shipments>
@@ -197,7 +197,7 @@ class FulfillShipments extends React.Component {
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}&ship_description=not_null&received=null`}
-              page = {{sort:"delivery_promised", direction:"ASC"}}
+              page = {{sort:"ship_by", direction:"ASC"}}
             />
           </shipments>
           <shipments>
@@ -215,7 +215,7 @@ class FulfillShipments extends React.Component {
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?store_id=${this.props.store.id}`}
-              page = {{sort:"delivery_promised", direction:"DESC"}}
+              page = {{sort:"ship_by", direction:"DESC"}}
             />
           </shipments>
           <shipments>
@@ -225,7 +225,7 @@ class FulfillShipments extends React.Component {
               component={Shipment}
               component_props={{fulfillment:true,edit_tags:true}}
               endpoint={`/shipment?search=${this.state.search_query}`}
-              page = {{sort:"delivery_promised", direction:"DESC"}}
+              page = {{sort:"ship_by", direction:"DESC"}}
             />
           </shipments>
         </Tabs>

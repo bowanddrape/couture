@@ -35,7 +35,7 @@ class Shipment extends JSONAPI {
     return {
       tablename: "shipments",
       pkey: "id",
-      fields: ["from_id", "to_id", "contents", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address", "billing_address", "fulfillment_id", "shipping_label_created", "shipping_carrier_pickup"]
+      fields: ["from_id", "to_id", "contents", "ship_by", "delivery_promised", "requested", "on_hold", "approved", "picked", "inspected", "packed", "received", "ship_description", "store_id", "email", "props", "payments", "tracking_code", "shipping_label", "address", "billing_address", "fulfillment_id", "shipping_label_created", "shipping_carrier_pickup"]
     };
   }
 
@@ -84,7 +84,7 @@ class Shipment extends JSONAPI {
     // get list of shipments by tag
     if (/\/shipment\/tagged/.test(req.path)) {
       let tag = req.query.tag;
-      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE props#>>'{imported}' IS NULL) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $1`;
+      let query = `WITH shipment_contents AS (SELECT *, jsonb_array_elements(contents) AS content_array FROM shipments WHERE props#>>'{imported}' IS NULL ORDER BY ship_by ASC) SELECT * FROM shipment_contents WHERE content_array->'tags' ? $1`;
       return SQLTable.sqlQuery(Shipment, query, [tag], (err, shipments) => {
         // remove an extra field we made just for the db select
         if (shipments) {
