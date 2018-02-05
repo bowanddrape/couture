@@ -49,6 +49,7 @@
     "ray-triangle-intersection": "^1.0.3",
     "react": "^16.0.0",
     "react-autocomplete": "^1.4.0",
+    "react-draggable": "^3.0.5",
     "response-time": "^2.3.2",
     "save-pixels": "^2.3.4",
     "sendgrid": "^4.7.1",

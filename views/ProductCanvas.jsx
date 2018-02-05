@@ -1,6 +1,7 @@
 
 const React = require('react');
 const SylvestorGlUtils = require('sylvester-es6');
+let Draggable = require('react-draggable').DraggableCore;
 const Matrix = SylvestorGlUtils.Matrix;
 const Vector = SylvestorGlUtils.Vector;
 const ProductComponentPicker = require('./ProductComponentPicker.jsx');
@@ -180,21 +181,14 @@ class ProductCanvas extends React.Component {
   }
 
   handleComponentMove(index, event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (event.touches && event.touches.length>1) return;
-    if (event.type=="mousemove" && !event.buttons&0x1) return;
-    let client_pos = event.touches ?
-      [event.touches[0].pageX, event.touches[0].pageY] :
-      [event.clientX, event.clientY+(document.body.scrollTop?document.body.scrollTop:document.documentElement.scrollTop)];
+    let client_pos = [event.x, event.y];
 
     // update the component position
     this.setState((prevState, props) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected = assembly[index];
       if (selected) {
-        selected.props.position = this.customizer.browserToWorld(client_pos);
+        selected.props.position = this.customizer.screenToWorld(client_pos);
       }
       return {assembly, selected_component: index};
     });
@@ -340,11 +334,16 @@ class ProductCanvas extends React.Component {
     this.customizer.resizeViewport();
     // handle actions on hitboxes
     this.canvas.parentNode.childNodes.forEach((node) => {
-      if (node.tagName.toLowerCase()!="component_hitbox") return;
+      if (node.className!="component_hitbox") return;
       // this overrides the synthetic react events so we don't scroll
-      node.ontouchmove = this.handleComponentMove.bind(this, node.getAttribute("data"));
-      node.onmousemove = this.handleComponentMove.bind(this, node.getAttribute("data"));
-      node.onclick = this.handleSelectComponent.bind(this, node.getAttribute("data"));
+      node.ontouchmove = (event)=>{
+        event.preventDefault();
+        event.stopPropagation();
+      };
+      node.onmousemove = (event)=>{
+        event.preventDefault();
+        event.stopPropagation();
+      };
     });
     this.handleUpdateProduct();
   }
@@ -377,22 +376,34 @@ class ProductCanvas extends React.Component {
       for (let index=0; index<this.customizer.components.length; index++) {
         let component = this.customizer.components[index];
         let dims_screen = this.customizer.getScreenBoundingBox(component);
+        let width = dims_screen.bottom_right[0]-dims_screen.top_left[0];
+        let height = dims_screen.top_left[1]-dims_screen.bottom_right[1];
         // FIXME we want to cull backfacing hitboxes but not like this
         //if (dims_screen.bottom_right[0]<dims_screen.top_left[0]) continue;
         component_hitboxes.push(
-          <component_hitbox
+          <Draggable
             key={component_hitboxes.length}
-            style={{
-              position:"absolute",
-              left:`${dims_screen.top_left[0]}px`,
-              top:`${dims_screen.bottom_right[1]}px`,
-              width:`${dims_screen.bottom_right[0]-dims_screen.top_left[0]}px`,
-              height:`${dims_screen.top_left[1]-dims_screen.bottom_right[1]}px`,
-              backgroundColor:"rgba(0,0,0,0)",
-              border:index==this.state.selected_component?`solid 1px #000`:`none`,
+            onDrag={(event, data) => {
+              event.preventDefault();
+              event.stopPropagation();
+              this.handleComponentMove(index, data);
             }}
             data={index}
-          />
+          >
+            <div
+              className="component_hitbox"
+              style={{
+                position: "absolute",
+                left: `${dims_screen.top_left[0]}px`,
+                top: `${dims_screen.bottom_right[1]}px`,
+                width: `${width}px`,
+                height: `${height}px`,
+                backgroundColor: "rgba(0,0,0,0)",
+                border: index==this.state.selected_component ?
+                  `solid 1px #000`:`none`,
+              }}
+            />
+          </Draggable>
         );
       };
     }
