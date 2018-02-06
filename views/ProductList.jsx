@@ -30,7 +30,7 @@ class ProductList extends React.Component {
     });
 
     this.state = {
-      selected_product: [null],
+      selected_product: this.props.selected_product || [null],
       product_map: product_map,
     };
   }
@@ -46,12 +46,12 @@ class ProductList extends React.Component {
       // deep clone initial specification (needed for admin)
       store.products_raw = JSON.parse(JSON.stringify(store.products));
       // convert compatible_component from sku list to component list
-      store.products.hydrateCompatibleComponents(function(err, compatible_component_map) {
+      store.products.hydrateCompatibleComponents((err, compatible_component_map) => {
         // get store inventory
-        Inventory.get(store.facility_id, function(err, store_inventory) {
+        Inventory.get(store.facility_id, (err, store_inventory) => {
           if (err) return callback(err);
           if (!store_inventory || !store_inventory.inventory) store_inventory={inventory:{}};
-          store.products.recurseProductFamily(function(item, ancestor) {
+          store.products.recurseProductFamily((item, ancestor) => {
             // merge inventory count with products in family
             item.quantity = store_inventory.inventory[item.sku] || 0;
             // inherit props through product families
@@ -62,13 +62,18 @@ class ProductList extends React.Component {
               component.quantity = store_inventory.inventory[sku] || 0;
               if (!component.options) return;
               component.options.forEach((option) => {
-                option.recurseProductFamily(function(item, ancestor) {
+                option.recurseProductFamily((item, ancestor) => {
                   item.quantity = store_inventory.inventory[item.sku]?store_inventory.inventory[item.sku]:0;
                 });
               });
             });
             options.compatible_component_map = compatible_component_map;
           }); // inherit unset fields through product families
+
+          let customization = ProductList.parseCustomization(options.c, store.products, compatible_component_map);
+          options.selected_product = customization.selected_product;
+          options.initial_product = customization.initial_product;
+          options.initial_assembly = customization.initial_assembly;
 
           callback(null, options);
 
@@ -77,83 +82,78 @@ class ProductList extends React.Component {
     }); // populate with db components
   };
 
-  componentWillMount() {
-    // TODO we should probably figure out a way to pull this reconstitution of
-    // a customization out of this class and into ComponentSerializer, probably
-    // also moving over the some of the recursive inheriting out of
-    // preprocessProps as well!
-    let customization_string = this.props.c;
-    if (typeof(location)!="undefined") {
-      customization_string = querystring.parse(location.search.slice(1)).c;
-    }
+  static parseCustomization(customization_string, product_list, compatible_component_map) {
+    if (!customization_string) return{};
     let customization = ComponentSerializer.parse(customization_string);
-    if (customization) {
-      // disable logging for this statement as it whines and I can't shut it up
-      let log = console.error;
-      console.error = ()=>{};
-        this.setState({selected_product: customization.selected_product});
-      console.error = log;
+    if (!customization) return{};
 
-      let product = this.state.product_map[customization.selected_product[0]];
-      for (let i=1; product && i<customization.selected_product.length; i++) {
-        product = product.options[customization.selected_product[i]];
+    let product_map = {};
+    product_list.forEach((product) => {
+      product_map[product.sku] = product;
+    });
+    let product = product_map[customization.selected_product[0]];
+    for (let i=1; product && i<customization.selected_product.length; i++) {
+      product = product.options[customization.selected_product[i]];
+    }
+    // fill in our customization
+    let initial_assembly = customization.assembly;
+    ItemUtils.recurseAssembly(initial_assembly, (component) => {
+      if (component.sku) {
+        let hydrated = null;
+        // search through compatible_component_map for match
+        let compatible_component_skus = Object.keys(compatible_component_map);
+        for (let i=0; i<compatible_component_skus.length; i++) {
+          ItemUtils.recurseOptions(compatible_component_map[compatible_component_skus[i]], (compatible_component) =>  {
+            if (hydrated) return;
+            if (component.sku == compatible_component.sku) {
+              hydrated = compatible_component;
+              return;
+            }
+          });
+        }
+        if (!hydrated) return;
+        component.props = hydrated.props;
       }
-      // fill in our customization
-      let initial_assembly = customization.assembly;
-      ItemUtils.recurseAssembly(initial_assembly, (component) => {
-        if (component.sku) {
-          let hydrated = null;
-          // search through compatible_component_map for match
-          let compatible_component_skus = Object.keys(this.props.compatible_component_map);
-          for (let i=0; i<compatible_component_skus.length; i++) {
-            ItemUtils.recurseOptions(this.props.compatible_component_map[compatible_component_skus[i]], (compatible_component) =>  {
-              if (hydrated) return;
-              if (component.sku == compatible_component.sku) {
-                hydrated = compatible_component;
-                return;
-              }
-            });
-          }
-          if (!hydrated) return;
-          component.props = hydrated.props;
-        }
-      });
-      let components = {};
-      // slow, but touch all of everything?
-      let traverse_item_options = (item_collection, foreach) => {
-        if (!item_collection) return;
-        if (typeof(item_collection)=='array') {
-          return item_array.forEach((component) => {
-            foreach(component);
-            traverse_item_options(component.options, foreach);
-            traverse_item_options(component.assembly, foreach);
-          });
-        }
-        if (typeof(item_collection)=='object') {
-          return Object.keys(item_collection).forEach((key) => {
-            let component = item_collection[key];
-            foreach(component);
-            traverse_item_options(component.options, foreach);
-            traverse_item_options(component.assembly, foreach);
-          });
-        }
-      };
-      // memory intensive, but make a map of all components?
-      if (product) {
-        traverse_item_options(product.compatible_components, (component) => {
-          if (component && component.sku)
-            components[component.sku] = component;
+    });
+    let components = {};
+    // slow, but touch all of everything?
+    let traverse_item_options = (item_collection, foreach) => {
+      if (!item_collection) return;
+      if (typeof(item_collection)=='array') {
+        return item_array.forEach((component) => {
+          foreach(component);
+          traverse_item_options(component.options, foreach);
+          traverse_item_options(component.assembly, foreach);
         });
       }
-      // fill in things we just have the sku for
-      traverse_item_options(initial_assembly, (component) => {
-        if (component && component.sku && components[component.sku]) {
-          component.props = JSON.parse(JSON.stringify(components[component.sku].props));
-        }
+      if (typeof(item_collection)=='object') {
+        return Object.keys(item_collection).forEach((key) => {
+          let component = item_collection[key];
+          foreach(component);
+          traverse_item_options(component.options, foreach);
+          traverse_item_options(component.assembly, foreach);
+        });
+      }
+    };
+    // memory intensive, but make a map of all components?
+    if (product) {
+      traverse_item_options(product.compatible_components, (component) => {
+        if (component && component.sku)
+          components[component.sku] = component;
       });
-      this.initial_product = product;
-      this.initial_assembly = initial_assembly;
-    } // this.props.c
+    }
+    // fill in things we just have the sku for
+    traverse_item_options(initial_assembly, (component) => {
+      if (component && component.sku && components[component.sku]) {
+        component.props = JSON.parse(JSON.stringify(components[component.sku].props));
+      }
+    });
+
+    return {
+      initial_product: product,
+      initial_assembly,
+      selected_product: customization.selected_product,
+    }
   }
 
   render() {
@@ -180,7 +180,7 @@ class ProductList extends React.Component {
             <span>Product<br></br>Options</span>
             {product_options}
           </product_options>
-          <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.initial_assembly} compatible_component_map={this.props.compatible_component_map}/>
+          <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.props.initial_assembly} compatible_component_map={this.props.compatible_component_map}/>
         </div>
         {this.props.edit ?
           null : <div className="add_to_cart">

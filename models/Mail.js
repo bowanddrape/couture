@@ -17,7 +17,6 @@ class Mail {
     // Object to hold neccessary email properties
     let bccArray = [
       'peter+testing@bowanddrape.com',
-      'renee+testing@bowanddrape.com',
     ]
     
     let options = {

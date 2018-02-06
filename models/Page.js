@@ -222,11 +222,7 @@ class Page extends JSONAPI {
     res.status(404);
     Page.get('/', (err, page) => {
       if (!page){
-        // render the 404 warning
-        // ex: Page.renderString([{component, props:Object.assign({}, req.query, props)}], layout);
-        // ex: let body = Page.renderString(data, req.query.embed?LayoutBasic:LayoutMain);
-        //   static renderString(component_list, layout)
-        return res.end("Error: No page");
+        return res.end("Error: No homepage");
       }
       page.elements.unshift({type: "WarningNotice", props: {message: "OOPS! Page Not Found"}});
       page.render(req, res);

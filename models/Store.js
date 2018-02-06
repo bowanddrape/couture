@@ -133,15 +133,13 @@ class Store extends SQLTable {
       if (req.headers['if-modified-since'])
         return res.status(304).end();
 
-      ProductList.preprocessProps({store:store}, (err, product_list) => {
+      ProductList.preprocessProps({store:store, c:req.query['c']}, (err, product_list) => {
         if (err) {
           console.log("Store::drawCustomization "+err.toString());
           return res.status(500);
         }
-        product_list.c = req.query['c'];
         product_list = new ProductList(product_list);
-        product_list.componentWillMount();
-        if (!product_list.initial_product) return Page.renderNotFound(req, res);
+        if (!product_list.props.initial_product) return Page.renderNotFound(req, res);
 
         let width = parseInt(req.query['w']) || 550;
         let height = parseInt(req.query['h']) || 600;
@@ -150,15 +148,15 @@ class Store extends SQLTable {
         let customizer = new Customizer({width:width*resolution, height:height*resolution, resolution});
         customizer.init();
         // set our camera, 404 if invalid
-        if (camera_index && !product_list.initial_product.props.cameras)
+        if (camera_index && !product_list.props.initial_product.props.cameras)
           return Page.renderNotFound(req, res);
-        if (product_list.initial_product.props.cameras) {
-          if (!product_list.initial_product.props.cameras[camera_index])
+        if (product_list.props.initial_product.props.cameras) {
+          if (!product_list.props.initial_product.props.cameras[camera_index])
             return Page.renderNotFound(req, res);
-          customizer.updatePMatrix(product_list.initial_product.props.cameras[camera_index]);
+          customizer.updatePMatrix(product_list.props.initial_product.props.cameras[camera_index]);
         }
 
-        customizer.set(product_list.initial_product, {assembly:product_list.initial_assembly}, () => {
+        customizer.set(product_list.props.initial_product, {assembly:product_list.props.initial_assembly}, () => {
 
           let pixel_buffer = new Uint8Array(width * height * resolution * resolution * 4);
           let gl = customizer.gl;
