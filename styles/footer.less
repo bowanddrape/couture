@@ -23,7 +23,7 @@
 
   .footer-menu {
     text-align: center;
-    padding:0;
+    padding: 0;
     margin-top: 40px;
     a {
       text-transform: uppercase;
@@ -76,35 +76,29 @@
     display: block;
   }
 
-   signup {
-     div:last-of-type {
-     display: inline-block;
-     margin-right: 15px;
-       input {
-         border:none;
-         border-bottom: 5px solid @color_secondary;
-         background: none;
-         text-transform: lowercase;
-       }
-   }
-     button {
-       display: inline-block;
-           top: 5px;
-     }
-   }
+  signup {
+    div:last-of-type {
+      display: inline-block;
+      margin-right: 15px;
+    }
+    button {
+      display: inline-block;
+      top: -2px;
+    }
+  }
 }
 
 @media (min-width: @desktop_min_width) {
   .footer {
-      .footer-menu {
-        a {
-          display: inline-block;
-          margin-right: 60px;
-        }
-        .social {
-          display: inline-block;
-          margin-right: 20px;
-        }
+    .footer-menu {
+      a {
+        display: inline-block;
+        margin-right: 60px;
       }
+      .social {
+        display: inline-block;
+        margin-right: 20px;
+      }
+    }
   }
 }

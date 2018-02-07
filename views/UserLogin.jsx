@@ -82,7 +82,7 @@ class UserLogin extends React.Component {
     return (
       <login className={this.state.loginState} style={this.props.style}>
         <Errors label="login" />
-        <section className="loginForm">
+        <section className="login_form">
           <div className="resetAction">
             <span className="formHead">Forgot Password</span>
             Enter your email address and we’ll send you instructions to reset your password.

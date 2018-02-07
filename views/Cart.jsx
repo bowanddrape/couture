@@ -9,8 +9,8 @@ const UserLogin = require('./UserLogin.jsx');
 const Errors = require('./Errors.jsx');
 const BADButton = require('./BADButton.jsx');
 
-const payment_method_client = require('./PayStripeClient.js');
-//const payment_method_client = require('./PayBraintreeClient.js');
+//const payment_method_client = require('./PayStripeClient.js');
+const payment_method_client = require('./PayBraintreeClient.js');
 
 /***
 Draws the cart page.
@@ -31,6 +31,8 @@ class Cart extends React.Component {
         credits: 0,
       },
       no_login_prompt: false,
+      same_billing: true,
+      payment_method: "credit",
       items: this.props.items,
       card: {
         number: "",
@@ -49,7 +51,6 @@ class Cart extends React.Component {
         postal: "",
         country: "",
       },
-      same_billing: true,
       billing: {
         name: "",
         street: "",
@@ -71,8 +72,8 @@ class Cart extends React.Component {
 
   static preprocessProps(options, callback) {
     // TODO select payment method
-    const payment_method = require('../models/PayStripe.js');
-    //const payment_method = require('../models/PayBraintree.js');
+    //const payment_method = require('../models/PayStripe.js');
+    const payment_method = require('../models/PayBraintree.js');
 
     // get braintree client token
     if (payment_method.getClientAuthorization) {
@@ -116,6 +117,13 @@ class Cart extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.state.shipping.street!=prevState.shipping.street) {
       this.updateNonProductItems();
+    }
+    if (this.state.payment_method!=prevState.payment_method || !equal(this.state.items, prevState.items)) {
+      // update paypal button
+      payment_method_client.drawPaypal(this.props.payment_authorization, this.state, (err, payment) => {
+        if (err) return Errors.emitError("payment", err);
+        this.handlePay(payment.nonce);
+      });
     }
   }
 
@@ -167,15 +175,24 @@ class Cart extends React.Component {
     BowAndDrape.cart_menu.update(items);
   }
 
-  handleToggleSameBilling(e) {
+  handleToggleGuestCheckout(e) {
+    let value = e.target.getAttribute("value")=="true";
     this.setState((prevState) => {
-      return {same_billing:!prevState.same_billing};
+      return {no_login_prompt: value};
     });
   }
 
-  handleToggleGuestCheckout(e) {
+  handleToggleSameBilling(e) {
+    let value = e.target.getAttribute("value")=="true";
     this.setState((prevState) => {
-      return {no_login_prompt:!prevState.no_login_prompt};
+      return {same_billing: value};
+    });
+  }
+
+  handleTogglePaymentMethod(e) {
+    let value = e.target.getAttribute("value");
+    this.setState((prevState) => {
+      return {payment_method: value};
     });
   }
 
@@ -215,26 +232,28 @@ class Cart extends React.Component {
   renderInputCredit() {
     return (
       <input_credit>
-        <section className="sectionTitle">Payment Info</section>
-        <Errors label="card" />
         <div className="paymentWrap">
           <div className="cardNumWrap">
-            <h5 style={{margin:"0"}}>Card Number</h5>
+            <h5>Card Number</h5>
             <input className="cardNum" type="text" maxLength="22" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.number} name="number" placeholder="Card Number"/>
             <input className="cardCvc" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.cvc} name="cvc" placeholder="CVC"/>
           </div>
           <div className="cardExpWrap">
-            <h5 style={{margin:"0"}}>Expiration Date</h5>
+            <h5>Expiration Date</h5>
             <input className="expMonth" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_month} name="exp_month" placeholder="MM"/>
             <input className="expYear" type="text" onChange={this.handleFieldChange.bind(this, "card")} value={this.state.card.exp_year} name="exp_year" placeholder="YY"/>
           </div>
-      </div>
+        </div>
+
+        <BADButton className="primary checkout_btn" onClick={this.handlePay.bind(this, null)}>
+          Get it!
+        </BADButton>
       </input_credit>
     );
   }
 
   // call when payment gets submitted
-  handlePay() {
+  handlePay(nonce) {
     // clear out errors so we can fill them with new ones
     Errors.clear();
 
@@ -245,14 +264,17 @@ class Cart extends React.Component {
     // make sure we have all the mandatory data we need
     if (!this.state.shipping.email) {
       Errors.emitError("shipping", "Please enter email address");
+      Errors.emitError("payment", "Check shipping info");
       return this.setState({processing_payment:false});
     }
     if (!this.state.shipping.name) {
       Errors.emitError("shipping", "Please enter name");
+      Errors.emitError("payment", "Check shipping info");
       return this.setState({processing_payment:false});
     }
     if (!this.state.shipping.street) {
       Errors.emitError("shipping", "If you don't tell us where to ship it, we're keeping it and wearing it");
+      Errors.emitError("payment", "Check shipping info");
       return this.setState({processing_payment:false});
     }
 
@@ -270,7 +292,7 @@ class Cart extends React.Component {
       BowAndDrape.api("POST", "/order", payload, (err, resp) => {
         if (err) {
           this.setState({processing_payment:false});
-          return Errors.emitError(null, err);
+          return Errors.emitError("payment", err);
         }
 
         // save our successfully placed order payload
@@ -325,6 +347,13 @@ class Cart extends React.Component {
     if (ItemUtils.getPrice(payload.contents)==0) {
       return placeOrder(payload);
     }
+
+    // if we were called with an alternate payment nonce, use that
+    if (nonce) {
+      payload.payment_nonce = nonce;
+      return placeOrder(payload);
+    }
+
     // credit card info goes to the payment gateway ONLY, not to our servers
     // the payment handling gateway then gives us a nonce to reference that
     // client's payment info, and this is what we pass back to the server to
@@ -332,7 +361,7 @@ class Cart extends React.Component {
     payment_method_client.getClientNonce(this.props.payment_authorization, this.state, (err, payment_nonce) => {
       if (err) {
         this.setState({processing_payment:false});
-        Errors.emitError("card", err);
+        Errors.emitError("payment", err);
         return;
       }
       payload.payment_nonce = payment_nonce;
@@ -342,7 +371,8 @@ class Cart extends React.Component {
 
   render() {
     if (this.state.done){
-      if (document) document.querySelector("body").scrollTop = 0;
+      if (typeof(document)!="undefined")
+        document.querySelector("body").scrollTop = 0;
       return <ThanksPurchaseComplete
         items={this.order_payload.contents}
         email={this.order_payload.email}
@@ -357,16 +387,43 @@ class Cart extends React.Component {
       total_price = ItemUtils.getPrice(this.refs.Items.state.contents);
     }
     if (total_price > 0) {
+      let payment_method = null;
+      switch (this.state.payment_method) {
+        case "paypal":
+          payment_method = (
+            <div>
+              <div id="paypal-button" />
+              <img id="paypal-loading" src="/loading.gif" style={{display:"block",margin:"auto"}}/>
+            </div>
+          );
+          break;
+        default:
+          payment_method = this.renderInputCredit();
+      };
       payment_info = (
-          <div className="cardInput">
-            {this.renderInputCredit()}
-          </div>
+        <section className={this.state.no_login_prompt?"":"hidden"}>
+          <div className="section_title">Payment Info</div>
+          <form className="toggle">
+            <input type="radio" name="payment_method" id="payment_method_credit" value="credit" defaultChecked={true} onChange={this.handleTogglePaymentMethod.bind(this)}/><label htmlFor="payment_method_credit" className="radio_label">Credit Card</label>
+            <input type="radio" name="payment_method" id="payment_method_paypal" value="paypal" onChange={this.handleTogglePaymentMethod.bind(this)}/><label htmlFor="payment_method_paypal" className="radio_label">Paypal</label>
+          </form>
+          <Errors label="payment" />
+          {payment_method}
+        </section>
       );
-
-    } // total_price > 0
+    } else {
+      payment_info = (
+        <section className={this.state.no_login_prompt?"":"hidden"}>
+          <BADButton className="primary checkout_btn" onClick={this.handlePay.bind(this, null)}>
+            Get it!
+          </BADButton>
+        </section>
+      );
+    }
 
     return (
-      <div className="cart-wrapper grid">
+      <div className="cart grid">
+        <Errors/>
         <h2 className="cart_header">My Cart</h2>
         <Items
           ref="Items"
@@ -381,46 +438,44 @@ class Cart extends React.Component {
         />
 
         { this.state.user.email ? null :
-          <div className="checkout_section">
-            <section className="loginHeader">
-              <h4>Check Out</h4>
-            </section>
-            <section className="loginToggle">
-              <form>
-                <input type="radio" name="checkout" value="false" defaultChecked={true} onChange={this.handleToggleGuestCheckout.bind(this)}/> <span className="radio_label">Login</span>
-                <input type="radio" name="checkout" value="true" onChange={this.handleToggleGuestCheckout.bind(this)}/><span className="radio_label">Checkout As Guest</span>
-              </form>
-            </section>
-          <section className={this.state.no_login_prompt?"hidden":"cartLoginWrap"} >
+          <section>
+            <div className="section_title">Checkout</div>
+            <form className="toggle">
+              <input type="radio" id="guest_false" name="guest_checkout" value={false} defaultChecked={true} onChange={this.handleToggleGuestCheckout.bind(this)}/>
+              <label htmlFor="guest_false" className="radio_label">Login</label>
+              <input type="radio" id="guest_true" name="guest_checkout" value={true} onChange={this.handleToggleGuestCheckout.bind(this)}/>
+              <label htmlFor="guest_true" className="radio_label">Checkout As Guest</label>
+            </form>
+            <div className={this.state.no_login_prompt?"hidden":""} >
               <UserLogin />
-            </section>
-          </div>
+            </div>
+          </section>
         }
 
-        <Errors/>
-        <section className={this.state.no_login_prompt?"addressArea":"hidden"}>
+        <section className={this.state.no_login_prompt?"":"hidden"}>
           <InputAddress section_title="Shipping Address" errors={<Errors label="shipping" />} handleFieldChange={this.handleFieldChange.bind(this, "shipping")} handleSetSectionState={this.handleSetSectionState.bind(this, "shipping")} {...this.state.shipping}/>
           <div className="billing-check">
-            <form>
-              <div className="radioWrap"><input type="radio" name="checkout" defaultChecked={this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/> <span className="radio_label">Same Billing address</span></div>
-              <div className="radioWrap"><input type="radio" name="checkout" defaultChecked={!this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/> <span className="radio_label">Different Billing address</span></div>
+            <form className="toggle">
+              <span>Billing address is </span>
+              <input type="radio" name="same_billing" id="same_billing_true" value={true} checked={this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/><label htmlFor="same_billing_true" className="radio_label">The Same</label>
+              <input type="radio" name="same_billing" id="same_billing_false" value={false} checked={!this.state.same_billing} onChange={this.handleToggleSameBilling.bind(this)}/><label htmlFor="same_billing_false" className="radio_label">Different</label>
             </form>
             { this.state.same_billing ? null :
               <InputAddress section_title="Billing Address" errors={<Errors label="billing"/>} handleFieldChange={this.handleFieldChange.bind(this, "billing")} handleSetSectionState={this.handleSetSectionState.bind(this, "billing")} {...this.state.billing}/>
             }
           </div>
-          {payment_info}
-          <BADButton className="primary checkout_btn" onClick={this.handlePay.bind(this)}>
-            Get it!
-          </BADButton>
+        </section>
+
+        {payment_info}
 
         <div id='hl-fbm-checkout'></div>
         <script dangerouslySetInnerHTML={{__html:`
           window.hlFbmPluginInit = function() {window.hl_fbm_checkout = new HlFbmPlugin("checkout", {});}
         `}} />
 
-        </section>
 
+{/* Needed by paypal */}
+        <script src="https://www.paypalobjects.com/api/checkout.js" data-version-4></script>
 
 {/* Needed by stripe, not needed by braintree */}
         <script type="text/javascript" src="https://js.stripe.com/v2/"></script>

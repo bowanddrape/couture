@@ -94,8 +94,6 @@ let applyCredits = (credits, items) => {
   // credits should never be negative anyways
   if (!credits || credits < 0) return;
   let total_price = getPrice(items);
-  // don't apply credit to a nothing
-  if (!total_price) return;
   let credit_price = Math.min(total_price, credits);
   items.push({
     props: {
@@ -186,7 +184,7 @@ let updateShipping = (contents, address, promo, callback) => {
     contents.push({
       props: {
         name: "Shipping & Handling:",
-        price: "enter address for quote"
+        price: "address required"
       }
     });
     return callback(null, contents);
