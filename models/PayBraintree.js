@@ -18,9 +18,27 @@ class Braintree {
     braintree.transaction.sale({
       amount: amount,
       paymentMethodNonce: nonce,
+      orderId: shipment.id,
+      customer: {
+        email: shipment.email,
+      },
+      billing: {
+        firstName: shipment.billing_address.name,
+        locality: shipment.billing_address.locality,
+        postalCode: shipment.billing_address.postal,
+        region: shipment.billing_address.region,
+        streetAddress: shipment.billing_address.street,
+      },
+      shipping: {
+        firstName: shipment.address.name,
+        locality: shipment.address.locality,
+        postalCode: shipment.address.postal,
+        region: shipment.address.region,
+        streetAddress: shipment.address.street,
+      },
       options: {
         submitForSettlement: true
-      }
+      },
     }, (err, result) => {
       if (err) {
         return callback(err);
