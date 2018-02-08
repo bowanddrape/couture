@@ -182,10 +182,8 @@ class Page extends JSONAPI {
       data.forEach((component) => {
         head_props = Object.assign(head_props, component.props);
       });
-      if (this.title)
-        head_props.title = this.title;
-      if (this.description)
-        head_props.description = this.description;
+      head_props.title = head_props.title || this.title;
+      head_props.description = head_props.description || this.description;
       let head = Page.getHTMLHead(req, res, head_props);
       let layout = Page.getLayout(req, res);
       if (!layout) return;

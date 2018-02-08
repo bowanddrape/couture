@@ -75,6 +75,8 @@ class ProductList extends React.Component {
           options.initial_product = customization.initial_product;
           options.initial_assembly = customization.initial_assembly;
 
+          if (options.initial_assembly && options.initial_product)
+            options.title = `${ItemUtils.getPhrase(options.initial_assembly)} | ${options.initial_product.props.name} | Bow & Drape Custom`;
           callback(null, options);
 
         }); // get store_inventory

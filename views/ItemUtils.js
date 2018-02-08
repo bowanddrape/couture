@@ -242,6 +242,44 @@ let updateShipping = (contents, address, promo, callback) => {
   });
 }
 
+let getPhrase = (assembly) => {
+  if (!assembly) return "";
+  let words = [];
+  let emoji = [];
+  for (let i=0; i<assembly.length; i++) {
+    let word = "";
+    recurseAssembly(assembly[i], (component) => {
+      let sku = component.sku || component.props.name;
+
+      // ignore anything you can't see
+      if (!component.props || !component.props.image) return;
+      let last_sku_tok = sku.split("_").pop();
+      // add single-letters to phrase
+      if (last_sku_tok.length==1) {
+        word += last_sku_tok;
+      } else {
+        emoji.push(last_sku_tok);
+      }
+    });
+    words.push(word);
+  }
+  // handle words
+  let phrase = words.join(" ").toUpperCase().trim();
+  if (phrase) {
+    // handle if letters are individual
+    let has_word = false;
+    words.forEach((word) => {if (word.length>1) has_word = true;});
+    if (!has_word) return words.join("").toUpperCase();
+
+    return phrase;
+  }
+  // handle no words
+  phrase = emoji.filter(function (value, index, self) {
+    return self.indexOf(value) === index;
+  }).join(" ");
+  return phrase.toUpperCase();
+}
+
 module.exports = {
   recurseAssembly,
   recurseOptions,
@@ -251,4 +289,5 @@ module.exports = {
   applyCredits,
   countBusinessDays,
   updateShipping,
+  getPhrase,
 };
