@@ -14,7 +14,7 @@ class Braintree {
     });
   }
 
-  static charge(nonce, amount, callback) {
+  static charge(shipment, nonce, amount, callback) {
     braintree.transaction.sale({
       amount: amount,
       paymentMethodNonce: nonce,

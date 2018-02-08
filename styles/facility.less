@@ -105,7 +105,6 @@ comments {
 .timestamp {
   display: inline-block;
   color: @color_secondary;
-  opacity: 0.5;
   width: 180px;
 }
 
@@ -133,16 +132,13 @@ comments {
   switch.expanded {
     display: none;
   }
-  .items, .item {
+  .items.fulfillment, .item.fulfillment {
     page-break-before: always;
     page-break-after: always;
   }
-  .items.packing_slip, .packing_slip .item {
+  .items.packing_slip, .item.packing_slip {
     page-break-before: auto;
     page-break-after: auto;
-  }
-  .items .product_wrapper .item .preview {
-    height: 300px !important;
   }
   .add_tag {
     display: none !important;
