@@ -188,7 +188,7 @@ class Page extends JSONAPI {
       let layout = Page.getLayout(req, res);
       if (!layout) return;
       let body = Page.renderString(data, layout);
-      return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
+      Page.renderDoc(res, head, body, head_props);
     });
   }
 
@@ -315,6 +315,12 @@ class Page extends JSONAPI {
     return layout;
   }
 
+  static renderDoc(res, head, body, props) {
+    if (props.amp)
+      return res.end(`<!doctype html><html ⚡><head>${head}</head><body><div class="layout">${body}</div></body></html>`);
+    return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
+  }
+
   // respond to a req by rendering page contents
   static render(req, res, component, props) {
     // if json was requested, just return the props object
@@ -324,7 +330,7 @@ class Page extends JSONAPI {
     let layout = Page.getLayout(req, res);
     if (!layout) return;
     let body = Page.renderString([{component, props:Object.assign({}, req.query, props)}], layout);
-    return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
+    Page.renderDoc(res, head, body, props);
   }
 
 }

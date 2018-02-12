@@ -46,8 +46,13 @@ class DashboardHome extends React.Component {
     let value = event.target.value;
 
     this.setState((prevState) => {
-      if (name=="start" || name=="stop")
-        value = new Date(value).getTime()/1000;
+      if (name=="start" || name=="stop") {
+        try {
+          value = new Date(value+" EST").getTime()/1000;
+        } catch(err) {
+          value = new Date(value).getTime()/1000;
+        }
+      }
       let search_params = Object.assign({}, this.state.search_params);
       search_params[name] = value;
       return ({search_params});
