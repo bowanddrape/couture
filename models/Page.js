@@ -230,15 +230,42 @@ class Page extends JSONAPI {
   // helper functions to get <head> stuff, usually used to popoulate meta tags
   static getHTMLHead(req, res, props) {
     let image_header = "";
+    let image_url = "";
     props = props || {};
     if (props.c && props.store) {
-      image_header = `<meta property="og:image:width" content="550"/><meta property="og:image:height" content="600"/><meta property="og:image" content="https://${req.headers.host}/store/${props.store.id}/preview?c=${encodeURIComponent(props.c)}"/>`
+      image_url = `https://${req.headers.host}/store/${props.store.id}/preview?c=${encodeURIComponent(props.c)}`;
+      image_header = `<meta property="og:image:width" content="550"/><meta property="og:image:height" content="600"/><meta property="og:image" content="${image_url}"/>`
     }
 
     let title = props.title || "Bow&Drape"+req.path.replace(/\//g, " ");
     let description_header = "";
     if (props.description)
       description_header = `<meta name="description" content="${props.description}"/>`;
+    let structured_data = `{
+      "@context": "http://schema.org",
+      "@type": "${props.c ? "Product" : "Organization"}",
+      ${props.c?`
+      "url": "https://www.bowanddrape.com${req.originalUrl}",
+      "name": "${title.split(" |").slice(0,-1).join(",")}",
+      "brand": "Bow & Drape",
+      "image": [
+        "${image_url}",
+        "${image_url}&w=512&h=512"
+      ],
+      `:`
+      "url": "https://www.bowanddrape.com",
+      "name": "Bow & Drape",
+      "sameAs": [
+        "http://www.facebook.com/bowanddrape",
+        "http://instagram.com/bowanddrape"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+1-800-864-5797",
+        "contactType": "Customer service"
+      },`}
+      "logo": "https://www.bowanddrape.com/icon.png"
+    }`;
 
     return `
       <meta httpEquiv="content-type" content="text/html; charset=utf-8"/>
@@ -249,6 +276,7 @@ class Page extends JSONAPI {
       <meta property="og:type" content="website"/>
       <meta charset="utf-8"/>
       ${image_header}
+      <script type="application/ld+json">${structured_data}</script>
 
       <script defer src="//plugin.headlinerlabs.com/users/bowanddrape.js"></script>
 
@@ -316,9 +344,16 @@ class Page extends JSONAPI {
   }
 
   static renderDoc(res, head, body, props) {
+    let amp = '';
     if (props.amp)
-      return res.end(`<!doctype html><html ⚡><head>${head}</head><body><div class="layout">${body}</div></body></html>`);
-    return res.end(`<head>${head}</head><body><div class="layout">${body}</div></body>`);
+      amp = ' ⚡';
+    return res.end(`
+      <!doctype html>
+      <html ${amp}>
+        <head>${head}</head>
+        <body><div class="layout">${body}</div></body>
+      </html>
+    `);
   }
 
   // respond to a req by rendering page contents
