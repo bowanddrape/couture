@@ -184,7 +184,8 @@ class Store extends SQLTable {
 // lookup each time
 // TODO cache things and look things up from cache instead
 Store.special_ids = {
-  vss : 'd955f9f3-e9ae-475a-a944-237862b589b3',
+  vss: 'd955f9f3-e9ae-475a-a944-237862b589b3',
+  webfront: '78f87a89-1bcb-4048-b6e5-68cf4ffcc53a',
 };
 
 module.exports = Store;

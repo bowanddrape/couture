@@ -107,7 +107,7 @@ class Items extends React.Component {
         line_items.push(
           <Item
             style={style}
-            key={line_items.length}
+            key={`${this.state.contents[i].sku}_${line_items.length}`}
             onRemove={remove}
             fulfillment={this.props.fulfillment}
             garment_id={this.props.fulfillment_id?(this.props.fulfillment_id+"-"+(line_items.length+1)):null}
