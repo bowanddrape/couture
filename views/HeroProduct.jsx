@@ -53,17 +53,19 @@ class HeroProduct extends React.Component {
 
     // otherwise we're a premade ats product
     let product_options = {};
-    options.options.forEach((option) => {
-      let name = option.name.trim().toLowerCase().replace(/_/g,"");
-      product_options[option.name] = {
-        sku: `${options.base_sku}_${name}`,
-        props: {
-          name: `${options.name}, ${option.name}`,
-          price: options.price,
-          image: options.image,
-        },
-      };
-    });
+    if (options.options) {
+      options.options.forEach((option) => {
+        let name = option.name.trim().toLowerCase().replace(/_/g,"");
+        product_options[option.name] = {
+          sku: `${options.base_sku}_${name}`,
+          props: {
+            name: `${options.name}, ${option.name}`,
+            price: options.price,
+            image: options.image,
+          },
+        };
+      });
+    }
     let product = {
       sku: options.base_sku,
       props: {
