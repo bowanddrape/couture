@@ -23,10 +23,19 @@ class UserLogin extends React.Component {
     }
   }
 
+  readFields() {
+    let container = ReactDOM.findDOMNode(this);
+    if (!container) return {};
+    let email = container.querySelector('input[type="email"]').value;
+    let password = container.querySelector('input[type="password"]').value;
+    return {email, password};
+  }
+
   login() {
     Errors.emitError("login_clear");
-    let email = this.fields.email.value;
-    let password = this.fields.password.value;
+    let fields = this.readFields();
+    let email = fields.email;
+    let password = fields.password;
     if (!email) {
       return Errors.emitError("login", "Must enter email");
     }
@@ -42,7 +51,8 @@ class UserLogin extends React.Component {
       }
       BowAndDrape.api("POST", "/user/login", payload, (err, response) => {
         if (err)
-          Errors.emitError("login", err);
+          return Errors.emitError("login", err);
+
         BowAndDrape.dispatcher.handleAuth(response);
 
         // google analytics event
@@ -64,7 +74,8 @@ class UserLogin extends React.Component {
   }
 
   verify() {
-    let email = this.fields.email.value;
+    let fields = this.readFields();
+    let email = fields.email;
     if (!email)
       return Errors.emitError("login", "Must enter email");
     let payload = {email: email};
@@ -78,7 +89,6 @@ class UserLogin extends React.Component {
     if (this.state.user.email)
       return null;
 
-    this.fields = this.fields || {};
     return (
       <login className={this.state.loginState} style={this.props.style}>
         <Errors label="login" />
@@ -89,8 +99,8 @@ class UserLogin extends React.Component {
             <button className="loginNav" onClick={()=>{this.setState({loginState:'login'})}}>Back to Sign In</button>
           </div>
           <div>
-            <input ref={(input)=>{this.fields.email=input}} placeholder="email address" type="email" name="email"/>
-            <input ref={(input)=>{this.fields.password=input}} placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password"/>
+            <input placeholder="email address" type="email" name="email"/>
+            <input placeholder="password" onKeyUp={(event)=>{if(event.which==13){this.login()}}} type="password" name="password"/>
             <button className="primary registerBtn" onClick={this.login.bind(this)}>Create Account</button>
             <button className="primary loginBtn" onClick={this.login.bind(this)}>Sign In</button>
             <button className="primary resetBtn" onClick={this.verify.bind(this)}>Send Reset Instructions</button>
