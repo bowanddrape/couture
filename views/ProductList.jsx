@@ -95,7 +95,10 @@ class ProductList extends React.Component {
     });
     let product = product_map[customization.selected_product[0]];
     for (let i=1; product && i<customization.selected_product.length; i++) {
-      product = product.options[customization.selected_product[i]];
+      if (product.options[customization.selected_product[i]])
+        product = product.options[customization.selected_product[i]];
+      else
+        customization.selected_product.splice(i, 1);
     }
     // fill in our customization
     let initial_assembly = customization.assembly;
