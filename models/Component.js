@@ -156,6 +156,15 @@ class Component extends JSONAPI {
     if (req.files && req.files.length && req.files[0].location)
       object.props.image = req.files[0].location;
 
+    // strip options down to sku
+    if (object.options) {
+      let stripped_options = {};
+      Object.keys(object.options).forEach((option_key) => {
+        stripped_options[option_key] = {sku:object.options[option_key].sku};
+      });
+      object.options = stripped_options;
+    }
+
     object.upsert((err, result) => {
       if (callback)
         return (callback(err, result));
