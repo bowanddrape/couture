@@ -240,17 +240,16 @@ class User extends SQLTable {
     User.get(req.body.email, function(err, user) {
       if (user && user.passhash) return res.json({error:"user exists"}).end();
 
-      let new_user = new User({
-        email: req.body.email,
-        passhash: req.body.passhash,
-        props: {
-          login_mode: "passhash"
-        }
-      });
-      new_user.upsert(function(err, result) {
+      user = user || {};
+      user.email = req.body.email;
+      user.passhash = req.body.passhash;
+      user.props = user.props || {};
+      user.props.login_mode = "passhash";
+      user = new User(user);
+      user.upsert(function(err, result) {
         if (err) console.log(err); // TODO: escalate this
         // login as the new user
-        User.sendJwtToken(res, new_user);
+        User.sendJwtToken(res, user);
       });
     });
   }
