@@ -166,6 +166,7 @@ module.exports = {
     Announcement: require('./Announcement.jsx'),
     AnnouncementEdit: require('./AnnouncementEdit.jsx'),
     StockistList: require('./StockistList.jsx'),
+    ManageInventory: require('./ManageInventory.jsx'),
   },
   dispatcher,
   api,

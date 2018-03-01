@@ -24,6 +24,12 @@ class Facility extends SQLTable {
       fields: ["props", "address"]
     };
   }
+
+  // query for all stores that we have admin roles on
+  static getList(user, callback) {
+    let query = "SELECT * FROM facilities WHERE props#>'{admins}'?|"+`array['${user.roles.join(",")}']`;
+    return Facility.sqlQuery(Facility, query, [], callback);
+  }
 }
 
 // keep around some common constant special ids so we don't have to do a db

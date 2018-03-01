@@ -1,0 +1,33 @@
+
+@import "./colors.less";
+.inventory {
+  button {
+    display: inline-block;
+  }
+
+  .inventory_line {
+    display: flex;
+    justify-content: space-between;
+    img {
+      max-height: 60px;
+    }
+    .count {
+      width: 320px;
+      text-align: right;
+      .number {
+        position: relative;
+        display: inline-block;
+        font-size: 24px;
+        top: 4px;
+        right: 10px;
+      }
+      input[type="text"] {
+        min-width: auto;
+        width: 75px;
+      }
+    }
+    &:nth-child(2n) {
+      background-color: @color_support_0;
+    }
+  }
+}

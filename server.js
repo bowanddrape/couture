@@ -67,6 +67,7 @@ const Signup = require('./models/Signup.js');
 const User = require('./models/User.js');
 const Order = require('./models/Order.js');
 const Fulfillment = require('./models/Fulfillment.js');
+const Inventory = require('./models/Inventory.js');
 const Store = require('./models/Store.js');
 const Shipment = require('./models/Shipment.js');
 const Facility = require('./models/Facility.js');
@@ -153,6 +154,7 @@ app.use(responseTime((req, res, time) => {
 app.use(User.handleHTTP);
 app.use(Order.handleHTTP);
 app.use(Fulfillment.handleHTTP);
+app.use(Inventory.handleHTTP);
 app.use(Store.handleHTTP);
 app.use(Log.handleHTTP);
 app.use(VSS.handleHTTP);

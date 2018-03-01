@@ -29,16 +29,16 @@ class DashboardMetrics extends React.Component {
     let data_sources = [
       {
         key: "orders",
-        query: "WITH shipment_contents AS (SELECT id, jsonb_array_elements(contents) AS content_line_item, from_id, to_id, requested, received, shipping_label_created, shipping_carrier_pickup, ship_by, delivery_promised, tracking_code, store_id, email, payments, address AS shipping_address, billing_address FROM shipments WHERE requested>$1 AND requested<$2 ORDER BY requested ASC) SELECT * FROM shipment_contents",
-        props: [start, stop],
+        query: "WITH shipment_contents AS (SELECT id, jsonb_array_elements(contents) AS content_line_item, from_id, to_id, requested, received, shipping_label_created, shipping_carrier_pickup, ship_by, delivery_promised, tracking_code, store_id, email, payments, address AS shipping_address, billing_address FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3 ORDER BY requested ASC) SELECT * FROM shipment_contents",
+        props: [start, stop, Facility.special_ids.customer_ship],
       }, {
         key: "orders_by_day",
-        query: "SELECT EXTRACT(EPOCH FROM CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE)) AS date, sum(cast(payments#>>'{0, price}' as float)) AS revenue, count(1) AS count FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3 GROUP BY 1 ORDER BY 1;",
-        props: [start, stop, Facility.special_ids.canceled],
+        query: "SELECT EXTRACT(EPOCH FROM CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE)) AS date, sum(cast(payments#>>'{0, price}' as float)) AS revenue, count(1) AS count FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3 GROUP BY 1 ORDER BY 1;",
+        props: [start, stop, Facility.special_ids.customer_ship],
       }, {
         key: "newuser_orders_by_day",
-        query: "SELECT EXTRACT(EPOCH FROM CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE)) AS date, count(1) AS count FROM shipments WHERE requested>$1 AND requested<$2 AND to_id!=$3 AND NOT EXISTS (SELECT 1 FROM shipments s WHERE shipments.email=s.email AND shipments.requested>s.requested) GROUP BY 1 ORDER BY 1;",
-        props: [start, stop, Facility.special_ids.canceled],
+        query: "SELECT EXTRACT(EPOCH FROM CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE)) AS date, count(1) AS count FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3 AND NOT EXISTS (SELECT 1 FROM shipments s WHERE shipments.email=s.email AND shipments.requested>s.requested) GROUP BY 1 ORDER BY 1;",
+        props: [start, stop, Facility.special_ids.customer_ship],
       }, {
         key: "component_use",
         query: "SELECT assembly_extract_skus(jsonb_agg(contents)) AS skus FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3",
@@ -286,7 +286,10 @@ class DashboardMetrics extends React.Component {
           row.content_line_item.tags?row.content_line_item.tags.join("|"):"",
         ];
         content_keys.forEach((key) => {
-          data.push(JSON.stringify(row.content_line_item.props[key]).replace(/,/g,"|").replace(/"/g,""));
+          let content = "";
+          if (row.content_line_item.props[key])
+            content = JSON.stringify(row.content_line_item.props[key]).replace(/,/g,"|").replace(/"/g,"");
+          data.push(content);
         });
         order_keys.forEach((key) => {
           if (["requested", "received", "shipping_label_created", "shipping_carrier_pickup", "ship_by", "delivery_promised"].indexOf(key) != -1) {
