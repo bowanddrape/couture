@@ -388,6 +388,9 @@ class ProductCanvas extends React.Component {
               event.stopPropagation();
               this.handleComponentMove(index, data);
             }}
+            onMouseDown={() => {
+              this.setState({selected_component: index});
+            }}
             data={index}
           >
             <div
