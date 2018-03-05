@@ -18,7 +18,7 @@ class ProductComponentPicker extends React.Component {
       text_input.focus();
       text_input.setSelectionRange(value.length, value.length);
       // update component letter type
-      this.handleSetComponentText(value, this.component_letter_map[this.tabs.state.selected_tab]);
+      this.props.productCanvas.handleRemapComponentLetters(this.component_letter_map[this.tabs.state.selected_tab]);
     }
   }
 
@@ -61,60 +61,6 @@ class ProductComponentPicker extends React.Component {
     for (let i=0; product.compatible_components && i<product.compatible_components.length; i++) {
       let compatible_component = this.props.compatible_component_map[product.compatible_components[i]];
       if (compatible_component.options) {
-        // handle if virtual keyboard
-        if (false && compatible_component.props.is_letters) {
-          // array => map
-          let component_letters = {};
-          let tab_components = [];
-          for (let j=0; j<compatible_component.options.length; j++) {
-            let letter = compatible_component.options[j];
-            let toks = letter.props.name.split('_');
-            let character = toks[toks.length-1].toLowerCase();
-            if (character.match(/^[a-z]$/))
-              component_letters[character] = letter;
-            else {
-              component_letters[character] = letter;
-              tab_components.push(
-                <div key={i+'_'+j} style={{backgroundImage:`url(${letter.props.image})`,backgroundSize:`${letter.props.imagewidth/letter.props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, letter)}/>
-              );
-            }
-          }
-          components.push(
-            <div key={components.length} name={compatible_component.props.name} className="component_virtual_keyboard_container">
-              <row>{['q','w','e','r','t','y','u','i','o','p'].map((character)=>{
-                return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
-              })}</row>
-              <row>
-                <div key="spacer0" className="halfgap"/>
-                {['a','s','d','f','g','h','j','k','l'].map((character)=>{
-                  return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
-                })}
-                <div key="spacer1" className="halfgap"/>
-              </row>
-              <row>
-                <div key="spacer2" className="halfgap"/>
-                <div key="spacer2a" className="halfgap"/>
-                {['z','x','c','v','b','n','m'].map((character)=>{
-                  return (<div key={character} style={{backgroundImage:`url(${component_letters[character].props.image})`,backgroundSize:`${component_letters[character].props.imagewidth/component_letters[character].props.imageheight*100}% 100%`}} onClick={this.handleAddComponent.bind(this, component_letters[character])}/>);
-                })}
-                <div key="spacer3" className="halfgap"/>
-                <div key="backspace" className="backspace" onClick={this.handlePopComponent.bind(this)}/>
-              </row>
-              <row>
-                <div key="spacer3a" className="halfgap"/>
-                <div key="spacer3b" className="halfgap"/>
-                <div key="spacebar" className="spacebar" onClick={this.handleAddComponent.bind(this, component_letters["space"])}/>
-                <div key="spacer3c" className="halfgap"/>
-                <div key="enter" className="enter" onClick={this.handleSelectComponent.bind(this, -1)}/>
-              </row>
-            </div>
-          );
-          components.push(
-            <div key={components.length} name={compatible_component.props.name+"_cont"} className="component_container" style={{overflow:"hidden"}}>{tab_components}</div>
-          );
-          continue;
-        } // is_letters
-
         // handle if native keyboard
         if (compatible_component.props.is_letters) {
           // array => map
@@ -161,7 +107,7 @@ class ProductComponentPicker extends React.Component {
           if (compatible_component.options[j].props.imagewidth>compatible_component.options[j].props.imageheight)
             backgroundSize = `100% ${compatible_component.options[j].props.imageheight/compatible_component.options[j].props.imagewidth*100}%`;
           tab_components.push(
-            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={() => {this.handleSelectComponent(-1); this.handleAddComponent(compatible_component.options[j]);}}/>
+            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={() => {this.handleAddComponent(compatible_component.options[j]);}}/>
           );
         }
         components.push(

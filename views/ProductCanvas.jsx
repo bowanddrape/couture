@@ -116,6 +116,28 @@ class ProductCanvas extends React.Component {
     });
   }
 
+  // switch from one font to a different font
+  handleRemapComponentLetters(componentMap) {
+    this.setState((prevState, props) => {
+      let assembly = JSON.parse(JSON.stringify(prevState.assembly));
+      let selected_component = prevState.selected_component;
+      let selected = assembly[prevState.selected_component];
+      if (!selected)
+        return {};
+      selected.assembly = selected.assembly.map((component) => {
+        let letter = component.sku.split("_").pop();
+        letter = letter.toLowerCase();
+        letter = character_to_skutext[letter] || letter;
+        if (componentMap[letter]) {
+          component = JSON.parse(JSON.stringify(componentMap[letter]));
+          component.quantity = 1;
+        }
+        return component;
+      });
+      return {assembly};
+    });
+  }
+
   handleAddComponent(component) {
     // deep copy and set the quantity of this component to be used to 1
     component = JSON.parse(JSON.stringify(component));
