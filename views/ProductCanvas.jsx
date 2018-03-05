@@ -458,7 +458,7 @@ class ProductCanvas extends React.Component {
     return (
       <section className="canvasWrap">
         <div className={this.state.assembly[this.state.selected_component]?"component_selected component_wrapper":"component_wrapper"}>
-          <canvas></canvas>
+          <canvas onClick={()=>{this.setState({selected_component:-1})}}></canvas>
           {component_hitboxes}
         </div>
         <hud_controls className={this.state.assembly[this.state.selected_component]?"rainbow_border":""}>{hud_controls}</hud_controls>
