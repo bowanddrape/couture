@@ -37,7 +37,7 @@ class VSS {
 
     // Grab a component representing the item to be sold
     Component.get(sku, (err, comp) => {
-      if (err)
+      if (err || !comp)
         return Page.renderNotFound(req, res)
 
       // Check if we have inventory before rendering cartProps
