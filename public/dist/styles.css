@@ -413,7 +413,7 @@ button:focus,
 input[type="button"]:focus {
   outline: none;
 }
-.warning404 {
+.warning {
   text-align: center;
   width: 100%;
   background-color: #ff5c5c;

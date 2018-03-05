@@ -18,7 +18,7 @@ class WarningNotice extends React.Component {
   render() {
 
     return (
-      <div className="warning404">
+      <div className="warning">
         <h1>{this.state.message}</h1>
       </div>
     );

@@ -144,7 +144,7 @@ module.exports = {
     FulfillShipments: require('./FulfillShipments.jsx'),
     ProductList: require('./ProductList.jsx'),
     Cart: require('./Cart.jsx'),
-    Placeholder: require('./Placeholder.jsx'),
+    MaintenanceMode: require('./MaintenanceMode.jsx'),
     PageList: require('./PageList.jsx'),
     PageEdit: require('./PageEdit.jsx'),
     Items: require('./Items.jsx'),

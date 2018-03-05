@@ -82,6 +82,7 @@ const Announcement = require('./models/Announcement.js');
 const LayoutMain = require('./views/LayoutMain');
 const BowAndDrape = require('./views/BowAndDrape.jsx');
 
+const MaintenanceMode = require('./views/MaintenanceMode.jsx');
 const Placeholder = require('./views/Placeholder.jsx');
 
 Facility.initMandatory([
@@ -176,7 +177,7 @@ app.use(function(req, res, next) {
     return next();
   }
 
-  return Page.render(req, res, Placeholder, {});
+  return Page.render(req, res, MaintenanceMode, {});
 });
 
 

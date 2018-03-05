@@ -10,6 +10,7 @@ const LayoutMain = require('../views/LayoutMain.jsx');
 const LayoutBasic = require('../views/LayoutBasic.jsx');
 
 const NotFound = require('../views/NotFound.jsx');
+const MaintenanceMode = require('../views/MaintenanceMode.jsx');
 const HTMLConvert = require('html-convert')({width: 600, height: 800});
 
 // these are the models the page query will have access to
@@ -217,11 +218,10 @@ class Page extends JSONAPI {
 
   // helper function to render 404
   static renderNotFound(req, res) {
-    res.status(404);
     Page.get('/', (err, page) => {
-      if (!page){
-        return res.end("Error: No homepage");
-      }
+      if (!page)
+        return Page.render(req, res, MaintenanceMode, {});
+      res.status(404);
       page.elements.unshift({type: "WarningNotice", props: {message: "OOPS! Page Not Found"}});
       page.render(req, res);
     });
