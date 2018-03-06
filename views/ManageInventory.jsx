@@ -109,11 +109,13 @@ class ManageInventory extends React.Component {
 
       let factory_sku="";
       let preview_img="";
+      let product_info="";
       if (this.component_map[sku]) {
         if (this.component_map[sku].props.factory_sku)
           factory_sku = `(${this.component_map[sku].props.factory_sku})`;
         if (this.component_map[sku].props.image)
           preview_img = <img src={this.component_map[sku].props.image}/>;
+        product_info = <span>{this.component_map[sku].props.name} <b>{parseFloat(this.component_map[sku].props.price).toFixed(2)}</b></span>;
       }
 
       inventory_lines.push(
@@ -122,6 +124,7 @@ class ManageInventory extends React.Component {
             <b>{sku}</b>:
             {factory_sku}
             {preview_img}
+            {product_info}
           </div>
           {count}
         </div>
