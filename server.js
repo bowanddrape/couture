@@ -60,7 +60,10 @@ let upload = multer({
         key = Date.now();
       cb(null, ((process.env.ENV=='prod')?'':'staging/')+req.path.substring(1)+'_uploads/'+key);
     }
-  })
+  }),
+  limits: {
+    fileSize: 1000000
+  }
 })
 
 const Signup = require('./models/Signup.js');
@@ -104,7 +107,8 @@ Store.initMandatory([
 app.use(compression());
 
 // parse multipart form data
-app.use(upload.any(), (req, res, next) => {
+app.use(upload.any(), (err, req, res, next) => {
+  if (err) return res.status(400).send({error:err.code});
   return next();
 });
 

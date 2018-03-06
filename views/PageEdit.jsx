@@ -1,5 +1,7 @@
 
 const React = require('react');
+const Errors = require('./Errors.jsx');
+const BADButton = require('./BADButton.jsx');
 const PageEditGallery = require("./PageEditGallery.jsx");
 const PageEditSignup = require("./PageEditSignup.jsx");
 const PageEditTextContent = require("./PageEditTextContent.jsx");
@@ -86,7 +88,7 @@ class PageEdit extends React.Component {
     });
     BowAndDrape.api("POST", "/page", page, (err, result) => {
       if (err)
-        return BowAndDrape.dispatcher.emit("error", err.error);
+        return Errors.emitError(null, err);
       location.reload();
     });
   }
@@ -97,7 +99,7 @@ class PageEdit extends React.Component {
     let page = this.state;
     BowAndDrape.api("DELETE", "/page", this.state, (err, result) => {
       if (err)
-        return BowAndDrape.dispatcher.emit("error", err.error);
+        return Errors.emitError(null, err);
       location.reload();
     });
   }
@@ -177,7 +179,8 @@ class PageEdit extends React.Component {
         {elements}
         <element onClick={this.handleNewElement.bind(this)}>Add Element</element>
         <div className="actions">
-          <button onClick={this.handleSave.bind(this)}>{this.props.path?"Save":"Add New Page"}</button>
+          <Errors />
+          <BADButton onClick={this.handleSave.bind(this)}>{this.props.path?"Save":"Add New Page"}</BADButton>
           {(this.props.path) ?
             <button onClick={this.handleRemove.bind(this)}>Delete</button>
             : null

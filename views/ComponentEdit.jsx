@@ -1,5 +1,6 @@
 
 const React = require('react');
+const Errors = require('./Errors.jsx');
 
 /***
 Used in the admin page for editing components
@@ -49,7 +50,7 @@ class ComponentEdit extends React.Component {
     if (this.file)
       payload.image_file = this.file;
     BowAndDrape.api("POST", `/component`, payload, (err, result) => {
-      if (err) return console.log(err);
+      if (err) return Errors.emitError(null, err);
       location.reload();
     });
   }
@@ -114,6 +115,7 @@ class ComponentEdit extends React.Component {
 
     return (
       <component_edit>
+        <Errors />
         {fields}
         <button onClick={this.handleSave.bind(this)}>Save</button>
         {this.props.children}
