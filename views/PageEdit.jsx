@@ -87,8 +87,9 @@ class PageEdit extends React.Component {
       page["file_"+file.name.replace(/ /g,"")] = file;
     });
     BowAndDrape.api("POST", "/page", page, (err, result) => {
-      if (err)
+      if (err) {
         return Errors.emitError(null, err);
+      }
       location.reload();
     });
   }

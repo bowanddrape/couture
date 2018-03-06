@@ -108,7 +108,7 @@ app.use(compression());
 
 // parse multipart form data
 app.use(upload.any(), (err, req, res, next) => {
-  if (err) return res.status(400).send({error:err.code});
+  if (err) return res.status(400).send({error:err.code+" for "+err.field});
   return next();
 });
 
