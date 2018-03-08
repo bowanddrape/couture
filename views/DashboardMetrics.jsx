@@ -28,10 +28,6 @@ class DashboardMetrics extends React.Component {
 
     let data_sources = [
       {
-        key: "orders",
-        query: "WITH shipment_contents AS (SELECT id, jsonb_array_elements(contents) AS content_line_item, from_id, to_id, requested, received, shipping_label_created, shipping_carrier_pickup, ship_by, delivery_promised, tracking_code, store_id, email, payments, address AS shipping_address, billing_address FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3 ORDER BY requested ASC) SELECT * FROM shipment_contents",
-        props: [start, stop, Facility.special_ids.customer_ship],
-      }, {
         key: "orders_by_day",
         query: "SELECT EXTRACT(EPOCH FROM CAST(to_timestamp(requested) AT TIME ZONE 'EST' AS DATE)) AS date, sum(cast(payments#>>'{0, price}' as float)) AS revenue, count(1) AS count FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3 GROUP BY 1 ORDER BY 1;",
         props: [start, stop, Facility.special_ids.customer_ship],
@@ -357,9 +353,6 @@ class DashboardMetrics extends React.Component {
         <script src="https://code.highcharts.com/modules/series-label.js"></script>
         <script src="https://code.highcharts.com/modules/exporting.js"></script>
 
-        <a className="export cta" href={"data:text/csv;charset=utf-8,"+encodeURIComponent(this.exportOrdersCSV())} download="orders.csv">
-          download orders
-        </a>
         <div id="time_container"></div>
 
         <a className="export cta" href={"data:text/csv;charset=utf-8,"+encodeURIComponent(this.exportComponentUseCSV())} download="component_use.csv">

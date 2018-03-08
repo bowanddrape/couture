@@ -92,6 +92,9 @@ class DashboardHome extends React.Component {
           <a className="button" href={`/dashboard/metrics?start=${this.state.search_params.start}&stop=${this.state.search_params.stop}`}>Metrics</a>
           <a className="button" href={`/dashboard/promos?start=${this.state.search_params.start}&stop=${this.state.search_params.stop}`}>Promos</a>
         </div>
+        <div style={{display:"flex"}}>
+          <a className="button" href={`/dashboard/export_orders?start=${this.state.search_params.start}&stop=${this.state.search_params.stop}`}>Export Orders</a>
+        </div>
         {metrics}
       </div>
     )

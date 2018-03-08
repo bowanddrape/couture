@@ -163,6 +163,7 @@ module.exports = {
     DashboardHome: require('./DashboardHome.jsx'),
     DashboardMetrics: require('./DashboardMetrics.jsx'),
     DashboardPromos: require('./DashboardPromos.jsx'),
+    ExportOrders: require('./ExportOrders.jsx'),
     Announcement: require('./Announcement.jsx'),
     AnnouncementEdit: require('./AnnouncementEdit.jsx'),
     StockistList: require('./StockistList.jsx'),

@@ -7,6 +7,7 @@ const async = require('async');
 const DashboardHome = require('../views/DashboardHome.jsx');
 const DashboardPromos = require('../views/DashboardPromos.jsx');
 const DashboardMetrics = require('../views/DashboardMetrics.jsx');
+const ExportOrders = require('../views/ExportOrders.jsx');
 
 class Dashboard {
 
@@ -18,6 +19,12 @@ class Dashboard {
     // user must be admin
     if (!req.user || req.user.roles.indexOf("bowanddrape")==-1)
       return Page.renderNotFound(req, res);
+
+    if (req.path_tokens[1] == "export_orders") {
+      return ExportOrders.preprocessProps(req.query, (err, props) => {
+        Page.render(req, res, ExportOrders, props);
+      });
+    }
 
     if (req.path_tokens[1] == "metrics") {
       return DashboardMetrics.preprocessProps(req.query, (err, props) => {
