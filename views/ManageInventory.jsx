@@ -115,7 +115,7 @@ class ManageInventory extends React.Component {
           factory_sku = `(${this.component_map[sku].props.factory_sku})`;
         if (this.component_map[sku].props.image)
           preview_img = <img src={this.component_map[sku].props.image}/>;
-        product_info = <span>{this.component_map[sku].props.name} <b>{parseFloat(this.component_map[sku].props.price).toFixed(2)}</b></span>;
+        product_info = <span>{this.component_map[sku].props.name} <b>{this.component_map[sku].props.price?parseFloat(this.component_map[sku].props.price).toFixed(2):""}</b></span>;
       }
 
       inventory_lines.push(

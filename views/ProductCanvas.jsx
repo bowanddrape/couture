@@ -65,7 +65,7 @@ class ProductCanvas extends React.Component {
       let selected = assembly[prevState.selected_component];
       if (!selected) {
         // if nothing is selected make a new selected component
-        let position = [0, 0, 0];
+        let position = this.props.product.props.default_component_position || [0, 0, 0];
         // if we have other stuff, make a new line below
         if (assembly.length) {
           // FIXME this assumes same side and a bunch of wrong shit

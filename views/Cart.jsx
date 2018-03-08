@@ -114,11 +114,11 @@ class Cart extends React.Component {
     });
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.shipping.street!=prevState.shipping.street) {
+  componentDidUpdate(prev_props, prev_state) {
+    if (!this.state.shipping || !prev_state.shipping || this.state.shipping.street!=prev_state.shipping.street) {
       this.updateNonProductItems();
     }
-    if (this.state.payment_method!=prevState.payment_method || !equal(this.state.items, prevState.items)) {
+    if (this.state.payment_method!=prev_state.payment_method || !equal(this.state.items, prev_state.items)) {
       // update paypal button
       payment_method_client.drawPaypal(this.props.payment_authorization, this.state, (err, payment) => {
         if (err) return Errors.emitError("payment", err);
@@ -150,7 +150,7 @@ class Cart extends React.Component {
       ItemUtils.updateShipping(items, this.state.shipping, promo, (err, items) => {
         if (err) return Errors.emit(null, err);
         // update account credit line
-        this.setState((prevState) => {
+        this.setState((prev_state) => {
           ItemUtils.applyCredits(this.state.user.credits, items);
           return ({items});
         });
@@ -177,21 +177,21 @@ class Cart extends React.Component {
 
   handleToggleGuestCheckout(e) {
     let value = e.target.getAttribute("value")=="true";
-    this.setState((prevState) => {
+    this.setState((prev_state) => {
       return {no_login_prompt: value};
     });
   }
 
   handleToggleSameBilling(e) {
     let value = e.target.getAttribute("value")=="true";
-    this.setState((prevState) => {
+    this.setState((prev_state) => {
       return {same_billing: value};
     });
   }
 
   handleTogglePaymentMethod(e) {
     let value = e.target.getAttribute("value");
-    this.setState((prevState) => {
+    this.setState((prev_state) => {
       return {payment_method: value};
     });
   }
