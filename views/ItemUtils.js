@@ -226,8 +226,8 @@ let updateShipping = (contents, address, promo, callback) => {
         shipping_info = "Free domestic shipping on orders of $75!";
       }
     } else {
-      if (shipping_cost < 25)
-        shipping_cost = 25;
+      if (shipping_cost < 15)
+        shipping_cost = 15;
     } // if (domestic)
     contents.push({
       props: {
