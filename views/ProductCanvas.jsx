@@ -279,7 +279,7 @@ class ProductCanvas extends React.Component {
       let design_area = this.props.product.props.design_area&&this.props.product.props.design_area.width ? this.props.product.props.design_area : {
         top: this.props.product.props.imageheight/2 - (this.props.product.props.imageheight * 0.2),
         left: -this.props.product.props.imagewidth/2,
-        width: this.props.product.props.imagewidth*5/9,
+        width: this.props.product.props.imagewidth*1/3,
         height: this.props.product.props.imageheight*3/4,
         gravity: [0,this.props.product.props.imageheight/4],
       };
@@ -288,9 +288,10 @@ class ProductCanvas extends React.Component {
 
       // TODO reorder component map to match current positions
 
-      // TODO go through and break up phrases that are too long
-      if (false && reflow) {
-        components.forEach((component, index) => {
+      // go through and break up phrases that are too long
+      if (reflow) {
+        // break a component phrase into 2
+        let breakComponent = (component) => {
           let total_width = 0;
           component.assembly.forEach((assembly_component) => {
             if (assembly_component.props)
@@ -298,25 +299,35 @@ class ProductCanvas extends React.Component {
           });
           if (total_width<=design_area.width) return;
           // try to find a breakpoint
+          let spaces = component.assembly.map((assembly) => {
+            let assembly_component_toks = assembly.sku.split('_');
+            let is_space = assembly_component_toks[assembly_component_toks.length-1]==" ";
+            return is_space;
+          });
+          let breakpoint = 0;
+          let halfpoint = Math.round(component.assembly.length/2);
           for (let i=0; i<component.assembly.length-1; i++) {
-            let assembly_component_toks = component.assembly[i].sku.split('_');
-            let is_space = assembly_component_toks[assembly_component_toks.length-1]=="space";
-
-            if (
-              is_space ||
-              (i>0 && assembly_component_toks[0]!=component.assembly[i-1].sku.split('_')[0])
-            ) {
-              // add a new component line with what we cut off
-              let new_assembly = is_space ? component.assembly.slice(i+1) : component.assembly.slice(i);
-              assembly.splice(assembly.indexOf(component)+1, 0, {
-                assembly: new_assembly,
-                props: JSON.parse(JSON.stringify(component.props)),
-              });
-              // remove the rest of this line
-              component.assembly = component.assembly.slice(0,i);
-              selected_component += 1;
-            }
+            if (spaces[i] && Math.abs(i-halfpoint)<Math.abs(breakpoint-halfpoint))
+              breakpoint = i;
           }
+          breakpoint = breakpoint || halfpoint;
+
+          // add a new component line with what we cut off
+          let new_assembly = spaces[breakpoint] ? component.assembly.slice(breakpoint+1) : component.assembly.slice(breakpoint);
+          let new_component = {
+            assembly: new_assembly,
+            props: JSON.parse(JSON.stringify(component.props)),
+          };
+          assembly.splice(assembly.indexOf(component)+1, 0, new_component);
+          // remove the rest of this line
+          component.assembly = component.assembly.slice(0,breakpoint);
+          selected_component = -1;
+          breakComponent(component);
+          breakComponent(new_component);
+        };
+
+        components.forEach((component, index) => {
+          breakComponent(component);
         });
         // update the array of components we're working on
         components = getComponentsOfInterest(assembly);
@@ -342,11 +353,8 @@ class ProductCanvas extends React.Component {
         component.props.position = component.props.position || [0,0,0];
         // center
         component.props.position[0] = 0;
-        // for now, only center horizontally
-        if (false) {
-          component.props.position[1] = line_position - component.max_height/2;
-          line_position -= component.max_height + line_spacing;
-        }
+        component.props.position[1] = line_position - component.max_height/2;
+        line_position -= component.max_height + line_spacing;
       });
       return {assembly, selected_component};
     });
