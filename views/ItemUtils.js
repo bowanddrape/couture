@@ -210,6 +210,7 @@ let updateShipping = (contents, address, promo, callback) => {
       shipping_cost = 7;
     // domestic orders may conditionally get free shipping
     let domestic = (address.country.toLowerCase().trim()=="usa" || address.country.toLowerCase().trim()=="united states");
+    let guam = (address.country.toLowerCase().trim()=="guam");
     if (domestic) {
       // apply free shipping promos
       if (promo && promo.props && promo.props.free_ship) {
@@ -225,9 +226,12 @@ let updateShipping = (contents, address, promo, callback) => {
         shipping_cost = 0;
         shipping_info = "Free domestic shipping on orders of $75!";
       }
-    } else {
+    } else if (guam) {
       if (shipping_cost < 15)
         shipping_cost = 15;
+    } else {
+      if (shipping_cost < 25)
+        shipping_cost = 25;
     } // if (domestic)
     contents.push({
       props: {
