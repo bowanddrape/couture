@@ -71,6 +71,7 @@ class Inventory extends SQLTable {
       }
 
       Inventory.get(req.path_tokens[1], (err, inventory) => {
+        inventory = inventory || {};
         Component.getAll({}, (err, components) => {
           Page.render(req, res, ManageInventory, {
             inventory:inventory.inventory,
