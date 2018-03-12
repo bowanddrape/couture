@@ -1520,6 +1520,11 @@ component_edit {
   display: flex;
   flex-wrap: wrap;
 }
+component_edit .note {
+  text-align: center;
+  width: 100%;
+  background-color: #eaeaea;
+}
 component_edit div {
   margin: 20px 5px;
   height: 23px;
@@ -1532,6 +1537,9 @@ component_edit div label {
   border-radius: 15px 0 0 15px;
   padding-left: 10px;
   box-sizing: border-box;
+}
+component_edit div img {
+  max-height: 22px;
 }
 component_edit textarea {
   position: relative;
@@ -1552,6 +1560,9 @@ component_edit input[type="text"][name="sku"] {
 }
 component_edit input[type="text"][name="props_name"] {
   width: 150px;
+}
+component_edit button {
+  max-width: 90%;
 }
 signup {
   text-align: center;

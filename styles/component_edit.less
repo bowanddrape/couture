@@ -4,6 +4,11 @@
 component_edit {
   display: flex;
   flex-wrap: wrap;
+  .note {
+    text-align: center;
+    width: 100%;
+    background-color: @color_support_0;
+  }
   div {
     margin: 20px 5px;
     height: 23px;
@@ -15,6 +20,9 @@ component_edit {
       border-radius: 15px 0 0 15px;
       padding-left: 10px;
       box-sizing: border-box;
+    }
+    img {
+      max-height: 22px;
     }
   }
   textarea {
@@ -36,5 +44,8 @@ component_edit {
   }
   input[type="text"][name="props_name"] {
     width: 150px;
+  }
+  button {
+    max-width: 90%;
   }
 }

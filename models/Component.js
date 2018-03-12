@@ -3,9 +3,9 @@ const async = require('async');
 const JSONAPI = require('./JSONAPI');
 const Page = require('./Page');
 
-const ComponentsEdit = require('../views/ComponentsEdit.jsx');
+const ComponentEdit = require('../views/ComponentEdit.jsx');
 
-const inherited_props = ['name', 'image', 'price', 'imagewidth', 'imageheight', 'design_area', 'weight', 'cameras', "details", "preview_swatch", "default_component_position"];
+const inherited_props = ['name', 'image', 'price', 'imagewidth', 'imageheight', 'design_area', 'weight', 'cameras', "details", "preview_swatch", "default_component_position", 'cost'];
 
 /***
 This is a bit weird and super ad-hoc...
@@ -147,7 +147,10 @@ class Component extends JSONAPI {
 
   // extends JSONAPI
   handleHTTPPage(req, res, next) {
-    Page.render(req, res, ComponentsEdit, {});
+    Component.get(req.path_tokens[1], (err, component) => {
+      component = component || {sku: req.path_tokens[1]};
+      Page.render(req, res, ComponentEdit, component);
+    });
   }
 
   // extends JSONAPI

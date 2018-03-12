@@ -72,6 +72,8 @@ class ComponentEdit extends React.Component {
       {name:"sku",type:"readonly"},
       {name:"props_name",type:"text"},
       {name:"props_price",type:"text"},
+      {name:"props_cost",type:"text"},
+      {name:"props_weight", type:"text"},
       {name:"props_imagewidth", type:"text"},
       {name:"props_imageheight", type:"text"},
       {name:"props_details", type:"textarea"},
@@ -80,7 +82,9 @@ class ComponentEdit extends React.Component {
       // use underscores to navigate child fields
       let name_toks = spec.name.split('_');
       let value = this.state[name_toks[0]] || "";
-      let placeholder = this.props.inherits[name_toks[0]] || "";
+      let placeholder = "";
+      if (this.props.inherits)
+        placeholder = this.props.inherits[name_toks[0]] || "";
       for (let i=1; i<name_toks.length; i++ ) {
         if (value)
           value = value[name_toks[i]] || "";
@@ -108,6 +112,7 @@ class ComponentEdit extends React.Component {
         return fields.push(<div key={fields.length}>
           <label>{spec.name}({value?"set":"inherited"})</label>
           <input type="file" onChange={this.handleFileChange.bind(this)} placeholder={placeholder} name={spec.name}/>
+          {value?<img src={value}/>:null}
         </div>);
       }
     });
@@ -115,6 +120,7 @@ class ComponentEdit extends React.Component {
 
     return (
       <component_edit>
+        <div className="note">currency in (USD), distances in (meters), weights in (grams)</div>
         <Errors />
         {fields}
         <button onClick={this.handleSave.bind(this)}>Save</button>

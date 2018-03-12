@@ -148,7 +148,7 @@ module.exports = {
     PageList: require('./PageList.jsx'),
     PageEdit: require('./PageEdit.jsx'),
     Items: require('./Items.jsx'),
-    ComponentsEdit: require('./ComponentsEdit.jsx'),
+    ComponentEdit: require('./ComponentEdit.jsx'),
     Gallery: require('./Gallery.jsx'),
     HeroProduct: require('./HeroProduct.jsx'),
     Signup: require('./Signup.jsx'),
