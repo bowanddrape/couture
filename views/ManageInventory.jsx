@@ -15,8 +15,13 @@ class ManageInventory extends React.Component {
     super(props);
     // make inventory entries an object instead of just a count
     let inventory = {};
-    for (let sku in this.props.inventory)
+    for (let sku in this.props.inventory) {
       inventory[sku] = {quantity:this.props.inventory[sku]};
+      let usage = this.props.usage[sku] || 1;
+      usage = usage/this.props.usage_period;
+      inventory[sku].usage = usage;
+      inventory[sku].oos_days = inventory[sku].quantity/usage;
+    }
     this.state = {
       inventory,
       autocomplete_items: [],
@@ -88,17 +93,25 @@ class ManageInventory extends React.Component {
     let inventory_lines = [];
     // sort applique skus to bottom
     Object.keys(this.state.inventory).sort((a, b) => {
-      return this.state.inventory[a].quantity - this.state.inventory[b].quantity;
+      return this.state.inventory[a].oos_days - this.state.inventory[b].oos_days;
       if (/(letter_)|(emoji_)|(premade_)/.test(a) && !/(letter_)|(emoji_)|(premade_)/.test(b))
         return 1;
       if (!/(letter_)|(emoji_)|(premade_)/.test(a) && /(letter_)|(emoji_)|(premade_)/.test(b))
         return -1;
       return a.localeCompare(b);
     }).forEach((sku) => {
+      let inventory = this.state.inventory[sku];
       // ignore embroidery letters
       if (/letter_embroidery/.test(sku)) return;
-      let inventory = this.state.inventory[sku];
-      let count = (<div className="count">
+      // calculate expected outage date
+      let usage = this.props.usage[sku] || 1;
+      usage = usage/this.props.usage_period;
+      inventory.usage = usage;
+      inventory.oos_days = inventory.quantity/usage;
+
+      let count = (<div className={`count ${inventory.oos_days<12?"low":""}`}>
+        <span className="rate">{((this.props.usage[sku]||0)/this.props.usage_period).toFixed(2)}/day</span>
+        <span className="weeks">{Math.round(inventory.oos_days/7)} weeks</span>
         <span className="number">{inventory.quantity}</span>
         <button onClick={this.handleToggleAdjust.bind(this, sku)}>adjust</button>
       </div>);

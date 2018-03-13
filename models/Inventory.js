@@ -70,17 +70,25 @@ class Inventory extends SQLTable {
         return Page.renderNotFound(req, res);
       }
 
+      // get inventory
       Inventory.get(req.path_tokens[1], (err, inventory) => {
         inventory = inventory || {};
+        // get component info
         Component.getAll({}, (err, components) => {
-          Page.render(req, res, ManageInventory, {
-            inventory:inventory.inventory,
-            facility,
-            components
-          });
-        });
-      });
-    });
+          let usage_period = 24;
+          // get historical usage
+          SQLTable.sqlQuery(null, "SELECT assembly_extract_skus(jsonb_agg(contents)) AS skus FROM shipments WHERE requested>$1 AND requested<$2 AND from_id=$3", [Math.floor(new Date().getTime()/1000-usage_period*86400), Math.floor(new Date().getTime()/1000), req.path_tokens[1]], (err, usage) => {
+            Page.render(req, res, ManageInventory, {
+              inventory:inventory.inventory,
+              usage:usage.rows[0].skus,
+              usage_period,
+              facility,
+              components
+            }); // Page.render
+          }); // sqlQuery
+        }); // Component.getAll
+      }); // Inventory.get
+    }); // Facility.get
   }
 }
 

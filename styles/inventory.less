@@ -12,8 +12,17 @@
       max-height: 60px;
     }
     .count {
-      width: 320px;
+      width: 450px;
       text-align: right;
+      .rate, .weeks {
+        position: relative;
+        display: inline-block;
+        top: 1px;
+        margin-right: 20px;
+      }
+      &.low .weeks {
+        color: @color_error;
+      }
       .number {
         position: relative;
         display: inline-block;
