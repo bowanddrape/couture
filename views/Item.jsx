@@ -320,12 +320,12 @@ class Item extends React.Component {
             <div className="name">{this.props.props.name}</div>
           </a>
           {info}
-          {this.props.onRemove?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
+          {this.props.onUpdateQuantity?<button className="remove" onClick={this.handleRemovePromptConfirm.bind(this)} onBlur={this.handleRemoveBlur}>Remove</button>:null}
 
           {assembly_phrase?<div className="assembly_phrase">{assembly_phrase}</div>:null}
           {assembly}
           {this.props.sku ?
-            <Price price={this.props.props.price} quantity={quantity} />
+            <Price price={this.props.props.price} quantity={quantity} quantity_editable={this.props.is_cart} onUpdateQuantity={this.props.onUpdateQuantity}/>
             : null
           }
           <Price total={true} price={this.props.props.price} quantity={quantity} />
@@ -338,7 +338,7 @@ class Item extends React.Component {
     event.stopPropagation();
     if (event.target.innerHTML=="Are you sure?") {
       this.handleRemoveBlur(event);
-      return this.props.onRemove();
+      return this.props.onUpdateQuantity(0);
     }
     event.target.classList.add("confirm");
     event.target.innerHTML = "Are you sure?";

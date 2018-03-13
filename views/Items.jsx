@@ -91,24 +91,26 @@ class Items extends React.Component {
     }
 
     for (let i=0; i<this.state.contents.length; i++) {
-      let remove = null;
+      let updateQuantity = null;
       // attach quantity edit buttons
       if (this.props.is_cart && typeof(BowAndDrape)!="undefined" && BowAndDrape.cart_menu) {
         // remove button
         if (this.state.contents[i].sku)
-          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, i);
+          updateQuantity = BowAndDrape.cart_menu.updateQuantity.bind(BowAndDrape.cart_menu, i);
         if (this.state.contents[i].props && new RegExp("^promo:", "i").test(this.state.contents[i].props.name)) {
           has_promo = true;
-          remove = BowAndDrape.cart_menu.remove.bind(BowAndDrape.cart_menu, i);
+          updateQuantity = BowAndDrape.cart_menu.updateQuantity.bind(BowAndDrape.cart_menu, i);
         }
       }
       // if has a base sku or is a legacy imported item
       if (this.state.contents[i].sku || this.state.contents[i].prerender_key) {
         line_items.push(
           <Item
+            is_cart={this.props.is_cart}
             style={style}
             key={`${this.state.contents[i].sku}_${line_items.length}`}
-            onRemove={remove}
+            onUpdateQuantity={updateQuantity}
+            quantity={this.state.contents[i].quantity}
             fulfillment={this.props.fulfillment}
             garment_id={this.props.fulfillment_id?(this.props.fulfillment_id+"-"+(line_items.length+1)):null}
             shipment_id={this.props.shipment_id}
@@ -122,7 +124,7 @@ class Items extends React.Component {
         let key = summary_items.length;
         if (this.state.contents[i].props && this.state.contents[i].props.name)
           key = this.state.contents[i].props.name;
-        summary_items.push(<Item style={style_summary} key={key} {...this.state.contents[i]} onRemove={remove} is_email={this.props.is_email}/>);
+        summary_items.push(<Item style={style_summary} key={key} {...this.state.contents[i]} onRemove={updateQuantity} is_email={this.props.is_email}/>);
       }
     }
 

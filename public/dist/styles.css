@@ -645,6 +645,18 @@ comments message {
   display: inline-block;
   margin-left: 20px;
 }
+.items .item .price .edit_quantity {
+  margin-left: 10px;
+}
+.items .item .price .edit_quantity input[type="text"] {
+  width: 50px;
+  height: 39px;
+  min-width: auto;
+  min-height: auto;
+}
+.items .item .price .edit_quantity button {
+  top: -2px;
+}
 .items .item.fulfillment .garment_id {
   font-size: 25px;
   font-weight: bold;
@@ -757,6 +769,11 @@ comments message {
 .summary_items.fulfillment,
 .summary_items.packing_slip {
   display: none;
+}
+.item button {
+  width: auto;
+  padding: 0 10px;
+  margin: 6px;
 }
 .remove {
   text-decoration: underline;

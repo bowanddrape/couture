@@ -53,9 +53,13 @@ class CartMenu extends React.Component {
     */
   }
 
-  remove(index) {
+  updateQuantity(index, quantity) {
     let contents = this.state.contents;
-    contents.splice(index, 1);
+    if (quantity==0) {
+      contents.splice(index, 1);
+      this.update(contents);
+    }
+    contents[index].quantity = quantity;
     this.update(contents);
   }
 
