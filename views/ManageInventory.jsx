@@ -102,7 +102,7 @@ class ManageInventory extends React.Component {
     }).forEach((sku) => {
       let inventory = this.state.inventory[sku];
       // ignore embroidery letters
-      if (/letter_embroidery/.test(sku)) return;
+      if (/letter_embroidery/.test(sku) || /letter_airbrush/.test(sku)) return;
       // calculate expected outage date
       let usage = this.props.usage[sku] || 1;
       usage = usage/this.props.usage_period;
@@ -125,6 +125,9 @@ class ManageInventory extends React.Component {
       let preview_img="";
       let product_info="";
       if (this.component_map[sku]) {
+        // ignore all components with options
+        if (this.component_map[sku].options && Object.keys(this.component_map[sku].options).length) return;
+
         if (this.component_map[sku].props.factory_sku)
           factory_sku = `(${this.component_map[sku].props.factory_sku})`;
         if (this.component_map[sku].props.image)
