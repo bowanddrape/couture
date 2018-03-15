@@ -10,6 +10,7 @@ const Log = require('./Log');
 const TaxCloud = require('./TaxCloud');
 const Facility = require('./Facility');
 const ShipProvider = require('./ShipProvider.js');
+const Signup = require('./Signup');
 
 //const payment_method = require('./PayStripe.js');
 const payment_method = require('./PayBraintree.js');
@@ -40,6 +41,9 @@ class Order {
     let payment_nonce = req.body.payment_nonce;
     let contents = new Item(req.body.contents);
     let address = new Address(req.body.address);
+
+    if (!Signup.isEmail(email))
+      return res.json({error: "Please enter an email address"});
 
     // TODO server-side order verification?
     // ensure tax and shipping at least
@@ -198,6 +202,11 @@ class Order {
               if (err) return console.log("Tax cloud error"+err);
             });
           });
+
+          // flag user has having made this purchase
+          let user = new User({email});
+          user.props.latest_purchase = Math.floor(new Date().getTime()/1000);
+          user.upsert(()=>{});
         }); // shipment.upsert()
       } // define handleCreateShipment()
 
