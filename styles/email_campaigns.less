@@ -1,0 +1,15 @@
+
+@import('./colors.less');
+
+.email_campaigns {
+  & > div {
+    border-bottom: solid @color_secondary 3px;
+    padding: 10px;
+    input[type="text"] {
+      width: 100%;
+    }
+    &:nth-child(2n) {
+      background-color: @color_support_0;
+    }
+  }
+}

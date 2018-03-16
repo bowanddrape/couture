@@ -14,7 +14,7 @@ class JSONAPI extends SQLTable {
       return next();
 
     if (!this.hasApiPermission(req, res))
-      return res.status(404).json({error:"Not Found"}).end();
+      return res.status(403).json({error:"Forbidden"}).end();
 
     // if not a json request, see if we handle that
     if (req.accepts('*/*') || !req.accepts('application/json'))

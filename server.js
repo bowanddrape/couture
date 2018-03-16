@@ -80,7 +80,7 @@ const VSS = require('./models/VSS.js');
 const Page = require('./models/Page.js');
 const Dashboard = require('./models/Dashboard.js');
 const Announcement = require('./models/Announcement.js');
-
+const EmailCampaign = require('./models/EmailCampaign.js');
 
 const LayoutMain = require('./views/LayoutMain');
 const BowAndDrape = require('./views/BowAndDrape.jsx');
@@ -169,6 +169,7 @@ app.use((req, res, next) => {new Shipment().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Component().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new PromoCode().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Announcement().handleHTTP(req, res, next);});
+app.use((req, res, next) => {new EmailCampaign().handleHTTP(req, res, next);});
 app.use((req, res, next) => {new Page().handleHTTP(req, res, next);});
 
 // handle pages

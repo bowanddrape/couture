@@ -2949,3 +2949,14 @@ form.toggle input[type="radio"]:checked + label {
 .inventory .inventory_line:nth-child(2n) {
   background-color: #eaeaea;
 }
+@import ('./colors.less');
+.email_campaigns > div {
+  border-bottom: solid #000 3px;
+  padding: 10px;
+}
+.email_campaigns > div input[type="text"] {
+  width: 100%;
+}
+.email_campaigns > div:nth-child(2n) {
+  background-color: #eaeaea;
+}

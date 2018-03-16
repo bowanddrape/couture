@@ -29,7 +29,7 @@ class ExportOrders extends React.Component {
     let data_sources = [
       {
         key: "orders",
-        query: "WITH shipment_contents AS (SELECT id, jsonb_array_elements(contents) AS content_line_item, from_id, to_id, requested, received, shipping_label_created, shipping_carrier_pickup, ship_by, delivery_promised, tracking_code, store_id, email, payments, address AS shipping_address, billing_address FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3 ORDER BY requested ASC) SELECT * FROM shipment_contents",
+        query: "WITH shipment_contents AS (SELECT id, jsonb_array_elements(contents) AS content_line_item, from_id, to_id, requested, received, shipping_label_created, shipping_carrier_pickup, ship_by, delivery_promised, tracking_code, store_id, email, payments, address AS shipping_address, billing_address, props#>>'{comments}' as comments FROM shipments WHERE requested>$1 AND requested<$2 AND to_id=$3 ORDER BY requested ASC) SELECT * FROM shipment_contents",
         props: [start, stop, Facility.special_ids.customer_ship],
       }
     ];
@@ -90,7 +90,7 @@ class ExportOrders extends React.Component {
   exportOrdersCSV() {
     if (!this.props.orders || !this.props.orders.length)
       return "";
-    let order_keys = ["requested", "received", "shipping_label_created", "shipping_carrier_pickup", "ship_by", "delivery_promised", "email", "shipping_address"];
+    let order_keys = ["requested", "received", "shipping_label_created", "shipping_carrier_pickup", "ship_by", "delivery_promised", "email", "shipping_address", "content_line_item", "comments"];
     let content_keys = ["name", "price"];
 
     return this.exportCSV(
@@ -113,7 +113,10 @@ class ExportOrders extends React.Component {
             let date = new Date(parseFloat(row[key])*1000);
             return data.push(`${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`);
           }
-          data.push(JSON.stringify(row[key]).replace(/,/g,"|").replace(/"/g,""));
+          if (row[key])
+            data.push(JSON.stringify(row[key]).replace(/,/g,"|").replace(/"/g,""));
+          else
+            data.push("");
         });
         return data;
       }
