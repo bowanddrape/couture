@@ -76,6 +76,7 @@ class ComponentEdit extends React.Component {
       {name:"props_weight", type:"text"},
       {name:"props_imagewidth", type:"text"},
       {name:"props_imageheight", type:"text"},
+      {name:"props_factorysku", type:"text"},
       {name:"props_details", type:"textarea"},
       {name:"props_image",type:"file"},
     ].forEach((spec) => {

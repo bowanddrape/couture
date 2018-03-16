@@ -121,15 +121,15 @@ class ManageInventory extends React.Component {
         </div>);
       }
 
-      let factory_sku="";
+      let factorysku="";
       let preview_img="";
       let product_info="";
       if (this.component_map[sku]) {
         // ignore all components with options
         if (this.component_map[sku].options && Object.keys(this.component_map[sku].options).length) return;
 
-        if (this.component_map[sku].props.factory_sku)
-          factory_sku = `(${this.component_map[sku].props.factory_sku})`;
+        if (this.component_map[sku].props.factorysku)
+          factorysku = `(${this.component_map[sku].props.factorysku})`;
         if (this.component_map[sku].props.image)
           preview_img = <img src={this.component_map[sku].props.image}/>;
         product_info = <span>{this.component_map[sku].props.name} <b>{this.component_map[sku].props.price?parseFloat(this.component_map[sku].props.price).toFixed(2):""}</b></span>;
@@ -139,7 +139,7 @@ class ManageInventory extends React.Component {
         <div key={sku} className="inventory_line">
           <div>
             <a href={`/component/${sku}`}><b>{sku}</b></a>:
-            {factory_sku}
+            {factorysku}
             {preview_img}
             {product_info}
           </div>
