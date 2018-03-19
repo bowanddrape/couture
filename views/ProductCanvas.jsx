@@ -260,6 +260,41 @@ class ProductCanvas extends React.Component {
     this.handleSelectComponent(-1);
   }
 
+  breakComponent(assembly, component) {
+    let total_width = 0;
+    component.assembly.forEach((assembly_component) => {
+      if (assembly_component.props)
+        total_width += parseFloat(assembly_component.props.imagewidth);
+    });
+    if (total_width<=design_area.width) return;
+    // try to find a breakpoint
+    let spaces = component.assembly.map((assembly) => {
+      let assembly_component_toks = assembly.sku.split('_');
+      let is_space = assembly_component_toks[assembly_component_toks.length-1]==" ";
+      return is_space;
+    });
+    let breakpoint = 0;
+    let halfpoint = Math.round(component.assembly.length/2);
+    for (let i=0; i<component.assembly.length-1; i++) {
+      if (spaces[i] && Math.abs(i-halfpoint)<Math.abs(breakpoint-halfpoint))
+        breakpoint = i;
+    }
+    breakpoint = breakpoint || halfpoint;
+
+    // add a new component line with what we cut off
+    let new_assembly = spaces[breakpoint] ? component.assembly.slice(breakpoint+1) : component.assembly.slice(breakpoint);
+    let new_component = {
+      assembly: new_assembly,
+      props: JSON.parse(JSON.stringify(component.props)),
+    };
+    assembly.splice(assembly.indexOf(component)+1, 0, new_component);
+    // remove the rest of this line
+    component.assembly = component.assembly.slice(0,breakpoint);
+    selected_component = -1;
+    this.breakComponent(assembly, component);
+    this.breakComponent(assembly, new_component);
+  };
+
   autoLayout(reflow=false) {
     let getComponentsOfInterest = (assembly) => {
       return assembly.filter((component) => {
@@ -291,43 +326,8 @@ class ProductCanvas extends React.Component {
       // go through and break up phrases that are too long
       if (reflow) {
         // break a component phrase into 2
-        let breakComponent = (component) => {
-          let total_width = 0;
-          component.assembly.forEach((assembly_component) => {
-            if (assembly_component.props)
-              total_width += parseFloat(assembly_component.props.imagewidth);
-          });
-          if (total_width<=design_area.width) return;
-          // try to find a breakpoint
-          let spaces = component.assembly.map((assembly) => {
-            let assembly_component_toks = assembly.sku.split('_');
-            let is_space = assembly_component_toks[assembly_component_toks.length-1]==" ";
-            return is_space;
-          });
-          let breakpoint = 0;
-          let halfpoint = Math.round(component.assembly.length/2);
-          for (let i=0; i<component.assembly.length-1; i++) {
-            if (spaces[i] && Math.abs(i-halfpoint)<Math.abs(breakpoint-halfpoint))
-              breakpoint = i;
-          }
-          breakpoint = breakpoint || halfpoint;
-
-          // add a new component line with what we cut off
-          let new_assembly = spaces[breakpoint] ? component.assembly.slice(breakpoint+1) : component.assembly.slice(breakpoint);
-          let new_component = {
-            assembly: new_assembly,
-            props: JSON.parse(JSON.stringify(component.props)),
-          };
-          assembly.splice(assembly.indexOf(component)+1, 0, new_component);
-          // remove the rest of this line
-          component.assembly = component.assembly.slice(0,breakpoint);
-          selected_component = -1;
-          breakComponent(component);
-          breakComponent(new_component);
-        };
-
         components.forEach((component, index) => {
-          breakComponent(component);
+          this.breakComponent(assembly, component);
         });
         // update the array of components we're working on
         components = getComponentsOfInterest(assembly);

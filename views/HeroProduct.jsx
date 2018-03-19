@@ -116,8 +116,8 @@ class HeroProduct extends React.Component {
 
   render() {
     let option_wrapper = null;
+    let options = [];
     if (this.props.product.options) {
-      let options = [];
       Object.keys(this.props.product.options).forEach((option, index) => {
         let className = "option";
         if (option==this.state.selected_option)
@@ -141,7 +141,7 @@ class HeroProduct extends React.Component {
         <div className="media">
           <img src={this.props.image}/>
         </div>
-        <div className={`add_to_cart ${this.props.options&&this.props.options.length?"haz_options":""}`}>
+        <div className={`add_to_cart ${options.length?"haz_options":""}`}>
           {option_wrapper}
           <div className="productName">{this.props.name} <span className="productPrice">${this.props.price}</span></div>
           <BADButton className="primary addCart" onClick={this.handleAddToCart.bind(this)}>Add To Cart</BADButton>
