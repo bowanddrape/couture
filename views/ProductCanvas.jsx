@@ -44,6 +44,18 @@ class ProductCanvas extends React.Component {
     });
   }
 
+  getDesignArea() {
+    // TODO rectangular design areas for now
+    let design_area = this.props.product.props.design_area&&this.props.product.props.design_area.width ? this.props.product.props.design_area : {
+      top: this.props.product.props.imageheight/2 - (this.props.product.props.imageheight * 0.2),
+      left: -this.props.product.props.imagewidth/2,
+      width: this.props.product.props.imagewidth*1/3,
+      height: this.props.product.props.imageheight*3/4,
+      gravity: [0,this.props.product.props.imageheight/4],
+    };
+    return design_area;
+  }
+
   // get a text version of a component
   getComponentText() {
     let ret = "";
@@ -112,6 +124,11 @@ class ProductCanvas extends React.Component {
       }).filter((component) => {
         return component;
       });
+      // auto line break
+      let initial_assembly_length = assembly.length;
+      this.breakComponent(assembly, selected);
+      if (assembly.length>initial_assembly_length)
+        selected_component += 1;
       return {assembly, selected_component};
     });
   }
@@ -261,6 +278,7 @@ class ProductCanvas extends React.Component {
   }
 
   breakComponent(assembly, component) {
+    let design_area = this.getDesignArea();
     let total_width = 0;
     component.assembly.forEach((assembly_component) => {
       if (assembly_component.props)
@@ -287,10 +305,11 @@ class ProductCanvas extends React.Component {
       assembly: new_assembly,
       props: JSON.parse(JSON.stringify(component.props)),
     };
+    // new component goes on new line
+    new_component.props.position[1] -= parseFloat(component.assembly[component.assembly.length-1].props.imageheight)*1.3;
     assembly.splice(assembly.indexOf(component)+1, 0, new_component);
     // remove the rest of this line
     component.assembly = component.assembly.slice(0,breakpoint);
-    selected_component = -1;
     this.breakComponent(assembly, component);
     this.breakComponent(assembly, new_component);
   };
@@ -310,14 +329,7 @@ class ProductCanvas extends React.Component {
     this.setState((prevState, prevProps) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected_component = prevState.selected_component;
-      // TODO rectangular design areas for now
-      let design_area = this.props.product.props.design_area&&this.props.product.props.design_area.width ? this.props.product.props.design_area : {
-        top: this.props.product.props.imageheight/2 - (this.props.product.props.imageheight * 0.2),
-        left: -this.props.product.props.imagewidth/2,
-        width: this.props.product.props.imagewidth*1/3,
-        height: this.props.product.props.imageheight*3/4,
-        gravity: [0,this.props.product.props.imageheight/4],
-      };
+      let design_area = this.getDesignArea();
       // only work on visible components
       let components = getComponentsOfInterest(assembly);
 

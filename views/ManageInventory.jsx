@@ -93,7 +93,7 @@ class ManageInventory extends React.Component {
     let inventory_lines = [];
     // sort applique skus to bottom
     Object.keys(this.state.inventory).sort((a, b) => {
-      return this.state.inventory[a].oos_days - this.state.inventory[b].oos_days;
+//      return this.state.inventory[a].oos_days - this.state.inventory[b].oos_days;
       if (/(letter_)|(emoji_)|(premade_)/.test(a) && !/(letter_)|(emoji_)|(premade_)/.test(b))
         return 1;
       if (!/(letter_)|(emoji_)|(premade_)/.test(a) && /(letter_)|(emoji_)|(premade_)/.test(b))
