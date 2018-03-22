@@ -46,14 +46,17 @@ class ProductCanvas extends React.Component {
 
   getDesignArea() {
     // TODO rectangular design areas for now
-    let design_area = this.props.product.props.design_area&&this.props.product.props.design_area.width ? this.props.product.props.design_area : {
+    let designarea = this.props.product.props.designarea || {
       top: this.props.product.props.imageheight/2 - (this.props.product.props.imageheight * 0.2),
-      left: -this.props.product.props.imagewidth/2,
-      width: this.props.product.props.imagewidth*1/3,
+      left: -this.props.product.props.imagewidth/6,
+      width: this.props.product.props.imagewidth/3,
       height: this.props.product.props.imageheight*3/4,
       gravity: [0,this.props.product.props.imageheight/4],
     };
-    return design_area;
+    designarea.gravity = designarea.gravity || [
+      0, 0
+    ]
+    return designarea;
   }
 
   // get a text version of a component
@@ -227,7 +230,13 @@ class ProductCanvas extends React.Component {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected = assembly[index];
       if (selected) {
-        selected.props.position = this.customizer.screenToWorld(client_pos);
+        let position = this.customizer.screenToWorld(client_pos);
+        if (position) {
+          let designarea = this.getDesignArea();
+          position[0] = Math.min(Math.max(position[0], designarea.left), designarea.left+designarea.width);
+          position[1] = Math.max(Math.min(position[1], designarea.top), designarea.top-designarea.height);
+          selected.props.position = position;
+        }
       }
       return {assembly, selected_component: index};
     });
@@ -278,13 +287,13 @@ class ProductCanvas extends React.Component {
   }
 
   breakComponent(assembly, component) {
-    let design_area = this.getDesignArea();
+    let designarea = this.getDesignArea();
     let total_width = 0;
     component.assembly.forEach((assembly_component) => {
       if (assembly_component.props)
         total_width += parseFloat(assembly_component.props.imagewidth);
     });
-    if (total_width<=design_area.width) return;
+    if (total_width<=designarea.width) return;
     // try to find a breakpoint
     let spaces = component.assembly.map((assembly) => {
       let assembly_component_toks = assembly.sku.split('_');
@@ -329,7 +338,7 @@ class ProductCanvas extends React.Component {
     this.setState((prevState, prevProps) => {
       let assembly = JSON.parse(JSON.stringify(prevState.assembly));
       let selected_component = prevState.selected_component;
-      let design_area = this.getDesignArea();
+      let designarea = this.getDesignArea();
       // only work on visible components
       let components = getComponentsOfInterest(assembly);
 
@@ -359,8 +368,8 @@ class ProductCanvas extends React.Component {
       });
       if (!line_count) return {};
       // line spacing is as large as possible between 0 and mean_lineheight/2
-      let line_spacing = Math.max(Math.min((design_area.height-total_height)/(line_count-1), total_height/line_count/2), 0);
-      let line_position = Math.min(design_area.top, design_area.gravity[1] + (total_height+line_spacing*(line_count-1))/2);
+      let line_spacing = Math.max(Math.min((designarea.height-total_height)/(line_count-1), total_height/line_count/2), 0);
+      let line_position = Math.min(designarea.top, designarea.gravity[1] + (total_height+line_spacing*(line_count-1))/2);
       components.forEach((component, index) => {
         component.props.position = component.props.position || [0,0,0];
         // center

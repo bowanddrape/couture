@@ -5,7 +5,7 @@ const Page = require('./Page');
 
 const ComponentEdit = require('../views/ComponentEdit.jsx');
 
-const inherited_props = ['name', 'image', 'price', 'imagewidth', 'imageheight', 'design_area', 'weight', 'cameras', "details", "preview_swatch", "default_component_position", 'cost'];
+const inherited_props = ["name", "image", "price", "imagewidth", "imageheight", "designarea", "weight", "cameras", "details", "preview_swatch", "default_component_position", "cost"];
 
 /***
 This is a bit weird and super ad-hoc...

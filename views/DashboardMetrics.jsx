@@ -347,6 +347,7 @@ class DashboardMetrics extends React.Component {
           <div>Total Revenue: {total_revenue.toFixed(2)}</div>
           <div>Total Num Orders: {total_orders}</div>
           <div>Total Num Orders(new user): {total_newuser_orders}</div>
+          <div>Repeat Order%: {((total_orders-total_newuser_orders)/total_orders*100).toFixed(2)}</div>
         </div>
 
         <script src="https://code.highcharts.com/highcharts.js"></script>
