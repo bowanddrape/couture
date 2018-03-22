@@ -60,6 +60,7 @@ class EmailCampaigns extends React.Component {
             onChange={this.handleFileChange.bind(this, index)}
           />
           <BADButton onClick={this.handleSave.bind(this, index)}>Save</BADButton>
+          <a href={`/emailcampaign/${campaign.id}/export_emails`} download="emails.csv">export emails</a>
         </div>
       );
     });

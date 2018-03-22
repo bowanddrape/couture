@@ -2973,6 +2973,7 @@ form.toggle input[type="radio"]:checked + label {
   padding: 10px;
 }
 .email_campaigns > div input[type="text"] {
+  box-sizing: border-box;
   width: 100%;
 }
 .email_campaigns > div:nth-child(2n) {

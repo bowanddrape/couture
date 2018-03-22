@@ -62,7 +62,7 @@ let upload = multer({
     }
   }),
   limits: {
-    fileSize: 1000000
+    fileSize: 500000
   }
 })
 
