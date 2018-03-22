@@ -110,7 +110,7 @@ class ManageInventory extends React.Component {
       inventory.oos_days = inventory.quantity/usage;
 
       let count = (<div className={`count ${inventory.oos_days<12?"low":""}`}>
-        <span className="rate">{((this.props.usage[sku]||0)/this.props.usage_period).toFixed(2)}/day</span>
+        <span className="rate">{((this.props.usage[sku]||0)/this.props.usage_period*30.44).toFixed(2)}/month</span>
         <span className="weeks">{Math.round(inventory.oos_days/7)} weeks</span>
         <span className="number">{inventory.quantity}</span>
         <button onClick={this.handleToggleAdjust.bind(this, sku)}>adjust</button>

@@ -75,7 +75,7 @@ class Inventory extends SQLTable {
         inventory = inventory || {};
         // get component info
         Component.getAll({}, (err, components) => {
-          let usage_period = 24;
+          let usage_period = 70;
           // get historical usage
           SQLTable.sqlQuery(null, "SELECT assembly_extract_skus(jsonb_agg(contents)) AS skus FROM shipments WHERE requested>$1 AND requested<$2 AND from_id=$3", [Math.floor(new Date().getTime()/1000-usage_period*86400), Math.floor(new Date().getTime()/1000), req.path_tokens[1]], (err, usage) => {
             Page.render(req, res, ManageInventory, {
