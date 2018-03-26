@@ -107,7 +107,7 @@ class ProductComponentPicker extends React.Component {
           if (compatible_component.options[j].props.imagewidth>compatible_component.options[j].props.imageheight)
             backgroundSize = `100% ${compatible_component.options[j].props.imageheight/compatible_component.options[j].props.imagewidth*100}%`;
           tab_components.push(
-            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={() => {this.handleAddComponent(compatible_component.options[j]);}}/>
+            <div key={i+'_'+j} style={{backgroundImage,backgroundSize}} onClick={() => {this.handleSelectComponent(-1); this.handleAddComponent(compatible_component.options[j]);}}/>
           );
         }
         components.push(

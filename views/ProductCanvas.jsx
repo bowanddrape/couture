@@ -129,7 +129,7 @@ class ProductCanvas extends React.Component {
       });
       // auto line break
       let initial_assembly_length = assembly.length;
-      this.breakComponent(assembly, selected);
+      //this.breakComponent(assembly, selected);
       if (assembly.length>initial_assembly_length)
         selected_component += 1;
       return {assembly, selected_component};
