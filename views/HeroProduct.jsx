@@ -18,13 +18,19 @@ class HeroProduct extends React.Component {
     if (this.props.product.options) {
       this.state.selected_option = Object.keys(this.props.product.options)[0];
     }
+
+    this.gtag_props = {
+      ecomm_pagetype: "product",
+    };
+    if (this.props.c)
+      this.gtag_props.ecomm_prodid = this.props.c;
   }
 
   static preprocessProps(options, callback) {
     if (options.customizer) {
       let query_params = querystring.parse(options.customizer.split('?')[1]);
-
-      return ProductList.preprocessProps({store:options.store, c:query_params.c}, (err, product_list) => {
+      options.c = query_params.c;
+      return ProductList.preprocessProps({store:options.store, c:options.c}, (err, product_list) => {
         if (err)
           return callback("HeroProduct::customization "+err.toString());
         product_list = new ProductList(product_list);
@@ -99,7 +105,8 @@ class HeroProduct extends React.Component {
         price: product.props.price,
         quantity: 1,
       }
-      gtag('event', 'add_to_cart', {value: product.props.price, currency:'usd', items: [ga_item]});
+      let payload = Object.assign({value: product.props.price, currency:'usd', items: [ga_item]}, this.gtag_props);
+      gtag('event', 'add_to_cart', payload);
     } catch(err) {console.log(err)}
     // facebook track event
     try {
@@ -112,6 +119,34 @@ class HeroProduct extends React.Component {
     } catch(err) {console.log(err)}
 
     location.href = "/cart";
+  }
+
+  componentDidMount() {
+    let product = this.props.product;
+    if (product.options && typeof(product.options[this.state.selected_option])!="undefined")
+      product = product.options[this.state.selected_option];
+    product.quantity = 1;
+
+    // facebook ViewContent event
+    try {
+      fbq('track', 'ViewContent', {
+        value: parseFloat(product.props.price),
+        currency: "USD",
+        content_ids: product.sku,
+      });
+    } catch(err) {}
+    // google analytics event
+    try {
+      let ga_item = {
+        id: product.sku,
+        name: product.props.name || product.sku,
+        brand: "Bow & Drape",
+        price: product.props.price,
+        quantity: 1,
+      }
+      let payload = Object.assign({items: [ga_item]}, this.gtag_props);
+      gtag('event', 'view_item', payload);
+    } catch(err) {console.log(err)}
   }
 
   render() {

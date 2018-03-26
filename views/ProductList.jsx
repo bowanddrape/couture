@@ -33,6 +33,8 @@ class ProductList extends React.Component {
       selected_product: this.props.selected_product || [null],
       product_map: product_map,
     };
+
+    this.gtag_props = {};
   }
 
   static preprocessProps(options, callback) {
@@ -219,8 +221,10 @@ class ProductList extends React.Component {
     let selected_product = this.state.selected_product;
     selected_product[depth] = value;
     let product = this.state.product_map[this.state.selected_product[0]];
-    if (!product)
+    if (!product) {
+      this.gtag_props.ecomm_pagetype = "category";
       return this.setState({selected_product: [null]});
+    }
 
     // see which of the currently selected options are applicable
     for (let i=1; i<selected_product.length; i++) {
@@ -250,6 +254,13 @@ class ProductList extends React.Component {
     } catch(err) {}
     // google analytics event
     try {
+      this.gtag_props.ecomm_pagetype = "product";
+      let toks = location.href.split('?');
+      if (toks.length>1) {
+        let c = querystring.parse(toks.slice(1).join('?')).c;
+        if (c)
+          this.gtag_props.ecomm_prodid = c;
+      }
       let ga_item = {
         id: product.sku,
         name: product.props.name || product.sku,
@@ -257,7 +268,8 @@ class ProductList extends React.Component {
         price: product.props.price,
         quantity: 1,
       }
-      gtag('event', 'view_item', {items: [ga_item]});
+      let payload = Object.assign({items: [ga_item]}, this.gtag_props);
+      gtag('event', 'view_item', payload);
     } catch(err) {console.log(err)}
 
     // if the product changed
@@ -266,7 +278,7 @@ class ProductList extends React.Component {
       window.scroll(0, 0);
       // count as pageview for tracking purposes
       try {
-        gtag('event', 'page_view');
+        gtag('event', 'page_view', this.gtag_props);
       } catch (err) {console.log(err)}
       try {
         fbq('track', 'PageView');
@@ -325,6 +337,7 @@ class ProductList extends React.Component {
       query_params = querystring.parse(toks.slice(1).join('?'));
     }
     item.props.image = `/store/${this.props.store.id}/preview?c=${encodeURIComponent(query_params.c)}`;
+    this.gtag_props.ecomm_prodid = query_params.c;
 
     BowAndDrape.cart_menu.add(item);
 
@@ -342,7 +355,8 @@ class ProductList extends React.Component {
         price: product.props.price,
         quantity: 1,
       }
-      gtag('event', 'add_to_cart', {value: product.props.price, currency:'usd', items: [ga_item]});
+      let payload = Object.assign({value: product.props.price, currency:'usd', items: [ga_item]}, this.gtag_props);
+      gtag('event', 'add_to_cart', payload);
     } catch(err) {console.log(err)}
     // facebook track event
     try {
@@ -483,6 +497,8 @@ class ProductList extends React.Component {
         query_params.c = serialized;
         url += '?' + querystring.stringify(query_params);
         history.replaceState(history.state, "", url);
+        // update gtag product
+        this.gtag_props.ecomm_prodid = serialized;
       });
     }, 500);
   }
