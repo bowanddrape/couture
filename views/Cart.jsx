@@ -115,7 +115,7 @@ class Cart extends React.Component {
   }
 
   componentDidUpdate(prev_props, prev_state) {
-    if (!this.state.shipping || !prev_state.shipping || this.state.shipping.street!=prev_state.shipping.street) {
+    if (this.state.shipping && (!prev_state.shipping || this.state.shipping.street!=prev_state.shipping.street)) {
       this.updateNonProductItems();
     }
     if (this.state.payment_method!=prev_state.payment_method || !equal(this.state.items, prev_state.items)) {
