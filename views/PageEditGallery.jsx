@@ -78,7 +78,7 @@ class PageEditGallery extends React.Component {
                   this.handleUpdateFile(index, "image", event.target.files[0])
                 }} placeholder={item.image||""} name="image"/>
                 <div className="checkbox">has_audio<input type="checkbox" onChange={(event)=>{this.handleUpdateItem(index, "has_audio", event.target.checked)}} checked={!!item.has_audio}/></div>
-                <div><input type="text" name="image" onChange={(event)=>{this.handleUpdateItem(index, "image", event.target.value)}} value={item.image||""} disabled={true}/></div>
+                <div><input type="text" name="image" onChange={(event)=>{this.handleUpdateItem(index, "image", event.target.value)}} value={item.image||""}/></div>
               </div>
               <div><label>href</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "href", event.target.value)}} value={item.href||""}/></div>
               <div><label>width</label><input type="text" onChange={(event)=>{this.handleUpdateItem(index, "width", event.target.value)}} value={item.width||""} placeholder="90px"/></div>
