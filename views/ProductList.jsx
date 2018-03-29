@@ -184,15 +184,20 @@ class ProductList extends React.Component {
         }
         <div className="canvas_container">
           <product_options>
-            <span>Product<br></br>Options</span>
             {product_options}
           </product_options>
           <ProductCanvas ref="ProductCanvas" product={product} handleUpdateProduct={this.handleUpdateProduct.bind(this)} assembly={this.props.initial_assembly} compatible_component_map={this.props.compatible_component_map}/>
         </div>
         {this.props.edit ?
           null : <div className="add_to_cart">
-            <div className="productName bottomSwitch">{product.props.name} <span className="productPrice">${product.props.price}</span></div>
-            <BADButton className="primary addCart" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</BADButton>
+            <div className="product_name">{product.props.name} <span className="productPrice">${product.props.price}</span></div>
+            <product_options>
+              {product_options.length>1?<span>Product Options</span>:null}
+              {product_options}
+            </product_options>
+            <div>
+              <BADButton className="primary addCart" onClick={this.handleAddToCart.bind(this, product)}>Add To Cart</BADButton>
+            </div>
 
             {/* headliner labs */}
             <div id='hl-fbm-add_to_cart'></div>
@@ -206,13 +211,15 @@ class ProductList extends React.Component {
 
             </div>
         }
-        {product.props.details ?
-          <div className="product_details grid" dangerouslySetInnerHTML={{
-            __html:unescape(product.props.details)
-          }} /> :
-          null
-        }
-        <ClickForMore href={`/pdp/${product.sku.split('_').slice(0, 2).join('_')}?layout=basic`} />
+        <div className="product_details">
+          <div className="product_name">{product.props.name} <span className="productPrice">${product.props.price}</span></div>
+          {product.props.details ?
+              <div dangerouslySetInnerHTML={{
+              __html:unescape(product.props.details)
+              }} /> : null
+          }
+        </div>
+        {/*<ClickForMore href={`/pdp/${product.sku.split('_').slice(0, 2).join('_')}?layout=basic`} />*/}
       </customize>
     );
   }

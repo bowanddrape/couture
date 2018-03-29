@@ -47,21 +47,21 @@ class Switch extends React.Component {
       if (child.type!="option") continue;
       if (!child.props.children) continue;
       options.push(
-        <switch_option className={child.props.value==this.props.value?"selected":""} ref={index} key={index} {...child.props} onClick={this.handleClick.bind(this, child.props.value)}
+        <div className={child.props.value==this.props.value?"switch_option selected":"switch_option"} ref={index} key={index} {...child.props} onClick={this.handleClick.bind(this, child.props.value)}
         >
           <div style={{textAlign:"center"}}>
             <img src={"/"+child.props.children.toString().replace(/ /g,"_").toLowerCase()+".svg"} alt={child.props.children} title={child.props.children.toString()}/>
           </div>
-        </switch_option>
+        </div>
       );
     }
     return (
-      <switch
-        className={this.state.expanded||this.props.always_expanded?"expanded":""}
+      <div
+        className={this.state.expanded||this.props.always_expanded?"switch expanded":"switch"}
         style={this.props.style}
       >
         {options}
-      </switch>
+      </div>
     )
   }
 }

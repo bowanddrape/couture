@@ -1,5 +1,6 @@
 
 @import "./boilerplate.less";
+@import "./switch.less";
 
 @customize_emoji_key_height: 40px;
 @customize_emoji_key_width: 40px;
@@ -8,26 +9,19 @@ customize {
   position: relative;
   display: block;
 
-  .rainbow_border {
-    max-width: 94%;
-    margin: 0 auto;
-  }
-
   .canvasWrap {
     width: 100%;
     display: inline-block;
+    position: relative;
   }
   product_options {
     position: absolute;
     left: 0;
     display: flex;
     flex-direction: column;
-
-    span {
-      display: none;
-    }
-    select {
-      font-size: 35px;
+    .switch.expanded {
+      .rainbow_border;
+      z-index: 1;
     }
   }
   .canvas_container {
@@ -50,7 +44,7 @@ customize {
   tabs.components {
     display: block;
   }
-  .components switch {
+  .components .switch {
     &:before {
       display: none;
     }
@@ -95,40 +89,12 @@ customize {
     }
   }
 
-  .component_virtual_keyboard_container {
-    .component_container;
-    div {
-      margin: @customize_emoji_key_margin;
-    }
-    align-content: center;
-    row {
-      display: flex;
-      justify-content: center;
-      div {
-        display: inline-block;
-        flex: 0 1 auto;
-      }
-    }
-    div.spacebar {
-      .icon;
-      .sprite(@spacebar);
-      background-size: auto;
-      margin: 0;
-      border: none;
-    }
-    div.halfgap {
-      height: @customize_emoji_key_height;
-      width: @customize_emoji_key_width/2;
-      margin: 0 @customize_emoji_key_margin;
-      border: none;
-    }
-  }
   .component_container.letters {
-    margin: 0 auto 20px auto;
-    padding: 15px;
-    bottom: 30px;
-    left: ~"calc(72vw - 330px)";
-    position: absolute;
+    left: 5%;
+    position: relative;
+    width: 90%;
+    padding: 0;
+    margin: 0 auto;
     display: inline-block;
     height: auto;
     overflow: hidden;
@@ -139,6 +105,7 @@ customize {
       float: left;
       width: 100%;
       height: auto;
+      margin: 0;
       &:after {
         content: '';
         background: @gradient-rainbow;
@@ -147,12 +114,15 @@ customize {
         display: block;
         position: relative;
       }
-    }
-    input {
-      border: none;
-      text-transform: lowercase;
-      display: inline-block;
-      width: 100%;
+    
+      input {
+        border: none;
+        text-transform: lowercase;
+        display: inline-block;
+        width: 100%;
+        margin-top: 0;
+        padding-top: 0;
+      }
     }
     .sayIt {
       display: inline-block;
@@ -160,11 +130,9 @@ customize {
       float: left;
       margin: 0;
     }
-
   }
 
-
-//Right Hand Btns
+  //Right Hand Btns
   .cameraBtn {
     .zurichroman;
     border: 0;
@@ -183,7 +151,6 @@ customize {
       background-repeat: no-repeat;
       background-size: contain;
       background-color: white;
-
     }
   }
 
@@ -217,8 +184,8 @@ customize {
     &:before {
       content: "";
       display: block;
-      height: 30px;
-      width: 40px;
+      height: 20px;
+      width: 30px;
       margin: 0 auto 10px auto;
       position: initial;
       background-position: center;
@@ -227,8 +194,6 @@ customize {
       background-color: white;
     }
   }
-
-
 
   .hudBtn--delete {
     &:before {
@@ -273,13 +238,12 @@ customize {
     }
   }
 
-
   hud_controls {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 20px;
-    right: 40px;
+    top: 0;
+    right: 10px;
     &.rainbow_border {
       padding: 0 15px 0 15px;
       position: absolute;
@@ -293,28 +257,22 @@ customize {
       display: none;
     }
   }
-  @media (max-width: @desktop_min_width) {
 
-    hud_controls {
-      top: 0;
-      right: 10px;
-    }
-
-    customize hud_controls.rainbow_border {
-          padding: 0 15px 0 15px;
-    }
-
-    .hudBtn {
-      padding: 10px 0;
-      &:before {
-        height: 20px;
-        width: 30px;
-      }
-    }
+  .product_name {
+    position: relative;
+    display: inline-block;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 3px solid #7f5cff;
+    margin: 5px 15px 0 15px;
   }
-}
+} // customize
 
 .product_details {
+  .product_name {
+    display: none;
+  }
   .description {
     margin: 20px auto;
     letter-spacing: 2px;
@@ -347,243 +305,122 @@ customize {
       }
     }
   }
-}
-
-@media (min-width: @desktop_min_width) {
-  customize {
-    .component_wrapper {
-      position: relative;
-      width: 62vw;
-      height: 81vh;
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-    }
-
-    hud_controls{
-      &.rainbow_border {
-      padding: 0 45px 0 20px;
-      z-index: 1;
-      right: 0;
-    }
-    .hudBtn {
-      padding: 20px 0;
-    }
-  }
-
-    .component_container {
-      margin: 0;
-      div {
-        height: 65px;
-        width: 65px;
-        margin: 10px;
-      }
-    }
-
-    div[name=Emoji].rainbow_border {
-      z-index: 100;
-      max-width: 100%;
-      border: none;
-      border-top: 3px solid @color_support_0;
-      z-index: 0;
-
-      &::before {
-        background-image: none;
-      }
-    }
-
-
-  .canvasWrap {
-    width: 100%;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-  product_options {
-    left: auto;
-    right: 0;
-    max-width: 750px;
-    top: 30px;
-    span {
-      display: block;
-      .zurichroman;
-      text-transform: uppercase;
-      padding-right: 40px;
-      text-align: right;
-    }
-    switch {
-      justify-content: flex-end;
-      margin-bottom: 10px;
-      padding-right: 40px;
-    }
-  }
-  hud_controls:not(.rainbow_border) {
-    top: 240px;
-    border-top: 3px solid @color_support_0;
-  }
-  .component_picker {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    bottom: 0px;
-    border-right: 3px solid @color_support_0;
-    width: auto;
-    min-width: 484px;
-    height: 100%;
-    background: white;
-
-    tab_contents {
-      max-width: 425px;
-      display: flex;
-      align-items: left;
-      justify-content: left;
-      flex-direction: row;
-      flex-wrap: wrap;
-      flex-flow: row wrap;
-      align-content: flex-start;
-      overflow-y: scroll;
-      flex: 1;
-      padding-left: 10px;
-    }
-    .components {
-      display: flex;
-      flex-direction: column-reverse;
-      justify-content: flex-start;
-      height: 95%;
-      padding: 20px;
-      switch {
-      max-width: 425px;
-      display: flex;
-      align-items: left;
-      justify-content: left;
-      flex-direction: row;
-      flex-wrap: wrap;
-      flex-flow: row wrap;
-      align-content: flex-start;
-        img {
-          width: 40px;
-        }
-      }
-      .component_container.letters {
-        width: 600px;
-        margin-top: 118px;
-      }
-      .component_container:not(.letters) {
-        height: 95%;
-        width: 340px;
-        padding: 10px 0;
-        flex-direction: row;
-      }
-    }
-  }
-  .canvas_container {
-    border-top: 3px solid @color_support_0;
-    border-bottom: 3px solid @color_support_0;
-    canvas {
-      height: 68vh;
-    }
-    .component_selected {
-      canvas, component_hitbox {
-        margin-left: 0px; /* cancel out the dumb in the mobile styles */
-      }
-    }
-  }
-}
-
-}
+} // product_details
 
 .component_wrapper {
   position: relative;
-  width: 100vw;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
 }
 
-switch_option img {
-  font-weight: 700;
-}
-
-
 .add_to_cart {
-  position: fixed;
+  position: sticky;
+  position: -webkit-sticky;
+  bottom: 0px;
   text-align: center;
-  bottom: 0;
   left: 0;
   right: 0;
-  height: 90px;
-  border-top: 1px solid black;
   z-index: 10;
-  background: white;
+  background: @color_primary;
   border-top: 3px solid @color_support_0;
+  border-bottom: 3px solid @color_support_0;
 
-  .productName {
-    position: relative;
-    display: inline-block;
-    font-size: 32px;
-    text-transform: uppercase;
-    font-weight: 800;
-    border-bottom: 5px solid #7f5cff;
-    margin: 15px 40px 0 0;
+  product_options {
+    text-align: left;
+    span {
+      .zurichroman; 
+      display: block;
+      margin-left: 20px;
+    }
   }
 
   .productPrice {
-  font-weight: 600;
+    font-weight: 600;
+  }
+  product_options {
+    display: none;
   }
 
   .addCart {
     display: inline-block;
+    font-size: 16px;
+    margin-top: 15px;
   }
+} // .add_to_cart
+
+.cameraBtn {
+  font-size: 10px;
+}
+.product_details {
+  width: 80%;
+  margin: auto;
 }
 
-
-@media (max-width: @desktop_min_width) {
-customize {
-  .component_container.letters {
-    top: -20px;
-    left: 5%;
-    position: relative;
-    width: 90%;
-    padding: 0;
-  }
-
-
-  .cameraBtn {
-    font-size: 10px;
-  }
-   .product_details {
-    .description {
+@media (min-width: @desktop_min_width) {
+  customize {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: auto;
+    .canvas_container {
       grid-column-start: 1;
-      grid-column-end: -1;
+      grid-column-end: span 5;
+      grid-row-start: 1;
+      grid-row-end: 5;
+      canvas {
+        height: 450px;
+      }
     }
-    .size_chart {
-      grid-column-start: 1;
-      grid-column-end: -1;
+    .product_details {
+      text-align: center;
+      grid-column-start: 6;
+      grid-column-end: span 4;
+      grid-row: 1;
+      .product_name {
+        display: inline-block;
+        text-align: center;
+        font-size: 16px;
+        padding-top: 40px;
+        margin: auto;
+      }
     }
-  }
-}
-
-  .add_to_cart {
-      height: auto;
-      position: relative;
+    .add_to_cart {
+      grid-column-start: 6;
+      grid-column-end: span 4;
+      grid-row: 2;
       border: none;
-      padding-top: 30px;
-    .productName {
-      position: relative;
-      display: inline-block;
-      font-size: 16px;
-      text-transform: uppercase;
-      font-weight: bold;
-      border-bottom: 3px solid #7f5cff;
-      margin: 5px 15px 0 15px;
+      .product_name {
+        display: none;
+      }
+      product_options {
+        .rainbow_border;
+        display: block;
+        padding: 20px;
+        margin: 20px;
+        margin-top: 0;
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        .switch:first-of-type {
+          display: none;
+        }
+        .switch {
+          .switch.expanded;
+        }
+      }
+      button {
+        display: block;
+      }
     }
-
-    .addCart {
-      font-size: 16px;
-      display: inline-block;
-      margin-top: 15px;
+    product_options {
+      left: 30px;
+      top: 30px;
+      z-index: 1;
+    }
+    hud_controls {
+      right: 30px;
+      top: 30px;
     }
   }
 }
