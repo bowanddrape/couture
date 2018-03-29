@@ -16,7 +16,6 @@ class Mail {
   static send(to, subject, html, callback) {
     // Object to hold neccessary email properties
     let bccArray = [
-      'peter+testing@bowanddrape.com',
     ]
     
     let options = {
