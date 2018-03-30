@@ -212,7 +212,6 @@ class ProductList extends React.Component {
             </div>
         }
         <div className="product_details">
-          <div className="product_name">{product.props.name} <span className="productPrice">${product.props.price}</span></div>
           {product.props.details ?
               <div dangerouslySetInnerHTML={{
               __html:unescape(product.props.details)

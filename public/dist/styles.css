@@ -826,12 +826,12 @@ customize product_options {
   display: flex;
   flex-direction: column;
 }
-customize product_options .switch.expanded {
+customize .canvas_container product_options .switch.expanded {
   z-index: 0;
   position: relative;
   z-index: 1;
 }
-customize product_options .switch.expanded:before {
+customize .canvas_container product_options .switch.expanded:before {
   content: " ";
   position: absolute;
   left: 0px;
@@ -841,7 +841,7 @@ customize product_options .switch.expanded:before {
   background-image: linear-gradient(135deg, #f5c9ca, #7f5cff 30%, #5ca9ff 48%, #ff5c5c 80%, #ffdd5c);
   z-index: -2;
 }
-customize product_options .switch.expanded:after {
+customize .canvas_container product_options .switch.expanded:after {
   content: " ";
   position: absolute;
   left: 5px;
@@ -1122,8 +1122,6 @@ customize .product_name {
   text-align: left;
 }
 .add_to_cart product_options span {
-  font-family: 'zurich_condensedregular', sans-serif;
-  font-weight: normal;
   display: block;
   margin-left: 20px;
 }
@@ -1164,23 +1162,24 @@ customize .product_name {
     text-align: center;
     grid-column-start: 6;
     grid-column-end: span 4;
-    grid-row: 1;
+    grid-row: 2;
   }
-  customize .product_details .product_name {
+  customize .canvas_container product_options {
+    display: none;
+  }
+  customize .add_to_cart {
+    grid-column-start: 6;
+    grid-column-end: span 4;
+    grid-row: 1;
+    border: none;
+  }
+  customize .add_to_cart .product_name {
     display: inline-block;
     text-align: center;
     font-size: 16px;
     padding-top: 40px;
     margin: auto;
-  }
-  customize .add_to_cart {
-    grid-column-start: 6;
-    grid-column-end: span 4;
-    grid-row: 2;
-    border: none;
-  }
-  customize .add_to_cart .product_name {
-    display: none;
+    margin-bottom: 20px;
   }
   customize .add_to_cart product_options {
     z-index: 0;
@@ -1230,6 +1229,9 @@ customize .product_name {
     border: solid 2px #fff;
     min-width: 36px;
     max-width: 165px;
+  }
+  customize .add_to_cart product_options span {
+    margin-bottom: 20px;
   }
   customize .add_to_cart button {
     display: block;

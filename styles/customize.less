@@ -19,7 +19,9 @@ customize {
     left: 0;
     display: flex;
     flex-direction: column;
-    .switch.expanded {
+  }
+  .canvas_container {
+    product_options .switch.expanded {
       .rainbow_border;
       z-index: 1;
     }
@@ -329,7 +331,6 @@ customize {
   product_options {
     text-align: left;
     span {
-      .zurichroman; 
       display: block;
       margin-left: 20px;
     }
@@ -375,22 +376,23 @@ customize {
       text-align: center;
       grid-column-start: 6;
       grid-column-end: span 4;
+      grid-row: 2;
+    }
+    .canvas_container product_options {
+      display: none;
+    }
+    .add_to_cart {
+      grid-column-start: 6;
+      grid-column-end: span 4;
       grid-row: 1;
+      border: none;
       .product_name {
         display: inline-block;
         text-align: center;
         font-size: 16px;
         padding-top: 40px;
         margin: auto;
-      }
-    }
-    .add_to_cart {
-      grid-column-start: 6;
-      grid-column-end: span 4;
-      grid-row: 2;
-      border: none;
-      .product_name {
-        display: none;
+        margin-bottom: 20px;
       }
       product_options {
         .rainbow_border;
@@ -407,6 +409,9 @@ customize {
         }
         .switch {
           .switch.expanded;
+        }
+        span {
+          margin-bottom: 20px;
         }
       }
       button {
