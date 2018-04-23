@@ -237,6 +237,7 @@ class User extends SQLTable {
 
   // create a new user
   static handleRegister(req, res) {
+    if (!req.body || !req.body.email) return res.json({error:"must specify email"}).end();
     User.get(req.body.email, function(err, user) {
       if (user && user.passhash) return res.json({error:"user exists"}).end();
 
