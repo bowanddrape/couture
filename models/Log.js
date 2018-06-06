@@ -24,8 +24,7 @@ slackbot.message((message) => {
 });
 const token = process.env.SLACK_TOKEN;
 // connect to slack RTM for messages
-slackbot.listen({token});
-
+//slackbot.listen({token});
 // setup connection to influxdb for timeseries logging
 const Influx = require('influx');
 const influx = new Influx.InfluxDB({
